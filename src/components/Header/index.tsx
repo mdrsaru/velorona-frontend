@@ -54,7 +54,7 @@ const TopHeader = () => {
         {/* 
           <MenuOutlined
             onClick={onClick}
-            style={{ fontSize: 20, color: 'var(--color-black)', marginLeft: 10 }}
+            style={{ fontSize: 20, color: 'var(--black)', marginLeft: 10 }}
           />
         */}
 

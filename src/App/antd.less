@@ -1,0 +1,28 @@
+@import '../../node_modules/antd/dist/antd.less';
+@primary-gradient: linear-gradient(to right, #3A43AF, #95239C);
+@primary-color: #3A43AF;
+@font-family: Montserrat;
+
+@btn-primary-bg: @primary-gradient;
+@primary-color-hover: @primary-gradient;
+@btn-border-radius-base: 31px;
+@btn-border-radius-sm: 31px;
+@btn-padding-horizontal-base: 50px;
+@btn-default-color: @primary-color;
+@btn-font-weight: 600;
+@btn-height-base: 41px;
+
+.ant-btn,
+.ant-btn-primary {
+  border-color: @primary-color;
+  &:hover {
+    border-color: @primary-color;
+  }
+}
+
+.ant-btn-primary {
+  &:hover {
+    background: @primary-gradient;
+  }
+}
+

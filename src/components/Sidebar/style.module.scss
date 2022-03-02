@@ -1,32 +1,26 @@
 :global {
   :local(.site-sidebar) {
     &.ant-layout-sider {
-      border-top: 1px solid var(--color-alto);
+      border-top: 1px solid var(--gray-3);
       overflow: auto;
       height: 100vh;
       position: fixed;
       left: 0;
 
-      .ant-menu-item {
-        a {
-          &:hover {
-            color: rgba(0, 0, 0, 0.85);
-          }
-        }
-      }
-
       .ant-menu-item-selected {
-        background: var(--color-light-gray);
+        background: unset;
         a {
           font-weight: 500;
-          color: var(--color-mine-shaft);
-
         }
       }
 
       .ant-menu-inline .ant-menu-item {
         &:after {
           border-right: unset;
+        }
+
+        &:active {
+          background: unset;
         }
       }
     }

@@ -3,7 +3,7 @@
     &.ant-layout-header {
       display: flex;
       justify-content: space-between;
-      background: var(--color-white);
+      background: var(--white);
       position: fixed;
       z-index: 1; 
       width: 100%;
@@ -26,7 +26,7 @@
 
   .divider,
   .language-switcher {
-    color: var(--color-white);
+    color: var(--white);
   }
 
   .language-switcher {
@@ -47,8 +47,8 @@
   gap: 10px;
 
   .notification {
-    border-right: 1px solid var(--color-alto);
-    border-left: 1px solid var(--color-alto);
+    border-right: 1px solid var(--gray-3);
+    border-left: 1px solid var(--gray-3);
     padding: 0 1.5rem;
     margin-right: 1rem;
     cursor: pointer;
