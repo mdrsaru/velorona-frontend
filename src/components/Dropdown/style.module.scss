@@ -1,0 +1,28 @@
+:global {
+  :local(.drop-down) {
+    .anticon {
+      padding-right: 1rem;
+      background: var(--primary-icon-gradient);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      float: right;
+    }
+
+    .ant-dropdown-trigger > .anticon.anticon-down, .ant-dropdown-link > .anticon.anticon-down {
+      font-size: 17px;
+      padding-top: 3px;
+    }
+  }
+}
+
+.drop-down {
+  background-color: var(--gray-2);
+  padding: 1rem;
+  width: 100%;
+  color: var(--gray-1);
+
+  span {
+    font-size: 18px;
+    line-height: 22px;
+  }
+}

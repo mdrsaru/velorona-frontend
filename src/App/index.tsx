@@ -3,7 +3,7 @@ import { ApolloProvider, ApolloClient, ApolloLink, InMemoryCache } from '@apollo
 import { Skeleton } from 'antd';
 
 import * as link from './link';
-import { authVar } from '../App/link';
+import { authVar } from './link';
 import TokenService from '../services/TokenService';
 import {
   fieldPolicy,

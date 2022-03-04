@@ -1,0 +1,28 @@
+.grid-style {
+  width: 25%;
+  box-shadow: none;
+  padding-top: 3.5rem;
+}
+
+.grid-style-full {
+  width: 100%;
+  box-shadow: none;
+}
+
+.site-card-wrapper {
+  padding-top: 2rem;
+  font-style: normal;
+
+  .timesheet {
+    font-weight: 600;
+    font-size: 28px;
+    line-height: 29px;
+  }
+  .add-time-stamp {
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 22px;
+    color: var(--primary-blue);
+    padding-top: 1rem;
+  }
+}

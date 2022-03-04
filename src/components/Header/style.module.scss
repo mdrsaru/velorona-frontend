@@ -66,10 +66,25 @@
     .name {
       padding: 0 1rem;
     }
+    @media only screen and (max-width: 562px) {
+      .name {
+        display: none;
+      }
+
+      .drop-arrow {
+        padding-left: 0.3rem;
+      }
+    }
 
     .drop-arrow {
       width: 16px;
       height: 16px;
     }
+  }
+}
+
+@media only screen and (max-width: 562px) {
+  .text-logo {
+    display: none;
   }
 }
