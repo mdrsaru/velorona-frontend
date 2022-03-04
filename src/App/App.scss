@@ -3,6 +3,7 @@
 
 :root {
   --primary-gradient: linear-gradient(to right, #3A43AF, #95239C);
+  --primary-icon-gradient: linear-gradient(137.31deg, #3B49AF 13.4%, #93239B 34.48%, #92239C 62.5%, #3B1A7B 83.74%);;
   --primary-color: #95239C;
   --primary-purple: #95239C;
   --primary-blue: #3A43AF;
@@ -10,7 +11,9 @@
   --gray-1: #333333;
   --gray-2: #F2F2F2;
   --gray-3: #E0E0E0;
+  --gray-4: rgb(231,231,231,0.25);
   --white: #FFFFFF;
   --black: #000000;
+  --black-1: #333333;
 }
 

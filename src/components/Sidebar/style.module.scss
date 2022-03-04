@@ -9,6 +9,7 @@
 
       .ant-menu-item-selected {
         background: unset;
+
         a {
           font-weight: 500;
         }
@@ -23,6 +24,12 @@
           background: unset;
         }
       }
+    }
+    a {
+      padding-left: 13%;
+    }
+    .ant-menu-title-content {
+      padding-top: 13%;
     }
   }
 }

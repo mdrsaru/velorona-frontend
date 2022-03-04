@@ -49,9 +49,9 @@ const TopHeader = () => {
       <div className={styles['logo']} >
         <div>
           <img src={logo} alt="logo" />
-          <img src={logoContent} alt="logo-01" />
+          <img src={logoContent} alt="logo-01" className={styles['text-logo']} />
         </div>
-        {/* 
+        {/*
           <MenuOutlined
             onClick={onClick}
             style={{ fontSize: 20, color: 'var(--black)', marginLeft: 10 }}

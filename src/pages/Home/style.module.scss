@@ -1,0 +1,165 @@
+:global {
+  :local(.dashboard-row) {
+    padding-top: 1rem;
+    font-style: normal;
+    font-weight: normal;
+  }
+
+  :local(.grid-style) {
+    .ant-btn {
+      font-weight: 600;
+      font-size: 14px;
+      line-height: 17px;
+      @media only screen and (max-width: 1229px) {
+        font-size: 12px;
+      }
+    }
+  }
+
+  :local(.attendance-card) {
+    .ant-card-grid {
+      padding: 10px 24px;
+    }
+  }
+}
+
+.dashboard-col {
+  padding-right: 1%;
+  @media only screen and (max-width: 767px) {
+    padding-bottom: 1.5rem;
+  }
+}
+
+.analytics {
+  word-break: break-word;
+  padding-left: 1rem;
+  padding-top: 0.5rem;
+  height: 85px;
+  margin-right: 1rem;
+  background: var(--white);
+  border: 1px solid var(--gray-3);
+  box-sizing: border-box;
+  box-shadow: 0 7px 4px var(--gray-4);
+  font-size: 15px;
+  line-height: 15px;
+  color: var(--black-1);
+}
+
+.main-title {
+  font-weight: bold;
+  width: 80%;
+  font-size: 38px;
+  line-height: 44px;
+  color: var(--black);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sub-text {
+  font-size: 19px;
+  line-height: 22px;
+  color: var(--black);
+  margin-top: 0.5rem;
+}
+
+.grid-style {
+  width: 50%;
+  height: 50px;
+  box-shadow: none;
+}
+
+b {
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 29px;
+}
+
+.grid-style-second {
+  width: 50%;
+  height: 86px;
+  box-shadow: none;
+  text-align: right;
+
+  span {
+    font-size: 18px;
+    line-height: 22px;
+    @media only screen and (max-width: 1389px) {
+      font-size: 17px;
+    }
+    @media only screen and (max-width: 1229px) {
+      font-size: 14px;
+    }
+    @media only screen and (max-width: 767px) and (min-width: 475px) {
+      font-size: 16px;
+    }
+  }
+
+  p {
+    font-weight: 600;
+    font-size: 36px;
+    line-height: 44px;
+    @media only screen and (max-width: 1495px) {
+      font-size: 32px;
+    }
+    @media only screen and (max-width: 1389px) {
+      font-size: 26px;
+    }
+    @media only screen and (max-width: 1229px) {
+      font-size: 15px;
+    }
+    @media only screen and (max-width: 767px) and (min-width: 475px) {
+      font-size: 26px;
+    }
+
+  }
+
+  .request-text {
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 22px;
+    background: var(--primary-blue);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+}
+
+.full-space {
+  width: 100%;
+  box-shadow: none;
+}
+
+.checkIn {
+  width: 50%;
+  box-shadow: none;
+
+}
+
+.attendance-card {
+  overflow: auto;
+  width: 98%;
+
+  .full-space, .drop-option-grid {
+    padding-top: 2rem;
+  }
+}
+
+
+.drop-option-grid {
+  width: 100%;
+  box-shadow: none;
+}
+
+.leave-report-table {
+  width: 100%;
+  box-shadow: none;
+  height: 24.2rem;
+  overflow: auto;
+}
+
+.attendance-table {
+  width: 100%;
+  box-shadow: none;
+  height: 31.2rem;
+  overflow: auto;
+}

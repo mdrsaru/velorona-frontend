@@ -54,10 +54,6 @@ const Sidebar = (props: any) => {
           <Link to={routes.home.path}>{routes.home.name}</Link>
         </Menu.Item>
 
-        <Menu.Item key={routes.dashboard.path}>
-          <Link to={routes.dashboard.path}>{routes.dashboard.name}</Link>
-        </Menu.Item>
-
         <Menu.Item key={routes.timesheet.path}>
           <Link to={routes.timesheet.path}>{routes.timesheet.name}</Link>
         </Menu.Item>
