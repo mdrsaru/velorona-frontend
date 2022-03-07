@@ -1,4 +1,5 @@
 @import '../../node_modules/antd/dist/antd.less';
+
 @primary-gradient: linear-gradient(to right, #3A43AF, #95239C);
 @primary-color: #3A43AF;
 @font-family: Montserrat;
@@ -15,6 +16,7 @@
 .ant-btn,
 .ant-btn-primary {
   border-color: @primary-color;
+
   &:hover {
     border-color: @primary-color;
   }
@@ -26,3 +28,57 @@
   }
 }
 
+.ant-dropdown-link, .ant-picker.ant-picker-borderless {
+  background-color: var(--gray-2) !important;
+  padding: 1rem;
+  width: 100%;
+  color: var(--gray-1);
+
+  .ant-picker-input input::placeholder {
+    color: var(--gray-1);
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 17px;
+  }
+
+  .anticon {
+    padding-right: 1rem;
+    background: var(--primary-icon-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    float: right;
+  }
+
+  .anticon.anticon-down, .ant-dropdown-link > .anticon.anticon-down {
+    font-size: 17px;
+    padding-top: 3px;
+    color: var(--gray-1);
+  }
+}
+
+.ant-picker-dropdown {
+  .ant-picker-panel-container .ant-picker-panel {
+    padding: 2rem;
+  }
+}
+
+.ant-table {
+  .ant-table-thead > tr > th {
+    background-color: var(--gray-secondary);
+    color: var(--white);
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 17px;
+  }
+  tr:nth-child(even) {
+    background-color: var(--gray-2);
+  }
+  td {
+    font-weight: normal;
+    font-size: 14px;
+    line-height: 17px;
+  }
+  .ant-table-thead > tr > th:not(:last-child):not(.ant-table-selection-column):not(.ant-table-row-expand-icon-cell):not([colspan])::before {
+    width: 0;
+  }
+}

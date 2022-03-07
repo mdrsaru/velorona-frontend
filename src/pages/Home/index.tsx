@@ -68,7 +68,7 @@ const Home = () => {
               <b>My Attendance</b>
             </Card.Grid>
             <Card.Grid hoverable={false} className={styles['drop-option-grid']}>
-              <DropdownMenu title={'This Week'}/>
+              <DropdownMenu title={'This Week'} spanClass={'span18'}/>
             </Card.Grid>
             <Card.Grid hoverable={false} className={styles['attendance-table']}>
               <Table dataSource={data} columns={columns}/>

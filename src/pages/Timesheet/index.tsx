@@ -1,4 +1,5 @@
 import { Card, Col, Row, Table, DatePicker } from 'antd';
+import { DownOutlined } from '@ant-design/icons';
 
 import { columns, data } from "../../config/constants";
 
@@ -17,12 +18,12 @@ const Timesheet = () => {
               <div className={styles['timesheet']}>My Timesheet</div>
             </Card.Grid>
             <Card.Grid hoverable={false} className={styles['grid-style']}>
-              <DatePicker bordered={false} placeholder={'Date'}/>
+              <DatePicker bordered={false} placeholder={'Date'} suffixIcon={<DownOutlined />}/>
             </Card.Grid>
             <Card.Grid hoverable={false} className={styles['grid-style']}>
-              <DropdownMenu title={'Select Project'}/>
+              <DropdownMenu title={'Select Project'} spanClass={'span14'}/>
             </Card.Grid>
-            <Card.Grid hoverable={false} className={styles['grid-style']}>
+            <Card.Grid hoverable={false} className={styles['grid-style2']}>
               <div className={styles['add-time-stamp']}>Add Time Stamp</div>
             </Card.Grid>
             <Card.Grid hoverable={false} className={styles['grid-style-full']}>

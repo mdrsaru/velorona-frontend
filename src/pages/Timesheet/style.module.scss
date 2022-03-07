@@ -1,7 +1,31 @@
+:global {
+  :local(.site-card-wrapper) {
+    .ant-card-grid {
+      padding-left: 7px;
+      padding-right: 7px;
+    }
+    .ant-table-wrapper {
+      padding: 1rem;
+    }
+  }
+}
+
 .grid-style {
-  width: 25%;
+  width: 27%;
   box-shadow: none;
   padding-top: 3.5rem;
+}
+
+.grid-style2 {
+  width: 19%;
+  box-shadow: none;
+  padding-top: 3.5rem;
+  font-size: 16px;
+
+  @media screen  and (max-width: 1521px) {
+    padding-top: 2.9rem;
+    font-size: 20px;
+  }
 }
 
 .grid-style-full {
@@ -14,15 +38,24 @@
   font-style: normal;
 
   .timesheet {
+    padding: 1rem;
     font-weight: 600;
     font-size: 28px;
     line-height: 29px;
+    @media screen and (max-width: 1282px) {
+      font-size: 20px;
+    }
   }
+
   .add-time-stamp {
     font-weight: 600;
-    font-size: 18px;
+    padding: 1rem;
+    font-size: 20px;
+    @media screen  and (max-width: 1281px) {
+      font-size: 14px;
+    }
     line-height: 22px;
+    cursor: pointer;
     color: var(--primary-blue);
-    padding-top: 1rem;
   }
 }
