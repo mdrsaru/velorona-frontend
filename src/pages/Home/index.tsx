@@ -1,9 +1,8 @@
 import { Row, Col, Typography, Card, Button, Space, Table } from 'antd';
 
-import { columns, data } from "../../config/constants";
+import {columns, data} from "../../utils/dummyData";
 
 import DropdownMenu from "../../components/Dropdown";
-
 import styles from './style.module.scss';
 
 

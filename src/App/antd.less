@@ -28,14 +28,20 @@
   }
 }
 
-.ant-dropdown-link, .ant-picker.ant-picker-borderless {
+.ant-input, .ant-picker {
+  border: none;
+  &:hover, &:focus {
+    border: none;
+    outline: none !important;
+  }
+}
+
+.ant-dropdown-link, .ant-picker, .ant-picker.ant-picker-borderless, .ant-input {
   background-color: var(--gray-2) !important;
   padding: 1rem;
   width: 100%;
-  color: var(--gray-1);
 
   .ant-picker-input input::placeholder {
-    color: var(--gray-1);
     font-weight: 600;
     font-size: 14px;
     line-height: 17px;
@@ -77,6 +83,7 @@
     font-weight: normal;
     font-size: 14px;
     line-height: 17px;
+    cursor: pointer;
   }
   .ant-table-thead > tr > th:not(:last-child):not(.ant-table-selection-column):not(.ant-table-row-expand-icon-cell):not([colspan])::before {
     width: 0;

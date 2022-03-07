@@ -25734,22 +25734,37 @@ div.ant-typography-edit-content.ant-typography-rtl {
 .ant-btn-primary:hover {
   background: linear-gradient(to right, #3A43AF, #95239C);
 }
+.ant-input,
+.ant-picker {
+  border: none;
+}
+.ant-input:hover,
+.ant-picker:hover,
+.ant-input:focus,
+.ant-picker:focus {
+  border: none;
+  outline: none !important;
+}
 .ant-dropdown-link,
-.ant-picker.ant-picker-borderless {
+.ant-picker,
+.ant-picker.ant-picker-borderless,
+.ant-input {
   background-color: var(--gray-2) !important;
   padding: 1rem;
   width: 100%;
-  color: var(--gray-1);
 }
 .ant-dropdown-link .ant-picker-input input::placeholder,
-.ant-picker.ant-picker-borderless .ant-picker-input input::placeholder {
-  color: var(--gray-1);
+.ant-picker .ant-picker-input input::placeholder,
+.ant-picker.ant-picker-borderless .ant-picker-input input::placeholder,
+.ant-input .ant-picker-input input::placeholder {
   font-weight: 600;
   font-size: 14px;
   line-height: 17px;
 }
 .ant-dropdown-link .anticon,
-.ant-picker.ant-picker-borderless .anticon {
+.ant-picker .anticon,
+.ant-picker.ant-picker-borderless .anticon,
+.ant-input .anticon {
   padding-right: 1rem;
   background: var(--primary-icon-gradient);
   -webkit-background-clip: text;
@@ -25757,9 +25772,13 @@ div.ant-typography-edit-content.ant-typography-rtl {
   float: right;
 }
 .ant-dropdown-link .anticon.anticon-down,
+.ant-picker .anticon.anticon-down,
 .ant-picker.ant-picker-borderless .anticon.anticon-down,
+.ant-input .anticon.anticon-down,
 .ant-dropdown-link .ant-dropdown-link > .anticon.anticon-down,
-.ant-picker.ant-picker-borderless .ant-dropdown-link > .anticon.anticon-down {
+.ant-picker .ant-dropdown-link > .anticon.anticon-down,
+.ant-picker.ant-picker-borderless .ant-dropdown-link > .anticon.anticon-down,
+.ant-input .ant-dropdown-link > .anticon.anticon-down {
   font-size: 17px;
   padding-top: 3px;
   color: var(--gray-1);
@@ -25781,6 +25800,7 @@ div.ant-typography-edit-content.ant-typography-rtl {
   font-weight: normal;
   font-size: 14px;
   line-height: 17px;
+  cursor: pointer;
 }
 .ant-table .ant-table-thead > tr > th:not(:last-child):not(.ant-table-selection-column):not(.ant-table-row-expand-icon-cell):not([colspan])::before {
   width: 0;
