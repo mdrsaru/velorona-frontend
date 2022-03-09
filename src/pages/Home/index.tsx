@@ -1,9 +1,8 @@
 import { Row, Col, Typography, Card, Button, Space, Table } from 'antd';
 
-import { columns, data } from "../../config/constants";
+import {columns, data} from "../../utils/dummyData";
 
 import DropdownMenu from "../../components/Dropdown";
-
 import styles from './style.module.scss';
 
 
@@ -68,7 +67,7 @@ const Home = () => {
               <b>My Attendance</b>
             </Card.Grid>
             <Card.Grid hoverable={false} className={styles['drop-option-grid']}>
-              <DropdownMenu title={'This Week'}/>
+              <DropdownMenu title={'This Week'} spanClass={'span18'}/>
             </Card.Grid>
             <Card.Grid hoverable={false} className={styles['attendance-table']}>
               <Table dataSource={data} columns={columns}/>

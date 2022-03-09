@@ -50,20 +50,20 @@ const Sidebar = (props: any) => {
         style={{ height: '100%', borderRight: 0 }}
         selectedKeys={[selectedMenuKey]}
       >
-        <Menu.Item key={routes.home.path}>
-          <Link to={routes.home.path}>{routes.home.name}</Link>
+        <Menu.Item key={routes.home.routePath}>
+          <Link to={routes.home.routePath}>{routes.home.name}</Link>
         </Menu.Item>
 
-        <Menu.Item key={routes.timesheet.path}>
-          <Link to={routes.timesheet.path}>{routes.timesheet.name}</Link>
+        <Menu.Item key={routes.timesheet.routePath}>
+          <Link to={routes.timesheet.routePath}>{routes.timesheet.name}</Link>
         </Menu.Item>
 
-        <Menu.Item key={routes.tasks.path}>
-          <Link to={routes.tasks.path}>{routes.tasks.name}</Link>
+        <Menu.Item key={routes.tasks.routePath}>
+          <Link to={routes.tasks.routePath}>{routes.tasks.name}</Link>
         </Menu.Item>
 
-        <Menu.Item key={routes.schedule.path}>
-          <Link to={routes.schedule.path}>{routes.schedule.name}</Link>
+        <Menu.Item key={routes.schedule.routePath}>
+          <Link to={routes.schedule.routePath}>{routes.schedule.name}</Link>
         </Menu.Item>
 
       </Menu>
