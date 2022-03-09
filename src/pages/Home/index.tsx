@@ -1,12 +1,13 @@
-import { Row, Col, Typography, Card, Button, Space, Table } from 'antd';
+import {Row, Col, Typography, Card, Button, Space, Table, Select} from 'antd';
 
 import {columns, data} from "../../utils/dummyData";
 
-import DropdownMenu from "../../components/Dropdown";
 import styles from './style.module.scss';
+import React from "react";
 
 
 const { Title } = Typography;
+const { Option } = Select;
 
 const Home = () => {
   return (
@@ -67,7 +68,10 @@ const Home = () => {
               <b>My Attendance</b>
             </Card.Grid>
             <Card.Grid hoverable={false} className={styles['drop-option-grid']}>
-              <DropdownMenu title={'This Week'} spanClass={'span18'}/>
+              <Select placeholder="This Week">
+                <Option value="project1">Project 1</Option>
+                <Option value="project2">Project 2</Option>
+              </Select>
             </Card.Grid>
             <Card.Grid hoverable={false} className={styles['attendance-table']}>
               <Table dataSource={data} columns={columns}/>

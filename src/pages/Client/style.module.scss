@@ -1,0 +1,60 @@
+:global {
+  :local(.dropdown-menu) {
+    .ant-dropdown-menu {
+      margin: 0 7rem;
+    }
+    .ant-dropdown-menu-item {
+      padding: 12px 0 12px 15px;
+    }
+  }
+}
+
+.form-col {
+  padding: 1.5rem 0 0.9rem 0;
+
+  h1 {
+    font-weight: 600;
+    font-size: 24px;
+    line-height: 29px;
+  }
+}
+
+.form-col2 {
+  padding: 0 1rem 0 0;
+}
+
+.client-main-div {
+  padding: 2rem 0 0 0;
+}
+
+.add-new-client {
+  float: right;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 22px;
+  color: var(--primary-blue);
+}
+
+.client-modal-message {
+  padding: 3rem 0 0 0;
+  text-align: center;
+
+  img {
+    height: 200px;
+    padding: 1rem;
+  }
+
+  p {
+    font-weight: 400;
+    font-size: 17px;
+    line-height: 17px;
+  }
+
+  .warning-text {
+    color: var(--primary-red);
+  }
+
+  .archive-text {
+    color: var(--primary-orange);
+  }
+}

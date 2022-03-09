@@ -38,6 +38,17 @@ const _Routes = () => {
             }
           />
 
+          <Route path={routes.client.path}>
+            <Route index element={<Suspense fallback={<Skeleton/>}><routes.client.component/></Suspense>}/>
+            <Route path={routes.addClient.path}
+                   element={
+                     <Suspense fallback={<Skeleton/>}>
+                       <routes.addClient.component/>
+                     </Suspense>
+                   }
+            />
+          </Route>
+
           <Route path={routes.timesheet.path}>
             <Route index element={<Suspense fallback={<Skeleton/>}><routes.timesheet.component/></Suspense>}/>
             <Route path={routes.newTimesheet.path}

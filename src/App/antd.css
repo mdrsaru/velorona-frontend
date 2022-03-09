@@ -25745,7 +25745,31 @@ div.ant-typography-edit-content.ant-typography-rtl {
   border: none;
   outline: none !important;
 }
-.ant-dropdown-link,
+.ant-select:not(.ant-select-customize-input) .ant-select-selector {
+  border: none;
+  background-color: var(--gray-2) !important;
+  height: 54px;
+}
+.ant-select-single.ant-select-show-arrow .ant-select-selection-placeholder,
+.ant-select-single.ant-select-show-arrow .ant-select-selection-item {
+  padding-top: 0.7rem;
+  padding-right: 0.3rem;
+}
+.ant-select {
+  width: 100%;
+}
+.ant-select input::placeholder {
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 17px;
+}
+.ant-select .anticon.anticon-down {
+  font-size: 17px;
+  color: var(--gray-1);
+}
+.ant-select .ant-select-arrow {
+  padding-right: 1.5rem;
+}
 .ant-picker,
 .ant-picker.ant-picker-borderless,
 .ant-input {
@@ -25753,7 +25777,6 @@ div.ant-typography-edit-content.ant-typography-rtl {
   padding: 1rem;
   width: 100%;
 }
-.ant-dropdown-link .ant-picker-input input::placeholder,
 .ant-picker .ant-picker-input input::placeholder,
 .ant-picker.ant-picker-borderless .ant-picker-input input::placeholder,
 .ant-input .ant-picker-input input::placeholder {
@@ -25761,30 +25784,13 @@ div.ant-typography-edit-content.ant-typography-rtl {
   font-size: 14px;
   line-height: 17px;
 }
-.ant-dropdown-link .anticon,
 .ant-picker .anticon,
 .ant-picker.ant-picker-borderless .anticon,
 .ant-input .anticon {
-  padding-right: 1rem;
   background: var(--primary-icon-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   float: right;
-}
-.ant-dropdown-link .anticon.anticon-down,
-.ant-picker .anticon.anticon-down,
-.ant-picker.ant-picker-borderless .anticon.anticon-down,
-.ant-input .anticon.anticon-down,
-.ant-dropdown-link .ant-dropdown-link > .anticon.anticon-down,
-.ant-picker .ant-dropdown-link > .anticon.anticon-down,
-.ant-picker.ant-picker-borderless .ant-dropdown-link > .anticon.anticon-down,
-.ant-input .ant-dropdown-link > .anticon.anticon-down {
-  font-size: 17px;
-  padding-top: 3px;
-  color: var(--gray-1);
-}
-.ant-picker-dropdown .ant-picker-panel-container .ant-picker-panel {
-  padding: 2rem;
 }
 .ant-table .ant-table-thead > tr > th {
   background-color: var(--gray-secondary);
@@ -25804,4 +25810,9 @@ div.ant-typography-edit-content.ant-typography-rtl {
 }
 .ant-table .ant-table-thead > tr > th:not(:last-child):not(.ant-table-selection-column):not(.ant-table-row-expand-icon-cell):not([colspan])::before {
   width: 0;
+}
+.ant-modal-footer {
+  border: none;
+  text-align: center;
+  padding-bottom: 5rem;
 }

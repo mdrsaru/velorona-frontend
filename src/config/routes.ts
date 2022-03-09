@@ -19,6 +19,18 @@ const routes = {
     component: lazy(() => import('../pages/Home')),
     name: 'Home',
   },
+  client: {
+    path: '/client/:id',
+    routePath: '/client/2',
+    component: lazy(() => import('../pages/Client')),
+    name: 'Client',
+  },
+  addClient: {
+    path: 'new',
+    routePath: '/client/:id/new',
+    component: lazy(() => import('../pages/Client/NewClient')),
+    name: 'New Client',
+  },
   timesheet: {
     path: '/timesheet',
     routePath: '/timesheet',

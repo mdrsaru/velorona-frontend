@@ -1,8 +1,7 @@
 import React from 'react';
-import { Card, Col, Row, Form, DatePicker, Input, Button, Space, TimePicker } from "antd";
+import {Card, Col, Row, Form, DatePicker, Input, Button, Space, TimePicker, Select} from "antd";
 import { ArrowLeftOutlined, DownOutlined } from '@ant-design/icons';
 
-import DropdownMenu from "../../../components/Dropdown";
 import { useNavigate } from 'react-router-dom';
 
 import styles from "../style.module.scss";
@@ -10,6 +9,7 @@ import styles from "../style.module.scss";
 
 const NewTimesheet = () => {
   const [form] = Form.useForm();
+  const { Option } = Select;
   const navigate = useNavigate();
 
   return (
@@ -17,7 +17,7 @@ const NewTimesheet = () => {
       <Card bordered={false}>
         <Row className={styles.cardHeaderRow}>
           <Col span={24}>
-            <ArrowLeftOutlined onClick={() => navigate(-1)}/> &nbsp; <span>Add Timesheet</span>
+            <ArrowLeftOutlined onClick={() => navigate(-1)}/> &nbsp; &nbsp; <span>Add Timesheet</span>
           </Col>
         </Row>
         <Form form={form} layout="vertical">
@@ -28,8 +28,11 @@ const NewTimesheet = () => {
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-              <Form.Item label="Project">
-                <DropdownMenu title={'Select Project'} spanClass={'spanInput'}/>
+              <Form.Item name="project" label="Project">
+                <Select placeholder="Select Project">
+                  <Option value="project1">Project 1</Option>
+                  <Option value="project2">Project 2</Option>
+                </Select>
               </Form.Item>
             </Col>
           </Row>
