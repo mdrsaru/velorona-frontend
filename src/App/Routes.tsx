@@ -38,6 +38,15 @@ const _Routes = () => {
             }
           />
 
+          <Route
+            path={routes.employee.path}
+            element={
+              <Suspense fallback={<Skeleton/>}>
+                <routes.employee.component/>
+              </Suspense>
+            }
+          />
+
           <Route path={routes.client.path}>
             <Route index element={<Suspense fallback={<Skeleton/>}><routes.client.component/></Suspense>}/>
             <Route path={routes.addClient.path}

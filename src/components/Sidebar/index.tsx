@@ -63,6 +63,9 @@ const Sidebar = (props: any) => {
             <Menu.Item key={routes.client.routePath}>
               <Link to={routes.client.routePath}>{routes.client.name}</Link>
             </Menu.Item>
+            <Menu.Item key={routes.employee.routePath}>
+              <Link to={routes.employee.routePath}>{routes.employee.name}</Link>
+            </Menu.Item>
           </>}
         {!isAdmin() &&
           <>

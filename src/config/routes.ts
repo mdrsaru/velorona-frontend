@@ -37,6 +37,12 @@ const routes = {
     component: lazy(() => import('../pages/Timesheet')),
     name: 'Timesheet',
   },
+  employee: {
+    path: '/employee',
+    routePath: '/employee',
+    component: lazy(() => import('../pages/Employee')),
+    name: 'Employee',
+  },
   schedule: {
     path: '/schedule',
     routePath: '/schedule',
