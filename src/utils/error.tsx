@@ -1,7 +1,7 @@
 import { message } from 'antd';
 
 export function notifyGraphqlError(err: any) {
-  let error = err?.graphQLErrors?.[0];
+  let error = err?.graphQLErrors?.[0] ?? err?.networkError?.result?.errors?.[0];
 
   message.error(
     <>

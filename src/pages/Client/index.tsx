@@ -1,7 +1,8 @@
 import { Modal, Card, Row, Col, Table, Menu, Dropdown } from 'antd';
 import { MoreOutlined } from '@ant-design/icons';
+import { useQuery, gql } from '@apollo/client';
 
-import { useState } from "react";
+import {useState} from "react";
 import { Link } from "react-router-dom";
 
 import routes from "../../config/routes";
@@ -10,47 +11,25 @@ import styles from "./style.module.scss";
 import deleteImg from "./../../assets/images/delete_btn.svg";
 import archiveImg from "./../../assets/images/archive_btn.svg";
 
-const dataSource = [
-  {
-    key: '1',
-    name: 'Mike',
-    code: 32,
-    email: "mike@gmail.com",
-    no_of_users: '10 Downing Street',
-    status: 'Active',
-    actions: ''
-  },
-  {
-    key: '2',
-    name: 'John',
-    code: 42,
-    email: "john@gmail.com",
-    no_of_users: '10 Downing Street',
-    status: 'Active',
-    actions: ''
-  },
-  {
-    key: '3',
-    name: 'John',
-    code: 42,
-    email: "john@gmail.com",
-    no_of_users: '10 Downing Street',
-    status: 'Active',
-    actions: ''
-  },
-  {
-    key: '4',
-    name: 'John',
-    code: 42,
-    email: "john@gmail.com",
-    no_of_users: '10 Downing Street',
-    status: 'Active',
-    actions: ''
-  },
-];
 const { SubMenu } = Menu;
+const CLIENT = gql`
+  query Client {
+    Client {
+      data {
+        id
+        name
+        status
+      }
+    }
+  }
+`
 
 const Client = () => {
+  const {data: clientData} = useQuery(CLIENT,{
+    variables: {
+
+    }
+  })
   const [visibility, setVisibility] = useState(false);
   const [showArchive, setArchiveModal] = useState(false);
   const setModalVisibility = (value: boolean) => {
@@ -83,21 +62,6 @@ const Client = () => {
       key: 'name',
     },
     {
-      title: 'Client Code',
-      dataIndex: 'code',
-      key: 'code',
-    },
-    {
-      title: 'Client Admin Email',
-      dataIndex: 'email',
-      key: 'email',
-    },
-    {
-      title: 'No. of users',
-      dataIndex: 'no_of_users',
-      key: 'no_of_users',
-    },
-    {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
@@ -116,6 +80,7 @@ const Client = () => {
         </div>,
     },
   ];
+
   return (
     <>
       <div className={styles['client-main-div']}>
@@ -132,7 +97,7 @@ const Client = () => {
           </Row>
           <Row>
             <Col span={24}>
-              <Table dataSource={dataSource} columns={columns} />
+              <Table dataSource={clientData?.Client?.data} columns={columns} rowKey={(record => record?.id)} />
             </Col>
           </Row>
         </Card>
