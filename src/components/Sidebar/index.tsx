@@ -60,8 +60,8 @@ const Sidebar = (props: any) => {
             <Menu.Item key={routes.dashboard.routePath}>
               <Link to={routes.dashboard.routePath}>{routes.dashboard.name}</Link>
             </Menu.Item>
-            <Menu.Item key={routes.client.routePath}>
-              <Link to={routes.client.routePath}>{routes.client.name}</Link>
+            <Menu.Item key={routes.client.routePath('1')}>
+              <Link to={routes.client.routePath('1')}>{routes.client.name}</Link>
             </Menu.Item>
             <Menu.Item key={routes.employee.routePath}>
               <Link to={routes.employee.routePath}>{routes.employee.name}</Link>

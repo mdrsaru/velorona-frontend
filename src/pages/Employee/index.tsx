@@ -1,8 +1,10 @@
-import {Card, Row, Col, Table, Dropdown, Menu} from 'antd';
-import styles from './style.module.scss';
-import {Link} from "react-router-dom";
-import routes from "../../config/routes";
+import { Card, Row, Col, Table, Dropdown, Menu } from 'antd';
 import {MoreOutlined} from "@ant-design/icons";
+
+import { Link } from "react-router-dom";
+import routes from "../../config/routes";
+
+import styles from './style.module.scss';
 
 const { SubMenu } = Menu;
 
@@ -101,27 +103,25 @@ const Employee = () => {
     },
   ];
   return (
-    <>
-      <div className={styles['main-div']}>
-        <Card bordered={false}>
-          <Row>
-            <Col span={12} className={styles['employee-col']}>
-              <h1>Employee</h1>
-            </Col>
-            <Col span={12} className={styles['employee-col']}>
-              <div className={styles['add-new-employee']}>
-                <Link to={routes.addClient.routePath}>Add new Employee</Link>
-              </div>
-            </Col>
-          </Row>
-          <Row>
-            <Col span={24}>
-              <Table dataSource={dataSource} columns={columns} />
-            </Col>
-          </Row>
-        </Card>
-      </div>
-    </>
+    <div className={styles['main-div']}>
+      <Card bordered={false}>
+        <Row>
+          <Col span={12} className={styles['employee-col']}>
+            <h1>Employee</h1>
+          </Col>
+          <Col span={12} className={styles['employee-col']}>
+            <div className={styles['add-new-employee']}>
+              <Link to={routes.addEmployee.routePath}>Add New Employee</Link>
+            </div>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={24}>
+            <Table dataSource={dataSource} columns={columns} />
+          </Col>
+        </Row>
+      </Card>
+    </div>
   )
 }
 

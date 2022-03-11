@@ -25816,3 +25816,22 @@ div.ant-typography-edit-content.ant-typography-rtl {
   text-align: center;
   padding-bottom: 5rem;
 }
+.ant-form-item-explain-error {
+  padding: 1rem 0 1rem 0;
+  font-weight: 600;
+}
+.ant-form-item-has-error .ant-input,
+.ant-form-item-has-error .ant-select {
+  border: 1px solid var(--primary-red) !important;
+  border-radius: 5px;
+}
+.ant-form-item-has-error .ant-input:focus,
+.ant-form-item-has-error .ant-select:focus {
+  border: 1px solid var(--primary-red) !important;
+}
+.ant-form-vertical .ant-form-item-label {
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 22px;
+  color: #000000;
+}
