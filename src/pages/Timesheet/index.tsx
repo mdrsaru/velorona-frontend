@@ -1,16 +1,16 @@
-import { Card, Col, Row, Table, DatePicker } from 'antd';
+import React from "react";
+import { Card, Col, Row, Table, DatePicker, Select, Form } from 'antd';
+
 import { DownOutlined } from '@ant-design/icons';
 
 import { Link } from "react-router-dom";
-
 import { columns, data } from "../../utils/dummyData";
-import { useNavigate } from "react-router-dom";
 
-import DropdownMenu from "../../components/Dropdown";
-
-import styles from "./style.module.scss";
 import routes from "../../config/routes";
+import { useNavigate } from "react-router-dom";
+import styles from "./style.module.scss";
 
+const { Option } = Select;
 
 const Timesheet = () => {
   let navigate = useNavigate();
@@ -27,7 +27,12 @@ const Timesheet = () => {
               <DatePicker bordered={false} placeholder={'Date'} suffixIcon={<DownOutlined />}/>
             </Card.Grid>
             <Card.Grid hoverable={false} className={styles['grid-style']}>
-              <DropdownMenu title={'Select Project'} spanClass={'span14'}/>
+              <Form.Item name="week">
+                <Select placeholder="Select Project">
+                  <Option value="project1">Project 1</Option>
+                  <Option value="project2">Project 2</Option>
+                </Select>
+              </Form.Item>
             </Card.Grid>
             <Card.Grid hoverable={false} className={styles['grid-style2']}>
               <div className={styles['add-time-stamp']}>

@@ -15,16 +15,15 @@ const Login = () => {
   const handleSubmit = (values: any) => {
     // TODO: replace this with API call
     localStorage.setItem('token', 'token');
-    authVar({
+    const loginData = authVar({
       token: 'test',
       user: {
         id: 'test',
-        role: 'test',
+        role: 'admin',
       },
       isLoggedIn: true,
     });
-
-    navigate(routes.dashboard.path);
+    loginData.user.role === 'admin' ?  navigate(routes.dashboard.path) :  navigate(routes.home.path);
 
   };
 

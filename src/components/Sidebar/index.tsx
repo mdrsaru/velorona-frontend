@@ -4,7 +4,7 @@ import { Menu, Layout } from 'antd';
 
 import routes from '../../config/routes';
 import { SIDEBAR } from '../../gql/app.gql';
-import { sidebarVar } from '../../App/link';
+import {authVar, sidebarVar} from '../../App/link';
 
 import styles from './style.module.scss';
 
@@ -21,6 +21,7 @@ const menuKeys = [
 const Sidebar = (props: any) => {
   const location = useLocation();
   const { data: sidebarData } = useQuery(SIDEBAR);
+  const userLoggedIn = authVar();
 
   const onCollapse = () => {
     const collapsed = sidebarData?.Sidebar?.collapsed;
@@ -29,6 +30,10 @@ const Sidebar = (props: any) => {
       collapsed: !collapsed,
     });
   };
+
+  const isAdmin = () => {
+    return userLoggedIn.user.role === 'admin'
+  }
 
   const selectedMenuKey = menuKeys.find(key => key.split('/')?.[1] === location.pathname?.split('/')?.[1]) ?? '';
 
@@ -50,21 +55,36 @@ const Sidebar = (props: any) => {
         style={{ height: '100%', borderRight: 0 }}
         selectedKeys={[selectedMenuKey]}
       >
-        <Menu.Item key={routes.home.routePath}>
-          <Link to={routes.home.routePath}>{routes.home.name}</Link>
-        </Menu.Item>
+        {isAdmin() &&
+          <>
+            <Menu.Item key={routes.dashboard.routePath}>
+              <Link to={routes.dashboard.routePath}>{routes.dashboard.name}</Link>
+            </Menu.Item>
+            <Menu.Item key={routes.client.routePath('1')}>
+              <Link to={routes.client.routePath('1')}>{routes.client.name}</Link>
+            </Menu.Item>
+            <Menu.Item key={routes.employee.routePath}>
+              <Link to={routes.employee.routePath}>{routes.employee.name}</Link>
+            </Menu.Item>
+          </>}
+        {!isAdmin() &&
+          <>
+            <Menu.Item key={routes.home.routePath}>
+              <Link to={routes.home.routePath}>{routes.home.name}</Link>
+            </Menu.Item>
 
-        <Menu.Item key={routes.timesheet.routePath}>
-          <Link to={routes.timesheet.routePath}>{routes.timesheet.name}</Link>
-        </Menu.Item>
+            <Menu.Item key={routes.timesheet.routePath}>
+              <Link to={routes.timesheet.routePath}>{routes.timesheet.name}</Link>
+            </Menu.Item>
 
-        <Menu.Item key={routes.tasks.routePath}>
-          <Link to={routes.tasks.routePath}>{routes.tasks.name}</Link>
-        </Menu.Item>
+            <Menu.Item key={routes.tasks.routePath}>
+              <Link to={routes.tasks.routePath}>{routes.tasks.name}</Link>
+            </Menu.Item>
 
-        <Menu.Item key={routes.schedule.routePath}>
-          <Link to={routes.schedule.routePath}>{routes.schedule.name}</Link>
-        </Menu.Item>
+            <Menu.Item key={routes.schedule.routePath}>
+              <Link to={routes.schedule.routePath}>{routes.schedule.name}</Link>
+            </Menu.Item>
+          </>}
 
       </Menu>
     </Sider>

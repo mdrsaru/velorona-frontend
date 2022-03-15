@@ -19,11 +19,41 @@ const routes = {
     component: lazy(() => import('../pages/Home')),
     name: 'Home',
   },
+  clientPage: {
+    path: '/client',
+    routePath: '/client',
+    component: lazy(() => import('../pages/Client')),
+    name: 'Client Page',
+  },
+  client: {
+    path: ':id',
+    routePath:  (id: string) => `/client/${id}`,
+    component: lazy(() => import('../pages/Client')),
+    name: 'Client',
+  },
+  addClient: {
+    path: ':id/new',
+    routePath: (id: string) => `/client/${id}/new`,
+    component: lazy(() => import('../pages/Client/NewClient')),
+    name: 'New Client',
+  },
   timesheet: {
     path: '/timesheet',
     routePath: '/timesheet',
     component: lazy(() => import('../pages/Timesheet')),
     name: 'Timesheet',
+  },
+  employee: {
+    path: '/employee',
+    routePath: '/employee',
+    component: lazy(() => import('../pages/Employee')),
+    name: 'Employee',
+  },
+  addEmployee: {
+    path: 'new',
+    routePath: '/employee/new',
+    component: lazy(() => import('../pages/Employee/NewEmployee')),
+    name: 'New Employee',
   },
   schedule: {
     path: '/schedule',

@@ -7,4 +7,3 @@ export const SIDEBAR = gql`
     }
   }
 `;
-

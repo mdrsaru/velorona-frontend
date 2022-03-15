@@ -36,7 +36,36 @@
   }
 }
 
-.ant-dropdown-link, .ant-picker, .ant-picker.ant-picker-borderless, .ant-input {
+.ant-select:not(.ant-select-customize-input) .ant-select-selector {
+  border: none;
+  background-color: var(--gray-2) !important;
+  height: 54px;
+}
+
+.ant-select-single.ant-select-show-arrow .ant-select-selection-placeholder,
+.ant-select-single.ant-select-show-arrow .ant-select-selection-item {
+  padding-top: 0.7rem;
+  padding-right: 0.3rem;
+}
+
+.ant-select {
+  width: 100%;
+
+  input::placeholder {
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 17px;
+  }
+  .anticon.anticon-down {
+    font-size: 17px;
+    color: var(--gray-1);
+  }
+  .ant-select-arrow {
+    padding-right: 1.5rem;
+  }
+}
+
+.ant-picker, .ant-picker.ant-picker-borderless, .ant-input {
   background-color: var(--gray-2) !important;
   padding: 1rem;
   width: 100%;
@@ -48,23 +77,10 @@
   }
 
   .anticon {
-    padding-right: 1rem;
     background: var(--primary-icon-gradient);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     float: right;
-  }
-
-  .anticon.anticon-down, .ant-dropdown-link > .anticon.anticon-down {
-    font-size: 17px;
-    padding-top: 3px;
-    color: var(--gray-1);
-  }
-}
-
-.ant-picker-dropdown {
-  .ant-picker-panel-container .ant-picker-panel {
-    padding: 2rem;
   }
 }
 
@@ -88,4 +104,31 @@
   .ant-table-thead > tr > th:not(:last-child):not(.ant-table-selection-column):not(.ant-table-row-expand-icon-cell):not([colspan])::before {
     width: 0;
   }
+}
+
+.ant-modal-footer {
+  border: none;
+  text-align: center;
+  padding-bottom: 5rem;
+}
+
+.ant-form-item-explain-error {
+  padding: 1rem 0 1rem 0;
+  font-weight: 600;
+}
+
+.ant-form-item-has-error {
+  .ant-input, .ant-select {
+    border: 1px solid var(--primary-red) !important;
+    border-radius: 5px;
+    &:focus {
+      border: 1px solid var(--primary-red) !important;;
+    }
+  }
+}
+.ant-form-vertical .ant-form-item-label {
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 22px;
+  color: #000000;
 }
