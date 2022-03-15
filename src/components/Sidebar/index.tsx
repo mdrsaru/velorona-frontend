@@ -30,6 +30,7 @@ const Sidebar = (props: any) => {
       collapsed: !collapsed,
     });
   };
+  console.log(userLoggedIn.user.role)
 
   const isAdmin = () => {
     return userLoggedIn.user.role === 'admin'

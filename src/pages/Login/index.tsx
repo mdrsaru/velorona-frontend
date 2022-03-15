@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom';
-import { Layout, Card, Row, Col, Form, Input, Button } from 'antd';
+import {Layout, Card, Row, Col, Form, Input, Button, message} from 'antd';
 import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
 
 import routes from '../../config/routes';
@@ -8,23 +8,47 @@ import { authVar } from '../../App/link';
 import logo from '../../assets/images/logo.svg';
 import logoContent from '../../assets/images/logo-01.svg';
 import styles from './style.module.scss';
+import {gql, useMutation} from "@apollo/client";
+import {notifyGraphqlError} from "../../utils/error";
+
+const LOGIN = gql`
+  mutation Login($input: LoginInput!) {
+    Login(input: $input) {
+        id
+        token
+    }
+  }
+`
 
 const Login = () => {
   const navigate = useNavigate();
+  const [Login] = useMutation(LOGIN);
 
   const handleSubmit = (values: any) => {
-    // TODO: replace this with API call
-    localStorage.setItem('token', 'token');
-    const loginData = authVar({
-      token: 'test',
-      user: {
-        id: 'test',
-        role: 'admin',
-      },
-      isLoggedIn: true,
-    });
-    loginData.user.role === 'admin' ?  navigate(routes.dashboard.path) :  navigate(routes.home.path);
-
+    Login({
+      variables: {
+        input: {
+          email: values.email,
+          password: values.password
+        }
+      }
+    }).then((response) => {
+      if(response.errors) {
+        return notifyGraphqlError((response.errors))
+      } else if (response?.data?.Login) {
+        message.success(`LoggedIn successfully!`).then(r => {});
+        const loginData = authVar({
+          token: response?.data?.Login?.token,
+          user: {
+            id: response?.data?.Login?.id,
+            role: 'admin',
+          },
+          isLoggedIn: true,
+        });
+        localStorage.setItem('token', response?.data?.Login?.token);
+        loginData.user.role === 'admin' ?  navigate(routes.dashboard.path) :  navigate(routes.home.path);
+      }
+    })
   };
 
   return (
