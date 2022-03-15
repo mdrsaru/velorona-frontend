@@ -5,6 +5,7 @@ import { Skeleton } from 'antd';
 import routes from '../config/routes';
 import NotFound from '../components/NotFound';
 import Layout from '../components/Layout';
+import AuthRoute from '../utils/AuthRoute';
 
 const _Routes = () => {
   return (
@@ -19,7 +20,7 @@ const _Routes = () => {
           }
         />
 
-        <Route path="/" element={<Layout/>}>
+        <Route path="/" element={<AuthRoute><Layout/></AuthRoute>}>
           <Route
             index
             element={
@@ -68,20 +69,22 @@ const _Routes = () => {
           </Route>
 
           <Route path={routes.timesheet.path}>
-            <Route index element={<Suspense fallback={<Skeleton/>}><routes.timesheet.component/></Suspense>}/>
+            <Route index element={<Suspense fallback={<Skeleton/>}>
+                <routes.timesheet.component/>
+            </Suspense>}/>
             <Route path={routes.newTimesheet.path}
-              element={
-                <Suspense fallback={<Skeleton/>}>
-                  <routes.newTimesheet.component/>
-                </Suspense>
-              }
+                   element={
+                     <Suspense fallback={<Skeleton/>}>
+                         <routes.newTimesheet.component/>
+                     </Suspense>
+                   }
             />
             <Route path={routes.detailTimesheet.path}
-              element={
-                <Suspense fallback={<Skeleton/>}>
-                  <routes.detailTimesheet.component/>
-                </Suspense>
-              }
+                   element={
+                     <Suspense fallback={<Skeleton/>}>
+                         <routes.detailTimesheet.component/>
+                     </Suspense>
+                   }
             />
           </Route>
 
@@ -89,7 +92,7 @@ const _Routes = () => {
             path={routes.tasks.path}
             element={
               <Suspense fallback={<Skeleton/>}>
-                <routes.tasks.component/>
+                  <routes.tasks.component/>
               </Suspense>
             }
           />
@@ -98,7 +101,7 @@ const _Routes = () => {
             path={routes.schedule.path}
             element={
               <Suspense fallback={<Skeleton/>}>
-                <routes.schedule.component/>
+                  <routes.schedule.component/>
               </Suspense>
             }
           />

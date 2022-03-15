@@ -2,6 +2,6 @@
   "data": {
     "accessToken": "token",
     "id": "test",
-    "role": "test"
+    "role": "admin"
   }
 }
