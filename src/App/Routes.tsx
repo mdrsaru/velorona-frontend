@@ -5,7 +5,6 @@ import { Skeleton } from 'antd';
 import routes from '../config/routes';
 import NotFound from '../components/NotFound';
 import Layout from '../components/Layout';
-import AuthRoute from '../utils/AuthRoute';
 
 const _Routes = () => {
   return (
@@ -20,7 +19,7 @@ const _Routes = () => {
           }
         />
 
-        <Route path="/" element={<AuthRoute><Layout/></AuthRoute>}>
+        <Route path="/" element={<Layout/>}>
           <Route
             index
             element={

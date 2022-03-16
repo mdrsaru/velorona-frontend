@@ -2,9 +2,10 @@ import { useQuery } from '@apollo/client';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, Layout } from 'antd';
 
+import constants from '../../config/constants';
 import routes from '../../config/routes';
 import { SIDEBAR } from '../../gql/app.gql';
-import {authVar, sidebarVar} from '../../App/link';
+import { authVar, sidebarVar } from '../../App/link';
 
 import styles from './style.module.scss';
 
@@ -21,7 +22,7 @@ const menuKeys = [
 const Sidebar = (props: any) => {
   const location = useLocation();
   const { data: sidebarData } = useQuery(SIDEBAR);
-  const userLoggedIn = authVar();
+  const loggedInUser = authVar();
 
   const onCollapse = () => {
     const collapsed = sidebarData?.Sidebar?.collapsed;
@@ -30,11 +31,8 @@ const Sidebar = (props: any) => {
       collapsed: !collapsed,
     });
   };
-  console.log(userLoggedIn.user.role)
 
-  const isAdmin = () => {
-    return userLoggedIn.user.role === 'admin'
-  }
+  const isAdmin = () => loggedInUser?.user?.roles?.includes(constants.roles.SuperAdmin);
 
   const selectedMenuKey = menuKeys.find(key => key.split('/')?.[1] === location.pathname?.split('/')?.[1]) ?? '';
 

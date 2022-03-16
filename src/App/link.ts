@@ -13,7 +13,7 @@ import { ISidebar } from '../interfaces/IApp';
 const auth: IAuth = {
   token: null,
   user: {
-    role: null,
+    roles: [],
     id: null,
   },
   isLoggedIn: false,

@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import {Layout, Card, Row, Col, Form, Input, Button, message} from 'antd';
 import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
 
+import constants from '../../config/constants';
 import routes from '../../config/routes';
 import { authVar } from '../../App/link';
 
@@ -16,6 +17,10 @@ const LOGIN = gql`
     Login(input: $input) {
         id
         token
+        roles {
+          id
+          name
+        }
     }
   }
 `
@@ -35,18 +40,25 @@ const Login = () => {
     }).then((response) => {
       if(response.errors) {
         return notifyGraphqlError((response.errors))
-      } else if (response?.data?.Login) {
-        message.success(`LoggedIn successfully!`).then(r => {});
-        const loginData = authVar({
-          token: response?.data?.Login?.token,
-          user: {
-            id: response?.data?.Login?.id,
-            role: 'admin',
-          },
-          isLoggedIn: true,
-        });
-        localStorage.setItem('token', response?.data?.Login?.token);
-        loginData.user.role === 'admin' ?  navigate(routes.dashboard.path) :  navigate(routes.home.path);
+      } 
+
+      message.success(`LoggedIn successfully!`)
+      const loginData = response.data.Login;
+      const roles = loginData?.roles?.map((role: any) => role.name);
+
+      authVar({
+        token: loginData?.token,
+        user: {
+          id: loginData?.id,
+          roles,
+        },
+        isLoggedIn: true,
+      });
+
+      if(roles.includes(constants.roles.SuperAdmin)) {
+        navigate(routes.dashboard.path)
+      } else {
+        navigate(routes.home.path);
       }
     })
   };
