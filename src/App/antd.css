@@ -25822,12 +25822,12 @@ div.ant-typography-edit-content.ant-typography-rtl {
 }
 .ant-form-item-has-error .ant-input,
 .ant-form-item-has-error .ant-select {
-  border: 1px solid var(--primary-red) !important;
+  border: 1px solid var(--primary-red);
   border-radius: 5px;
 }
 .ant-form-item-has-error .ant-input:focus,
 .ant-form-item-has-error .ant-select:focus {
-  border: 1px solid var(--primary-red) !important;
+  border: 1px solid var(--primary-red);
 }
 .ant-form-vertical .ant-form-item-label {
   font-weight: 600;
