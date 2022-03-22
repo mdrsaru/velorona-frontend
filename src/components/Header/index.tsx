@@ -44,6 +44,10 @@ const TopHeader = () => {
           roles: [],
           id: null,
         },
+        client: {
+          id: null,
+          code: '',
+        }
       });
       client.clearStore();
       navigate(routes.login.path);

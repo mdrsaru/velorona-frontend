@@ -62,11 +62,18 @@ const Login = () => {
           id: loginData?.id,
           roles,
         },
+        client: {
+          id: loginData?.client?.id,
+          code: loginData?.client?.clientCode
+        },
         isLoggedIn: true,
       });
+      console.log(loginData);
 
       if(roles.includes(constants.roles.SuperAdmin)) {
         navigate(routes.dashboard.path)
+      } else if(roles.includes(constants.roles.ClientAdmin)) {
+        navigate(routes.clientDashboard.routePath(loginData?.client?.clientCode));
       } else {
         navigate(routes.home.path);
       }

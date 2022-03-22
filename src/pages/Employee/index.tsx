@@ -5,10 +5,36 @@ import { Link } from "react-router-dom";
 import routes from "../../config/routes";
 
 import styles from './style.module.scss';
+import {gql, useQuery} from "@apollo/client";
+import constants from "../../config/constants";
+import {authVar} from "../../App/link";
 
 const { SubMenu } = Menu;
 
+const ROLE = gql`
+  query Role($input: RoleQueryInput) {
+    Role(input: $input) {
+      data {
+        id
+        name
+        description
+      }
+    }
+  }
+`
+
 const Employee = () => {
+  const loggedInUser = authVar();
+  const {data: employeeData} = useQuery(ROLE, {
+    variables: {
+      input: {
+        query: {
+          name: constants.roles.Employee
+        }
+      }
+    }
+  })
+
   const menu = (
     <Menu>
       <SubMenu title="Change status" key="4">
@@ -31,24 +57,9 @@ const Employee = () => {
       key: 'name',
     },
     {
-      title: 'Role',
-      dataIndex: 'role',
-      key: 'role',
-    },
-    {
-      title: 'Email',
-      dataIndex: 'email',
-      key: 'email',
-    },
-    {
-      title: 'Reports to',
-      dataIndex: 'reports_to',
-      key: 'reports_to',
-    },
-    {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
+      title: 'Description',
+      dataIndex: 'description',
+      key: 'description',
     },
     {
       title: 'Actions',
@@ -64,44 +75,7 @@ const Employee = () => {
         </div>,
     },
   ];
-  const dataSource = [
-    {
-      key: '1',
-      name: 'Mike',
-      role: 32,
-      email: "mike@gmail.com",
-      reports_to: '10 Downing Street',
-      status: 'Active',
-      actions: ''
-    },
-    {
-      key: '2',
-      name: 'John',
-      role: 42,
-      email: "john@gmail.com",
-      reports_to: '10 Downing Street',
-      status: 'Active',
-      actions: ''
-    },
-    {
-      key: '3',
-      name: 'John',
-      role: 42,
-      email: "john@gmail.com",
-      reports_to: '10 Downing Street',
-      status: 'Active',
-      actions: ''
-    },
-    {
-      key: '4',
-      name: 'John',
-      role: 42,
-      email: "john@gmail.com",
-      reports_to: '10 Downing Street',
-      status: 'Active',
-      actions: ''
-    },
-  ];
+
   return (
     <div className={styles['main-div']}>
       <Card bordered={false}>
@@ -111,13 +85,13 @@ const Employee = () => {
           </Col>
           <Col span={12} className={styles['employee-col']}>
             <div className={styles['add-new-employee']}>
-              <Link to={routes.addEmployee.routePath}>Add New Employee</Link>
+              <Link to={routes.addEmployee.routePath(loggedInUser?.client?.code ? loggedInUser?.client?.code : '')}>Add New Employee</Link>
             </div>
           </Col>
         </Row>
         <Row>
           <Col span={24}>
-            <Table dataSource={dataSource} columns={columns} />
+            <Table dataSource={employeeData?.Role?.data} columns={columns} rowKey={(record => record?.id)} />
           </Col>
         </Row>
       </Card>

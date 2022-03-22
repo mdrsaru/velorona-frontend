@@ -43,7 +43,6 @@ const NewClient = () => {
           navigate(-1)
       }
     }).catch(notifyGraphqlError)
-
   }
 
   return (

@@ -25811,11 +25811,6 @@ div.ant-typography-edit-content.ant-typography-rtl {
 .ant-table .ant-table-thead > tr > th:not(:last-child):not(.ant-table-selection-column):not(.ant-table-row-expand-icon-cell):not([colspan])::before {
   width: 0;
 }
-.ant-modal-footer {
-  border: none;
-  text-align: center;
-  padding-bottom: 5rem;
-}
 .ant-form-item-explain-error {
   padding: 1rem 0 1rem 0;
   font-weight: 600;

@@ -24,11 +24,7 @@ const CLIENT = gql`
 `
 
 const Client = () => {
-  const {data: clientData} = useQuery(CLIENT,{
-    variables: {
-
-    }
-  })
+  const {data: clientData} = useQuery(CLIENT)
   const [visibility, setVisibility] = useState(false);
   const [showArchive, setArchiveModal] = useState(false);
   const setModalVisibility = (value: boolean) => {
@@ -90,7 +86,7 @@ const Client = () => {
             </Col>
             <Col span={12} className={styles['form-col']}>
               <div className={styles['add-new-client']}>
-                <Link to={routes.addClient.routePath('2')}>Add new client</Link>
+                <Link to={routes.addClient.routePath}>Add new client</Link>
               </div>
             </Col>
           </Row>

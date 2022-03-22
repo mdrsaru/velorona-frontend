@@ -19,48 +19,58 @@ const menuKeys = [
   routes.schedule.path,
 ];
 
-const menuItems = [
-  {
-    name: routes.dashboard.name,
-    route: routes.dashboard.routePath,
-    accessRoles: [constants.roles.ClientAdmin, constants.roles.SuperAdmin]
-  },
-  {
-    name: routes.client.name,
-    route: routes.client.routePath('1'),
-    accessRoles: [constants.roles.SuperAdmin]
-  },
-  {
-    name: routes.employee.name,
-    route: routes.employee.routePath,
-    accessRoles: [constants.roles.ClientAdmin]
-  },
-  {
-    name: routes.home.name,
-    route: routes.home.routePath,
-    accessRoles: [constants.roles.Employee, constants.roles.TaskManager]
-  },
-  {
-    name: routes.timesheet.name,
-    route: routes.timesheet.routePath,
-    accessRoles: [constants.roles.Employee, constants.roles.TaskManager]
-  },
-  {
-    name: routes.tasks.name,
-    route: routes.tasks.routePath,
-    accessRoles: [constants.roles.Employee, constants.roles.TaskManager]
-  },
-  {
-    name: routes.schedule.name,
-    route: routes.schedule.routePath,
-    accessRoles: [constants.roles.Employee, constants.roles.TaskManager]
-  }
-]
 
 const Sidebar = () => {
   const location = useLocation();
   const { data: sidebarData } = useQuery(SIDEBAR);
   const loggedInUser = authVar();
+  const menuItems = [
+    {
+      name: routes.dashboard.name,
+      route: routes.dashboard.routePath,
+      accessRoles: [constants.roles.SuperAdmin]
+    },
+    {
+      name: routes.clientDashboard.name,
+      route: routes.clientDashboard.routePath(loggedInUser?.client?.code ? loggedInUser?.client?.code : ''),
+      accessRoles: [constants.roles.ClientAdmin]
+    },
+    {
+      name: routes.role.name,
+      route: routes.role.routePath(loggedInUser?.client?.code ? loggedInUser?.client?.code : ''),
+      accessRoles: [constants.roles.ClientAdmin]
+    },
+    {
+      name: routes.clientAdmin.name,
+      route: routes.clientAdmin.routePath,
+      accessRoles: [constants.roles.SuperAdmin]
+    },
+    {
+      name: routes.employee.name,
+      route: routes.employee.routePath(loggedInUser?.client?.code ? loggedInUser?.client?.code : ''),
+      accessRoles: [constants.roles.ClientAdmin]
+    },
+    {
+      name: routes.home.name,
+      route: routes.home.routePath,
+      accessRoles: [constants.roles.Employee, constants.roles.TaskManager]
+    },
+    {
+      name: routes.timesheet.name,
+      route: routes.timesheet.routePath,
+      accessRoles: [constants.roles.Employee, constants.roles.TaskManager]
+    },
+    {
+      name: routes.tasks.name,
+      route: routes.tasks.routePath,
+      accessRoles: [constants.roles.Employee, constants.roles.TaskManager]
+    },
+    {
+      name: routes.schedule.name,
+      route: routes.schedule.routePath,
+      accessRoles: [constants.roles.Employee, constants.roles.TaskManager]
+    }
+  ]
   const menuArray = menuItems.filter(menu => {return loggedInUser?.user?.roles?.some(role => menu.accessRoles.includes(role))})
 
   const onCollapse = () => {
