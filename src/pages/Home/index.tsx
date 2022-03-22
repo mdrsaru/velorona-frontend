@@ -1,6 +1,6 @@
-import {Row, Col, Typography, Card, Button, Space, Table, Select} from 'antd';
+import { Row, Col, Typography, Card, Button, Space, Table, Select } from 'antd';
 
-import {columns, data} from "../../utils/dummyData";
+import { columns, data } from "../../utils/dummyData";
 
 import styles from './style.module.scss';
 import React from "react";

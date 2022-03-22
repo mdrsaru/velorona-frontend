@@ -13,6 +13,12 @@ const routes = {
     component: lazy(() => import('../pages/Login')),
     name: 'Login',
   },
+  loginAdmin: {
+    path: ':role',
+    routePath: '/login/admin',
+    component: lazy(() => import('../pages/Login')),
+    name: 'Login',
+  },
   home: {
     path: '/',
     routePath: '/',

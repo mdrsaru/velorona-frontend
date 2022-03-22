@@ -1,22 +1,26 @@
-import { useNavigate } from 'react-router-dom';
-import {Layout, Card, Row, Col, Form, Input, Button, message} from 'antd';
-import { EyeInvisibleOutlined, EyeTwoTone } from '@ant-design/icons';
+import { useNavigate, useParams } from 'react-router-dom';
+import { Layout, Row, Col, Form, Input, Button, message, Typography } from 'antd';
 
 import constants from '../../config/constants';
 import routes from '../../config/routes';
 import { authVar } from '../../App/link';
 
-import logo from '../../assets/images/logo.svg';
-import logoContent from '../../assets/images/logo-01.svg';
+import logo from '../../assets/images/main_logo.svg';
+import highFiveImg from '../../assets/images/High_five.svg';
 import styles from './style.module.scss';
-import {gql, useMutation} from "@apollo/client";
-import {notifyGraphqlError} from "../../utils/error";
+import { gql, useMutation } from "@apollo/client";
+import { notifyGraphqlError } from "../../utils/error";
 
 const LOGIN = gql`
   mutation Login($input: LoginInput!) {
     Login(input: $input) {
         id
         token
+        refreshToken
+        client {
+          id
+          clientCode
+        }
         roles {
           id
           name
@@ -28,23 +32,29 @@ const LOGIN = gql`
 const Login = () => {
   const navigate = useNavigate();
   const [Login] = useMutation(LOGIN);
+  let { role } = useParams();
+
+  console.log(role)
 
   const handleSubmit = (values: any) => {
+    let formData = role === 'admin' ?
+      {email: values.email,
+        password: values.password} :
+      {email: values.email,
+        password: values.password,
+        clientCode: values.code}
     Login({
       variables: {
-        input: {
-          email: values.email,
-          password: values.password
-        }
+        input: formData
       }
     }).then((response) => {
       if(response.errors) {
-        return notifyGraphqlError((response.errors))
+        return notifyGraphqlError((response?.errors))
       } 
 
       message.success(`LoggedIn successfully!`)
-      const loginData = response.data.Login;
-      const roles = loginData?.roles?.map((role: any) => role.name);
+      const loginData = response?.data?.Login;
+      const roles = loginData?.roles?.map((role: any) => role?.name);
 
       authVar({
         token: loginData?.token,
@@ -65,60 +75,42 @@ const Login = () => {
 
   return (
     <Layout>
-      <Row justify="center" align="middle" style={{ minHeight: '100vh' }}>
-        <Col>
-          <Card>
-            <div className={styles['signin-content']}>
-              <div className={styles['signin-header']}>
-                <img className={styles.logo} alt="logo" src={logo} />
-                <img className={styles.logo} alt="logo-01" src={logoContent} />
-                <h1>Sign in</h1>
-              </div>
+      <Row style={{ minHeight: '100vh', background: '#FFFFFF' }} className={styles['login-row']}>
+        <Col sm={24} xs={24} md={14} lg={13} className={styles['sign-in-form-col']}>
+          <div className={styles['sign-in-content']}>
+            <div className={styles['sign-in-logo']}>
+              <img className={styles.logo} alt="logo" src={logo} />
+            </div>
+            <div className={styles['sign-in-header']}>
+              <h1>Sign in</h1>
+            </div>
+            <br/>
+            <div>
               <Form onFinish={handleSubmit} layout="vertical">
-                <Form.Item
-                  label="Email"
-                  name="email"
-                  rules={[
-                    {
-                      required: true,
-                      message: 'Email is required',
-                    },
-                  ]}
-                >
-                  <Input placeholder="Email" />
+                {role !=='admin' &&
+                <Form.Item label="Company Code" name="code" rules={[{required: role !== 'admin', message: 'Company Code is required'},]}>
+                  <Input placeholder="Enter the company code" autoComplete="off"/>
+                </Form.Item>}
+                <Form.Item label="Email" name="email" rules={[{required: true, message: 'Email is required'},]}>
+                  <Input placeholder="Email" autoComplete="off"/>
                 </Form.Item>
-
-                <Form.Item
-                  name="password"
-                  label="Password"
-                  rules={[
-                    {
-                      required: true,
-                      message: 'Password is required',
-                    },
-                  ]}
-                >
-                  <Input.Password
-                    type="password"
-                    placeholder="Password"
-                    iconRender={(visible: boolean) =>
-                      visible ? <EyeTwoTone /> : <EyeInvisibleOutlined />
-                    }
-                  />
+                <Form.Item name="password" label="Password" rules={[{required: true, message: 'Password is required'},]}>
+                  <Input type="password" placeholder="Password" autoComplete="off"/>
                 </Form.Item>
-
-                <Form.Item style={{ paddingTop: '1em' }}>
-                  <Button
-                    type="primary"
-                    htmlType="submit"
-                    className={styles['login-form-button']}
-                  >
-                    Sign In
-                  </Button>
+                <Form.Item>
+                  <div className={styles['forgot-password']}>
+                    <Typography.Link href="#API">Forgot Password?</Typography.Link>
+                  </div>
+                </Form.Item>
+                <Form.Item>
+                  <Button type="primary" htmlType="submit" className={styles['login-form-button']}>Login</Button>
                 </Form.Item>
               </Form>
             </div>
-          </Card>
+          </div>
+        </Col>
+        <Col sm={24} xs={0} md={10} lg={11} className={styles['image-col']}>
+          <img className={styles.highFiveImage} alt="highFiveImg" src={highFiveImg} />
         </Col>
       </Row>
     </Layout>

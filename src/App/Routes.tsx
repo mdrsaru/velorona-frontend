@@ -10,14 +10,16 @@ const _Routes = () => {
   return (
     <Router>
       <Routes>
-        <Route
-          path="/login"
-          element={
-            <Suspense fallback={<Skeleton/>}>
-              <routes.login.component/>
-            </Suspense>
-          }
-        />
+        <Route path={routes.login.path}>
+          <Route index element={<Suspense fallback={<Skeleton/>}><routes.login.component/></Suspense>}/>
+          <Route path={routes.loginAdmin.path}
+                 element={
+                   <Suspense fallback={<Skeleton/>}>
+                     <routes.login.component/>
+                   </Suspense>
+                 }
+          />
+        </Route>
 
         <Route path="/" element={<Layout/>}>
           <Route
