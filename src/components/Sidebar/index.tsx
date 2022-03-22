@@ -19,10 +19,49 @@ const menuKeys = [
   routes.schedule.path,
 ];
 
-const Sidebar = (props: any) => {
+const menuItems = [
+  {
+    name: routes.dashboard.name,
+    route: routes.dashboard.routePath,
+    accessRoles: [constants.roles.ClientAdmin, constants.roles.SuperAdmin]
+  },
+  {
+    name: routes.client.name,
+    route: routes.client.routePath('1'),
+    accessRoles: [constants.roles.SuperAdmin]
+  },
+  {
+    name: routes.employee.name,
+    route: routes.employee.routePath,
+    accessRoles: [constants.roles.ClientAdmin]
+  },
+  {
+    name: routes.home.name,
+    route: routes.home.routePath,
+    accessRoles: [constants.roles.Employee, constants.roles.TaskManager]
+  },
+  {
+    name: routes.timesheet.name,
+    route: routes.timesheet.routePath,
+    accessRoles: [constants.roles.Employee, constants.roles.TaskManager]
+  },
+  {
+    name: routes.tasks.name,
+    route: routes.tasks.routePath,
+    accessRoles: [constants.roles.Employee, constants.roles.TaskManager]
+  },
+  {
+    name: routes.schedule.name,
+    route: routes.schedule.routePath,
+    accessRoles: [constants.roles.Employee, constants.roles.TaskManager]
+  }
+]
+
+const Sidebar = () => {
   const location = useLocation();
   const { data: sidebarData } = useQuery(SIDEBAR);
   const loggedInUser = authVar();
+  const menuArray = menuItems.filter(menu => {return loggedInUser?.user?.roles?.some(role => menu.accessRoles.includes(role))})
 
   const onCollapse = () => {
     const collapsed = sidebarData?.Sidebar?.collapsed;
@@ -31,9 +70,6 @@ const Sidebar = (props: any) => {
       collapsed: !collapsed,
     });
   };
-
-  const isAdmin = () => loggedInUser?.user?.roles?.includes(constants.roles.SuperAdmin);
-
   const selectedMenuKey = menuKeys.find(key => key.split('/')?.[1] === location.pathname?.split('/')?.[1]) ?? '';
 
   return (
@@ -45,46 +81,18 @@ const Sidebar = (props: any) => {
       onCollapse={onCollapse}
       breakpoint="lg"
       collapsedWidth="0"
-      trigger={null}
-    >
+      trigger={null}>
       <Menu
         mode="inline"
         defaultSelectedKeys={['1']}
         defaultOpenKeys={['sub1']}
         style={{ height: '100%', borderRight: 0 }}
-        selectedKeys={[selectedMenuKey]}
-      >
-        {isAdmin() &&
-          <>
-            <Menu.Item key={routes.dashboard.routePath}>
-              <Link to={routes.dashboard.routePath}>{routes.dashboard.name}</Link>
-            </Menu.Item>
-            <Menu.Item key={routes.client.routePath('1')}>
-              <Link to={routes.client.routePath('1')}>{routes.client.name}</Link>
-            </Menu.Item>
-            <Menu.Item key={routes.employee.routePath}>
-              <Link to={routes.employee.routePath}>{routes.employee.name}</Link>
-            </Menu.Item>
-          </>}
-        {!isAdmin() &&
-          <>
-            <Menu.Item key={routes.home.routePath}>
-              <Link to={routes.home.routePath}>{routes.home.name}</Link>
-            </Menu.Item>
-
-            <Menu.Item key={routes.timesheet.routePath}>
-              <Link to={routes.timesheet.routePath}>{routes.timesheet.name}</Link>
-            </Menu.Item>
-
-            <Menu.Item key={routes.tasks.routePath}>
-              <Link to={routes.tasks.routePath}>{routes.tasks.name}</Link>
-            </Menu.Item>
-
-            <Menu.Item key={routes.schedule.routePath}>
-              <Link to={routes.schedule.routePath}>{routes.schedule.name}</Link>
-            </Menu.Item>
-          </>}
-
+        selectedKeys={[selectedMenuKey]}>
+        {menuArray && menuArray.map((menu, index) => (
+          <Menu.Item key={index}>
+            <Link to={menu.route}>{menu.name}</Link>
+          </Menu.Item>
+        ))}
       </Menu>
     </Sider>
   );
