@@ -6,68 +6,131 @@ import routes from "../../config/routes";
 
 import styles from './style.module.scss';
 import {gql, useQuery} from "@apollo/client";
-import constants from "../../config/constants";
 import {authVar} from "../../App/link";
+import {useState} from "react";
+import deleteImg from "../../assets/images/delete_btn.svg";
+import archiveImg from "../../assets/images/archive_btn.svg";
+import ModalConfirm from "../../components/Modal";
 
-const { SubMenu } = Menu;
+const {SubMenu} = Menu;
 
-const ROLE = gql`
-  query Role($input: RoleQueryInput) {
-    Role(input: $input) {
+const USER = gql`
+  query User($input: UserQueryInput) {
+    User(input: $input) {
       data {
         id
-        name
-        description
+        email
+        phone
+        firstName
+        lastName
+        middleName
+        status
+        roles {
+          id
+          name
+        }
       }
     }
   }
 `
+const deleteBody = () => {
+  return (
+    <div className={styles['modal-message']}>
+      <div><img src={deleteImg} alt="confirm" /></div><br/>
+      <p>Are you sure you want to delete <strong>Insight Workshop Pvt. Ltd?</strong></p>
+      <p className={styles['warning-text']}>All the data associated with the employee will be deleted permanently.</p>
+    </div>
+  )
+}
+
+const archiveBody = () => {
+  return (
+    <div className={styles['modal-message']}>
+      <div><img src={archiveImg} alt="archive-confirm"/></div> <br/>
+      <p>Are you sure you want to archive <strong>Insight Workshop Pvt. Ltd?</strong></p>
+      <p className={styles['archive-text']}>Employee will not be able to login to the system.</p>
+    </div>
+  )
+}
 
 const Employee = () => {
   const loggedInUser = authVar();
-  const {data: employeeData} = useQuery(ROLE, {
+  const [visibility, setVisibility] = useState(false);
+  const [showArchive, setArchiveModal] = useState(false);
+  const setModalVisibility = (value: boolean) => {
+    setVisibility(value)
+  }
+  const setArchiveVisibility = (value: boolean) => {
+    setArchiveModal(value)
+  }
+
+  const {data: employeeData} = useQuery(USER, {
     variables: {
       input: {
         query: {
-          name: constants.roles.Employee
+          // name: constants.roles.Employee
         }
       }
     }
   })
 
-  const menu = (
+  const menu = (id: string) => (
     <Menu>
-      <SubMenu title="Change status" key="4">
+      <SubMenu title="Change status" key="5">
         <Menu.Item key="0">Active</Menu.Item>
-        <Menu.Divider />
+        <Menu.Divider/>
         <Menu.Item key="1">Inactive</Menu.Item>
       </SubMenu>
-      <Menu.Divider />
+      <Menu.Divider/>
       <Menu.Item key="2">
-        <div>Archive Employee</div>
+        <div><Link to={routes.editEmployee.routePath(loggedInUser?.client?.code ?? '1', id ?? '1')}>Edit Employee</Link></div>
       </Menu.Item>
-      <Menu.Divider />
-      <Menu.Item key="3"><div>Delete Employee</div></Menu.Item>
+      <Menu.Divider/>
+      <Menu.Item key="3">
+        <div onClick={() => setArchiveVisibility(true)}>Archive Employee</div>
+      </Menu.Item>
+      <Menu.Divider/>
+      <Menu.Item key="4"><div onClick={() => setModalVisibility(true)}>Delete Employee</div></Menu.Item>
     </Menu>
   );
   const columns = [
     {
-      title: 'Employee Name',
-      dataIndex: 'name',
-      key: 'name',
+      title: 'Name',
+      dataIndex: 'firstName',
+      key: 'firstName',
     },
     {
-      title: 'Description',
-      dataIndex: 'description',
-      key: 'description',
+      title: 'Role',
+      dataIndex: 'roles',
+      key: 'roles',
+      render: (roles: { name: string; id: string;}[]) => `${roles[0]?.name}`
+    },
+    {
+      title: 'Email',
+      dataIndex: 'email',
+      key: 'email',
+    },
+    {
+      title: 'Phone',
+      dataIndex: 'phone',
+      key: 'phone',
+    },
+    {
+      title: 'Status',
+      dataIndex: 'status',
+      key: 'status',
+      render: (status: string) =>
+        <span className={status === 'Active' ? styles['active-status'] : styles['inactive-status']}>
+          {status}
+        </span>
     },
     {
       title: 'Actions',
-      dataIndex: 'actions',
+      dataIndex: 'id',
       key: 'actions',
-      render: () =>
+      render: (id: string) =>
         <div className={styles['dropdown-menu']}>
-          <Dropdown overlay={menu} trigger={['click']} placement="bottomRight">
+          <Dropdown overlay={menu(id)} trigger={['click']} placement="bottomRight">
             <div className="ant-dropdown-link" onClick={e => e.preventDefault()} style={{paddingLeft: '1rem'}}>
               <MoreOutlined />
             </div>
@@ -91,10 +154,14 @@ const Employee = () => {
         </Row>
         <Row>
           <Col span={24}>
-            <Table dataSource={employeeData?.Role?.data} columns={columns} rowKey={(record => record?.id)} />
+            <Table dataSource={employeeData?.User?.data} columns={columns} rowKey={(record => record?.id)} />
           </Col>
         </Row>
       </Card>
+      <ModalConfirm visibility={visibility} setModalVisibility={setModalVisibility} imgSrc={deleteImg}
+                    okText={'Delete'} modalBody={deleteBody}/>
+      <ModalConfirm visibility={showArchive} setModalVisibility={setArchiveVisibility} imgSrc={archiveImg}
+                    okText={'Archive'} modalBody={archiveBody}/>
     </div>
   )
 }

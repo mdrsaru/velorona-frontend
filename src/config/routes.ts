@@ -61,6 +61,12 @@ const routes = {
     component: lazy(() => import('../pages/Employee')),
     name: 'Employee',
   },
+  editEmployee: {
+    path: ':eid',
+    routePath: (id: string, eid: string) => `${eid}`,
+    component: lazy(() => import('../pages/Employee/EditEmployee')),
+    name: 'Edit Employee',
+  },
   addEmployee: {
     path: ':id/new-employee',
     routePath: (id: string) => `/${id}/new-employee`,

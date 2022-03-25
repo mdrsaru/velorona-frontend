@@ -58,7 +58,7 @@ const Role = () => {
   }
 
   return (
-    <>
+    <div className={styles.mainDiv}>
       <div className={styles['role-div']}>
         <Card bordered={false}>
           <Row>
@@ -101,7 +101,7 @@ const Role = () => {
           </Form.Item>
         </Form>
       </Modal>
-    </>
+    </div>
   )
 }
 

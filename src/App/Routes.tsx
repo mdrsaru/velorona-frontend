@@ -100,11 +100,18 @@ const _Routes = () => {
                      <routes.addEmployee.component/>
                    </Suspense>
                  }/>
-          <Route path={routes.employee.path} element={
-            <Suspense fallback={<Skeleton/>}>
-              <routes.employee.component/>
-            </Suspense>
-          }/>
+          <Route path={routes.employee.path}>
+            <Route index element={
+              <Suspense fallback={<Skeleton/>}>
+                <routes.employee.component/>
+              </Suspense>}/>
+            <Route path={routes.editEmployee.path}
+                   element={
+                     <Suspense fallback={<Skeleton/>}>
+                       <routes.editEmployee.component/>
+                     </Suspense>
+                   }/>
+          </Route>
           <Route
             path="*"
             element={<NotFound/>}/>

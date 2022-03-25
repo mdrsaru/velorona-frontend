@@ -34,8 +34,6 @@ const Login = () => {
   const [Login] = useMutation(LOGIN);
   let { role } = useParams();
 
-  console.log(role)
-
   const handleSubmit = (values: any) => {
     let formData = role === 'admin' ?
       {email: values.email,
@@ -68,7 +66,6 @@ const Login = () => {
         },
         isLoggedIn: true,
       });
-      console.log(loginData);
 
       if(roles.includes(constants.roles.SuperAdmin)) {
         navigate(routes.dashboard.path)

@@ -23,7 +23,6 @@ const _Layout = (props: IProps) => {
   const { data: sidebarData } = useQuery(SIDEBAR);
 
   const isLoggedIn = authData?.AuthUser?.isLoggedIn;
-  console.log(authData);
 
   if (!isLoggedIn) {
     return <Navigate to={routes.login.path} />;
