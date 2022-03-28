@@ -4,8 +4,9 @@ import { Skeleton } from 'antd';
 
 import routes from '../config/routes';
 import NotFound from '../components/NotFound';
-import Layout from '../components/Layout';
+import AuthRoute from "../components/AuthRoute";
 import constants from "../config/constants";
+import Layout from "../components/Layout";
 
 const _Routes = () => {
   return (
@@ -25,92 +26,78 @@ const _Routes = () => {
         </Route>
 
         {/* protected routes */}
-        <Route path="/"  element={<Layout allowedRoles={[constants.roles.Employee]}/>}>
-          <Route index element={<Suspense fallback={<Skeleton/>}>
-            <routes.home.component/>
-          </Suspense>}/>
-          <Route path={routes.timesheet.path}>
-            <Route index element={<Suspense fallback={<Skeleton/>}>
-              <routes.timesheet.component/>
-            </Suspense>}/>
-            <Route path={routes.newTimesheet.path}
-                   element={
-                     <Suspense fallback={<Skeleton/>}>
-                       <routes.newTimesheet.component/>
-                     </Suspense>
-                   }/>
-            <Route path={routes.detailTimesheet.path}
-                   element={
-                     <Suspense fallback={<Skeleton/>}>
-                       <routes.detailTimesheet.component/>
-                     </Suspense>
-                   }/>
+        <Route path="/" element={<Layout/>}>
+          <Route path={routes.client.path} element={<AuthRoute allowedRoles={[constants.roles.ClientAdmin]}/>}>
+            <Route index element={<Suspense fallback={<Skeleton/>}><routes.dashboard.component/></Suspense>}/>
+            <Route path={routes.role.path} element={<Suspense fallback={<Skeleton/>}>
+                <routes.role.component/>
+              </Suspense>}/>
+            <Route path={routes.addEmployee.path} element={<Suspense fallback={<Skeleton/>}>
+                       <routes.addEmployee.component/>
+                     </Suspense>}/>
+            <Route path={routes.employee.path}>
+              <Route index element={
+                <Suspense fallback={<Skeleton/>}>
+                  <routes.employee.component/>
+                </Suspense>}/>
+              <Route path={routes.editEmployee.path}
+                     element={
+                       <Suspense fallback={<Skeleton/>}>
+                         <routes.editEmployee.component/>
+                       </Suspense>
+                     }/>
+            </Route>
           </Route>
-          <Route
-            path={routes.tasks.path}
-            element={
+          <Route element={<AuthRoute allowedRoles={[constants.roles.SuperAdmin]}/>}>
+            <Route path={routes.dashboard.path} element={
+              <Suspense fallback={<Skeleton/>}>
+                <routes.dashboard.component/>
+              </Suspense>
+            }/>
+            <Route path={routes.clientAdmin.path}>
+              <Route index element={<Suspense fallback={<Skeleton/>}>
+                <routes.client.component/>
+              </Suspense>}/>
+              <Route path={routes.addClient.path}
+                     element={
+                       <Suspense fallback={<Skeleton/>}>
+                         <routes.addClient.component/>
+                       </Suspense>
+                     }/>
+            </Route>
+          </Route>
+          <Route element={<AuthRoute allowedRoles={[constants.roles.Employee]}/>}>
+            <Route index element={<Suspense fallback={<Skeleton/>}><routes.home.component/></Suspense>}/>
+            <Route path={routes.timesheet.path}>
+              <Route index element={<Suspense fallback={<Skeleton/>}>
+                <routes.timesheet.component/>
+              </Suspense>}/>
+              <Route path={routes.newTimesheet.path}
+                     element={
+                       <Suspense fallback={<Skeleton/>}>
+                         <routes.newTimesheet.component/>
+                       </Suspense>
+                     }/>
+              <Route path={routes.detailTimesheet.path}
+                     element={
+                       <Suspense fallback={<Skeleton/>}>
+                         <routes.detailTimesheet.component/>
+                       </Suspense>
+                     }/>
+            </Route>
+            <Route path={routes.tasks.path} element={
               <Suspense fallback={<Skeleton/>}>
                 <routes.tasks.component/>
               </Suspense>
             }/>
 
-          <Route
-            path={routes.schedule.path}
-            element={
-              <Suspense fallback={<Skeleton/>}>
-                <routes.schedule.component/>
-              </Suspense>
-            }/>
-        </Route>
-        <Route element={<Layout allowedRoles={[constants.roles.SuperAdmin]}/>}>
-          <Route
-            path={routes.dashboard.path}
-            element={
-              <Suspense fallback={<Skeleton/>}>
-                <routes.dashboard.component/>
-              </Suspense>
-            }/>
-          <Route path={routes.clientAdmin.path}>
-            <Route index element={<Suspense fallback={<Skeleton/>}>
-              <routes.client.component/>
-            </Suspense>}/>
-            <Route path={routes.addClient.path}
-                   element={
-                     <Suspense fallback={<Skeleton/>}>
-                       <routes.addClient.component/>
-                     </Suspense>
-                   }/>
-          </Route>
-        </Route>
-        <Route element={<Layout allowedRoles={[constants.roles.ClientAdmin]}/>}>
-          <Route path={routes.clientDashboard.path}
-            element={
-              <Suspense fallback={<Skeleton/>}>
-                <routes.dashboard.component/>
-              </Suspense>
-            }/>
-          <Route path={routes.role.path} element={
-            <Suspense fallback={<Skeleton/>}>
-              <routes.role.component/>
-            </Suspense>
-          }/>
-          <Route path={routes.addEmployee.path}
-                 element={
-                   <Suspense fallback={<Skeleton/>}>
-                     <routes.addEmployee.component/>
-                   </Suspense>
-                 }/>
-          <Route path={routes.employee.path}>
-            <Route index element={
-              <Suspense fallback={<Skeleton/>}>
-                <routes.employee.component/>
-              </Suspense>}/>
-            <Route path={routes.editEmployee.path}
-                   element={
-                     <Suspense fallback={<Skeleton/>}>
-                       <routes.editEmployee.component/>
-                     </Suspense>
-                   }/>
+            <Route
+              path={routes.schedule.path}
+              element={
+                <Suspense fallback={<Skeleton/>}>
+                  <routes.schedule.component/>
+                </Suspense>
+              }/>
           </Route>
           <Route
             path="*"

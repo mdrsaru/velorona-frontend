@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client';
-import { Outlet, RouteProps, Navigate } from 'react-router-dom';
+import { Outlet, Navigate } from 'react-router-dom';
 import { Layout } from 'antd';
 
 import { AUTH } from '../../gql/auth.gql';
@@ -10,15 +10,11 @@ import Sidebar from '../Sidebar';
 import Header from '../Header';
 
 import styles from './style.module.scss';
-import NotFound from "../NotFound";
 
 const { Content } = Layout;
 
-interface IProps extends RouteProps {
-  allowedRoles?: string[]
-}
 
-const _Layout = (props: IProps) => {
+const _Layout = () => {
   const { data: authData } = useQuery(AUTH);
   const { data: sidebarData } = useQuery(SIDEBAR);
 
@@ -40,7 +36,7 @@ const _Layout = (props: IProps) => {
         <Sidebar />
         <Layout className={styles['site-layout']}>
           <Content style={{ padding: '1em' }}>
-            {authData?.AuthUser?.user?.roles?.find((role: string) => props.allowedRoles?.includes(role)) ? <Outlet /> : <NotFound/>}
+           <Outlet />
           </Content>
         </Layout>
       </Layout>

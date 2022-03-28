@@ -32,7 +32,7 @@ const Sidebar = () => {
     },
     {
       name: routes.clientDashboard.name,
-      route: routes.clientDashboard.routePath(loggedInUser?.client?.code ? loggedInUser?.client?.code : ''),
+      route: routes.client.routePath(loggedInUser?.client?.code ? loggedInUser?.client?.code : ''),
       accessRoles: [constants.roles.ClientAdmin]
     },
     {

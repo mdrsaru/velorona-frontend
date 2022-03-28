@@ -68,11 +68,11 @@ const Login = () => {
       });
 
       if(roles.includes(constants.roles.SuperAdmin)) {
-        navigate(routes.dashboard.path)
+        navigate(routes.dashboard.routePath)
       } else if(roles.includes(constants.roles.ClientAdmin)) {
-        navigate(routes.clientDashboard.routePath(loginData?.client?.clientCode));
+        navigate(routes.client.routePath(loginData?.client?.clientCode));
       } else {
-        navigate(routes.home.path);
+        navigate(routes.home.routePath);
       }
     })
   };
