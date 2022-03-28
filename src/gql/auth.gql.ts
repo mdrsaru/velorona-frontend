@@ -7,6 +7,7 @@ export const AUTH = gql`
       isLoggedIn
       user {
         id
+        roles
       }
     }
   }

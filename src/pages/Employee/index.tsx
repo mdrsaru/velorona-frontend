@@ -1,37 +1,109 @@
-import {Card, Row, Col, Table, Dropdown, Menu} from 'antd';
-import styles from './style.module.scss';
-import {Link} from "react-router-dom";
-import routes from "../../config/routes";
+import { Card, Row, Col, Table, Dropdown, Menu } from 'antd';
 import {MoreOutlined} from "@ant-design/icons";
 
-const { SubMenu } = Menu;
+import { Link } from "react-router-dom";
+import routes from "../../config/routes";
+
+import styles from './style.module.scss';
+import {gql, useQuery} from "@apollo/client";
+import {authVar} from "../../App/link";
+import {useState} from "react";
+import deleteImg from "../../assets/images/delete_btn.svg";
+import archiveImg from "../../assets/images/archive_btn.svg";
+import ModalConfirm from "../../components/Modal";
+
+const {SubMenu} = Menu;
+
+const USER = gql`
+  query User($input: UserQueryInput) {
+    User(input: $input) {
+      data {
+        id
+        email
+        phone
+        firstName
+        lastName
+        middleName
+        status
+        roles {
+          id
+          name
+        }
+      }
+    }
+  }
+`
+const deleteBody = () => {
+  return (
+    <div className={styles['modal-message']}>
+      <div><img src={deleteImg} alt="confirm" /></div><br/>
+      <p>Are you sure you want to delete <strong>Insight Workshop Pvt. Ltd?</strong></p>
+      <p className={styles['warning-text']}>All the data associated with the employee will be deleted permanently.</p>
+    </div>
+  )
+}
+
+const archiveBody = () => {
+  return (
+    <div className={styles['modal-message']}>
+      <div><img src={archiveImg} alt="archive-confirm"/></div> <br/>
+      <p>Are you sure you want to archive <strong>Insight Workshop Pvt. Ltd?</strong></p>
+      <p className={styles['archive-text']}>Employee will not be able to login to the system.</p>
+    </div>
+  )
+}
 
 const Employee = () => {
-  const menu = (
+  const loggedInUser = authVar();
+  const [visibility, setVisibility] = useState(false);
+  const [showArchive, setArchiveModal] = useState(false);
+  const setModalVisibility = (value: boolean) => {
+    setVisibility(value)
+  }
+  const setArchiveVisibility = (value: boolean) => {
+    setArchiveModal(value)
+  }
+
+  const {data: employeeData} = useQuery(USER, {
+    variables: {
+      input: {
+        query: {
+          // name: constants.roles.Employee
+        }
+      }
+    }
+  })
+
+  const menu = (id: string) => (
     <Menu>
-      <SubMenu title="Change status" key="4">
+      <SubMenu title="Change status" key="5">
         <Menu.Item key="0">Active</Menu.Item>
-        <Menu.Divider />
+        <Menu.Divider/>
         <Menu.Item key="1">Inactive</Menu.Item>
       </SubMenu>
-      <Menu.Divider />
+      <Menu.Divider/>
       <Menu.Item key="2">
-        <div>Archive Employee</div>
+        <div><Link to={routes.editEmployee.routePath(loggedInUser?.client?.code ?? '1', id ?? '1')}>Edit Employee</Link></div>
       </Menu.Item>
-      <Menu.Divider />
-      <Menu.Item key="3"><div>Delete Employee</div></Menu.Item>
+      <Menu.Divider/>
+      <Menu.Item key="3">
+        <div onClick={() => setArchiveVisibility(true)}>Archive Employee</div>
+      </Menu.Item>
+      <Menu.Divider/>
+      <Menu.Item key="4"><div onClick={() => setModalVisibility(true)}>Delete Employee</div></Menu.Item>
     </Menu>
   );
   const columns = [
     {
-      title: 'Employee Name',
-      dataIndex: 'name',
-      key: 'name',
+      title: 'Name',
+      dataIndex: 'firstName',
+      key: 'firstName',
     },
     {
       title: 'Role',
-      dataIndex: 'role',
-      key: 'role',
+      dataIndex: 'roles',
+      key: 'roles',
+      render: (roles: { name: string; id: string;}[]) => `${roles[0]?.name}`
     },
     {
       title: 'Email',
@@ -39,22 +111,26 @@ const Employee = () => {
       key: 'email',
     },
     {
-      title: 'Reports to',
-      dataIndex: 'reports_to',
-      key: 'reports_to',
+      title: 'Phone',
+      dataIndex: 'phone',
+      key: 'phone',
     },
     {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
+      render: (status: string) =>
+        <span className={status === 'Active' ? styles['active-status'] : styles['inactive-status']}>
+          {status}
+        </span>
     },
     {
       title: 'Actions',
-      dataIndex: 'actions',
+      dataIndex: 'id',
       key: 'actions',
-      render: () =>
+      render: (id: string) =>
         <div className={styles['dropdown-menu']}>
-          <Dropdown overlay={menu} trigger={['click']} placement="bottomRight">
+          <Dropdown overlay={menu(id)} trigger={['click']} placement="bottomRight">
             <div className="ant-dropdown-link" onClick={e => e.preventDefault()} style={{paddingLeft: '1rem'}}>
               <MoreOutlined />
             </div>
@@ -62,66 +138,31 @@ const Employee = () => {
         </div>,
     },
   ];
-  const dataSource = [
-    {
-      key: '1',
-      name: 'Mike',
-      role: 32,
-      email: "mike@gmail.com",
-      reports_to: '10 Downing Street',
-      status: 'Active',
-      actions: ''
-    },
-    {
-      key: '2',
-      name: 'John',
-      role: 42,
-      email: "john@gmail.com",
-      reports_to: '10 Downing Street',
-      status: 'Active',
-      actions: ''
-    },
-    {
-      key: '3',
-      name: 'John',
-      role: 42,
-      email: "john@gmail.com",
-      reports_to: '10 Downing Street',
-      status: 'Active',
-      actions: ''
-    },
-    {
-      key: '4',
-      name: 'John',
-      role: 42,
-      email: "john@gmail.com",
-      reports_to: '10 Downing Street',
-      status: 'Active',
-      actions: ''
-    },
-  ];
+
   return (
-    <>
-      <div className={styles['main-div']}>
-        <Card bordered={false}>
-          <Row>
-            <Col span={12} className={styles['employee-col']}>
-              <h1>Employee</h1>
-            </Col>
-            <Col span={12} className={styles['employee-col']}>
-              <div className={styles['add-new-employee']}>
-                <Link to={routes.addClient.routePath}>Add new Employee</Link>
-              </div>
-            </Col>
-          </Row>
-          <Row>
-            <Col span={24}>
-              <Table dataSource={dataSource} columns={columns} />
-            </Col>
-          </Row>
-        </Card>
-      </div>
-    </>
+    <div className={styles['main-div']}>
+      <Card bordered={false}>
+        <Row>
+          <Col span={12} className={styles['employee-col']}>
+            <h1>Employee</h1>
+          </Col>
+          <Col span={12} className={styles['employee-col']}>
+            <div className={styles['add-new-employee']}>
+              <Link to={routes.addEmployee.routePath(loggedInUser?.client?.code ? loggedInUser?.client?.code : '')}>Add New Employee</Link>
+            </div>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={24}>
+            <Table dataSource={employeeData?.User?.data} columns={columns} rowKey={(record => record?.id)} />
+          </Col>
+        </Row>
+      </Card>
+      <ModalConfirm visibility={visibility} setModalVisibility={setModalVisibility} imgSrc={deleteImg}
+                    okText={'Delete'} modalBody={deleteBody}/>
+      <ModalConfirm visibility={showArchive} setModalVisibility={setArchiveVisibility} imgSrc={archiveImg}
+                    okText={'Archive'} modalBody={archiveBody}/>
+    </div>
   )
 }
 

@@ -28,8 +28,9 @@
   }
 }
 
-.ant-input, .ant-picker {
+.ant-input, .ant-picker, .ant-input-number {
   border: none;
+
   &:hover, &:focus {
     border: none;
     outline: none !important;
@@ -56,13 +57,21 @@
     font-size: 14px;
     line-height: 17px;
   }
+
   .anticon.anticon-down {
     font-size: 17px;
     color: var(--gray-1);
   }
+
   .ant-select-arrow {
     padding-right: 1.5rem;
   }
+}
+
+.ant-input-number {
+  background-color: var(--gray-2) !important;
+  padding: 0.7rem;
+  width: 100%;
 }
 
 .ant-picker, .ant-picker.ant-picker-borderless, .ant-input {
@@ -92,24 +101,44 @@
     font-size: 14px;
     line-height: 17px;
   }
+
   tr:nth-child(even) {
     background-color: var(--gray-2);
   }
+
   td {
     font-weight: normal;
     font-size: 14px;
     line-height: 17px;
     cursor: pointer;
   }
+
   .ant-table-thead > tr > th:not(:last-child):not(.ant-table-selection-column):not(.ant-table-row-expand-icon-cell):not([colspan])::before {
     width: 0;
   }
 }
 
-.ant-modal-footer {
-  border: none;
-  text-align: center;
-  padding-bottom: 5rem;
+.ant-form-item-explain-error {
+  padding: 1rem 0 1rem 0;
+  font-weight: 600;
+}
+
+.ant-form-item-has-error {
+  .ant-input, .ant-select {
+    border: 1px solid var(--primary-red);
+    border-radius: 5px;
+
+    &:focus {
+      border: 1px solid var(--primary-red);
+    }
+  }
+}
+
+.ant-form-vertical .ant-form-item-label {
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 22px;
+  color: #000000;
 }
 
 .ant-form-item-explain-error {

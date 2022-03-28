@@ -1,12 +1,12 @@
 import React from "react";
-import {Card, Col, Row, Form, Input, Space, Button, Select, message} from "antd";
+import { Card, Col, Row, Form, Input, Space, Button, Select, message } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 
-import {useMutation} from "@apollo/client";
 import {gql} from "@apollo/client";
-import {notifyGraphqlError} from "../../../utils/error";
+import {useMutation} from "@apollo/client";
 
 import { useNavigate } from "react-router-dom";
+import { notifyGraphqlError } from "../../../utils/error";
 
 import styles from "../style.module.scss";
 
@@ -28,7 +28,6 @@ const NewClient = () => {
   const [createClient] = useMutation(CLIENT_CREATE);
 
   const onSubmitForm = (values: any) => {
-    console.log(values);
     createClient({
       variables: {
         input: {
@@ -37,7 +36,6 @@ const NewClient = () => {
         }
       }
     }).then((response) => {
-      console.log(response)
       if(response.errors) {
          return notifyGraphqlError((response.errors))
       } else if (response?.data?.ClientCreate) {
@@ -45,7 +43,6 @@ const NewClient = () => {
           navigate(-1)
       }
     }).catch(notifyGraphqlError)
-
   }
 
   return (

@@ -1,5 +1,6 @@
-//import { useQuery } from '@apollo/client';
+import { gql, useMutation, useApolloClient } from '@apollo/client';
 import { Layout, Menu, Avatar, Dropdown } from 'antd';
+import { useNavigate } from 'react-router-dom';
 
 //import { SIDEBAR } from '../../gql/app.gql';
 import { /*sidebarVar, */authVar } from '../../App/link';
@@ -7,14 +8,23 @@ import logo from '../../assets/images/logo.svg';
 import logoContent from '../../assets/images/logo-01.svg';
 import downArrow from '../../assets/images/down-arrow.svg';
 import notification from '../../assets/images/notification.svg';
+import routes from '../../config/routes';
 
 import styles from './style.module.scss';
 
 const { Header } = Layout;
 
-const TopHeader = () => {
+const LOGOUT = gql`
+  mutation Logout {
+    Logout
+  }
+`;
 
-  /*
+const TopHeader = () => {
+  const client = useApolloClient();
+  const navigate = useNavigate();
+
+  /* Uncomment it to make sidebar toggle
   const { data: sidebarData } = useQuery(SIDEBAR);
   const onClick = () => {
     const collapsed = sidebarData?.Sidebar?.collapsed;
@@ -25,16 +35,24 @@ const TopHeader = () => {
   };
    */
 
-  const logout = () => {
-    authVar({
-      isLoggedIn: false,
-      token: null,
-      user: {
-        role: null,
-        id: null,
-      },
-    });
-  }
+  const [logout] = useMutation(LOGOUT, {
+    onCompleted(data) {
+      authVar({
+        isLoggedIn: false,
+        token: null,
+        user: {
+          roles: [],
+          id: null,
+        },
+        client: {
+          id: null,
+          code: '',
+        }
+      });
+      client.clearStore();
+      navigate(routes.login.path);
+    },
+  });
 
   const menu = (
     <Menu style={{ width: 120 }}>

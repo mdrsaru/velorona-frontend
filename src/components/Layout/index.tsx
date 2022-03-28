@@ -10,10 +10,13 @@ import Sidebar from '../Sidebar';
 import Header from '../Header';
 
 import styles from './style.module.scss';
+import NotFound from "../NotFound";
 
 const { Content } = Layout;
 
-interface IProps extends RouteProps {}
+interface IProps extends RouteProps {
+  allowedRoles?: string[]
+}
 
 const _Layout = (props: IProps) => {
   const { data: authData } = useQuery(AUTH);
@@ -33,12 +36,11 @@ const _Layout = (props: IProps) => {
           sidebarData?.Sidebar?.collapsed
             ? styles['site-content-collapsed']
             : styles['site-content']
-        }
-      >
+        }>
         <Sidebar />
         <Layout className={styles['site-layout']}>
           <Content style={{ padding: '1em' }}>
-            <Outlet />
+            {authData?.AuthUser?.user?.roles?.find((role: string) => props.allowedRoles?.includes(role)) ? <Outlet /> : <NotFound/>}
           </Content>
         </Layout>
       </Layout>

@@ -25,12 +25,18 @@ export interface IToken {
 
 export interface IAuthUser {
   id: string | null;
-  role: string | null;
+  roles: string[];
+}
+
+export interface IClientUser {
+  id: string | null;
+  code: string;
 }
 
 export interface IAuth {
   token: string | null;
   user: IAuthUser;
   isLoggedIn: boolean;
+  client?: IClientUser;
 }
 

@@ -2,9 +2,10 @@ import { useQuery } from '@apollo/client';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, Layout } from 'antd';
 
+import constants from '../../config/constants';
 import routes from '../../config/routes';
 import { SIDEBAR } from '../../gql/app.gql';
-import {authVar, sidebarVar} from '../../App/link';
+import { authVar, sidebarVar } from '../../App/link';
 
 import styles from './style.module.scss';
 
@@ -18,10 +19,59 @@ const menuKeys = [
   routes.schedule.path,
 ];
 
-const Sidebar = (props: any) => {
+
+const Sidebar = () => {
   const location = useLocation();
   const { data: sidebarData } = useQuery(SIDEBAR);
-  const userLoggedIn = authVar();
+  const loggedInUser = authVar();
+  const menuItems = [
+    {
+      name: routes.dashboard.name,
+      route: routes.dashboard.routePath,
+      accessRoles: [constants.roles.SuperAdmin]
+    },
+    {
+      name: routes.clientDashboard.name,
+      route: routes.clientDashboard.routePath(loggedInUser?.client?.code ? loggedInUser?.client?.code : ''),
+      accessRoles: [constants.roles.ClientAdmin]
+    },
+    {
+      name: routes.role.name,
+      route: routes.role.routePath(loggedInUser?.client?.code ? loggedInUser?.client?.code : ''),
+      accessRoles: [constants.roles.ClientAdmin]
+    },
+    {
+      name: routes.clientAdmin.name,
+      route: routes.clientAdmin.routePath,
+      accessRoles: [constants.roles.SuperAdmin]
+    },
+    {
+      name: routes.employee.name,
+      route: routes.employee.routePath(loggedInUser?.client?.code ? loggedInUser?.client?.code : ''),
+      accessRoles: [constants.roles.ClientAdmin]
+    },
+    {
+      name: routes.home.name,
+      route: routes.home.routePath,
+      accessRoles: [constants.roles.Employee, constants.roles.TaskManager]
+    },
+    {
+      name: routes.timesheet.name,
+      route: routes.timesheet.routePath,
+      accessRoles: [constants.roles.Employee, constants.roles.TaskManager]
+    },
+    {
+      name: routes.tasks.name,
+      route: routes.tasks.routePath,
+      accessRoles: [constants.roles.Employee, constants.roles.TaskManager]
+    },
+    {
+      name: routes.schedule.name,
+      route: routes.schedule.routePath,
+      accessRoles: [constants.roles.Employee, constants.roles.TaskManager]
+    }
+  ]
+  const menuArray = menuItems.filter(menu => {return loggedInUser?.user?.roles?.some(role => menu.accessRoles.includes(role))})
 
   const onCollapse = () => {
     const collapsed = sidebarData?.Sidebar?.collapsed;
@@ -30,11 +80,6 @@ const Sidebar = (props: any) => {
       collapsed: !collapsed,
     });
   };
-
-  const isAdmin = () => {
-    return userLoggedIn.user.role === 'admin'
-  }
-
   const selectedMenuKey = menuKeys.find(key => key.split('/')?.[1] === location.pathname?.split('/')?.[1]) ?? '';
 
   return (
@@ -46,46 +91,18 @@ const Sidebar = (props: any) => {
       onCollapse={onCollapse}
       breakpoint="lg"
       collapsedWidth="0"
-      trigger={null}
-    >
+      trigger={null}>
       <Menu
         mode="inline"
         defaultSelectedKeys={['1']}
         defaultOpenKeys={['sub1']}
         style={{ height: '100%', borderRight: 0 }}
-        selectedKeys={[selectedMenuKey]}
-      >
-        {isAdmin() &&
-          <>
-            <Menu.Item key={routes.dashboard.routePath}>
-              <Link to={routes.dashboard.routePath}>{routes.dashboard.name}</Link>
-            </Menu.Item>
-            <Menu.Item key={routes.client.routePath}>
-              <Link to={routes.client.routePath}>{routes.client.name}</Link>
-            </Menu.Item>
-            <Menu.Item key={routes.employee.routePath}>
-              <Link to={routes.employee.routePath}>{routes.employee.name}</Link>
-            </Menu.Item>
-          </>}
-        {!isAdmin() &&
-          <>
-            <Menu.Item key={routes.home.routePath}>
-              <Link to={routes.home.routePath}>{routes.home.name}</Link>
-            </Menu.Item>
-
-            <Menu.Item key={routes.timesheet.routePath}>
-              <Link to={routes.timesheet.routePath}>{routes.timesheet.name}</Link>
-            </Menu.Item>
-
-            <Menu.Item key={routes.tasks.routePath}>
-              <Link to={routes.tasks.routePath}>{routes.tasks.name}</Link>
-            </Menu.Item>
-
-            <Menu.Item key={routes.schedule.routePath}>
-              <Link to={routes.schedule.routePath}>{routes.schedule.name}</Link>
-            </Menu.Item>
-          </>}
-
+        selectedKeys={[selectedMenuKey]}>
+        {menuArray && menuArray.map((menu, index) => (
+          <Menu.Item key={index}>
+            <Link to={menu.route}>{menu.name}</Link>
+          </Menu.Item>
+        ))}
       </Menu>
     </Sider>
   );

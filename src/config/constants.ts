@@ -4,7 +4,13 @@ const config = {
   paging: {
     perPage: 25,
   },
-  roles: {},
+  roles: {
+    SuperAdmin: 'SuperAdmin',
+    ClientAdmin: 'ClientAdmin',
+    Employee: 'Employee',
+    TaskManager: 'TaskManager',
+    Vendor: 'Vendor',
+  },
 };
 
 export default config;

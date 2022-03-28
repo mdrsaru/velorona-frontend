@@ -54,8 +54,12 @@ function App() {
           token: response?.data?.accessToken,
           user: {
             id: response?.data?.id ?? null,
-            role: response?.data?.role ?? null,
+            roles: response?.data?.roles?.map((role: any) => role.name),
           },
+          client: {
+            id: response?.data?.client?.id ?? null,
+            code: response?.data?.client?.clientCode ?? null,
+          }
         });
       })
       .finally(() => {

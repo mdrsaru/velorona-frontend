@@ -1,5 +1,5 @@
 import React from "react";
-import {Card, Col, Row, Table, DatePicker, Select, Form} from 'antd';
+import { Card, Col, Row, Table, DatePicker, Select, Form } from 'antd';
 
 import { DownOutlined } from '@ant-design/icons';
 
