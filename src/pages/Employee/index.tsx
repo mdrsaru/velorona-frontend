@@ -11,6 +11,7 @@ import {useState} from "react";
 import deleteImg from "../../assets/images/delete_btn.svg";
 import archiveImg from "../../assets/images/archive_btn.svg";
 import ModalConfirm from "../../components/Modal";
+import moment from "moment";
 
 const {SubMenu} = Menu;
 
@@ -21,6 +22,7 @@ const USER = gql`
         id
         email
         phone
+        fullName
         firstName
         lastName
         middleName
@@ -28,6 +30,16 @@ const USER = gql`
         roles {
           id
           name
+        }
+        address {
+          streetAddress
+          city
+          zipcode
+        }
+        record {
+          startDate 
+          endDate
+          payRate
         }
       }
     }
@@ -95,9 +107,15 @@ const Employee = () => {
   );
   const columns = [
     {
-      title: 'Name',
-      dataIndex: 'firstName',
-      key: 'firstName',
+      title: 'Employee Info',
+      render: (user: any) => {
+        return <div>
+          <p>Name: {user?.fullName}</p>
+          <p>Phone: {user?.phone}</p>
+          <p>Email: {user?.email}</p>
+          <p>Address: {user?.address?.streetAddress}</p>
+        </div>
+      }
     },
     {
       title: 'Role',
@@ -106,14 +124,30 @@ const Employee = () => {
       render: (roles: { name: string; id: string;}[]) => `${roles[0]?.name}`
     },
     {
-      title: 'Email',
-      dataIndex: 'email',
-      key: 'email',
+      title: 'Start Date',
+      render: (user: any) => {
+        console.log(user);
+        return <div>
+          <p>{moment(user?.record?.startDate).format('Do MMMM YYYY') ?? 'N/A'}</p>
+        </div>
+      }
     },
     {
-      title: 'Phone',
-      dataIndex: 'phone',
-      key: 'phone',
+      title: 'End Date',
+      render: (user: any) => {
+        console.log(user);
+        return <div>
+          <p>{moment(user?.record?.endDate).format('Do MMMM YYYY') ?? 'N/A'}</p>
+        </div>
+      }
+    },
+    {
+      title: 'Pay Rate',
+      render: (user: any) => {
+        return <div>
+          <p>{user?.record?.payRate ?? 'N/A'}</p>
+        </div>
+      }
     },
     {
       title: 'Status',

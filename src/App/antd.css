@@ -25734,6 +25734,16 @@ div.ant-typography-edit-content.ant-typography-rtl {
 .ant-btn-primary:hover {
   background: linear-gradient(to right, #3A43AF, #95239C);
 }
+.ant-input:placeholder-shown,
+.ant-select-selection-placeholder,
+.ant-picker:placeholder-shown,
+.ant-input-number-input:placeholder-shown,
+.ant-form-item-label > label,
+input {
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 22px;
+}
 .ant-input,
 .ant-picker,
 .ant-input-number {
@@ -25761,11 +25771,6 @@ div.ant-typography-edit-content.ant-typography-rtl {
 .ant-select {
   width: 100%;
 }
-.ant-select input::placeholder {
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 17px;
-}
 .ant-select .anticon.anticon-down {
   font-size: 17px;
   color: var(--gray-1);
@@ -25778,14 +25783,6 @@ div.ant-typography-edit-content.ant-typography-rtl {
   padding: 0.7rem;
   width: 100%;
 }
-.ant-input-number ::placeholder {
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 17px;
-}
-.ant-input-number .ant-input-number-handler-wrap {
-  display: none;
-}
 .ant-picker,
 .ant-picker.ant-picker-borderless,
 .ant-input {
@@ -25793,12 +25790,12 @@ div.ant-typography-edit-content.ant-typography-rtl {
   padding: 1rem;
   width: 100%;
 }
-.ant-picker input::placeholder,
-.ant-picker.ant-picker-borderless input::placeholder,
-.ant-input input::placeholder {
+.ant-picker .ant-picker-input input::placeholder,
+.ant-picker.ant-picker-borderless .ant-picker-input input::placeholder,
+.ant-input .ant-picker-input input::placeholder {
   font-weight: 600;
-  font-size: 14px;
-  line-height: 17px;
+  font-size: 15px;
+  line-height: 22px;
 }
 .ant-picker .anticon,
 .ant-picker.ant-picker-borderless .anticon,

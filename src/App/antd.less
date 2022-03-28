@@ -28,6 +28,13 @@
   }
 }
 
+.ant-input:placeholder-shown, .ant-select-selection-placeholder, .ant-picker:placeholder-shown,
+.ant-input-number-input:placeholder-shown, .ant-form-item-label > label, input  {
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 22px;
+}
+
 .ant-input, .ant-picker, .ant-input-number {
   border: none;
 
@@ -52,12 +59,6 @@
 .ant-select {
   width: 100%;
 
-  input::placeholder {
-    font-weight: 600;
-    font-size: 14px;
-    line-height: 17px;
-  }
-
   .anticon.anticon-down {
     font-size: 17px;
     color: var(--gray-1);
@@ -81,8 +82,8 @@
 
   .ant-picker-input input::placeholder {
     font-weight: 600;
-    font-size: 14px;
-    line-height: 17px;
+    font-size: 15px;
+    line-height: 22px;
   }
 
   .anticon {
@@ -150,6 +151,7 @@
   .ant-input, .ant-select {
     border: 1px solid var(--primary-red) !important;
     border-radius: 5px;
+
     &:focus {
       border: 1px solid var(--primary-red) !important;;
     }

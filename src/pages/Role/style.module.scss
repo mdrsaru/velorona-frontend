@@ -9,14 +9,12 @@
     .ant-modal-body {
       padding-right: 3rem;
     }
+    label, input::placeholder {
+      font-weight: 600;
+      font-size: 18px;
+      line-height: 22px;
+    }
   }
-  label, input::placeholder {
-    font-weight: 600;
-    font-size: 18px;
-    line-height: 22px;
-  }
-
-
   .ant-form-item-label {
     font-weight: 600;
     font-size: 18px;
