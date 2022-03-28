@@ -33,11 +33,6 @@ const Login = () => {
   const navigate = useNavigate();
   const [Login] = useMutation(LOGIN);
   let { role } = useParams();
-<<<<<<< HEAD
-=======
-
-  console.log(role)
->>>>>>> develop
 
   const handleSubmit = (values: any) => {
     let formData = role === 'admin' ?
