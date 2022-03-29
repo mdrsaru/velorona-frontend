@@ -28,7 +28,7 @@ export interface IAuthUser {
   roles: string[];
 }
 
-export interface IClientUser {
+export interface ICompanyUser {
   id: string | null;
   code: string;
 }
@@ -37,6 +37,6 @@ export interface IAuth {
   token: string | null;
   user: IAuthUser;
   isLoggedIn: boolean;
-  client?: IClientUser;
+  company?: ICompanyUser;
 }
 

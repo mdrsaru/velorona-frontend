@@ -56,9 +56,9 @@ function App() {
             id: response?.data?.id ?? null,
             roles: response?.data?.roles?.map((role: any) => role.name),
           },
-          client: {
-            id: response?.data?.client?.id ?? null,
-            code: response?.data?.client?.clientCode ?? null,
+          company: {
+            id: response?.data?.company?.id ?? null,
+            code: response?.data?.company?.companyCode ?? null,
           }
         });
       })

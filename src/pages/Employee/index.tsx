@@ -23,9 +23,6 @@ const USER = gql`
         email
         phone
         fullName
-        firstName
-        lastName
-        middleName
         status
         roles {
           id
@@ -33,8 +30,6 @@ const USER = gql`
         }
         address {
           streetAddress
-          city
-          zipcode
         }
         record {
           startDate 
@@ -95,7 +90,7 @@ const Employee = () => {
       </SubMenu>
       <Menu.Divider/>
       <Menu.Item key="2">
-        <div><Link to={routes.editEmployee.routePath(loggedInUser?.client?.code ?? '1', id ?? '1')}>Edit Employee</Link></div>
+        <div><Link to={routes.editEmployee.routePath(loggedInUser?.company?.code ?? '1', id ?? '1')}>Edit Employee</Link></div>
       </Menu.Item>
       <Menu.Divider/>
       <Menu.Item key="3">
@@ -107,15 +102,9 @@ const Employee = () => {
   );
   const columns = [
     {
-      title: 'Employee Info',
-      render: (user: any) => {
-        return <div>
-          <p>Name: {user?.fullName}</p>
-          <p>Phone: {user?.phone}</p>
-          <p>Email: {user?.email}</p>
-          <p>Address: {user?.address?.streetAddress}</p>
-        </div>
-      }
+      title: 'Name',
+      dataIndex: 'fullName',
+      key: 'fullName',
     },
     {
       title: 'Role',
@@ -126,7 +115,6 @@ const Employee = () => {
     {
       title: 'Start Date',
       render: (user: any) => {
-        console.log(user);
         return <div>
           <p>{moment(user?.record?.startDate).format('Do MMMM YYYY') ?? 'N/A'}</p>
         </div>
@@ -135,7 +123,6 @@ const Employee = () => {
     {
       title: 'End Date',
       render: (user: any) => {
-        console.log(user);
         return <div>
           <p>{moment(user?.record?.endDate).format('Do MMMM YYYY') ?? 'N/A'}</p>
         </div>
@@ -182,7 +169,7 @@ const Employee = () => {
           </Col>
           <Col span={12} className={styles['employee-col']}>
             <div className={styles['add-new-employee']}>
-              <Link to={routes.addEmployee.routePath(loggedInUser?.client?.code ? loggedInUser?.client?.code : '')}>Add New Employee</Link>
+              <Link to={routes.addEmployee.routePath(loggedInUser?.company?.code ? loggedInUser?.company?.code : '')}>Add New Employee</Link>
             </div>
           </Col>
         </Row>

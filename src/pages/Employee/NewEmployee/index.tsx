@@ -50,12 +50,11 @@ const NewEmployee = () => {
       variables: {
         input: {
           email: values.email,
-          password: 'password',
           phone: values.phone,
           firstName: values.firstName,
           lastName: values.lastName,
           status: values.status,
-          client_id: authData?.client?.id,
+          company_id: authData?.company?.id,
           roles: [values?.roles],
           address: {
             streetAddress: values.streetAddress,
@@ -96,24 +95,26 @@ const NewEmployee = () => {
           </Row>
           <Row>
             <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-              <Form.Item label="First Name" name='firstName'>
+              <Form.Item label="First Name" name='firstName' rules={[{ required: true, message: 'Please enter firstname!' }]}>
                 <Input placeholder="Enter firstname" name='firstname'/>
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-              <Form.Item label="Last Name" name='lastName'>
+              <Form.Item label="Last Name" name='lastName' rules={[{ required: true, message: 'Please input your lastname!' }]}>
                 <Input placeholder="Enter lastname" name='lastname'/>
               </Form.Item>
             </Col>
           </Row>
           <Row>
             <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-              <Form.Item label="Email" name='email'>
-                <Input placeholder="Enter your email"/>
+              <Form.Item label="Email" name='email'  rules={[{type: 'email', message: 'The input is not valid E-mail!',},
+                {required: true, message: 'Please input your E-mail!'},]}>
+                <Input placeholder="Enter your email" />
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-              <Form.Item label="Phone Number" name='phone'>
+              <Form.Item label="Phone Number" name='phone' rules={[{ required: true, message: 'Please input your phone number!' },
+                {max: 10, message: "Phone number should be less than 10 digits"}]}>
                 <Input placeholder="Enter your phone number"/>
               </Form.Item>
             </Col>
@@ -135,7 +136,7 @@ const NewEmployee = () => {
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={8} lg={8} className={styles.formCol}>
-              <Form.Item label="Street Address" name='streetAddress'>
+              <Form.Item label="Street Address" name='streetAddress' rules={[{ required: true, message: 'Please enter your street address!' }]}>
                 <Input placeholder="Enter street address" name='street'/>
               </Form.Item>
             </Col>
@@ -214,10 +215,10 @@ const NewEmployee = () => {
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-              <Form.Item name="status" label="Employee Status">
+              <Form.Item name="status" label="Employee Status" rules={[{ required: true, message: 'Please select the status' }]}>
                 <Select placeholder="Select status">
                   <Option value="Active">Active</Option>
-                  <Option value="InActive">In Active</Option>
+                  <Option value="Inactive">In Active</Option>
                 </Select>
               </Form.Item>
             </Col>

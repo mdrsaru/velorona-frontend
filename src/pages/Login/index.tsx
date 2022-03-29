@@ -17,9 +17,9 @@ const LOGIN = gql`
         id
         token
         refreshToken
-        client {
+        company {
           id
-          clientCode
+          companyCode
         }
         roles {
           id
@@ -40,7 +40,7 @@ const Login = () => {
         password: values.password} :
       {email: values.email,
         password: values.password,
-        clientCode: values.code}
+        companyCode: values.code}
     Login({
       variables: {
         input: formData
@@ -60,17 +60,17 @@ const Login = () => {
           id: loginData?.id,
           roles,
         },
-        client: {
-          id: loginData?.client?.id,
-          code: loginData?.client?.clientCode
+        company: {
+          id: loginData?.company?.id,
+          code: loginData?.company?.companyCode
         },
         isLoggedIn: true,
       });
 
       if(roles.includes(constants.roles.SuperAdmin)) {
         navigate(routes.dashboard.routePath)
-      } else if(roles.includes(constants.roles.ClientAdmin)) {
-        navigate(routes.client.routePath(loginData?.client?.clientCode));
+      } else if(roles.includes(constants.roles.CompanyAdmin)) {
+        navigate(routes.company.routePath(loginData?.company?.companyCode));
       } else {
         navigate(routes.home.routePath);
       }

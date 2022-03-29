@@ -27,7 +27,7 @@ const _Routes = () => {
 
         {/* protected routes */}
         <Route path="/" element={<Layout/>}>
-          <Route path={routes.client.path} element={<AuthRoute allowedRoles={[constants.roles.ClientAdmin]}/>}>
+          <Route path={routes.company.path} element={<AuthRoute allowedRoles={[constants.roles.CompanyAdmin]}/>}>
             <Route index element={<Suspense fallback={<Skeleton/>}><routes.dashboard.component/></Suspense>}/>
             <Route path={routes.role.path} element={<Suspense fallback={<Skeleton/>}>
                 <routes.role.component/>
@@ -54,14 +54,14 @@ const _Routes = () => {
                 <routes.dashboard.component/>
               </Suspense>
             }/>
-            <Route path={routes.clientAdmin.path}>
+            <Route path={routes.companyAdmin.path}>
               <Route index element={<Suspense fallback={<Skeleton/>}>
-                <routes.client.component/>
+                <routes.company.component/>
               </Suspense>}/>
-              <Route path={routes.addClient.path}
+              <Route path={routes.addCompany.path}
                      element={
                        <Suspense fallback={<Skeleton/>}>
-                         <routes.addClient.component/>
+                         <routes.addCompany.component/>
                        </Suspense>
                      }/>
             </Route>

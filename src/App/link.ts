@@ -17,7 +17,7 @@ const auth: IAuth = {
     id: null,
   },
   isLoggedIn: false,
-  client: {
+  company: {
     code: '',
     id: null
   }

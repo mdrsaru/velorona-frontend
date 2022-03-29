@@ -7,11 +7,11 @@ const routes = {
     component: lazy(() => import('../pages/Dashboard')),
     name: 'Dashboard',
   },
-  clientAdmin: {
-    path: 'client',
-    routePath: '/client',
-    component: lazy(() => import('../pages/Client')),
-    name: 'Client',
+  companyAdmin: {
+    path: 'company',
+    routePath: '/company',
+    component: lazy(() => import('../pages/Company')),
+    name: 'Company',
   },
   login: {
     path: 'login',
@@ -37,23 +37,23 @@ const routes = {
     component: lazy(() => import('../pages/Role')),
     name: 'Role',
   },
-  clientDashboard: {
+  companyDashboard: {
     path: 'dashboard',
     routePath:  (id: string) => `/${id}/dashboard`,
     component: lazy(() => import('../pages/Dashboard')),
     name: 'Dashboard',
   },
-  client: {
+  company: {
     path: ':id',
     routePath:  (id: string) => `/${id}`,
-    component: lazy(() => import('../pages/Client')),
-    name: 'Client',
+    component: lazy(() => import('../pages/Company')),
+    name: 'Company',
   },
-  addClient: {
+  addCompany: {
     path: ':new',
-    routePath: `/client/new`,
-    component: lazy(() => import('../pages/Client/NewClient')),
-    name: 'New Client',
+    routePath: `/company/new`,
+    component: lazy(() => import('../pages/Company/NewCompany')),
+    name: 'New Company',
   },
   employee: {
     path: 'employee',
