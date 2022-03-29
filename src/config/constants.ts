@@ -6,6 +6,7 @@ const config = {
   },
   roles: {
     SuperAdmin: 'SuperAdmin',
+    CompanyAdmin: 'CompanyAdmin',
     ClientAdmin: 'ClientAdmin',
     Employee: 'Employee',
     TaskManager: 'TaskManager',

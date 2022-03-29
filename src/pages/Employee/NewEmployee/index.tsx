@@ -1,16 +1,35 @@
-import React from "react";
+import React, {useState} from "react";
 import moment from 'moment';
 
-import { Button, Card, Col, Form, Input, message, Row, Select, Space, DatePicker, InputNumber } from "antd";
-import { ArrowLeftOutlined } from "@ant-design/icons";
+import { Button, Card, Col, Form, Input, message, Row, Select, Space, Upload, DatePicker, InputNumber } from "antd";
+import { ArrowLeftOutlined, UploadOutlined } from "@ant-design/icons";
 
 import { useNavigate } from "react-router-dom";
+import { mediaServices } from '../../../services/MediaService';
 
-import styles from "../style.module.scss";
 import {gql, useMutation, useQuery} from "@apollo/client";
 import {notifyGraphqlError} from "../../../utils/error";
 import {authVar} from "../../../App/link";
+
 import {IRole} from "../../../interfaces/IRole";
+import styles from "../style.module.scss";
+
+const normFile = (e: any) => {
+  if (Array.isArray(e)) {
+    return e;
+  }
+  return e && e.fileList;
+};
+
+const CHANGE_PROFILE_IMAGE = gql`
+  mutation ChangeProfilePicture($input: ChangeProfilePictureInput!) {
+    ChangeProfilePicture(input: $input) {
+      id
+      firstName
+      lastName
+    }
+  }
+`
 
 const EMPLOYEE_CREATE = gql`
   mutation UserCreate($input: UserCreateInput!) {
@@ -31,10 +50,13 @@ const ROLES = gql`
   }
 `
 
+
 const NewEmployee = () => {
   const navigate = useNavigate();
   const authData = authVar();
+  const [dates, setDates] = useState([]);
   const [UserCreate] = useMutation(EMPLOYEE_CREATE);
+  const [ChangeProfilePictureInput] = useMutation(CHANGE_PROFILE_IMAGE);
   const { data: roles } = useQuery(ROLES, {
     fetchPolicy: "cache-first"
   });
@@ -44,18 +66,28 @@ const NewEmployee = () => {
   const cancelAddEmployee = () => {
     navigate(-1);
   }
+  const successMessage = (response: string) => {
+    message.success(`New Employee ${response} is created successfully!`).then(r => {
+      if (r) {
+        navigate(-1)
+      }
+    });
+  }
+
+  function disabledDate(current: any) {
+    return current && current < moment(dates, 'YYYY-MM-DD');
+  }
 
   const onSubmitForm = (values: any) => {
     UserCreate({
       variables: {
         input: {
           email: values.email,
-          password: 'password',
           phone: values.phone,
           firstName: values.firstName,
           lastName: values.lastName,
           status: values.status,
-          client_id: authData?.client?.id,
+          company_id: authData?.company?.id,
           roles: [values?.roles],
           address: {
             streetAddress: values.streetAddress,
@@ -74,8 +106,30 @@ const NewEmployee = () => {
       if(response.errors) {
         return notifyGraphqlError((response.errors))
       } else if (response?.data?.UserCreate) {
-        message.success(`New Employee ${response?.data?.UserCreate?.firstName} is created successfully!`).then(r => {});
-        navigate(-1)
+        if (values?.upload) {
+          const formData = new FormData();
+          formData.append('file', values?.upload[0]?.originFileObj)
+          mediaServices.uploadProfileImage(formData).then((res: any) => {
+            if (res?.status === 200) {
+              const user = response?.data?.UserCreate?.id;
+              const avatar = res?.data?.data?.id;
+              ChangeProfilePictureInput({
+                variables: {
+                  input: {
+                    id: user,
+                    avatar_id: avatar
+                  }
+                }}).then((response) => {
+                if(response.errors) {
+                  return notifyGraphqlError((response.errors))
+                } else if (response?.data) {
+                  successMessage(response?.data?.UserCreate?.firstName)
+                }
+              }).catch(notifyGraphqlError)
+            }})
+        } else {
+          successMessage(response?.data?.UserCreate?.firstName)
+        }
       }
     }).catch(notifyGraphqlError)
   }
@@ -96,24 +150,26 @@ const NewEmployee = () => {
           </Row>
           <Row>
             <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-              <Form.Item label="First Name" name='firstName'>
+              <Form.Item label="First Name" name='firstName' rules={[{ required: true, message: 'Please enter firstname!' }]}>
                 <Input placeholder="Enter firstname" name='firstname'/>
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-              <Form.Item label="Last Name" name='lastName'>
+              <Form.Item label="Last Name" name='lastName' rules={[{ required: true, message: 'Please input your lastname!' }]}>
                 <Input placeholder="Enter lastname" name='lastname'/>
               </Form.Item>
             </Col>
           </Row>
           <Row>
             <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-              <Form.Item label="Email" name='email'>
-                <Input placeholder="Enter your email"/>
+              <Form.Item label="Email" name='email'  rules={[{type: 'email', message: 'The input is not valid E-mail!',},
+                {required: true, message: 'Please input your E-mail!'},]}>
+                <Input placeholder="Enter your email" />
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-              <Form.Item label="Phone Number" name='phone'>
+              <Form.Item label="Phone Number" name='phone' rules={[{ required: true, message: 'Please input your phone number!' },
+                {max: 10, message: "Phone number should be less than 10 digits"}]}>
                 <Input placeholder="Enter your phone number"/>
               </Form.Item>
             </Col>
@@ -135,7 +191,7 @@ const NewEmployee = () => {
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={8} lg={8} className={styles.formCol}>
-              <Form.Item label="Street Address" name='streetAddress'>
+              <Form.Item label="Street Address" name='streetAddress' rules={[{ required: true, message: 'Please enter your street address!' }]}>
                 <Input placeholder="Enter street address" name='street'/>
               </Form.Item>
             </Col>
@@ -159,21 +215,23 @@ const NewEmployee = () => {
           </Row>
           <Row>
             <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-              <Form.Item name="startDate" label="Employee Start Time">
+              <Form.Item name="startDate" label="Employee Start Date" rules={[{ required: true, message: 'Please enter start time!' }]}>
                 <DatePicker format="YYYY-MM-DD HH:mm:ss" placeholder={"Enter Start Date"} suffixIcon={""}
+                            onChange={(val: any) => setDates(val)}
                             showTime={{ defaultValue: moment('00:00:00', 'HH:mm:ss') }}/>
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-              <Form.Item name="endDate" label="Employee End Date">
+              <Form.Item name="endDate" label="Employee End Date" rules={[{ required: true, message: 'Please enter end date!' }]}>
                 <DatePicker format="YYYY-MM-DD HH:mm:ss" placeholder={"Enter End Date"} suffixIcon={""}
+                            disabledDate={disabledDate}
                             showTime={{ defaultValue: moment('00:00:00', 'HH:mm:ss') }}/>
               </Form.Item>
             </Col>
           </Row>
           <Row>
             <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-              <Form.Item name="roles" label="Role">
+              <Form.Item name="roles" label="Role" rules={[{ required: true, message: 'Please enter role!' }]}>
                 <Select placeholder="Employee">
                   {roles && roles?.Role?.data.map((role: IRole, index:number) => (
                     <Option value={role?.id} key={index}>{role?.name}</Option>
@@ -182,7 +240,7 @@ const NewEmployee = () => {
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-              <Form.Item label="Pay Rate" name='payRate'>
+              <Form.Item label="Pay Rate" name='payRate' rules={[{ required: true, message: 'Please enter pay rate!' }]}>
                 <InputNumber placeholder="$20" />
               </Form.Item>
             </Col>
@@ -209,15 +267,17 @@ const NewEmployee = () => {
           </Row>
           <Row>
             <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-              <Form.Item label="Input Field with text" name='image'>
-                <Input placeholder="Employee Image" />
+              <Form.Item name="upload" label="Upload" valuePropName="fileList" getValueFromEvent={normFile}>
+                <Upload name="profileImg" maxCount={1}>
+                  <Button icon={<UploadOutlined />}>Click to Upload</Button>
+                </Upload>
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-              <Form.Item name="status" label="Employee Status">
+              <Form.Item name="status" label="Employee Status" rules={[{ required: true, message: 'Please select the status' }]}>
                 <Select placeholder="Select status">
                   <Option value="Active">Active</Option>
-                  <Option value="InActive">In Active</Option>
+                  <Option value="Inactive">In Active</Option>
                 </Select>
               </Form.Item>
             </Col>

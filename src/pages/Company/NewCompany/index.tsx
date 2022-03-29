@@ -12,9 +12,9 @@ import styles from "../style.module.scss";
 
 const { Option } = Select;
 
-const CLIENT_CREATE = gql`
-  mutation ClientCreate($input: ClientCreateInput!) {
-      ClientCreate(input: $input) {
+const COMPANY_CREATE = gql`
+  mutation CompanyCreate($input: CompanyCreateInput!) {
+      CompanyCreate(input: $input) {
           id
           name
           createdAt 
@@ -22,13 +22,13 @@ const CLIENT_CREATE = gql`
   }
 `
 
-const NewClient = () => {
+const NewCompany = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
-  const [createClient] = useMutation(CLIENT_CREATE);
+  const [createCompany] = useMutation(COMPANY_CREATE);
 
   const onSubmitForm = (values: any) => {
-    createClient({
+    createCompany({
       variables: {
         input: {
           name: values.name,
@@ -38,30 +38,31 @@ const NewClient = () => {
     }).then((response) => {
       if(response.errors) {
          return notifyGraphqlError((response.errors))
-      } else if (response?.data?.ClientCreate) {
-          message.success(`Client admin ${response?.data?.ClientCreate?.name} is created successfully!`).then(r => {});
+      } else if (response?.data?.CompanyCreate) {
+          message.success(`Company admin ${response?.data?.CompanyCreate?.name} is created successfully!`).then(r => {});
           navigate(-1)
       }
     }).catch(notifyGraphqlError)
   }
 
   return (
-    <div className={styles['client-main-div']}>
+    <div className={styles['company-main-div']}>
       <Card bordered={false}>
         <Row>
           <Col span={24} className={styles['form-col']}>
-            <h1><ArrowLeftOutlined onClick={() => navigate(-1)}/> &nbsp; Add New Client</h1>
+            <h1><ArrowLeftOutlined onClick={() => navigate(-1)}/> &nbsp; Add New Company</h1>
           </Col>
         </Row>
         <Form form={form} layout="vertical" onFinish={onSubmitForm}>
           <Row>
             <Col xs={24} sm={24} md={12} className={styles['form-col2']}>
-              <Form.Item label="Client Name" name="name" rules={[{required: true, message: 'Enter a client name.'}]}>
-                <Input placeholder="Enter Name of the client"/>
+              <Form.Item label="Company Name" name="name" rules={[{required: true, message: 'Enter a company name.'},
+                {max: 50, message: "Name should be less than 50 character"}]}>
+                <Input placeholder="Enter Name of the company"/>
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={12} className={styles['form-col2']}>
-              <Form.Item name="status" label="Client Status" rules={[{required: true, message: 'Select a client status.'}]}>
+              <Form.Item name="status" label="Company Status" rules={[{required: true, message: 'Select a company status.'}]}>
                 <Select placeholder="Active">
                   <Option value="Active">Active</Option>
                   <Option value="Inactive">In Active</Option>
@@ -71,8 +72,9 @@ const NewClient = () => {
           </Row>
           <Row>
             <Col span={24} className={styles['form-col2']}>
-              <Form.Item label="Email">
-                <Input placeholder="Client Admin Email"/>
+              <Form.Item label="Email" name='email' rules={[{type: 'email', message: 'The input is not valid E-mail!',},
+                {required: true, message: 'Please input your E-mail!'},]}>
+                <Input placeholder="Company Admin Email"/>
               </Form.Item>
             </Col>
           </Row>
@@ -82,7 +84,7 @@ const NewClient = () => {
               <Form.Item>
                 <Space size={'large'}>
                   <Button type="default" htmlType="button">Cancel</Button>
-                  <Button type="primary" htmlType="submit">Add Client</Button>
+                  <Button type="primary" htmlType="submit">Add Company</Button>
                 </Space>
               </Form.Item>
             </Col>
@@ -93,4 +95,4 @@ const NewClient = () => {
   )
 }
 
-export default NewClient;
+export default NewCompany;

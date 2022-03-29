@@ -31,24 +31,24 @@ const Sidebar = () => {
       accessRoles: [constants.roles.SuperAdmin]
     },
     {
-      name: routes.clientDashboard.name,
-      route: routes.client.routePath(loggedInUser?.client?.code ? loggedInUser?.client?.code : ''),
-      accessRoles: [constants.roles.ClientAdmin]
+      name: routes.companyDashboard.name,
+      route: routes.company.routePath(loggedInUser?.company?.code ? loggedInUser?.company?.code : ''),
+      accessRoles: [constants.roles.CompanyAdmin]
     },
     {
       name: routes.role.name,
-      route: routes.role.routePath(loggedInUser?.client?.code ? loggedInUser?.client?.code : ''),
-      accessRoles: [constants.roles.ClientAdmin]
+      route: routes.role.routePath(loggedInUser?.company?.code ? loggedInUser?.company?.code : ''),
+      accessRoles: [constants.roles.CompanyAdmin]
     },
     {
-      name: routes.clientAdmin.name,
-      route: routes.clientAdmin.routePath,
+      name: routes.companyAdmin.name,
+      route: routes.companyAdmin.routePath,
       accessRoles: [constants.roles.SuperAdmin]
     },
     {
       name: routes.employee.name,
-      route: routes.employee.routePath(loggedInUser?.client?.code ? loggedInUser?.client?.code : ''),
-      accessRoles: [constants.roles.ClientAdmin]
+      route: routes.employee.routePath(loggedInUser?.company?.code ? loggedInUser?.company?.code : ''),
+      accessRoles: [constants.roles.CompanyAdmin]
     },
     {
       name: routes.home.name,

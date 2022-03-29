@@ -14,9 +14,9 @@ import ModalConfirm from "../../components/Modal";
 
 
 const {SubMenu} = Menu;
-const CLIENT = gql`
-  query Client {
-    Client {
+const COMPANY = gql`
+  query Company {
+    Company {
       data {
         id
         name
@@ -30,7 +30,7 @@ const deleteBody = () => {
     <div className={styles['modal-message']}>
       <div><img src={deleteImg} alt="confirm" /></div><br/>
       <p>Are you sure you want to delete <strong>Insight Workshop Pvt. Ltd?</strong></p>
-      <p className={styles['warning-text']}>All the data associated with the client will be deleted permanently.</p>
+      <p className={styles['warning-text']}>All the data associated with the company will be deleted permanently.</p>
     </div>
   )
 }
@@ -40,14 +40,14 @@ const archiveBody = () => {
     <div className={styles['modal-message']}>
       <div><img src={archiveImg} alt="archive-confirm"/></div> <br/>
       <p>Are you sure you want to archive <strong>Insight Workshop Pvt. Ltd?</strong></p>
-      <p className={styles['archive-text']}>Client will not be able to login to the system.</p>
+      <p className={styles['archive-text']}>Company will not be able to login to the system.</p>
     </div>
   )
 }
 
 
-const Client = () => {
-  const {data: clientData} = useQuery(CLIENT)
+const Company = () => {
+  const {data: companyData} = useQuery(COMPANY)
   const [visibility, setVisibility] = useState(false);
   const [showArchive, setArchiveModal] = useState(false);
   const setModalVisibility = (value: boolean) => {
@@ -60,24 +60,26 @@ const Client = () => {
   const menu = (
     <Menu>
       <SubMenu title="Change status" key="4">
-        <Menu.Item key="0">Active</Menu.Item>
+        <Menu.Item key="Active">Active</Menu.Item>
         <Menu.Divider/>
-        <Menu.Item key="1">Inactive</Menu.Item>
+        <Menu.Item key="Inactive">Inactive</Menu.Item>
+        <Menu.Divider/>
+        <Menu.Item key="Archived">Archived</Menu.Item>
       </SubMenu>
       <Menu.Divider/>
       <Menu.Item key="2">
-        <div onClick={() => setArchiveVisibility(true)}>Archive Client</div>
+        <div onClick={() => setArchiveVisibility(true)}>Archive Company</div>
       </Menu.Item>
       <Menu.Divider/>
       <Menu.Item key="3">
-        <div onClick={() => setModalVisibility(true)}>Delete Client</div>
+        <div onClick={() => setModalVisibility(true)}>Delete Company</div>
       </Menu.Item>
     </Menu>
   );
 
   const columns = [
     {
-      title: 'Client Name',
+      title: 'Company Name',
       dataIndex: 'name',
       key: 'name',
     },
@@ -103,21 +105,21 @@ const Client = () => {
 
   return (
     <>
-      <div className={styles['client-main-div']}>
+      <div className={styles['company-main-div']}>
         <Card bordered={false}>
           <Row>
             <Col span={12} className={styles['form-col']}>
-              <h1>Clients</h1>
+              <h1>Companies</h1>
             </Col>
             <Col span={12} className={styles['form-col']}>
-              <div className={styles['add-new-client']}>
-                <Link to={routes.addClient.routePath}>Add new client</Link>
+              <div className={styles['add-new-company']}>
+                <Link to={routes.addCompany.routePath}>Add new company</Link>
               </div>
             </Col>
           </Row>
           <Row>
             <Col span={24}>
-              <Table dataSource={clientData?.Client?.data} columns={columns} rowKey={(record => record?.id)}/>
+              <Table dataSource={companyData?.Company?.data} columns={columns} rowKey={(record => record?.id)}/>
             </Col>
           </Row>
         </Card>
@@ -130,4 +132,4 @@ const Client = () => {
   )
 }
 
-export default Client;
+export default Company;

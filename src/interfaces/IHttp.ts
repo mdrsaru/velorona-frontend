@@ -34,7 +34,7 @@ export interface IFetchService {
   url: string;
   method: string;
   credentials?: CredentialsEnum | undefined;
-  headers?: Headers | string[][];
+  headers?: Headers | string[][] | {};
   body?: any;
 }
 

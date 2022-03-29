@@ -1,4 +1,4 @@
-export interface IClient {
+export interface ICompany {
   id: any;
   name: string;
   status: string;

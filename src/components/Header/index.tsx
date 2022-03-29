@@ -44,7 +44,7 @@ const TopHeader = () => {
           roles: [],
           id: null,
         },
-        client: {
+        company: {
           id: null,
           code: '',
         }
