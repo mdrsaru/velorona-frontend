@@ -66,6 +66,11 @@ const Sidebar = () => {
       accessRoles: [constants.roles.Employee, constants.roles.TaskManager]
     },
     {
+      name: routes.projects.name,
+      route: routes.projects.path,
+      accessRoles: [constants.roles.CompanyAdmin]
+    },
+    {
       name: routes.schedule.name,
       route: routes.schedule.path,
       accessRoles: [constants.roles.Employee, constants.roles.TaskManager]

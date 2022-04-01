@@ -97,6 +97,18 @@ const routes = {
     component: lazy(() => import('../pages/Tasks')),
     name: 'Tasks',
   },
+  projects: {
+    childPath: 'projects',
+    path: '/projects',
+    component: lazy(() => import('../pages/Project')),
+    name: 'Projects',
+  },
+  addProject: {
+    childPath: ':new',
+    path: `/projects/new`,
+    component: lazy(() => import('../pages/Project/NewProject')),
+    name: 'New Company',
+  },
   newTimesheet: {
     childPath: 'new',
     path: '/timesheet/new',
