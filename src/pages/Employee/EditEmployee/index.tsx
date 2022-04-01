@@ -133,6 +133,7 @@ const EditEmployee = () => {
         formData[data] = values[data]
       }
     }
+
     UserUpdate({
       variables: {
         input: formData
@@ -145,23 +146,22 @@ const EditEmployee = () => {
           const formData = new FormData();
           formData.append('file', values?.upload[0]?.originFileObj)
           mediaServices.uploadProfileImage(formData).then((res: any) => {
-            if (res?.status === 200) {
-              const user = params?.eid;
-              const avatar = res?.data?.id;
-              ChangeProfilePictureInput({
-                variables: {
-                  input: {
-                    id: user,
-                    avatar_id: avatar
-                  }
-                }}).then((response) => {
-                if(response.errors) {
-                  return notifyGraphqlError((response.errors))
-                } else if (response?.data) {
-                  successMessage()
+            const user = params?.eid;
+            const avatar = res?.data?.id;
+            ChangeProfilePictureInput({
+              variables: {
+                input: {
+                  id: user,
+                  avatar_id: avatar
                 }
-              }).catch(notifyGraphqlError)
-            }})
+              }}).then((response) => {
+              if(response.errors) {
+                return notifyGraphqlError((response.errors))
+              } else if (response?.data) {
+                successMessage()
+              }
+            }).catch(notifyGraphqlError)
+          })
         } else {
           successMessage()
         }

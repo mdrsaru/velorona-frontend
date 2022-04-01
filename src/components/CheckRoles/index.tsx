@@ -1,5 +1,5 @@
 import {useQuery} from '@apollo/client';
-import {Outlet, RouteProps, useNavigate} from 'react-router-dom';
+import {Outlet, RouteProps, Navigate} from 'react-router-dom';
 
 import {AUTH} from '../../gql/auth.gql';
 import NotFound from "../NotFound";
@@ -13,10 +13,9 @@ interface IProps extends RouteProps {
 
 const CheckRoles = (props: IProps) => {
   const {data: authData} = useQuery(AUTH);
-  const navigate = useNavigate();
 
   if (props?.redirect_to) {
-    return navigate(props?.redirect_to)
+    return <Navigate to={props?.redirect_to} />;
   }
 
   if (authData?.AuthUser?.user?.roles?.find((role: string) => props.allowedRoles?.includes(role))) {

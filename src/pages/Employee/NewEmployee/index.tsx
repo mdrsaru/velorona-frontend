@@ -66,8 +66,8 @@ const NewEmployee = () => {
   const cancelAddEmployee = () => {
     navigate(-1);
   }
-  const successMessage = (response: string) => {
-    message.success(`New Employee ${response} is created successfully!`).then(r => {
+  const successMessage = () => {
+    message.success(`New Employee is created successfully!`).then(r => {
       if (r) {
         navigate(-1)
       }
@@ -110,7 +110,6 @@ const NewEmployee = () => {
           const formData = new FormData();
           formData.append('file', values?.upload[0]?.originFileObj)
           mediaServices.uploadProfileImage(formData).then((res: any) => {
-            if (res?.status === 200) {
               const user = response?.data?.UserCreate?.id;
               const avatar = res?.data?.id;
               ChangeProfilePictureInput({
@@ -123,12 +122,12 @@ const NewEmployee = () => {
                 if(response.errors) {
                   return notifyGraphqlError((response.errors))
                 } else if (response?.data) {
-                  successMessage(response?.data?.UserCreate?.firstName)
+                  successMessage()
                 }
               }).catch(notifyGraphqlError)
-            }})
+            })
         } else {
-          successMessage(response?.data?.UserCreate?.firstName)
+          successMessage()
         }
       }
     }).catch(notifyGraphqlError)
