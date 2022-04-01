@@ -67,7 +67,7 @@ const Role = () => {
             </Col>
             <Col span={12} className={styles['role-col']}>
               {/*<div className={styles['add-new-role']}>*/}
-              {/*  <Link to={routes.role.routePath} onClick={() => setVisible(true)}>Add New Role</Link>*/}
+              {/*  <Link to={routes.role.path} onClick={() => setVisible(true)}>Add New Role</Link>*/}
               {/*</div>*/}
             </Col>
           </Row>

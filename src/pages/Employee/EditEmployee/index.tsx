@@ -1,17 +1,35 @@
 import React from "react";
 import moment from 'moment';
 
-import {Button, Card, Col, Form, Input, message, Row, Select, Space, DatePicker, InputNumber} from "antd";
-import {ArrowLeftOutlined} from "@ant-design/icons";
+import {Button, Card, Col, Form, Input, message, Row, Select, Space, DatePicker, InputNumber, Upload} from "antd";
+import {ArrowLeftOutlined, UploadOutlined} from "@ant-design/icons";
 
 import {useNavigate, useParams} from "react-router-dom";
 
 import styles from "../style.module.scss";
 import {gql, useMutation, useQuery} from "@apollo/client";
 import {notifyGraphqlError} from "../../../utils/error";
+import {mediaServices} from "../../../services/MediaService";
 import {IRole} from "../../../interfaces/IRole";
 
 const dateFormat = 'YYYY-MM-DD HH:mm:ss';
+const profileFile = (e: any) => {
+  if (Array.isArray(e)) {
+    return e;
+  }
+  return e && e.fileList;
+};
+
+const CHANGE_PROFILE_IMAGE = gql`
+  mutation ChangeProfilePicture($input: ChangeProfilePictureInput!) {
+    ChangeProfilePicture(input: $input) {
+      id
+      firstName
+      lastName
+    }
+  }
+`
+
 const EMPLOYEE_UPDATE = gql`
   mutation UserUpdate($input: UserUpdateInput!) {
       UserUpdate(input: $input) {
@@ -22,6 +40,7 @@ const EMPLOYEE_UPDATE = gql`
       }
   }
 `
+
 const USER = gql`
   query User($input: UserQueryInput!) {
       User(input: $input) {
@@ -68,9 +87,10 @@ const ROLES = gql`
 `
 
 const EditEmployee = () => {
-  const navigate = useNavigate();
   let params = useParams();
+  const navigate = useNavigate();
   const [UserUpdate] = useMutation(EMPLOYEE_UPDATE);
+  const [ChangeProfilePictureInput] = useMutation(CHANGE_PROFILE_IMAGE);
   const {data: roles} = useQuery(ROLES, {
     fetchPolicy: "cache-first"
   });
@@ -84,13 +104,17 @@ const EditEmployee = () => {
     }
   })
 
-  console.log(userData);
-
   const [form] = Form.useForm();
   const {Option} = Select;
 
   const cancelEditEmployee = () => {
     navigate(-1);
+  }
+
+  const successMessage = () => {
+    message.success(`Employee is updated successfully!`).then(r => {
+    });
+    navigate(-1)
   }
 
   const onSubmitForm = () => {
@@ -105,7 +129,7 @@ const EditEmployee = () => {
       } else if (data === 'startDate' || data === 'endDate' || data === 'payRate') {
         record[data] = values[data]
         formData['record'] = record
-      } else {
+      } else if (data !== 'upload') {
         formData[data] = values[data]
       }
     }
@@ -117,9 +141,30 @@ const EditEmployee = () => {
       if (response.errors) {
         return notifyGraphqlError((response.errors))
       } else if (response?.data?.UserUpdate) {
-        message.success(`Employee ${response?.data?.UserUpdate?.firstName} is updated successfully!`).then(r => {
-        });
-        navigate(-1)
+        if (values?.upload) {
+          const formData = new FormData();
+          formData.append('file', values?.upload[0]?.originFileObj)
+          mediaServices.uploadProfileImage(formData).then((res: any) => {
+            if (res?.status === 200) {
+              const user = params?.eid;
+              const avatar = res?.data?.id;
+              ChangeProfilePictureInput({
+                variables: {
+                  input: {
+                    id: user,
+                    avatar_id: avatar
+                  }
+                }}).then((response) => {
+                if(response.errors) {
+                  return notifyGraphqlError((response.errors))
+                } else if (response?.data) {
+                  successMessage()
+                }
+              }).catch(notifyGraphqlError)
+            }})
+        } else {
+          successMessage()
+        }
       }
     }).catch(notifyGraphqlError)
   }
@@ -127,7 +172,7 @@ const EditEmployee = () => {
   return (
     <div className={styles['main-div']}>
       <Card bordered={false}>
-        <Row>
+        <Row style={{height: '122px'}}>
           <Col span={12} className={styles['employee-col']}>
             <h1><ArrowLeftOutlined onClick={() => navigate(-1)}/> &nbsp; Edit Employee</h1>
           </Col>
@@ -142,6 +187,8 @@ const EditEmployee = () => {
             roles: userData?.User?.data[0]?.roles[0]?.id ?? '',
             status: userData?.User?.data[0]?.status ?? '',
             streetAddress: userData?.User?.data[0]?.address?.streetAddress ?? '',
+            startDate: moment(userData?.User?.data[0]?.record?.endDate ?? '2022-01-01T00:00:00.410Z', dateFormat),
+            endDate: moment(userData?.User?.data[0]?.record?.startDate ?? '2022-01-02T00:00:00.410Z', dateFormat),
             state: userData?.User?.data[0]?.address?.state ?? '',
             city: userData?.User?.data[0]?.address?.city ?? '',
             zipcode: userData?.User?.data[0]?.address?.zipcode ?? '',
@@ -154,7 +201,7 @@ const EditEmployee = () => {
             </Row>
             <Row>
               <Col xs={24} sm={24} md={8} lg={8} className={styles.formCol}>
-                <Form.Item label="First Name" name='firstName'>
+                <Form.Item label="First Name" name='firstName' rules={[{ required: true, message: 'Please enter the firstname' }]}>
                   <Input placeholder="Enter firstname"/>
                 </Form.Item>
               </Col>
@@ -164,7 +211,7 @@ const EditEmployee = () => {
                 </Form.Item>
               </Col>
               <Col xs={24} sm={24} md={8} lg={8} className={styles.formCol}>
-                <Form.Item label="Last Name" name='lastName'>
+                <Form.Item label="Last Name" name='lastName' rules={[{ required: true, message: 'Please select the lastname' }]}>
                   <Input placeholder="Enter lastname"/>
                 </Form.Item>
               </Col>
@@ -200,7 +247,8 @@ const EditEmployee = () => {
                 </Form.Item>
               </Col>
               <Col xs={24} sm={24} md={8} lg={8} className={styles.formCol}>
-                <Form.Item label="Street Address" name='streetAddress'>
+                <Form.Item label="Street Address" name='streetAddress' rules={[{ required: true, message: 'Please select the ' +
+                    'street address' }]}>
                   <Input placeholder="Enter street address"/>
                 </Form.Item>
               </Col>
@@ -224,23 +272,21 @@ const EditEmployee = () => {
             </Row>
             <Row>
               <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-                <Form.Item name="startDate" label="Employee Start Time">
+                <Form.Item name="startDate" label="Employee Start Date" rules={[{ required: true, message: 'Please select the start date' }]}>
                   <DatePicker format="YYYY-MM-DD HH:mm:ss" placeholder={"Enter Start Date"} suffixIcon={""}
-                              defaultValue={moment(userData?.User?.data[0]?.record?.endDate, dateFormat)}
                               showTime={{defaultValue: moment('00:00:00', 'HH:mm:ss')}}/>
                 </Form.Item>
               </Col>
               <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-                <Form.Item name="endDate" label="Employee End Date">
+                <Form.Item name="endDate" label="Employee End Date" rules={[{ required: true, message: 'Please select the end date' }]}>
                   <DatePicker format="YYYY-MM-DD HH:mm:ss" placeholder={"Enter End Date"} suffixIcon={""}
-                              defaultValue={moment(userData?.User?.data[0]?.record?.startDate, dateFormat)}
                               showTime={{defaultValue: moment('00:00:00', 'HH:mm:ss')}}/>
                 </Form.Item>
               </Col>
             </Row>
             <Row>
               <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-                <Form.Item name="roles" label="Role">
+                <Form.Item name="roles" label="Role" rules={[{ required: true, message: 'Please select the role!' }]}>
                   <Select placeholder="Employee" disabled={true}>
                     {roles && roles?.Role?.data.map((role: IRole, index: number) => (
                       <Option value={role?.id} key={index}>{role?.name}</Option>
@@ -249,7 +295,7 @@ const EditEmployee = () => {
                 </Form.Item>
               </Col>
               <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-                <Form.Item label="Pay Rate" name='payRate'>
+                <Form.Item label="Pay Rate" name='payRate' rules={[{ required: true, message: 'Please enter the pay rate' }]}>
                   <InputNumber placeholder="$20"/>
                 </Form.Item>
               </Col>
@@ -276,12 +322,14 @@ const EditEmployee = () => {
             </Row>
             <Row>
               <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-                <Form.Item label="Input Field with text" name='image'>
-                  <Input placeholder="Employee Image"/>
+                <Form.Item name="upload" label="Upload" valuePropName="fileList" getValueFromEvent={profileFile}>
+                  <Upload name="profileImg" maxCount={1}>
+                    <Button icon={<UploadOutlined />}>Click to Upload</Button>
+                  </Upload>
                 </Form.Item>
               </Col>
               <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-                <Form.Item name="status" label="Employee Status">
+                <Form.Item name="status" label="Employee Status" rules={[{ required: true, message: 'Please select the status' }]}>
                   <Select placeholder="Select status">
                     <Option value="Active">Active</Option>
                     <Option value="Inactive">In Active</Option>

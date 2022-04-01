@@ -1,17 +1,19 @@
 import { Card, Row, Col, Table, Dropdown, Menu } from 'antd';
-import {MoreOutlined} from "@ant-design/icons";
+import { MoreOutlined } from "@ant-design/icons";
 
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import routes from "../../config/routes";
 
 import styles from './style.module.scss';
-import {gql, useQuery} from "@apollo/client";
-import {authVar} from "../../App/link";
-import {useState} from "react";
+import { gql, useMutation, useQuery } from "@apollo/client";
+import { authVar } from "../../App/link";
+import { useState } from "react";
 import deleteImg from "../../assets/images/delete_btn.svg";
 import archiveImg from "../../assets/images/archive_btn.svg";
 import ModalConfirm from "../../components/Modal";
 import moment from "moment";
+import { notifyGraphqlError } from "../../utils/error";
+import AppLoader from "../../components/Skeleton/AppLoader";
 
 const {SubMenu} = Menu;
 
@@ -40,6 +42,18 @@ const USER = gql`
     }
   }
 `
+
+const EMPLOYEE_UPDATE = gql`
+  mutation UserUpdate($input: UserUpdateInput!) {
+      UserUpdate(input: $input) {
+          id
+          firstName
+          lastName
+          email
+          status
+      }
+  }
+`
 const deleteBody = () => {
   return (
     <div className={styles['modal-message']}>
@@ -62,6 +76,8 @@ const archiveBody = () => {
 
 const Employee = () => {
   const loggedInUser = authVar();
+  const navigate = useNavigate();
+  const [EmployeeUpdate] = useMutation(EMPLOYEE_UPDATE);
   const [visibility, setVisibility] = useState(false);
   const [showArchive, setArchiveModal] = useState(false);
   const setModalVisibility = (value: boolean) => {
@@ -71,33 +87,59 @@ const Employee = () => {
     setArchiveModal(value)
   }
 
-  const {data: employeeData} = useQuery(USER, {
+  const { loading: employeeLoading, data: employeeData } = useQuery(USER, {
     variables: {
       input: {
         query: {
           // name: constants.roles.Employee
+        },
+        paging: {
+          order: ['updatedAt:DESC']
         }
       }
     }
   })
 
-  const menu = (id: string) => (
+  const changeStatus = (value: string, id: string) => {
+    EmployeeUpdate({
+      variables: {
+        input: {
+          status: value,
+          id: id
+        }
+      }
+    }).then((response: any) => {
+      if (response.errors) {
+        return notifyGraphqlError((response.errors))
+      }
+    }).catch(notifyGraphqlError)
+  }
+
+  const onRowClick = (record: any, rowIndex: any) => {
+    return {
+      onClick: (event: any) => {
+        navigate(routes.detailEmployee.path(loggedInUser?.company?.code ?? '', record?.id ?? ''));
+      },
+    };
+  };
+
+  const menu = (data: any) => (
     <Menu>
-      <SubMenu title="Change status" key="5">
-        <Menu.Item key="0">Active</Menu.Item>
+      <SubMenu title="Change status" key="mainMenu">
+        <Menu.Item key="active" onClick={() => changeStatus('Active', data?.id)}>Active</Menu.Item>
         <Menu.Divider/>
-        <Menu.Item key="1">Inactive</Menu.Item>
+        <Menu.Item key="inactive" onClick={() => changeStatus('Inactive', data?.id)}>Inactive</Menu.Item>
       </SubMenu>
       <Menu.Divider/>
-      <Menu.Item key="2">
-        <div><Link to={routes.editEmployee.routePath(loggedInUser?.company?.code ?? '1', id ?? '1')}>Edit Employee</Link></div>
+      <Menu.Item key="edit">
+        <div><Link to={routes.editEmployee.path(loggedInUser?.company?.code ?? '1', data?.id ?? '1')}>Edit Employee</Link></div>
       </Menu.Item>
       <Menu.Divider/>
-      <Menu.Item key="3">
+      <Menu.Item key="archive">
         <div onClick={() => setArchiveVisibility(true)}>Archive Employee</div>
       </Menu.Item>
       <Menu.Divider/>
-      <Menu.Item key="4"><div onClick={() => setModalVisibility(true)}>Delete Employee</div></Menu.Item>
+      <Menu.Item key="delete"><div onClick={() => setModalVisibility(true)}>Delete Employee</div></Menu.Item>
     </Menu>
   );
   const columns = [
@@ -147,11 +189,10 @@ const Employee = () => {
     },
     {
       title: 'Actions',
-      dataIndex: 'id',
       key: 'actions',
-      render: (id: string) =>
-        <div className={styles['dropdown-menu']}>
-          <Dropdown overlay={menu(id)} trigger={['click']} placement="bottomRight">
+      render: (record: any) =>
+        <div className={styles['dropdown-menu']} onClick={(event) => event.stopPropagation()}>
+          <Dropdown overlay={menu(record)} trigger={['click']} placement="bottomRight">
             <div className="ant-dropdown-link" onClick={e => e.preventDefault()} style={{paddingLeft: '1rem'}}>
               <MoreOutlined />
             </div>
@@ -162,23 +203,27 @@ const Employee = () => {
 
   return (
     <div className={styles['main-div']}>
-      <Card bordered={false}>
-        <Row>
-          <Col span={12} className={styles['employee-col']}>
-            <h1>Employee</h1>
-          </Col>
-          <Col span={12} className={styles['employee-col']}>
-            <div className={styles['add-new-employee']}>
-              <Link to={routes.addEmployee.routePath(loggedInUser?.company?.code ? loggedInUser?.company?.code : '')}>Add New Employee</Link>
-            </div>
-          </Col>
-        </Row>
-        <Row>
-          <Col span={24}>
-            <Table dataSource={employeeData?.User?.data} columns={columns} rowKey={(record => record?.id)} />
-          </Col>
-        </Row>
-      </Card>
+      {employeeLoading ?
+        <AppLoader loading={employeeLoading} count={14}/> :
+        <Card bordered={false}>
+          <Row>
+            <Col span={12} className={styles['employee-col']}>
+              <h1>Employee</h1>
+            </Col>
+            <Col span={12} className={styles['employee-col']}>
+              <div className={styles['add-new-employee']}>
+                <Link to={routes.addEmployee.path(loggedInUser?.company?.code ? loggedInUser?.company?.code : '')}>Add
+                  New Employee</Link>
+              </div>
+            </Col>
+          </Row>
+          <Row>
+            <Col span={24}>
+              <Table dataSource={employeeData?.User?.data} columns={columns} rowKey={(record => record?.id)}
+                     onRow={onRowClick}/>
+            </Col>
+          </Row>
+        </Card>}
       <ModalConfirm visibility={visibility} setModalVisibility={setModalVisibility} imgSrc={deleteImg}
                     okText={'Delete'} modalBody={deleteBody}/>
       <ModalConfirm visibility={showArchive} setModalVisibility={setArchiveVisibility} imgSrc={archiveImg}

@@ -27,47 +27,47 @@ const Sidebar = () => {
   const menuItems = [
     {
       name: routes.dashboard.name,
-      route: routes.dashboard.routePath,
+      route: routes.dashboard.path,
       accessRoles: [constants.roles.SuperAdmin]
     },
     {
       name: routes.companyDashboard.name,
-      route: routes.company.routePath(loggedInUser?.company?.code ? loggedInUser?.company?.code : ''),
+      route: routes.company.path(loggedInUser?.company?.code ? loggedInUser?.company?.code : ''),
       accessRoles: [constants.roles.CompanyAdmin]
     },
     {
       name: routes.role.name,
-      route: routes.role.routePath(loggedInUser?.company?.code ? loggedInUser?.company?.code : ''),
-      accessRoles: [constants.roles.CompanyAdmin]
+      route: routes.role.path,
+      accessRoles: [constants.roles.SuperAdmin]
     },
     {
       name: routes.companyAdmin.name,
-      route: routes.companyAdmin.routePath,
+      route: routes.companyAdmin.path,
       accessRoles: [constants.roles.SuperAdmin]
     },
     {
       name: routes.employee.name,
-      route: routes.employee.routePath(loggedInUser?.company?.code ? loggedInUser?.company?.code : ''),
+      route: routes.employee.path(loggedInUser?.company?.code ? loggedInUser?.company?.code : ''),
       accessRoles: [constants.roles.CompanyAdmin]
     },
     {
       name: routes.home.name,
-      route: routes.home.routePath,
+      route: routes.home.path,
       accessRoles: [constants.roles.Employee, constants.roles.TaskManager]
     },
     {
       name: routes.timesheet.name,
-      route: routes.timesheet.routePath,
+      route: routes.timesheet.path,
       accessRoles: [constants.roles.Employee, constants.roles.TaskManager]
     },
     {
       name: routes.tasks.name,
-      route: routes.tasks.routePath,
+      route: routes.tasks.path,
       accessRoles: [constants.roles.Employee, constants.roles.TaskManager]
     },
     {
       name: routes.schedule.name,
-      route: routes.schedule.routePath,
+      route: routes.schedule.path,
       accessRoles: [constants.roles.Employee, constants.roles.TaskManager]
     }
   ]

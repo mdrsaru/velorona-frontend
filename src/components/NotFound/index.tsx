@@ -12,7 +12,7 @@ const NotFound = () => {
       subTitle="Whoops! Page Not Found"
       extra={
         <Button type="primary">
-          <Link to={routes.dashboard.routePath}>Back Home</Link>
+          <Link to={routes.dashboard.path}>Back Home</Link>
         </Button>
       }
     />

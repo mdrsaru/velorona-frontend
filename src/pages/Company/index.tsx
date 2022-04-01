@@ -113,7 +113,7 @@ const Company = () => {
             </Col>
             <Col span={12} className={styles['form-col']}>
               <div className={styles['add-new-company']}>
-                <Link to={routes.addCompany.routePath}>Add new company</Link>
+                <Link to={routes.addCompany.path}>Add new company</Link>
               </div>
             </Col>
           </Row>

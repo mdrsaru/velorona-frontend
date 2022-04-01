@@ -56,7 +56,8 @@ const NewCompany = () => {
         <Form form={form} layout="vertical" onFinish={onSubmitForm}>
           <Row>
             <Col xs={24} sm={24} md={12} className={styles['form-col2']}>
-              <Form.Item label="Company Name" name="name" rules={[{required: true, message: 'Enter a company name.'}]}>
+              <Form.Item label="Company Name" name="name" rules={[{required: true, message: 'Enter a company name.'},
+                {max: 50, message: "Name should be less than 50 character"}]}>
                 <Input placeholder="Enter Name of the company"/>
               </Form.Item>
             </Col>
@@ -71,7 +72,8 @@ const NewCompany = () => {
           </Row>
           <Row>
             <Col span={24} className={styles['form-col2']}>
-              <Form.Item label="Email">
+              <Form.Item label="Email" name='email' rules={[{type: 'email', message: 'The input is not valid E-mail!',},
+                {required: true, message: 'Please input your E-mail!'},]}>
                 <Input placeholder="Company Admin Email"/>
               </Form.Item>
             </Col>
