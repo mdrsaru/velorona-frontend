@@ -13,6 +13,43 @@
       padding: 12px 0 12px 15px;
     }
   }
+
+  :local(.project-main-div) {
+    .ant-progress-inner {
+      border-radius: 0;
+    }
+
+    .ant-progress-outer {
+      width: 85%;
+    }
+
+    .ant-progress-text {
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 17px;
+    }
+
+    .ant-progress-status-success {
+      .ant-progress-text {
+        color: var(--black);
+        .anticon {
+          display: none;
+        }
+      }
+
+      .ant-progress-text::before {
+        content: '100%';
+      }
+    }
+
+    .ant-progress-bg {
+      border-radius: 0;
+      background-color: var(--primary-orange);
+    }
+    .ant-progress-status-success .ant-progress-bg {
+      background-color: var(--primary-green);
+    }
+  }
 }
 
 .form-col {
@@ -33,7 +70,7 @@
   padding: 2rem 0 0 0;
 }
 
-.add-new-project {
+.add-new {
   float: right;
   font-weight: 600;
   font-size: 18px;
@@ -93,7 +130,7 @@
     line-height: 29px;
   }
 
-  .add-new-project {
+  .add-new {
     float: right;
     font-weight: 600;
     font-size: 18px;
@@ -110,4 +147,40 @@
     font-size: 24px;
     line-height: 29px;
   }
+}
+
+
+.Active-text {
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 22px;
+  color: var(--primary-green);
+}
+
+.Inactive-text {
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 22px;
+  color: var(--primary-purple);
+}
+
+.Closed-text {
+  font-weight: 500;
+  font-size: 18px;
+  line-height: 22px;
+  color: var(--gray-secondary);
+}
+
+.add-task-row {
+  margin-left: 1rem;
+  margin-right: 1rem;
+  padding-right: 1.5rem;
+  padding-left: 1.5rem;
+  padding-bottom: 1rem;
+  border: 1px solid var(--gray-secondary);
+  box-sizing: border-box;
+}
+
+.form-col-task {
+  padding: 0 1rem 0 0;
 }

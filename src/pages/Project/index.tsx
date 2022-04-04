@@ -1,6 +1,6 @@
 import React, {useState} from "react";
 
-import {Card, Col, Dropdown, Menu, Row, Table} from "antd";
+import { Card, Col, Dropdown, Menu, Row, Table, Progress } from "antd";
 import {Link} from "react-router-dom";
 import routes from "../../config/routes";
 
@@ -62,33 +62,40 @@ const Project = () => {
   const columns = [
     {
       title: 'Project Name',
-      dataIndex: 'start_date',
-      key: 'start_date',
+      dataIndex: 'name',
+      key: 'name',
     },
     {
       title: 'Vendor',
-      dataIndex: 'end_date',
-      key: 'end_date',
+      dataIndex: 'vendor',
+      key: 'vendor',
     },
     {
       title: 'Active Employees',
-      dataIndex: 'leave_days',
-      key: 'leave_days',
+      dataIndex: 'active_employees',
+      key: 'active_employees',
     },
     {
       title: 'Project Deadline',
-      dataIndex: 'leave_type',
-      key: 'leave_type',
+      dataIndex: 'deadline',
+      key: 'deadline',
     },
     {
       title: 'Project Progress',
-      dataIndex: 'status',
-      key: 'status',
+      key: 'progress',
+      render: (record:any) =>
+        <div style={{ width: 170 }}>
+          <Progress percent={record?.progress} size="small" />
+        </div>
     },
     {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
+      render: (status: string) =>
+        <div className={styles[`${status}-text`]}>
+          {status}
+        </div>,
     },
     {
       title: 'Actions',
@@ -107,35 +114,39 @@ const Project = () => {
   const data = [
     {
       key: '1',
-      start_date: '02-02-2022',
-      end_date: '02-04-2022',
-      leave_days: '2',
-      leave_type: 'Personal',
-      status: 'Pending'
+      name: 'Vellorum',
+      vendor: 'Spark College',
+      active_employees: '2',
+      deadline: '02-02-2022',
+      status: 'Active',
+      progress: 30
     },
     {
       key: '2',
-      start_date: '02-02-2022',
-      end_date: '02-04-2022',
-      leave_days: '2',
-      leave_type: 'Personal',
-      status: 'Pending'
+      name: 'Vellorum',
+      vendor: 'Insight Workshop',
+      active_employees: '2',
+      deadline: '02-04-2022',
+      status: 'Active',
+      progress: 100
     },
     {
       key: '3',
-      start_date: '02-02-2022',
-      end_date: '02-04-2022',
-      leave_days: '2',
-      leave_type: 'Personal',
-      status: 'Pending'
+      name: 'Vellorum',
+      vendor: 'Araniko College',
+      active_employees: '2',
+      deadline: '02-04-2022',
+      status: 'Closed',
+      progress: 80
     },
     {
       key: '4',
-      start_date: '02-02-2022',
-      end_date: '02-04-2022',
-      leave_days: '2',
-      leave_type: 'Personal',
-      status: 'Pending'
+      name: 'Vellorum',
+      vendor: 'New College',
+      active_employees: '2',
+      deadline: '02-04-2022',
+      status: 'Inactive',
+      progress: 50
     },
   ];
 
@@ -149,7 +160,7 @@ const Project = () => {
               <h1>Projects</h1>
             </Col>
             <Col span={12} className={styles['form-col']}>
-              <div className={styles['add-new-project']}>
+              <div className={styles['add-new']}>
                 <Link to={routes.addProject.path}>Add new project</Link>
               </div>
             </Col>
