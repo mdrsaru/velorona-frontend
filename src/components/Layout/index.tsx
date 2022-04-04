@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client';
-import { Outlet, RouteProps, Navigate } from 'react-router-dom';
+import { Outlet, Navigate } from 'react-router-dom';
 import { Layout } from 'antd';
 
 import { AUTH } from '../../gql/auth.gql';
@@ -13,9 +13,8 @@ import styles from './style.module.scss';
 
 const { Content } = Layout;
 
-interface IProps extends RouteProps {}
 
-const _Layout = (props: IProps) => {
+const _Layout = () => {
   const { data: authData } = useQuery(AUTH);
   const { data: sidebarData } = useQuery(SIDEBAR);
 
@@ -33,12 +32,11 @@ const _Layout = (props: IProps) => {
           sidebarData?.Sidebar?.collapsed
             ? styles['site-content-collapsed']
             : styles['site-content']
-        }
-      >
+        }>
         <Sidebar />
         <Layout className={styles['site-layout']}>
           <Content style={{ padding: '1em' }}>
-            <Outlet />
+           <Outlet />
           </Content>
         </Layout>
       </Layout>

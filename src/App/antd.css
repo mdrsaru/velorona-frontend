@@ -25734,14 +25734,27 @@ div.ant-typography-edit-content.ant-typography-rtl {
 .ant-btn-primary:hover {
   background: linear-gradient(to right, #3A43AF, #95239C);
 }
+.ant-input:placeholder-shown,
+.ant-select-selection-placeholder,
+.ant-picker:placeholder-shown,
+.ant-input-number-input:placeholder-shown,
+.ant-form-item-label > label,
+input {
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 22px;
+}
 .ant-input,
-.ant-picker {
+.ant-picker,
+.ant-input-number {
   border: none;
 }
 .ant-input:hover,
 .ant-picker:hover,
+.ant-input-number:hover,
 .ant-input:focus,
-.ant-picker:focus {
+.ant-picker:focus,
+.ant-input-number:focus {
   border: none;
   outline: none !important;
 }
@@ -25758,17 +25771,17 @@ div.ant-typography-edit-content.ant-typography-rtl {
 .ant-select {
   width: 100%;
 }
-.ant-select input::placeholder {
-  font-weight: 600;
-  font-size: 14px;
-  line-height: 17px;
-}
 .ant-select .anticon.anticon-down {
   font-size: 17px;
   color: var(--gray-1);
 }
 .ant-select .ant-select-arrow {
   padding-right: 1.5rem;
+}
+.ant-input-number {
+  background-color: var(--gray-2) !important;
+  padding: 0.7rem;
+  width: 100%;
 }
 .ant-picker,
 .ant-picker.ant-picker-borderless,
@@ -25781,8 +25794,8 @@ div.ant-typography-edit-content.ant-typography-rtl {
 .ant-picker.ant-picker-borderless .ant-picker-input input::placeholder,
 .ant-input .ant-picker-input input::placeholder {
   font-weight: 600;
-  font-size: 14px;
-  line-height: 17px;
+  font-size: 15px;
+  line-height: 22px;
 }
 .ant-picker .anticon,
 .ant-picker.ant-picker-borderless .anticon,
@@ -25811,11 +25824,6 @@ div.ant-typography-edit-content.ant-typography-rtl {
 .ant-table .ant-table-thead > tr > th:not(:last-child):not(.ant-table-selection-column):not(.ant-table-row-expand-icon-cell):not([colspan])::before {
   width: 0;
 }
-.ant-modal-footer {
-  border: none;
-  text-align: center;
-  padding-bottom: 5rem;
-}
 .ant-form-item-explain-error {
   padding: 1rem 0 1rem 0;
   font-weight: 600;
@@ -25834,4 +25842,17 @@ div.ant-typography-edit-content.ant-typography-rtl {
   font-size: 18px;
   line-height: 22px;
   color: #000000;
+}
+.ant-form-item-explain-error {
+  padding: 1rem 0 1rem 0;
+  font-weight: 600;
+}
+.ant-form-item-has-error .ant-input,
+.ant-form-item-has-error .ant-select {
+  border: 1px solid var(--primary-red) !important;
+  border-radius: 5px;
+}
+.ant-form-item-has-error .ant-input:focus,
+.ant-form-item-has-error .ant-select:focus {
+  border: 1px solid var(--primary-red) !important;
 }

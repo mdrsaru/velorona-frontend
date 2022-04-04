@@ -17,9 +17,9 @@ const LOGIN = gql`
         id
         token
         refreshToken
-        client {
+        company {
           id
-          clientCode
+          companyCode
         }
         roles {
           id
@@ -34,21 +34,20 @@ const Login = () => {
   const [Login] = useMutation(LOGIN);
   let { role } = useParams();
 
-  console.log(role)
-
   const handleSubmit = (values: any) => {
     let formData = role === 'admin' ?
       {email: values.email,
         password: values.password} :
       {email: values.email,
         password: values.password,
-        clientCode: values.code}
+        companyCode: values.code}
     Login({
       variables: {
         input: formData
       }
     }).then((response) => {
       if(response.errors) {
+        console.log('Login Error');
         return notifyGraphqlError((response?.errors))
       } 
 
@@ -62,15 +61,21 @@ const Login = () => {
           id: loginData?.id,
           roles,
         },
+        company: {
+          id: loginData?.company?.id,
+          code: loginData?.company?.companyCode
+        },
         isLoggedIn: true,
       });
 
       if(roles.includes(constants.roles.SuperAdmin)) {
         navigate(routes.dashboard.path)
+      } else if(roles.includes(constants.roles.CompanyAdmin)) {
+        navigate(routes.company.path(loginData?.company?.companyCode));
       } else {
         navigate(routes.home.path);
       }
-    })
+    }).catch(notifyGraphqlError)
   };
 
   return (
@@ -82,16 +87,18 @@ const Login = () => {
               <img className={styles.logo} alt="logo" src={logo} />
             </div>
             <div className={styles['sign-in-header']}>
-              <h1>Sign in</h1>
+              <h1>Sign in {role === 'admin' ? 'as Admin' : ''}</h1>
             </div>
             <br/>
             <div>
               <Form onFinish={handleSubmit} layout="vertical">
                 {role !=='admin' &&
-                <Form.Item label="Company Code" name="code" rules={[{required: role !== 'admin', message: 'Company Code is required'},]}>
+                <Form.Item label="Company Code" name="code" rules={[{required: role !== 'admin', message: 'Company Code is required'},
+                  {max: 10, message: "Code should be less than 10 character"}]}>
                   <Input placeholder="Enter the company code" autoComplete="off"/>
                 </Form.Item>}
-                <Form.Item label="Email" name="email" rules={[{required: true, message: 'Email is required'},]}>
+                <Form.Item label="Email" name="email" rules={[{type: 'email', message: 'The input is not valid E-mail!',},
+                  {required: true, message: 'Please enter your E-mail!'},]}>
                   <Input placeholder="Email" autoComplete="off"/>
                 </Form.Item>
                 <Form.Item name="password" label="Password" rules={[{required: true, message: 'Password is required'},]}>

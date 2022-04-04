@@ -1,5 +1,26 @@
+:global {
+  .ant-modal-footer {
+    border: none;
+    text-align: center;
+    padding-bottom: 5rem;
+  }
+
+  .ant-upload-span {
+    .ant-btn {
+      border: none;
+    }
+  }
+
+  :local(.avatar-col) {
+    .ant-avatar .ant-avatar-circle .ant-avatar-image .ant-avatar-icon {
+      height: 122px;
+      width: 122px;
+    }
+  }
+}
+
 .main-div {
-  padding: 2rem 0 0 0;
+  padding: 2rem 0 2rem 0;
 }
 
 .employee-col {
@@ -28,4 +49,115 @@
     font-size: 24px;
     line-height: 29px;
   }
+}
+
+.formHeader {
+  width: 100%;
+  margin: 1.5rem 1rem 1.5rem;
+  background: var(--gray-secondary);
+  padding: 1rem 0.6rem 0 2rem;
+
+  p {
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 22px;
+    color: var(--white);
+  }
+}
+
+.active-status {
+  color: var(--primary-green);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 17px;
+}
+
+.inactive-status {
+  color: var(--black-1);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 17px;
+}
+
+
+.modal-message {
+  padding: 3rem 0 0 0;
+  text-align: center;
+
+  img {
+    height: 200px;
+    padding: 1rem;
+  }
+
+  p {
+    font-weight: 400;
+    font-size: 17px;
+    line-height: 17px;
+  }
+
+  .warning-text {
+    color: var(--primary-red);
+  }
+
+  .archive-text {
+    color: var(--primary-orange);
+  }
+}
+
+.avatar-col {
+  position: relative;
+
+  .avatar-image {
+    height: 122px;
+    width: 122px;
+  }
+  .name-tag {
+    position: absolute;
+    width: 103px;
+    height: 30px;
+    text-align: center;
+    display: flex;
+    bottom: 0;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 17px;
+    align-items: center;
+    justify-content: center;
+    color: var(--white);
+    background: var(--primary-green);
+    border-radius: 6px;
+  }
+
+  .employee-name {
+    font-weight: 600;
+    font-size: 24px;
+    line-height: 29px;
+    text-align: center;
+    padding-bottom: 3%;
+  }
+
+  .employee-title {
+    text-align: center;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 17px;
+  }
+}
+
+.detail-row {
+  font-weight: 600;
+  font-size: 17px;
+  line-height: 22px;
+
+  .detailValue {
+    background: var(--gray-2);
+    display: flex;
+    margin: 1rem 1.8rem 1rem 0;
+    flex-direction: row;
+    align-items: flex-start;
+    padding: 9px 23px;
+  }
+}
+.footer-btn {
+  padding-right: 2rem;
 }

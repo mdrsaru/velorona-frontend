@@ -36,13 +36,13 @@ const Timesheet = () => {
             </Card.Grid>
             <Card.Grid hoverable={false} className={styles['grid-style2']}>
               <div className={styles['add-time-stamp']}>
-                <Link to={routes.newTimesheet.routePath}>Add Time Stamp</Link>
+                <Link to={routes.newTimesheet.path}>Add Time Stamp</Link>
               </div>
             </Card.Grid>
             <Card.Grid hoverable={false} className={styles['grid-style-full']}>
               <Table dataSource={data} columns={columns} onRow={record => ({
                 onClick: (e) => {
-                  navigate(routes.detailTimesheet.routePath(record?.key))
+                  navigate(routes.detailTimesheet.path(record?.key))
                 }
               })}/>
             </Card.Grid>

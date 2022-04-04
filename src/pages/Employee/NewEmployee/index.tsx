@@ -1,16 +1,137 @@
-import React from "react";
+import React, {useState} from "react";
+import moment from 'moment';
 
-import { Button, Card, Col, Form, Input, Row, Select, Space, TimePicker } from "antd";
-import { ArrowLeftOutlined } from "@ant-design/icons";
+import { Button, Card, Col, Form, Input, message, Row, Select, Space, Upload, DatePicker, InputNumber } from "antd";
+import { ArrowLeftOutlined, UploadOutlined } from "@ant-design/icons";
 
 import { useNavigate } from "react-router-dom";
+import { mediaServices } from '../../../services/MediaService';
 
+import {gql, useMutation, useQuery} from "@apollo/client";
+import {notifyGraphqlError} from "../../../utils/error";
+import {authVar} from "../../../App/link";
+
+import {IRole} from "../../../interfaces/IRole";
 import styles from "../style.module.scss";
+
+const normFile = (e: any) => {
+  if (Array.isArray(e)) {
+    return e;
+  }
+  return e && e.fileList;
+};
+
+const CHANGE_PROFILE_IMAGE = gql`
+  mutation ChangeProfilePicture($input: ChangeProfilePictureInput!) {
+    ChangeProfilePicture(input: $input) {
+      id
+      firstName
+      lastName
+    }
+  }
+`
+
+const EMPLOYEE_CREATE = gql`
+  mutation UserCreate($input: UserCreateInput!) {
+      UserCreate(input: $input) {
+          id
+          firstName
+      }
+  }
+`
+const ROLES = gql`
+  query Role {
+    Role {
+      data {
+        id
+        name
+      }
+    }
+  }
+`
+
 
 const NewEmployee = () => {
   const navigate = useNavigate();
+  const authData = authVar();
+  const [dates, setDates] = useState([]);
+  const [UserCreate] = useMutation(EMPLOYEE_CREATE);
+  const [ChangeProfilePictureInput] = useMutation(CHANGE_PROFILE_IMAGE);
+  const { data: roles } = useQuery(ROLES, {
+    fetchPolicy: "cache-first"
+  });
   const [form] = Form.useForm();
   const { Option } = Select;
+
+  const cancelAddEmployee = () => {
+    navigate(-1);
+  }
+  const successMessage = () => {
+    message.success(`New Employee is created successfully!`).then(r => {
+      if (r) {
+        navigate(-1)
+      }
+    });
+  }
+
+  function disabledDate(current: any) {
+    return current && current < moment(dates, 'YYYY-MM-DD');
+  }
+
+  const onSubmitForm = (values: any) => {
+    UserCreate({
+      variables: {
+        input: {
+          email: values.email,
+          phone: values.phone,
+          firstName: values.firstName,
+          lastName: values.lastName,
+          status: values.status,
+          company_id: authData?.company?.id,
+          roles: [values?.roles],
+          address: {
+            streetAddress: values.streetAddress,
+            state: values.state,
+            city: values.city,
+            zipcode: values.zipcode
+          },
+          record: {
+            startDate: values.startDate,
+            endDate: values.endDate,
+            payRate: values.payRate
+          }
+        }
+      }
+    }).then((response) => {
+      if(response.errors) {
+        return notifyGraphqlError((response.errors))
+      } else if (response?.data?.UserCreate) {
+        if (values?.upload) {
+          const formData = new FormData();
+          formData.append('file', values?.upload[0]?.originFileObj)
+          mediaServices.uploadProfileImage(formData).then((res: any) => {
+              const user = response?.data?.UserCreate?.id;
+              const avatar = res?.data?.id;
+              ChangeProfilePictureInput({
+                variables: {
+                  input: {
+                    id: user,
+                    avatar_id: avatar
+                  }
+                }}).then((response) => {
+                if(response.errors) {
+                  return notifyGraphqlError((response.errors))
+                } else if (response?.data) {
+                  successMessage()
+                }
+              }).catch(notifyGraphqlError)
+            })
+        } else {
+          successMessage()
+        }
+      }
+    }).catch(notifyGraphqlError)
+  }
 
   return(
     <div className={styles['main-div']}>
@@ -20,67 +141,143 @@ const NewEmployee = () => {
             <h1><ArrowLeftOutlined onClick={() => navigate(-1)}/> &nbsp; Add New Employee</h1>
           </Col>
         </Row>
-        <Form form={form} layout="vertical">
+        <Form form={form} layout="vertical" onFinish={onSubmitForm}>
+          <Row>
+            <Col className={`${styles.formHeader}`}>
+              <p>Employee Information</p>
+            </Col>
+          </Row>
           <Row>
             <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-              <Form.Item label="First Name">
-                <Input placeholder="Enter firstname"/>
+              <Form.Item label="First Name" name='firstName' rules={[{ required: true, message: 'Please enter firstname!' }]}>
+                <Input placeholder="Enter firstname" name='firstname'/>
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-              <Form.Item label="Last Name">
-                <Input placeholder="Enter lastname"/>
+              <Form.Item label="Last Name" name='lastName' rules={[{ required: true, message: 'Please input your lastname!' }]}>
+                <Input placeholder="Enter lastname" name='lastname'/>
               </Form.Item>
             </Col>
           </Row>
           <Row>
             <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-              <Form.Item name="role" label="Role">
-                <Select placeholder="Employee">
-                  <Option value="project1">Employee 1</Option>
-                  <Option value="project2">Employee 2</Option>
-                </Select>
+              <Form.Item label="Email" name='email'  rules={[{type: 'email', message: 'The input is not valid E-mail!',},
+                {required: true, message: 'Please input your E-mail!'},]}>
+                <Input placeholder="Enter your email" />
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-              <Form.Item label="Designation">
-                <Input placeholder="UI/UX Designer"/>
-              </Form.Item>
-            </Col>
-          </Row>
-          <Row>
-            <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-              <Form.Item label="Email">
-                <Input placeholder="Enter your email" value={'ndhungana@gmail.com'}/>
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-              <Form.Item label="Phone Number">
+              <Form.Item label="Phone Number" name='phone' rules={[{ required: true, message: 'Please input your phone number!' },
+                {max: 10, message: "Phone number should be less than 10 digits"}]}>
                 <Input placeholder="Enter your phone number"/>
               </Form.Item>
             </Col>
           </Row>
           <Row>
-            <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-              <Form.Item name="start-time-picker" label="Employee Start Time">
-                <TimePicker placeholder={"Enter Start Time"} suffixIcon={""} />
+            <Col className={`${styles.formHeader}`}>
+              <p>Address</p>
+            </Col>
+          </Row>
+          <Row>
+            <Col xs={24} sm={24} md={8} lg={8} className={styles.formCol}>
+              <Form.Item label="State" name='state'>
+                <Input placeholder="Enter the state name" />
               </Form.Item>
             </Col>
-            <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-              <Form.Item label="Employee Reports to">
-                <Input placeholder="Enter the name of reporter" value={"Rabin Karki"}/>
+            <Col xs={24} sm={24} md={8} lg={8} className={styles.formCol}>
+              <Form.Item label="City" name='city'>
+                <Input placeholder="Enter city name" />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={24} md={8} lg={8} className={styles.formCol}>
+              <Form.Item label="Street Address" name='streetAddress' rules={[{ required: true, message: 'Please enter your street address!' }]}>
+                <Input placeholder="Enter street address" name='street'/>
               </Form.Item>
             </Col>
           </Row>
           <Row>
             <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-              <Form.Item label="Employee Image">
-                <Input placeholder="Enter the name of reporter" value={"Rabin Karki"}/>
+              <Form.Item label="Apartment/Suite" name='apartment'>
+                <Input placeholder="Enter your apartment no" name=''/>
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-              <Form.Item label="Renumeration">
-                <Input placeholder="$20" />
+              <Form.Item label="Zip Code" name='zipcode'>
+                 <Input placeholder="Enter the zipcode"/>
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row>
+            <Col className={`${styles.formHeader}`}>
+              <p>Employee Roles</p>
+            </Col>
+          </Row>
+          <Row>
+            <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+              <Form.Item name="startDate" label="Employee Start Date" rules={[{ required: true, message: 'Please enter start time!' }]}>
+                <DatePicker format="YYYY-MM-DD HH:mm:ss" placeholder={"Enter Start Date"} suffixIcon={""}
+                            onChange={(val: any) => setDates(val)}
+                            showTime={{ defaultValue: moment('00:00:00', 'HH:mm:ss') }}/>
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+              <Form.Item name="endDate" label="Employee End Date" rules={[{ required: true, message: 'Please enter end date!' }]}>
+                <DatePicker format="YYYY-MM-DD HH:mm:ss" placeholder={"Enter End Date"} suffixIcon={""}
+                            disabledDate={disabledDate}
+                            showTime={{ defaultValue: moment('00:00:00', 'HH:mm:ss') }}/>
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row>
+            <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+              <Form.Item name="roles" label="Role" rules={[{ required: true, message: 'Please enter role!' }]}>
+                <Select placeholder="Employee">
+                  {roles && roles?.Role?.data.map((role: IRole, index:number) => (
+                    <Option value={role?.id} key={index}>{role?.name}</Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+              <Form.Item label="Pay Rate" name='payRate' rules={[{ required: true, message: 'Please enter pay rate!' }]}>
+                <InputNumber placeholder="$20" />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row>
+            <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+              <Form.Item name="reporting" label="Reporting Manager">
+                <Select placeholder="Select Reporting Manager">
+                  <Option value="Employee">Employee</Option>
+                  <Option value="TaskManager">Task Manager</Option>
+                  <Option value="Vendor">Vendor</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+              <Form.Item name="reportsTo" label="Employee Reports to">
+                <Select placeholder="Select Reporting Officer">
+                  <Option value="Employee">Employee</Option>
+                  <Option value="TaskManager">Task Manager</Option>
+                  <Option value="Vendor">Vendor</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row>
+            <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+              <Form.Item name="upload" label="Upload" valuePropName="fileList" getValueFromEvent={normFile}>
+                <Upload name="profileImg" maxCount={1}>
+                  <Button icon={<UploadOutlined />}>Click to Upload</Button>
+                </Upload>
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+              <Form.Item name="status" label="Employee Status" rules={[{ required: true, message: 'Please select the status' }]}>
+                <Select placeholder="Select status">
+                  <Option value="Active">Active</Option>
+                  <Option value="Inactive">In Active</Option>
+                </Select>
               </Form.Item>
             </Col>
           </Row>
@@ -89,7 +286,7 @@ const NewEmployee = () => {
             <Col>
               <Form.Item>
                 <Space>
-                  <Button type="default" htmlType="button">Cancel</Button>
+                  <Button type="default" htmlType="button" onClick={cancelAddEmployee}>Cancel</Button>
                   <Button type="primary" htmlType="submit">Create Employee</Button>
                 </Space>
               </Form.Item>

@@ -10,7 +10,9 @@ export default class TokenService {
       url: `${config.apiUrl}/v1/token/refresh`,
       method: 'POST',
       credentials: CredentialsEnum.include,
+      headers: {
+        'Content-Type': `multipart/form-data`,
+      },
     });
   };
-
 }

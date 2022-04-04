@@ -17,6 +17,10 @@ const auth: IAuth = {
     id: null,
   },
   isLoggedIn: false,
+  company: {
+    code: '',
+    id: null
+  }
 };
 
 const sidebar = {

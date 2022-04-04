@@ -1,0 +1,31 @@
+.modal-message {
+  padding: 3rem 0 0 0;
+  text-align: center;
+
+  img {
+    height: 200px;
+    padding: 1rem;
+  }
+
+  p {
+    font-weight: 400;
+    font-size: 17px;
+    line-height: 17px;
+  }
+
+  .warning-text {
+    color: var(--primary-red);
+  }
+
+  .archive-text {
+    color: var(--primary-orange);
+  }
+}
+
+:global {
+  .ant-modal-footer {
+    border: none;
+    text-align: center;
+    padding-bottom: 5rem;
+  }
+}
