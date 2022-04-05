@@ -11,6 +11,7 @@ import deleteImg from "../../assets/images/delete_btn.svg";
 import archiveImg from "../../assets/images/archive_btn.svg";
 import styles from "./style.module.scss";
 import {MoreOutlined} from "@ant-design/icons";
+import {authVar} from "../../App/link";
 
 
 
@@ -36,6 +37,7 @@ const archiveBody = () => {
 }
 
 const Project = () => {
+  const loggedInUser = authVar();
   const [visibility, setVisibility] = useState(false);
   const [showArchive, setArchiveModal] = useState(false);
   const setModalVisibility = (value: boolean) => {
@@ -161,7 +163,7 @@ const Project = () => {
             </Col>
             <Col span={12} className={styles['form-col']}>
               <div className={styles['add-new']}>
-                <Link to={routes.addProject.path}>Add new project</Link>
+                <Link to={routes.addProject.path(loggedInUser?.company?.code ? loggedInUser?.company?.code : '')}>Add new project</Link>
               </div>
             </Col>
           </Row>

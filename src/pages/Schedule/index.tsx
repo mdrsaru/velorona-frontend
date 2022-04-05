@@ -12,7 +12,7 @@ const Schedule = () => {
         <Card bordered={false}>
           <Row>
             <Col span={24} className={styles['form-col']}>
-              <h1>My Tasks Schedule</h1>
+              <h1>My Weekly Work Schedule</h1>
             </Col>
           </Row>
           <Row>

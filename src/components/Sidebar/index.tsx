@@ -67,7 +67,7 @@ const Sidebar = () => {
     },
     {
       name: routes.projects.name,
-      route: routes.projects.path,
+      route: routes.projects.path(loggedInUser?.company?.code ? loggedInUser?.company?.code : ''),
       accessRoles: [constants.roles.CompanyAdmin]
     },
     {

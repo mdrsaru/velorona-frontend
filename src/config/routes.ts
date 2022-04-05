@@ -99,13 +99,13 @@ const routes = {
   },
   projects: {
     childPath: 'projects',
-    path: '/projects',
+    path: (id: string) => `${id}/projects`,
     component: lazy(() => import('../pages/Project')),
     name: 'Projects',
   },
   addProject: {
     childPath: ':new',
-    path: `/projects/new`,
+    path: (id: string) => `/${id}/projects/new`,
     component: lazy(() => import('../pages/Project/NewProject')),
     name: 'New Company',
   },

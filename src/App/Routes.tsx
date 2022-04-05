@@ -58,6 +58,23 @@ const _Routes = () => {
                 </CheckRoles>
               }/>
 
+            <Route path={routes.projects.childPath}>
+              <Route index element={
+                <CheckRoles allowedRoles={[constants.roles.CompanyAdmin]}>
+                  <Suspense fallback={<RouteLoader/>}>
+                    <routes.projects.component/>
+                  </Suspense>
+                </CheckRoles>
+              }/>
+              <Route
+                path={routes.addProject.childPath}
+                element={
+                  <Suspense fallback={<RouteLoader/>}>
+                    <routes.addProject.component/>
+                  </Suspense>
+                }/>
+            </Route>
+
             <Route path={routes.employee.childPath}>
               <Route
                 index
@@ -183,23 +200,6 @@ const _Routes = () => {
                 </Suspense>
               </CheckRoles>
             }/>
-
-          <Route path={routes.projects.path}>
-            <Route index element={
-              <CheckRoles allowedRoles={[constants.roles.CompanyAdmin]}>
-                <Suspense fallback={<RouteLoader/>}>
-                  <routes.projects.component/>
-                </Suspense>
-              </CheckRoles>
-            }/>
-            <Route
-              path={routes.addProject.childPath}
-              element={
-                <Suspense fallback={<RouteLoader/>}>
-                  <routes.addProject.component/>
-                </Suspense>
-              }/>
-          </Route>
 
           <Route
             path="*"
