@@ -77,24 +77,27 @@ const NewProject = () => {
               <h1>Add Tasks</h1>
             </Col>
             <Col span={12} className={styles['form-col']}>
-              <div className={styles['add-new']}>
+              <div className={styles['add-new-task']}>
                 <Link to={routes.addProject.path}>Add New Tasks</Link>
               </div>
             </Col>
-            <Col xs={24} sm={24} md={12} lg={12} className={styles['form-col-task']}>
-              <Form.Item label="Task Name" name='name' rules={[{ required: true, message: 'Please enter task name' }]}>
-                <InputNumber placeholder="Enter the Name of the Task" />
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-              <Form.Item name="assignee" label="Tasks Assigned to" rules={[{ required: true, message: 'Please enter employees!' }]}>
-                <Select {...selectProps}>
-                  <Option value={1}>Employee 1</Option>
-                  <Option value={2}>Employee 2</Option>
-                  <Option value={3}>Employee 3</Option>
-                </Select>
-              </Form.Item>
-            </Col>
+            <>
+              <Col xs={24} sm={24} md={12} lg={12} className={styles['form-col-task']}>
+                <Form.Item label="Task Name" name='name' rules={[{ required: true, message: 'Please enter task name' }]}>
+                  <InputNumber placeholder="Enter the Name of the Task" />
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+                <Form.Item name="assignee" label="Tasks Assigned to" rules={[{ required: true, message: 'Please enter employees!' }]}
+                           style={{ position: 'relative' }}>
+                  <Select {...selectProps} dropdownStyle={{ maxHeight: 100, overflowY: 'hidden' }}>
+                    <Option value={1}>Employee 1</Option>
+                    <Option value={2}>Employee 2</Option>
+                    <Option value={3}>Employee 3</Option>
+                  </Select>
+                </Form.Item>
+              </Col>
+            </>
           </Row>
           <br/><br/>
           <Row justify="end">

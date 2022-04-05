@@ -78,6 +78,15 @@
   color: var(--primary-blue);
 }
 
+.add-new-task {
+  float: right;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 22px;
+  color: var(--primary-blue);
+  padding: 0 1rem 0 1rem;
+}
+
 .modal-message {
   padding: 3rem 0 0 0;
   text-align: center;
@@ -129,18 +138,21 @@
     font-size: 24px;
     line-height: 29px;
   }
+}
 
-  .add-new {
-    float: right;
-    font-weight: 600;
-    font-size: 18px;
-    line-height: 22px;
-    color: var(--primary-blue);
-  }
+.add-new {
+  float: right;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 22px;
+  color: var(--primary-blue);
 }
 
 .formCol {
   padding: 0 1rem 0 1rem;
+  @media screen and  (max-width: 767px) {
+    padding: 0 1rem 0 0;
+  }
 
   h1 {
     font-weight: 600;
@@ -151,23 +163,14 @@
 
 
 .Active-text {
-  font-weight: 500;
-  font-size: 18px;
-  line-height: 22px;
   color: var(--primary-green);
 }
 
 .Inactive-text {
-  font-weight: 500;
-  font-size: 18px;
-  line-height: 22px;
   color: var(--primary-purple);
 }
 
 .Closed-text {
-  font-weight: 500;
-  font-size: 18px;
-  line-height: 22px;
   color: var(--gray-secondary);
 }
 
