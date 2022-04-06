@@ -142,6 +142,7 @@ const Employee = () => {
       <Menu.Item key="delete"><div onClick={() => setModalVisibility(true)}>Delete Employee</div></Menu.Item>
     </Menu>
   );
+
   const columns = [
     {
       title: 'Name',

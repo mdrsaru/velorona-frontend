@@ -1,19 +1,40 @@
-import React, {useState} from "react";
+import React, { useState } from "react";
+import { gql, useQuery } from "@apollo/client";
 
-import { Card, Col, Dropdown, Menu, Row, Table, Progress } from "antd";
-import {Link} from "react-router-dom";
+import { Card, Col, Dropdown, Menu, Row, Table } from "antd";
+import { Link } from "react-router-dom";
 import routes from "../../config/routes";
+import { MoreOutlined } from "@ant-design/icons";
 
+import { authVar } from "../../App/link";
 import ModalConfirm from "../../components/Modal";
 
 import deleteImg from "../../assets/images/delete_btn.svg";
-
 import archiveImg from "../../assets/images/archive_btn.svg";
+
 import styles from "./style.module.scss";
-import {MoreOutlined} from "@ant-design/icons";
-import {authVar} from "../../App/link";
 
 
+
+
+const PROJECT = gql`
+    query Project($input: ProjectQueryInput!) {
+      Project(input: $input) {
+        data {
+          id
+          name
+          client {
+            id
+            email
+          }
+          company {
+            id
+            name
+          }
+        }
+      }
+    }
+   `
 
 
 const deleteBody = () => {
@@ -47,6 +68,19 @@ const Project = () => {
     setArchiveModal(value)
   }
 
+  const { data: projectData } = useQuery(PROJECT, {
+    variables: {
+      input: {
+        query: {
+          company_id: loggedInUser?.company?.id
+        },
+        paging: {
+          order: ['updatedAt:DESC']
+        }
+      }
+    }
+  })
+
   const menu = (data: any) => (
     <Menu>
       <Menu.Item key="edit">
@@ -68,37 +102,40 @@ const Project = () => {
       key: 'name',
     },
     {
-      title: 'Vendor',
-      dataIndex: 'vendor',
-      key: 'vendor',
-    },
-    {
-      title: 'Active Employees',
-      dataIndex: 'active_employees',
-      key: 'active_employees',
-    },
-    {
-      title: 'Project Deadline',
-      dataIndex: 'deadline',
-      key: 'deadline',
-    },
-    {
-      title: 'Project Progress',
-      key: 'progress',
+      title: 'Client',
+      key: 'client',
       render: (record:any) =>
-        <div style={{ width: 170 }}>
-          <Progress percent={record?.progress} size="small" />
+        <div>
+          {record?.client?.email}
         </div>
     },
-    {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      render: (status: string) =>
-        <div className={styles[`${status}-text`]}>
-          {status}
-        </div>,
-    },
+    // {
+    //   title: 'Active Employees',
+    //   dataIndex: 'active_employees',
+    //   key: 'active_employees',
+    // },
+    // {
+    //   title: 'Project Deadline',
+    //   dataIndex: 'deadline',
+    //   key: 'deadline',
+    // },
+    // {
+    //   title: 'Project Progress',
+    //   key: 'progress',
+    //   render: (record:any) =>
+    //     <div style={{ width: 170 }}>
+    //       <Progress percent={record?.progress} size="small" />
+    //     </div>
+    // },
+    // {
+    //   title: 'Status',
+    //   dataIndex: 'status',
+    //   key: 'status',
+    //   render: (status: string) =>
+    //     <div className={styles[`${status}-text`]}>
+    //       {status}
+    //     </div>,
+    // },
     {
       title: 'Actions',
       key: 'actions',
@@ -112,46 +149,6 @@ const Project = () => {
         </div>,
     },
   ];
-
-  const data = [
-    {
-      key: '1',
-      name: 'Vellorum',
-      vendor: 'Spark College',
-      active_employees: '2',
-      deadline: '02-02-2022',
-      status: 'Active',
-      progress: 30
-    },
-    {
-      key: '2',
-      name: 'Vellorum',
-      vendor: 'Insight Workshop',
-      active_employees: '2',
-      deadline: '02-04-2022',
-      status: 'Active',
-      progress: 100
-    },
-    {
-      key: '3',
-      name: 'Vellorum',
-      vendor: 'Araniko College',
-      active_employees: '2',
-      deadline: '02-04-2022',
-      status: 'Closed',
-      progress: 80
-    },
-    {
-      key: '4',
-      name: 'Vellorum',
-      vendor: 'New College',
-      active_employees: '2',
-      deadline: '02-04-2022',
-      status: 'Inactive',
-      progress: 50
-    },
-  ];
-
 
   return (
     <>
@@ -169,7 +166,7 @@ const Project = () => {
           </Row>
           <Row>
             <Col span={24}>
-              <Table dataSource={data} columns={columns}/>
+              <Table dataSource={projectData?.Project?.data} columns={columns}/>
             </Col>
           </Row>
         </Card>

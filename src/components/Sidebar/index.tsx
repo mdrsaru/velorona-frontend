@@ -51,6 +51,11 @@ const Sidebar = () => {
       accessRoles: [constants.roles.CompanyAdmin]
     },
     {
+      name: routes.client.name,
+      route: routes.client.path(loggedInUser?.company?.code ? loggedInUser?.company?.code : ''),
+      accessRoles: [constants.roles.CompanyAdmin]
+    },
+    {
       name: routes.home.name,
       route: routes.home.path,
       accessRoles: [constants.roles.Employee, constants.roles.TaskManager]
@@ -68,6 +73,11 @@ const Sidebar = () => {
     {
       name: routes.projects.name,
       route: routes.projects.path(loggedInUser?.company?.code ? loggedInUser?.company?.code : ''),
+      accessRoles: [constants.roles.CompanyAdmin]
+    },
+    {
+      name: routes.invoice.name,
+      route: routes.invoice.path(loggedInUser?.company?.code ? loggedInUser?.company?.code : ''),
       accessRoles: [constants.roles.CompanyAdmin]
     },
     {

@@ -75,6 +75,33 @@ const _Routes = () => {
                 }/>
             </Route>
 
+            <Route path={routes.invoice.childPath}>
+              <Route index element={
+                <CheckRoles allowedRoles={[constants.roles.CompanyAdmin]}>
+                  <Suspense fallback={<RouteLoader/>}>
+                    <routes.invoice.component/>
+                  </Suspense>
+                </CheckRoles>
+              }/>
+            </Route>
+
+            <Route path={routes.client.childPath}>
+              <Route index element={
+                <CheckRoles allowedRoles={[constants.roles.CompanyAdmin]}>
+                  <Suspense fallback={<RouteLoader/>}>
+                    <routes.client.component/>
+                  </Suspense>
+                </CheckRoles>
+              }/>
+              <Route
+                path={routes.addClient.childPath}
+                element={
+                  <Suspense fallback={<RouteLoader/>}>
+                    <routes.addClient.component/>
+                  </Suspense>
+                }/>
+            </Route>
+
             <Route path={routes.employee.childPath}>
               <Route
                 index
