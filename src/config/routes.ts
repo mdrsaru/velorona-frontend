@@ -50,8 +50,8 @@ const routes = {
     name: 'Company',
   },
   addCompany: {
-    childPath: ':new',
-    path: `/company/new`,
+    childPath: ':add',
+    path: `/company/add`,
     component: lazy(() => import('../pages/Company/NewCompany')),
     name: 'New Company',
   },
@@ -104,8 +104,8 @@ const routes = {
     name: 'Project',
   },
   addProject: {
-    childPath: ':new',
-    path: (id: string) => `/${id}/projects/new`,
+    childPath: ':add',
+    path: (id: string) => `/${id}/projects/add`,
     component: lazy(() => import('../pages/Project/NewProject')),
     name: 'New Company',
   },
@@ -114,6 +114,12 @@ const routes = {
     path: (id: string) => `${id}/invoices`,
     component: lazy(() => import('../pages/Invoice')),
     name: 'Invoice',
+  },
+  addInvoice: {
+    childPath: 'add',
+    path: (id: string) => `/${id}/invoices/add`,
+    component: lazy(() => import('../pages/Invoice/NewInvoice')),
+    name: 'New Client',
   },
   client: {
     childPath: 'clients',
@@ -128,8 +134,8 @@ const routes = {
     name: 'New Client',
   },
   newTimesheet: {
-    childPath: 'new',
-    path: '/timesheet/new',
+    childPath: 'add',
+    path: '/timesheet/add',
     component: lazy(() => import('../pages/Timesheet/NewTimesheet')),
     name: 'New Timesheet',
   },

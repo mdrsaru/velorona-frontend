@@ -83,6 +83,13 @@ const _Routes = () => {
                   </Suspense>
                 </CheckRoles>
               }/>
+              <Route
+                path={routes.addInvoice.childPath}
+                element={
+                  <Suspense fallback={<RouteLoader/>}>
+                    <routes.addInvoice.component/>
+                  </Suspense>
+                }/>
             </Route>
 
             <Route path={routes.client.childPath}>
