@@ -25856,3 +25856,6 @@ input {
 .ant-form-item-has-error .ant-select:focus {
   border: 1px solid var(--primary-red) !important;
 }
+.ant-card-body {
+  overflow-x: auto;
+}

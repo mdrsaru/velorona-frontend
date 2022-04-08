@@ -1,5 +1,8 @@
 import { gql, useMutation, useApolloClient } from '@apollo/client';
 import { Layout, Menu, Avatar, Dropdown } from 'antd';
+import {
+  MenuOutlined,
+} from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 
 //import { SIDEBAR } from '../../gql/app.gql';
@@ -20,7 +23,8 @@ const LOGOUT = gql`
   }
 `;
 
-const TopHeader = () => {
+const TopHeader = (props: any) => {
+  const { onCollapse } = props;
   const client = useApolloClient();
   const navigate = useNavigate();
 
@@ -65,17 +69,11 @@ const TopHeader = () => {
   return (
     <Header className={styles['header-container']}>
       <div className={styles['logo']} >
+        <MenuOutlined onClick={onCollapse} style={{ fontSize: 20, color: 'var(--black)', marginLeft: 10 }}/>
         <div>
-          <img src={logo} alt="logo" />
+          <img src={logo} alt="logo" className={styles['mini-logo']} />
           <img src={logoContent} alt="logo-01" className={styles['text-logo']} />
         </div>
-        {/*
-          <MenuOutlined
-            onClick={onClick}
-            style={{ fontSize: 20, color: 'var(--black)', marginLeft: 10 }}
-          />
-        */}
-
       </div>
 
       <div className={styles['header-right']}>

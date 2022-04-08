@@ -15,6 +15,11 @@
         }
       }
 
+      .ant-layout-sider-trigger {
+        background: var(--white);
+        color: var(--primary-icon-gradient);
+      }
+
 
       .ant-menu-inline .ant-menu-item {
         &:after {

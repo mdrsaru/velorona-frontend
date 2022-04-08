@@ -1,4 +1,3 @@
-import { useQuery } from '@apollo/client';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, Layout } from 'antd';
 import {
@@ -17,8 +16,7 @@ import {
 
 import constants from '../../config/constants';
 import routes from '../../config/routes';
-import { SIDEBAR } from '../../gql/app.gql';
-import { authVar, sidebarVar } from '../../App/link';
+import { authVar } from '../../App/link';
 
 import styles from './style.module.scss';
 
@@ -33,9 +31,9 @@ const menuKeys = [
 ];
 
 
-const Sidebar = () => {
+const Sidebar = (props: any) => {
+  const { collapsed, onCollapse } = props
   const location = useLocation();
-  const { data: sidebarData } = useQuery(SIDEBAR);
   const loggedInUser = authVar();
   const menuItems = [
     {
@@ -112,13 +110,6 @@ const Sidebar = () => {
     }
   ]
   const menuArray = menuItems.filter(menu => {return loggedInUser?.user?.roles?.some(role => menu.accessRoles.includes(role))})
-  const onCollapse = () => {
-    const collapsed = sidebarData?.Sidebar?.collapsed;
-    sidebarVar({
-      ...sidebarData.Sidebar,
-      collapsed: !collapsed,
-    });
-  };
   const selectedMenuKey = menuKeys.find(key => key.split('/')?.[1] === location.pathname?.split('/')?.[1]) ?? '';
 
   return (
@@ -126,9 +117,10 @@ const Sidebar = () => {
       className={styles['site-sidebar']}
       width={263}
       collapsible
-      collapsedWidth={50}
-      collapsed={sidebarData?.Sidebar?.collapsed}
+      collapsedWidth={80}
+      collapsed={collapsed}
       onCollapse={onCollapse}
+      trigger={null}
       breakpoint="lg">
       <Menu
         mode="inline"
