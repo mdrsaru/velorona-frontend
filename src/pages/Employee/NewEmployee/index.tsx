@@ -233,7 +233,7 @@ const NewEmployee = () => {
               <Form.Item name="roles" label="Role" rules={[{ required: true, message: 'Please enter role!' }]}>
                 <Select placeholder="Employee">
                   {roles && roles?.Role?.data.map((role: IRole, index:number) => (
-                    <Option value={role?.id} key={index}>{role?.name}</Option>
+                    <Option value={role?.name} key={index}>{role?.name}</Option>
                   ))}
                 </Select>
               </Form.Item>
