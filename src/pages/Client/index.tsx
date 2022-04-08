@@ -32,7 +32,6 @@ const Client = () => {
     variables: {
       input: {
         query: {
-          // name: constants.roles.Employee
         },
         paging: {
           order: ['updatedAt:DESC']

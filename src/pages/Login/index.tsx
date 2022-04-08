@@ -1,5 +1,5 @@
 import { useNavigate, useParams } from 'react-router-dom';
-import { Layout, Row, Col, Form, Input, Button, message, Typography } from 'antd';
+import { Layout, Row, Col, Form, Input, Button, message, Modal } from 'antd';
 
 import constants from '../../config/constants';
 import routes from '../../config/routes';
@@ -10,6 +10,7 @@ import highFiveImg from '../../assets/images/High_five.svg';
 import styles from './style.module.scss';
 import { gql, useMutation } from "@apollo/client";
 import { notifyGraphqlError } from "../../utils/error";
+import { useState } from "react";
 
 const LOGIN = gql`
   mutation Login($input: LoginInput!) {
@@ -29,10 +30,20 @@ const LOGIN = gql`
   }
 `
 
+const FORGOT_PASSWORD = gql`
+  mutation ForgotPassword($input: ForgotPasswordInput!) {
+    ForgotPassword(input: $input)
+  }
+`
+
 const Login = () => {
+  const [form] = Form.useForm();
+  const [forgetForm] = Form.useForm();
   const navigate = useNavigate();
   const [Login] = useMutation(LOGIN);
+  const [ForgotPassword] = useMutation(FORGOT_PASSWORD);
   let { role } = useParams();
+  const [modalVisible, setModalVisible] = useState<boolean>(false);
 
   const handleSubmit = (values: any) => {
     let formData = role === 'admin' ?
@@ -78,6 +89,31 @@ const Login = () => {
     }).catch(notifyGraphqlError)
   };
 
+  const onSubmitForgotPasswordForm = (values: any) => {
+    let formData = role === 'admin' ?
+      {
+        email: values?.email,
+        userType: constants?.userType?.SystemAdmin,
+        companyCode: null
+      } :
+      {
+        email: values?.email,
+        userType: constants?.userType?.Company,
+        companyCode: values?.code
+      }
+    ForgotPassword({
+      variables: {
+        input: formData
+      }
+    }).then((response) => {
+      if(response.errors) {
+        console.log('Forget Password Error');
+        return notifyGraphqlError((response?.errors))
+      }
+      message.success(`Reset Password link sent to the email successfully!`)
+    }).catch(notifyGraphqlError)
+  }
+
   return (
     <Layout>
       <Row style={{ minHeight: '100vh', background: '#FFFFFF' }} className={styles['login-row']}>
@@ -91,7 +127,7 @@ const Login = () => {
             </div>
             <br/>
             <div>
-              <Form onFinish={handleSubmit} layout="vertical">
+              <Form form={form} onFinish={handleSubmit} layout="vertical">
                 {role !=='admin' &&
                 <Form.Item label="Company Code" name="code" rules={[{required: role !== 'admin', message: 'Company Code is required'},
                   {max: 10, message: "Code should be less than 10 character"}]}>
@@ -105,8 +141,8 @@ const Login = () => {
                   <Input type="password" placeholder="Password" autoComplete="off"/>
                 </Form.Item>
                 <Form.Item>
-                  <div className={styles['forgot-password']}>
-                    <Typography.Link href="#API">Forgot Password?</Typography.Link>
+                  <div className={styles['forgot-password']} onClick={() => setModalVisible(true)}>
+                    <p>Forgot Password?</p>
                   </div>
                 </Form.Item>
                 <Form.Item>
@@ -120,6 +156,36 @@ const Login = () => {
           <img className={styles.highFiveImage} alt="highFiveImg" src={highFiveImg} />
         </Col>
       </Row>
+      <Modal
+        centered
+        width={900}
+        visible={modalVisible}
+        onCancel={() => setModalVisible(false)}
+        footer={null}>
+        <div className={styles['modal-header']}>Forgot Password</div>
+        <div className={styles['forget-form']}>
+          <div className={styles['modal-subtitle']}>Please fill in the details to verify your identity.</div>
+          <br/><br/>
+          <Form
+            form={forgetForm}
+            layout="vertical"
+            onFinish={onSubmitForgotPasswordForm}>
+            {role !=='admin' &&
+              <Form.Item label="Company Code" name="code" rules={[{required: role !== 'admin', message: 'Company Code is required'},
+                {max: 10, message: "Code should be less than 10 character"}]}>
+                <Input placeholder="Enter Company Code" />
+              </Form.Item>}
+              <Form.Item label="Email Address" name="email" rules={[{type: 'email', message: 'The input is not valid E-mail!',},
+                {required: true, message: 'Please enter your E-mail!'},]}>
+                <Input placeholder="Enter Email Address" />
+              </Form.Item>
+              <Form.Item>
+                <Button type="primary" htmlType="submit">Proceed</Button><br/><br/>
+                <Button type="default" onClick={() => setModalVisible(false)}>Go to Login</Button>
+              </Form.Item>
+          </Form>
+        </div>
+      </Modal>
     </Layout>
   );
 };

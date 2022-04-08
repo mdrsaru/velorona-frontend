@@ -14,6 +14,11 @@
       height: 3rem;
     }
   }
+  :local(.forget-form) {
+    .ant-btn {
+      width: 100%;
+    }
+  }
 }
 
 .login-form-button {
@@ -87,8 +92,24 @@
 
 .forgot-password {
   float: right;
+  cursor: pointer;
   font-weight: 400;
   font-size: 14px;
   line-height: 17px;
   color: var(--primary-blue);
+}
+
+.modal-header {
+  padding: 1rem 2rem 1rem 2rem;
+}
+
+.modal-subtitle, .modal-header {
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 22px;
+}
+
+
+.forget-form {
+  padding: 2rem 3rem 0 3rem;
 }

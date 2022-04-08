@@ -7,12 +7,12 @@ import { ArrowLeftOutlined, UploadOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 import { mediaServices } from '../../../services/MediaService';
 
-import {gql, useMutation, useQuery} from "@apollo/client";
-import {notifyGraphqlError} from "../../../utils/error";
-import {authVar} from "../../../App/link";
+import { gql, useMutation } from "@apollo/client";
+import { notifyGraphqlError } from "../../../utils/error";
+import { authVar } from "../../../App/link";
 
-import {IRole} from "../../../interfaces/IRole";
 import styles from "../style.module.scss";
+import {roles_user} from "../../../config/constants";
 
 const normFile = (e: any) => {
   if (Array.isArray(e)) {
@@ -39,17 +39,6 @@ const EMPLOYEE_CREATE = gql`
       }
   }
 `
-const ROLES = gql`
-  query Role {
-    Role {
-      data {
-        id
-        name
-      }
-    }
-  }
-`
-
 
 const NewEmployee = () => {
   const navigate = useNavigate();
@@ -57,9 +46,6 @@ const NewEmployee = () => {
   const [dates, setDates] = useState([]);
   const [UserCreate] = useMutation(EMPLOYEE_CREATE);
   const [ChangeProfilePictureInput] = useMutation(CHANGE_PROFILE_IMAGE);
-  const { data: roles } = useQuery(ROLES, {
-    fetchPolicy: "cache-first"
-  });
   const [form] = Form.useForm();
   const { Option } = Select;
 
@@ -232,8 +218,8 @@ const NewEmployee = () => {
             <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
               <Form.Item name="roles" label="Role" rules={[{ required: true, message: 'Please enter role!' }]}>
                 <Select placeholder="Employee">
-                  {roles && roles?.Role?.data.map((role: IRole, index:number) => (
-                    <Option value={role?.id} key={index}>{role?.name}</Option>
+                  {roles_user?.map((role: string, index:number) => (
+                    <Option value={role} key={index}>{role}</Option>
                   ))}
                 </Select>
               </Form.Item>

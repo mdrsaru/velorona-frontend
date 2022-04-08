@@ -7,11 +7,18 @@ const config = {
   roles: {
     SuperAdmin: 'SuperAdmin',
     CompanyAdmin: 'CompanyAdmin',
-    ClientAdmin: 'ClientAdmin',
+    Client: 'Client',
     Employee: 'Employee',
     TaskManager: 'TaskManager',
     Vendor: 'Vendor',
   },
+  userType: {
+    SystemAdmin: 'SystemAdmin',
+    Company: 'Company'
+  }
 };
+
+export const roles_user = ['CompanyAdmin', 'Client', 'Employee', 'TaskManager']
+
 
 export default config;
