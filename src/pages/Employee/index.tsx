@@ -142,6 +142,7 @@ const Employee = () => {
       <Menu.Item key="delete"><div onClick={() => setModalVisibility(true)}>Delete Employee</div></Menu.Item>
     </Menu>
   );
+
   const columns = [
     {
       title: 'Name',
@@ -213,7 +214,8 @@ const Employee = () => {
             <Col span={12} className={styles['employee-col']}>
               <div className={styles['add-new-employee']}>
                 <Link to={routes.addEmployee.path(loggedInUser?.company?.code ? loggedInUser?.company?.code : '')}>Add
-                  New Employee</Link>
+                  New Employee
+                </Link>
               </div>
             </Col>
           </Row>

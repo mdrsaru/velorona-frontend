@@ -15,6 +15,12 @@
         }
       }
 
+      .ant-layout-sider-trigger {
+        background: var(--white);
+        color: var(--primary-icon-gradient);
+      }
+
+
       .ant-menu-inline .ant-menu-item {
         &:after {
           border-right: unset;
@@ -24,9 +30,6 @@
           background: unset;
         }
       }
-    }
-    a {
-      padding-left: 13%;
     }
     .ant-menu {
       padding-top: 1rem;

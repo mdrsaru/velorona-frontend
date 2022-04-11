@@ -1,0 +1,189 @@
+:global {
+  .ant-modal-footer {
+    border: none;
+    text-align: center;
+    padding-bottom: 5rem;
+  }
+
+  :local(.dropdown-menu) {
+    .ant-dropdown-menu {
+      margin: 0 7rem;
+    }
+    .ant-dropdown-menu-item {
+      padding: 12px 0 12px 15px;
+    }
+  }
+
+  :local(.project-main-div) {
+    .ant-progress-inner {
+      border-radius: 0;
+    }
+
+    .ant-progress-outer {
+      width: 85%;
+    }
+
+    .ant-progress-text {
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 17px;
+    }
+
+    .ant-progress-status-success {
+      .ant-progress-text {
+        color: var(--black);
+        .anticon {
+          display: none;
+        }
+      }
+
+      .ant-progress-text::before {
+        content: '100%';
+      }
+    }
+
+    .ant-progress-bg {
+      border-radius: 0;
+      background-color: var(--primary-orange);
+    }
+    .ant-progress-status-success .ant-progress-bg {
+      background-color: var(--primary-green);
+    }
+  }
+}
+
+.form-col {
+  padding: 1.5rem 0 0.9rem 0;
+
+  h1 {
+    font-weight: 600;
+    font-size: 24px;
+    line-height: 29px;
+  }
+}
+
+.form-col2 {
+  padding: 0 1rem 0 0;
+}
+
+.project-main-div {
+  padding: 2rem 0 0 0;
+}
+
+.add-new {
+  float: right;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 22px;
+  color: var(--primary-blue);
+}
+
+.add-new-task {
+  float: right;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 22px;
+  color: var(--primary-blue);
+  padding: 0 1rem 0 1rem;
+}
+
+.modal-message {
+  padding: 3rem 0 0 0;
+  text-align: center;
+
+  img {
+    height: 200px;
+    padding: 1rem;
+  }
+
+  p {
+    font-weight: 400;
+    font-size: 17px;
+    line-height: 17px;
+  }
+
+  .warning-text {
+    color: var(--primary-red);
+  }
+
+  .archive-text {
+    color: var(--primary-orange);
+  }
+}
+
+.main-div {
+  padding: 2rem 0 2rem 0;
+}
+
+
+.formHeader {
+  width: 100%;
+  margin: 1.5rem 1rem 1.5rem;
+  background: var(--gray-secondary);
+  padding: 1rem 0.6rem 0 2rem;
+
+  p {
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 22px;
+    color: var(--white);
+  }
+}
+
+.project-col {
+  padding: 1.5rem 0 0.9rem 0;
+
+  h1 {
+    font-weight: 600;
+    font-size: 24px;
+    line-height: 29px;
+  }
+}
+
+.add-new {
+  float: right;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 22px;
+  color: var(--primary-blue);
+}
+
+.formCol {
+  padding: 0 1rem 0 1rem;
+  @media screen and  (max-width: 767px) {
+    padding: 0 1rem 0 0;
+  }
+
+  h1 {
+    font-weight: 600;
+    font-size: 24px;
+    line-height: 29px;
+  }
+}
+
+
+.Active-text {
+  color: var(--primary-green);
+}
+
+.Inactive-text {
+  color: var(--primary-purple);
+}
+
+.Closed-text {
+  color: var(--gray-secondary);
+}
+
+.add-task-row {
+  margin-left: 1rem;
+  margin-right: 1rem;
+  padding-right: 1.5rem;
+  padding-left: 1.5rem;
+  padding-bottom: 1rem;
+  border: 1px solid var(--gray-secondary);
+  box-sizing: border-box;
+}
+
+.form-col-task {
+  padding: 0 1rem 0 0;
+}

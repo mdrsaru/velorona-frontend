@@ -47,7 +47,7 @@ const Home = () => {
               <Button type="primary">Check-in</Button>
             </Card.Grid>
             <Card.Grid hoverable={false} className={styles['grid-style-second']}>
-              <p>9:40:55 AM</p>
+              <p>00:00:00 AM</p>
             </Card.Grid>
           </Card> <br/>
           <Card className={styles['leave-report-card']}>
