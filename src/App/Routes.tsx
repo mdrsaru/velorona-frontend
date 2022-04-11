@@ -34,6 +34,16 @@ const _Routes = () => {
             }/>
         </Route>
 
+        <Route path={routes.resetPassword.path}>
+          <Route
+            index
+            element={
+              <Suspense fallback={<LoginLoader/>}>
+                <routes.resetPassword.component/>
+              </Suspense>
+            }/>
+        </Route>
+
         {/* protected routes */}
         <Route path={routes.home.path} element={<Layout/>}>
 

@@ -3,16 +3,15 @@ import moment from 'moment';
 
 import { Button, Card, Col, Form, Input, message, Row, Select, Space, Upload, DatePicker, InputNumber } from "antd";
 import { ArrowLeftOutlined, UploadOutlined } from "@ant-design/icons";
+import { mediaServices } from '../../../services/MediaService';
+import {roles_user} from "../../../config/constants";
 
 import { useNavigate } from "react-router-dom";
-import { mediaServices } from '../../../services/MediaService';
-
 import { gql, useMutation } from "@apollo/client";
 import { notifyGraphqlError } from "../../../utils/error";
 import { authVar } from "../../../App/link";
 
 import styles from "../style.module.scss";
-import {roles_user} from "../../../config/constants";
 
 const normFile = (e: any) => {
   if (Array.isArray(e)) {

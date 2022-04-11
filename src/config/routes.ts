@@ -25,6 +25,12 @@ const routes = {
     component: lazy(() => import('../pages/Login')),
     name: 'Login',
   },
+  resetPassword: {
+    childPath: null,
+    path: '/reset-password',
+    component: lazy(() => import('../pages/ResetPassword')),
+    name: 'Reset Password',
+  },
   home: {
     childPath: null,
     path: '/',

@@ -1,0 +1,39 @@
+:global {
+  :local(.main-div) {
+    .ant-btn {
+      width: 100%;
+    }
+  }
+}
+.main-div {
+  padding: 2rem;
+  .gutter-col {
+    padding-top: 3rem;
+    img {
+      height: 130px;
+    }
+  }
+
+  .email-sent-text {
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 17px;
+  }
+
+  .email-sent-message {
+    padding-bottom: 1rem;
+  }
+
+  .resend-code {
+    cursor: pointer;
+    color: var(--primary-blue);
+  }
+
+  .go-to-login {
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 17px;
+    color: var(--primary-blue);
+    cursor: pointer;
+  }
+}

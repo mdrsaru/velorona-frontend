@@ -1,16 +1,17 @@
-import { useNavigate, useParams } from 'react-router-dom';
 import { Layout, Row, Col, Form, Input, Button, message, Modal } from 'antd';
+import { useState } from "react";
+import { useNavigate, useParams } from 'react-router-dom';
 
+import { authVar } from '../../App/link';
+import { gql, useMutation } from "@apollo/client";
+
+import { notifyGraphqlError } from "../../utils/error";
 import constants from '../../config/constants';
 import routes from '../../config/routes';
-import { authVar } from '../../App/link';
 
 import logo from '../../assets/images/main_logo.svg';
 import highFiveImg from '../../assets/images/High_five.svg';
 import styles from './style.module.scss';
-import { gql, useMutation } from "@apollo/client";
-import { notifyGraphqlError } from "../../utils/error";
-import { useState } from "react";
 
 const LOGIN = gql`
   mutation Login($input: LoginInput!) {
@@ -110,13 +111,17 @@ const Login = () => {
         console.log('Forget Password Error');
         return notifyGraphqlError((response?.errors))
       }
-      message.success(`Reset Password link sent to the email successfully!`)
+      setModalVisible(false)
+      navigate(routes?.resetPassword?.path)
+      forgetForm.resetFields();
+      message.success(`If account ${values?.email} exists,
+       reset password link is successfully sent to the email!`)
     }).catch(notifyGraphqlError)
   }
 
   return (
     <Layout>
-      <Row style={{ minHeight: '100vh', background: '#FFFFFF' }} className={styles['login-row']}>
+      <Row className={styles['login-row']}>
         <Col sm={24} xs={24} md={14} lg={13} className={styles['sign-in-form-col']}>
           <div className={styles['sign-in-content']}>
             <div className={styles['sign-in-logo']}>
