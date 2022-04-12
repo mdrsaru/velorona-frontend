@@ -1,8 +1,7 @@
 import React from "react";
-import moment from 'moment';
-
 import {Button, Card, Col, Form, Input, message, Row, Select, Space, DatePicker, InputNumber, Upload} from "antd";
 import {ArrowLeftOutlined, UploadOutlined} from "@ant-design/icons";
+import moment from 'moment';
 
 import {useNavigate, useParams} from "react-router-dom";
 
@@ -273,14 +272,14 @@ const EditEmployee = () => {
             <Row>
               <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
                 <Form.Item name="startDate" label="Employee Start Date" rules={[{ required: true, message: 'Please select the start date' }]}>
-                  <DatePicker format="YYYY-MM-DD HH:mm:ss" placeholder={"Enter Start Date"} suffixIcon={""}
-                              showTime={{defaultValue: moment('00:00:00', 'HH:mm:ss')}}/>
+                  {/*<DatePicker format="YYYY-MM-DD HH:mm:ss" placeholder={"Enter Start Date"} suffixIcon={""}*/}
+                  {/*            showTime={{defaultValue: moment('00:00:00', 'HH:mm:ss')}}/>*/}
                 </Form.Item>
               </Col>
               <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
                 <Form.Item name="endDate" label="Employee End Date" rules={[{ required: true, message: 'Please select the end date' }]}>
-                  <DatePicker format="YYYY-MM-DD HH:mm:ss" placeholder={"Enter End Date"} suffixIcon={""}
-                              showTime={{defaultValue: moment('00:00:00', 'HH:mm:ss')}}/>
+                  {/*<DatePicker format="YYYY-MM-DD HH:mm:ss" placeholder={"Enter End Date"} suffixIcon={""}*/}
+                  {/*            showTime={{defaultValue: moment('00:00:00', 'HH:mm:ss')}}/>*/}
                 </Form.Item>
               </Col>
             </Row>

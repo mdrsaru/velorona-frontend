@@ -1,19 +1,21 @@
-import { Card, Row, Col, Table, Dropdown, Menu } from 'antd';
+import {Card, Row, Col, Table, Dropdown, Menu, message} from 'antd';
 import { MoreOutlined } from "@ant-design/icons";
 
 import { Link, useNavigate } from "react-router-dom";
 import routes from "../../config/routes";
 
-import styles from './style.module.scss';
+import moment from "moment";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { authVar } from "../../App/link";
 import { useState } from "react";
-import deleteImg from "../../assets/images/delete_btn.svg";
-import archiveImg from "../../assets/images/archive_btn.svg";
+
 import ModalConfirm from "../../components/Modal";
-import moment from "moment";
 import { notifyGraphqlError } from "../../utils/error";
 import AppLoader from "../../components/Skeleton/AppLoader";
+
+import deleteImg from "../../assets/images/delete_btn.svg";
+import archiveImg from "../../assets/images/archive_btn.svg";
+import styles from './style.module.scss';
 
 const {SubMenu} = Menu;
 
@@ -101,6 +103,7 @@ const Employee = () => {
   })
 
   const changeStatus = (value: string, id: string) => {
+    message.loading({content: "Updating status of employee..", className: 'custom-message', duration: '19', rtl: true}).then(() =>
     EmployeeUpdate({
       variables: {
         input: {
@@ -112,7 +115,7 @@ const Employee = () => {
       if (response.errors) {
         return notifyGraphqlError((response.errors))
       }
-    }).catch(notifyGraphqlError)
+    }).catch(notifyGraphqlError))
   }
 
   const onRowClick = (record: any, rowIndex: any) => {

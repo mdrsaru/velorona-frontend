@@ -24,7 +24,7 @@ const NewTimesheet = () => {
           <Row>
             <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
               <Form.Item name="date-picker" label="Date">
-                <DatePicker bordered={false} placeholder={'Select Date'} suffixIcon={<DownOutlined/>}/>
+                {/*<DatePicker bordered={false} placeholder={'Select Date'} suffixIcon={<DownOutlined/>}/>*/}
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>

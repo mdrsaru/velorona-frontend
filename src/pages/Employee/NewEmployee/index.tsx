@@ -52,11 +52,8 @@ const NewEmployee = () => {
     navigate(-1);
   }
   const successMessage = () => {
-    message.success(`New Employee is created successfully!`).then(r => {
-      if (r) {
-        navigate(-1)
-      }
-    });
+    navigate(-1)
+    message.success({content: `New Employee is created successfully!`, className: 'custom-message'});
   }
 
   function disabledDate(current: any) {
@@ -64,6 +61,7 @@ const NewEmployee = () => {
   }
 
   const onSubmitForm = (values: any) => {
+    message.loading({content: "New employee adding in progress..", className: 'custom-message'}).then(() =>
     UserCreate({
       variables: {
         input: {
@@ -97,6 +95,7 @@ const NewEmployee = () => {
           mediaServices.uploadProfileImage(formData).then((res: any) => {
               const user = response?.data?.UserCreate?.id;
               const avatar = res?.data?.id;
+              message.loading({content: "Uploading user's profile image..", className: 'custom-message'}).then(() =>
               ChangeProfilePictureInput({
                 variables: {
                   input: {
@@ -109,13 +108,13 @@ const NewEmployee = () => {
                 } else if (response?.data) {
                   successMessage()
                 }
-              }).catch(notifyGraphqlError)
+              }).catch(notifyGraphqlError))
             })
         } else {
           successMessage()
         }
       }
-    }).catch(notifyGraphqlError)
+    }).catch(notifyGraphqlError))
   }
 
   return(
@@ -200,16 +199,16 @@ const NewEmployee = () => {
           <Row>
             <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
               <Form.Item name="startDate" label="Employee Start Date" rules={[{ required: true, message: 'Please enter start time!' }]}>
-                <DatePicker format="YYYY-MM-DD HH:mm:ss" placeholder={"Enter Start Date"} suffixIcon={""}
-                            onChange={(val: any) => setDates(val)}
-                            showTime={{ defaultValue: moment('00:00:00', 'HH:mm:ss') }}/>
+                {/*<DatePicker format="YYYY-MM-DD HH:mm:ss" placeholder={"Enter Start Date"} suffixIcon={""}*/}
+                {/*            onChange={(val: any) => setDates(val)}*/}
+                {/*            showTime={{ defaultValue: moment('00:00:00', 'HH:mm:ss') }}/>*/}
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
               <Form.Item name="endDate" label="Employee End Date" rules={[{ required: true, message: 'Please enter end date!' }]}>
-                <DatePicker format="YYYY-MM-DD HH:mm:ss" placeholder={"Enter End Date"} suffixIcon={""}
-                            disabledDate={disabledDate}
-                            showTime={{ defaultValue: moment('00:00:00', 'HH:mm:ss') }}/>
+                {/*<DatePicker format="YYYY-MM-DD HH:mm:ss" placeholder={"Enter End Date"} suffixIcon={""}*/}
+                {/*            disabledDate={disabledDate}*/}
+                {/*            showTime={{ defaultValue: moment('00:00:00', 'HH:mm:ss') }}/>*/}
               </Form.Item>
             </Col>
           </Row>

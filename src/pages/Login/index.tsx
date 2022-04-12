@@ -53,13 +53,13 @@ const Login = () => {
       {email: values.email,
         password: values.password,
         companyCode: values.code}
+    message.loading("Please wait, logging in progress..").then(() =>
     Login({
       variables: {
         input: formData
       }
     }).then((response) => {
       if(response.errors) {
-        console.log('Login Error');
         return notifyGraphqlError((response?.errors))
       } 
 
@@ -87,7 +87,7 @@ const Login = () => {
       } else {
         navigate(routes.home.path);
       }
-    }).catch(notifyGraphqlError)
+    }).catch(notifyGraphqlError))
   };
 
   const onSubmitForgotPasswordForm = (values: any) => {
@@ -102,6 +102,7 @@ const Login = () => {
         userType: constants?.userType?.Company,
         companyCode: values?.code
       }
+    message.loading("Sending reset link to user's email..").then(() =>
     ForgotPassword({
       variables: {
         input: formData
@@ -112,11 +113,10 @@ const Login = () => {
         return notifyGraphqlError((response?.errors))
       }
       setModalVisible(false)
-      navigate(routes?.resetPassword?.path)
       forgetForm.resetFields();
       message.success(`If account ${values?.email} exists,
        reset password link is successfully sent to the email!`)
-    }).catch(notifyGraphqlError)
+    }).catch(notifyGraphqlError)  )
   }
 
   return (
