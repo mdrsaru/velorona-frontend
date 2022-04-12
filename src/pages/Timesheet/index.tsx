@@ -24,7 +24,7 @@ const Timesheet = () => {
               <div className={styles['timesheet']}>My Timesheet</div>
             </Card.Grid>
             <Card.Grid hoverable={false} className={styles['grid-style']}>
-              {/*<DatePicker bordered={false} placeholder={'Date'} suffixIcon={<DownOutlined />}/>*/}
+              <DatePicker bordered={false} placeholder={'Date'} suffixIcon={<DownOutlined />}/>
             </Card.Grid>
             <Card.Grid hoverable={false} className={styles['grid-style']}>
               <Form.Item name="week">

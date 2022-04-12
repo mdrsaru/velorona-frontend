@@ -25858,22 +25858,36 @@ input {
 }
 .ant-message {
   font-weight: 600;
-  font-size: 20px;
+  font-size: 15px;
   line-height: 29px;
 }
 .ant-message .anticon {
-  margin-right: 3rem;
+  margin-right: 2rem;
+}
+.ant-message-custom-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 .ant-message-notice-content {
-  min-width: 50VW;
-  min-height: 7VH;
+  min-width: 35VW;
 }
 @media only screen and (max-width: 1025px) {
   .ant-message-notice-content {
-    min-width: 70VW;
-    min-height: 5VH;
+    min-width: 60VW;
   }
 }
-.ant-message-loading .anticon svg {
-  font-size: 30px;
+.ant-message-loading .anticon svg,
+.ant-message-success .anticon svg,
+.ant-message-error .anticon svg {
+  font-size: 35px;
+}
+.ant-message-success {
+  color: var(--primary-green);
+}
+.ant-message-loading {
+  color: var(--primary-blue);
+}
+.ant-message-error {
+  color: var(--primary-red);
 }

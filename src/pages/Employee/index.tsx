@@ -103,7 +103,7 @@ const Employee = () => {
   })
 
   const changeStatus = (value: string, id: string) => {
-    message.loading({content: "Updating status of employee..", className: 'custom-message', duration: '19', rtl: true}).then(() =>
+    message.loading({content: "Updating status of employee..", className: 'custom-message'}).then(() =>
     EmployeeUpdate({
       variables: {
         input: {

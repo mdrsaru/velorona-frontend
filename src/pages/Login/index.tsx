@@ -63,7 +63,7 @@ const Login = () => {
         return notifyGraphqlError((response?.errors))
       } 
 
-      message.success(`LoggedIn successfully!`)
+      message.success( {content: `LoggedIn successfully!`, className: 'custom-message'})
       const loginData = response?.data?.Login;
       const roles = loginData?.roles?.map((role: any) => role?.name);
 
