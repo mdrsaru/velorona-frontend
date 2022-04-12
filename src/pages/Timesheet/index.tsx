@@ -36,7 +36,7 @@ const Timesheet = () => {
             </Card.Grid>
             <Card.Grid hoverable={false} className={styles['grid-style2']}>
               <div className={styles['add-time-stamp']}>
-                <Link to={routes.newTimesheet.path}>Add Time Stamp</Link>
+                <Link to={routes.newTimesheet.path}>Add Project</Link>
               </div>
             </Card.Grid>
             <Card.Grid hoverable={false} className={styles['grid-style-full']}>
