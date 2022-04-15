@@ -1,4 +1,4 @@
-import {Card, Row, Col, Table, Dropdown, Menu, message} from 'antd';
+import { Card, Row, Col, Table, Dropdown, Menu, message } from 'antd';
 import { MoreOutlined } from "@ant-design/icons";
 
 import { Link, useNavigate } from "react-router-dom";

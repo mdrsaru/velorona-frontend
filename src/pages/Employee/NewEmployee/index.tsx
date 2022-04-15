@@ -4,7 +4,7 @@ import moment from 'moment';
 import { Button, Card, Col, Form, Input, message, Row, Select, Space, Upload, DatePicker, InputNumber } from "antd";
 import { ArrowLeftOutlined, UploadOutlined } from "@ant-design/icons";
 import { mediaServices } from '../../../services/MediaService';
-import {roles_user} from "../../../config/constants";
+import { roles_user } from "../../../config/constants";
 
 import { useNavigate } from "react-router-dom";
 import { gql, useMutation } from "@apollo/client";
@@ -51,6 +51,7 @@ const NewEmployee = () => {
   const cancelAddEmployee = () => {
     navigate(-1);
   }
+
   const successMessage = () => {
     navigate(-1)
     message.success({content: `New Employee is created successfully!`, className: 'custom-message'});

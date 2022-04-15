@@ -84,7 +84,7 @@ const Project = () => {
   const menu = (data: any) => (
     <Menu>
       <Menu.Item key="edit">
-        <div>Edit Project</div>
+        <Link to={routes.editProject.path(loggedInUser?.company?.code ?? '1', data?.id ?? '1')}>Edit Project</Link>
       </Menu.Item>
       <Menu.Divider/>
       <Menu.Item key="archive">

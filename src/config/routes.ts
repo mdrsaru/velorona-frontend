@@ -110,10 +110,16 @@ const routes = {
     name: 'Project',
   },
   addProject: {
-    childPath: ':add',
+    childPath: 'add',
     path: (id: string) => `/${id}/projects/add`,
     component: lazy(() => import('../pages/Project/NewProject')),
     name: 'New Company',
+  },
+  editProject: {
+    childPath: ':pid',
+    path: (id: string, pid: string) => `/${id}/projects/${pid}`,
+    component: lazy(() => import('../pages/Project/EditProject')),
+    name: 'Edit Project',
   },
   invoice: {
     childPath: 'invoices',
