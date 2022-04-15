@@ -1,15 +1,15 @@
 import React from "react";
-import {Button, Card, Col, Form, Input, message, Row, Select, Space, DatePicker, InputNumber, Upload} from "antd";
-import {ArrowLeftOutlined, UploadOutlined} from "@ant-design/icons";
+import { Button, Card, Col, Form, Input, message, Row, Select, Space, DatePicker, InputNumber, Upload } from "antd";
+import { ArrowLeftOutlined, UploadOutlined } from "@ant-design/icons";
 import moment from 'moment';
 
-import {useNavigate, useParams} from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import styles from "../style.module.scss";
-import {gql, useMutation, useQuery} from "@apollo/client";
-import {notifyGraphqlError} from "../../../utils/error";
-import {mediaServices} from "../../../services/MediaService";
-import {IRole} from "../../../interfaces/IRole";
+import { gql, useMutation, useQuery } from "@apollo/client";
+import { notifyGraphqlError } from "../../../utils/error";
+import { mediaServices } from "../../../services/MediaService";
+import { IRole } from "../../../interfaces/IRole";
 
 const dateFormat = 'YYYY-MM-DD HH:mm:ss';
 const profileFile = (e: any) => {

@@ -4,11 +4,11 @@ import moment from "moment";
 import { Avatar, Card, Col, Row, Button } from "antd";
 import { ArrowLeftOutlined, AntDesignOutlined } from "@ant-design/icons";
 
-import {gql, useQuery} from "@apollo/client";
-import {Link, useNavigate, useParams} from "react-router-dom";
+import { gql, useQuery } from "@apollo/client";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import routes from "../../../config/routes";
 
-import {authVar} from "../../../App/link";
+import { authVar } from "../../../App/link";
 import image from '../../../assets/images/High_five.svg'
 import styles from "../style.module.scss";
 
@@ -48,8 +48,6 @@ const DetailEmployee = () => {
       }
     }
   })
-
-  console.log(userData);
 
   return (
     <div className={styles['main-div']}>

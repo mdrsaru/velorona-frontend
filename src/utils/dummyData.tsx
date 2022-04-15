@@ -1,7 +1,7 @@
 export const columns = [
   {
-    title: 'Start Date',
-    dataIndex: 'start_date',
+    title: 'Project Name',
+    dataIndex: 'project',
     key: 'start_date',
   },
   {

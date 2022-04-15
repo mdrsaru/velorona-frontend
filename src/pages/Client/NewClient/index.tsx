@@ -18,7 +18,7 @@ const NewClient = () => {
         <Card bordered={false}>
           <Row>
             <Col span={12} className={styles['client-col']}>
-              <h1><ArrowLeftOutlined onClick={() => navigate(-1)}/> &nbsp; Add New Employee</h1>
+              <h1><ArrowLeftOutlined onClick={() => navigate(-1)}/> &nbsp; Add New Client</h1>
             </Col>
           </Row>
           <Form form={form} layout="vertical">
