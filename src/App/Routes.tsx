@@ -11,8 +11,23 @@ import constants from "../config/constants";
 import AppLoader from "../components/Skeleton/AppLoader";
 import LoginLoader from "../components/Skeleton/LoginLoader";
 import RouteLoader from "../components/Skeleton/RouteLoader";
+import PublicRoutes from "../components/PublicRoutes";
+import {authVar} from "./link";
+
 
 const _Routes = () => {
+  const loginData = authVar();
+  const roles = loginData?.user?.roles;
+  const getRoute = () => {
+    if (roles.includes(constants.roles.SuperAdmin)) {
+      return routes.dashboard.path
+    } else if(roles.includes(constants.roles.CompanyAdmin)) {
+      return routes.company.path(loginData?.company?.code)
+    } else {
+      return routes.home.path
+    }
+  }
+
   return (
     <Router>
       <Routes>
@@ -21,16 +36,20 @@ const _Routes = () => {
           <Route
             index
             element={
-              <Suspense fallback={<LoginLoader/>}>
-                <routes.login.component/>
-              </Suspense>
+              <PublicRoutes>
+                <Suspense fallback={<LoginLoader/>}>
+                  <routes.login.component/>
+                </Suspense>
+              </PublicRoutes>
             }/>
           <Route
             path={routes.loginAdmin.childPath}
             element={
-              <Suspense fallback={<LoginLoader/>}>
-                <routes.login.component/>
-              </Suspense>
+              <PublicRoutes>
+                <Suspense fallback={<LoginLoader/>}>
+                  <routes.login.component/>
+                </Suspense>
+              </PublicRoutes>
             }/>
         </Route>
 
@@ -38,15 +57,16 @@ const _Routes = () => {
           <Route
             index
             element={
-              <Suspense fallback={<LoginLoader/>}>
-                <routes.resetPassword.component/>
-              </Suspense>
+              <PublicRoutes>
+                <Suspense fallback={<LoginLoader/>}>
+                  <routes.resetPassword.component/>
+                </Suspense>
+              </PublicRoutes>
             }/>
         </Route>
 
         {/* protected routes */}
         <Route path={routes.home.path} element={<Layout/>}>
-
           <Route
             path={routes.role.path}
             element={
@@ -196,7 +216,7 @@ const _Routes = () => {
           <Route
             index
             element={
-              <CheckRoles allowedRoles={[constants.roles.Employee]}>
+              <CheckRoles allowedRoles={[constants.roles.Employee]} redirect_to={getRoute()}>
                 <Suspense fallback={<RouteLoader/>}>
                   <routes.home.component/>
                 </Suspense>

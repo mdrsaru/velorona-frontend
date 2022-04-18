@@ -51,7 +51,7 @@ const routes = {
   },
   company: {
     childPath: ':id',
-    path:  (id: string) => `/${id}`,
+    path: (id: string | undefined) => `/${id}`,
     component: lazy(() => import('../pages/Company')),
     name: 'Company',
   },

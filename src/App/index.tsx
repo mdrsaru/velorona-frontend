@@ -49,24 +49,24 @@ function App() {
     TokenService.renewAccessToken()
       .then((response) => response.json())
       .then((response) => {
-        authVar({
-          isLoggedIn: true,
-          token: response?.data?.accessToken,
-          user: {
-            id: response?.data?.id ?? null,
-            roles: response?.data?.roles?.map((role: any) => role.name),
-          },
-          company: {
-            id: response?.data?.company?.id ?? null,
-            code: response?.data?.company?.companyCode ?? null,
-          }
-        });
+        if (response?.data) {
+          authVar({
+            isLoggedIn: true,
+            token: response?.data?.accessToken,
+            user: {
+              id: response?.data?.id ?? null,
+              roles: response?.data?.roles?.map((role: any) => role.name),
+            },
+            company: {
+              id: response?.data?.company?.id ?? null,
+              code: response?.data?.company?.companyCode ?? null,
+            }
+          })}
       })
       .finally(() => {
         setAppLoading(false);
       });
   }, []);
-
   return (
     <>
       {appLoading ? (

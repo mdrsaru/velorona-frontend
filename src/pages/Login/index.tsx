@@ -46,6 +46,7 @@ const Login = () => {
   let { role } = useParams();
   const [modalVisible, setModalVisible] = useState<boolean>(false);
 
+
   const handleSubmit = (values: any) => {
     let formData = role === 'admin' ?
       {email: values.email,
@@ -62,30 +63,31 @@ const Login = () => {
       if(response.errors) {
         return notifyGraphqlError((response?.errors))
       } 
+      if (response?.data?.Login) {
+        message.success( {content: `LoggedIn successfully!`, className: 'custom-message'})
+        const loginData = response?.data?.Login;
+        const roles = loginData?.roles?.map((role: any) => role?.name);
 
-      message.success( {content: `LoggedIn successfully!`, className: 'custom-message'})
-      const loginData = response?.data?.Login;
-      const roles = loginData?.roles?.map((role: any) => role?.name);
+        authVar({
+          token: loginData?.token,
+          user: {
+            id: loginData?.id,
+            roles,
+          },
+          company: {
+            id: loginData?.company?.id,
+            code: loginData?.company?.companyCode
+          },
+          isLoggedIn: true,
+        });
 
-      authVar({
-        token: loginData?.token,
-        user: {
-          id: loginData?.id,
-          roles,
-        },
-        company: {
-          id: loginData?.company?.id,
-          code: loginData?.company?.companyCode
-        },
-        isLoggedIn: true,
-      });
-
-      if(roles.includes(constants.roles.SuperAdmin)) {
-        navigate(routes.dashboard.path)
-      } else if(roles.includes(constants.roles.CompanyAdmin)) {
-        navigate(routes.company.path(loginData?.company?.companyCode));
-      } else {
-        navigate(routes.home.path);
+        if(roles.includes(constants.roles.SuperAdmin)) {
+          navigate(routes.dashboard.path)
+        } else if(roles.includes(constants.roles.CompanyAdmin)) {
+          navigate(routes.company.path(loginData?.company?.companyCode));
+        } else {
+          navigate(routes.home.path);
+        }
       }
     }).catch(notifyGraphqlError))
   };
