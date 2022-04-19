@@ -1,13 +1,12 @@
 import React from "react";
-import {Button, Card, Col, Form, Input, Row, Select, Space} from "antd";
-import {ArrowLeftOutlined} from "@ant-design/icons";
-import {useNavigate} from "react-router-dom";
+import { Button, Card, Col, Form, Input, Row, Select, Space } from "antd";
+import { ArrowLeftOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 
 import styles from "../style.module.scss";
 
 
 const NewClient = () => {
-
   const navigate = useNavigate();
   const [form] = Form.useForm();
 

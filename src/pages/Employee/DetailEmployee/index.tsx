@@ -4,36 +4,16 @@ import moment from "moment";
 import { Avatar, Card, Col, Row, Button } from "antd";
 import { ArrowLeftOutlined, AntDesignOutlined } from "@ant-design/icons";
 
-import { gql, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import routes from "../../../config/routes";
-
 import { authVar } from "../../../App/link";
+
 import image from '../../../assets/images/High_five.svg'
+import { USER } from "../index";
+
 import styles from "../style.module.scss";
 
-const USER = gql`
-  query User($input: UserQueryInput!) {
-      User(input: $input) {
-      data {
-        id
-        email
-        phone
-        fullName
-        status
-        address {
-          city
-          streetAddress
-        }
-        record {
-          startDate
-          endDate
-          payRate
-        }
-      }
-    }
-  }
-`
 
 const DetailEmployee = () => {
   const navigate = useNavigate();

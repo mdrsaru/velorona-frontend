@@ -2,8 +2,8 @@ import React from "react";
 import { Card, Col, Row, Form, Input, Space, Button, Select, message } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 
-import {gql} from "@apollo/client";
-import {useMutation} from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 
 import { useNavigate } from "react-router-dom";
 import { notifyGraphqlError } from "../../../utils/error";

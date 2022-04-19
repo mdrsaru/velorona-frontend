@@ -4,12 +4,16 @@ import { ArrowLeftOutlined, UploadOutlined } from "@ant-design/icons";
 import moment from 'moment';
 
 import { useNavigate, useParams } from "react-router-dom";
-
-import styles from "../style.module.scss";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { notifyGraphqlError } from "../../../utils/error";
+
 import { mediaServices } from "../../../services/MediaService";
 import { IRole } from "../../../interfaces/IRole";
+import {EMPLOYEE_UPDATE, USER} from "..";
+import { ROLES } from "../../Role";
+import { CHANGE_PROFILE_IMAGE } from "../NewEmployee";
+
+import styles from "../style.module.scss";
 
 const dateFormat = 'YYYY-MM-DD HH:mm:ss';
 const profileFile = (e: any) => {
@@ -19,71 +23,6 @@ const profileFile = (e: any) => {
   return e && e.fileList;
 };
 
-const CHANGE_PROFILE_IMAGE = gql`
-  mutation ChangeProfilePicture($input: ChangeProfilePictureInput!) {
-    ChangeProfilePicture(input: $input) {
-      id
-      firstName
-      lastName
-    }
-  }
-`
-
-const EMPLOYEE_UPDATE = gql`
-  mutation UserUpdate($input: UserUpdateInput!) {
-      UserUpdate(input: $input) {
-          id
-          firstName
-          lastName
-          email
-      }
-  }
-`
-
-const USER = gql`
-  query User($input: UserQueryInput!) {
-      User(input: $input) {
-      data {
-        id
-        email
-        phone
-        firstName
-        middleName
-        lastName
-        status
-        address {
-          city
-          streetAddress
-          zipcode
-          state
-        }
-        record {
-          startDate
-          endDate
-          payRate
-        }
-        company {
-          id
-          name
-        }
-        roles {
-          id
-          name
-        }
-      }
-    }
-  }
-`
-const ROLES = gql`
-  query Role {
-    Role {
-      data {
-        id
-        name
-      }
-    }
-  }
-`
 
 const EditEmployee = () => {
   let params = useParams();

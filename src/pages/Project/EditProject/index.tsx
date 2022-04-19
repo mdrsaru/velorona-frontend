@@ -1,13 +1,17 @@
 import { Button, Card, Col, Form, Input, message, Row, Select, Space } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import React from "react";
-import {useNavigate, useParams} from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 import { authVar } from "../../../App/link";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { notifyGraphqlError } from "../../../utils/error";
+
 import constants from "../../../config/constants";
+import { PROJECT } from "../index";
+
 import styles from "../style.module.scss";
+import {USER} from "../../Employee";
 
 interface ItemProps {
   label: string;
@@ -24,56 +28,11 @@ for (let i = 10; i < 36; i++) {
   });
 }
 
-const PROJECT = gql`
-    query Project($input: ProjectQueryInput!) {
-        Project(input: $input) {
-            data {
-                id
-                name
-                client {
-                    id
-                    email
-                }
-                company {
-                    id
-                    name
-                }
-            }
-        }
-    }
-`
-
 const PROJECT_UPDATE = gql`
     mutation ProjectUpdate($input: ProjectUpdateInput!) {
         ProjectUpdate(input: $input) {
             id
             name
-        }
-    }
-`
-
-const USER = gql`
-    query User($input: UserQueryInput) {
-        User(input: $input) {
-            data {
-                id
-                email
-                phone
-                fullName
-                status
-                roles {
-                    id
-                    name
-                }
-                address {
-                    streetAddress
-                }
-                record {
-                    startDate
-                    endDate
-                    payRate
-                }
-            }
         }
     }
 `

@@ -5,30 +5,19 @@ import { Link } from "react-router-dom";
 import routes from "../../config/routes";
 import { authVar } from "../../App/link";
 
-import styles from "./style.module.scss";
-import {gql, useQuery} from "@apollo/client";
+import { gql, useQuery } from "@apollo/client";
 import { MoreOutlined } from "@ant-design/icons";
 
-const {SubMenu} = Menu;
+import styles from "./style.module.scss";
+import {USER} from "../Employee";
 
-const CLIENT = gql`
-  query User($input: UserQueryInput) {
-    User(input: $input) {
-      data {
-        id
-        email
-        phone
-        fullName
-        status
-      }
-    }
-  }
-`
+const { SubMenu } = Menu;
+
 
 
 const Client = () => {
   const loggedInUser = authVar();
-  const { loading: clientLoading, data: clientData } = useQuery(CLIENT, {
+  const { data: clientData } = useQuery(USER, {
     variables: {
       input: {
         query: {

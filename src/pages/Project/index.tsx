@@ -17,7 +17,7 @@ import styles from "./style.module.scss";
 
 
 
-const PROJECT = gql`
+export const PROJECT = gql`
     query Project($input: ProjectQueryInput!) {
       Project(input: $input) {
         data {

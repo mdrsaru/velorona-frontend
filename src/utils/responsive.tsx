@@ -1,4 +1,4 @@
-import {useLayoutEffect, useState} from "react";
+import { useLayoutEffect, useState } from "react";
 
 export function useMediaQuery() {
   const [screenSize, setScreenSize] = useState([0, 0]);

@@ -1,17 +1,17 @@
 import { Card, Col, Row, Modal, Form, Input, message } from "antd";
 // import { Link } from "react-router-dom";
 
-import React, {useState} from "react";
+import React, { useState } from "react";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { IRole } from "../../interfaces/IRole";
 
 import { useMediaQuery } from "../../utils/responsive";
 // import routes from "../../config/routes";
 
-import styles from "./style.module.scss";
 import { notifyGraphqlError } from "../../utils/error";
+import styles from "./style.module.scss";
 
-const ROLES = gql`
+export const ROLES = gql`
   query Role {
     Role {
       data {

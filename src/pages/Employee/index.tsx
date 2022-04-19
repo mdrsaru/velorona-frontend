@@ -16,36 +16,42 @@ import AppLoader from "../../components/Skeleton/AppLoader";
 import deleteImg from "../../assets/images/delete_btn.svg";
 import archiveImg from "../../assets/images/archive_btn.svg";
 import styles from './style.module.scss';
+import constants from "../../config/constants";
 
 const {SubMenu} = Menu;
 
-const USER = gql`
-  query User($input: UserQueryInput) {
-    User(input: $input) {
-      data {
-        id
-        email
-        phone
-        fullName
-        status
-        roles {
-          id
-          name
+export const USER = gql`
+    query User($input: UserQueryInput!) {
+        User(input: $input) {
+            data {
+                id
+                email
+                phone
+                firstName
+                middleName
+                lastName
+                fullName
+                status
+                address {
+                    city
+                    streetAddress
+                    zipcode
+                    state
+                }
+                company {
+                    id
+                    name
+                }
+                roles {
+                    id
+                    name
+                }
+            }
         }
-        address {
-          streetAddress
-        }
-        record {
-          startDate 
-          endDate
-          payRate
-        }
-      }
     }
-  }
 `
 
-const EMPLOYEE_UPDATE = gql`
+export const EMPLOYEE_UPDATE = gql`
   mutation UserUpdate($input: UserUpdateInput!) {
       UserUpdate(input: $input) {
           id
@@ -93,7 +99,7 @@ const Employee = () => {
     variables: {
       input: {
         query: {
-          // name: constants.roles.Employee
+          role: constants.roles.Employee
         },
         paging: {
           order: ['updatedAt:DESC']

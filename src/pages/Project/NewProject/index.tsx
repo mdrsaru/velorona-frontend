@@ -1,13 +1,16 @@
-import {Button, Card, Col, Form, Input, InputNumber, message, Row, Select, Space} from "antd";
+import { Button, Card, Col, Form, Input, InputNumber, message, Row, Select, Space } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import React from "react";
-import {Link, useNavigate} from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import routes from "../../../config/routes";
-import styles from "../style.module.scss";
-import {authVar} from "../../../App/link";
-import {gql, useMutation, useQuery} from "@apollo/client";
-import {notifyGraphqlError} from "../../../utils/error";
+
+import { authVar } from "../../../App/link";
+import { gql, useMutation, useQuery } from "@apollo/client";
+import { notifyGraphqlError } from "../../../utils/error";
 import constants from "../../../config/constants";
+
+import {USER} from "../../Employee";
+import styles from "../style.module.scss";
 
 interface ItemProps {
   label: string;
@@ -24,31 +27,6 @@ for (let i = 10; i < 36; i++) {
   });
 }
 
-const USER = gql`
-  query User($input: UserQueryInput) {
-    User(input: $input) {
-      data {
-        id
-        email
-        phone
-        fullName
-        status
-        roles {
-          id
-          name
-        }
-        address {
-          streetAddress
-        }
-        record {
-          startDate 
-          endDate
-          payRate
-        }
-      }
-    }
-  }
-`
 
 const PROJECT_CREATE = gql`
   mutation ProjectCreate($input: ProjectCreateInput!) {
