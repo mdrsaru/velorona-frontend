@@ -5,6 +5,11 @@
     padding-bottom: 5rem;
   }
 
+  .ant-modal-close-x {
+    padding-top: 1rem;
+    padding-right: 1rem;
+  }
+
   .ant-upload-span {
     .ant-btn {
       border: none;
@@ -15,6 +20,60 @@
     .ant-avatar .ant-avatar-circle .ant-avatar-image .ant-avatar-icon {
       height: 122px;
       width: 122px;
+    }
+  }
+}
+
+.modal-body {
+  .client-col {
+    padding: 1rem 0 1rem 1rem;
+    line-height: 20px;
+    width: 100%;
+    border: 1px solid #F2F2F2;
+    box-sizing: border-box;
+    cursor: pointer;
+    box-shadow: 0 7px 4px rgba(231, 231, 231, 0.25);
+
+    b {
+      font-weight: 600;
+      font-size: 14px;
+      line-height: 17px;
+    }
+    div {
+      font-weight: 400;
+      font-size: 12px;
+      line-height: 15px;
+    }
+  }
+
+  :global {
+    .ant-input-affix-wrapper {
+      padding: 0.7rem 1rem 0.7rem 1rem;
+      background-color: var(--gray-2) !important;
+    }
+
+    .anticon svg {
+      font-size: 21px;
+    }
+
+    .ant-input-affix-wrapper > input.ant-input  {
+      padding-left: 1.5rem;
+    }
+
+    .ant-input::placeholder {
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 17px;
+      color: var(--black-1);
+    }
+
+    .ant-input-affix-wrapper {
+      border: none;
+
+      &:hover, &:focus {
+        border: none;
+        outline: none !important;
+      }
     }
   }
 }
@@ -39,6 +98,7 @@
     line-height: 22px;
     color: var(--primary-blue);
   }
+
 }
 
 .formCol {
@@ -164,4 +224,49 @@
 
 .user-name {
   cursor: pointer;
+}
+
+.add-existing-col h1 {
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 22px;
+  float: right;
+  color: var(--primary-blue);
+  cursor: pointer;
+  padding-right: 1rem;
+  padding-top: 1.5rem;
+}
+
+.add-title {
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 29px;
+}
+
+.add-body {
+  padding: 2rem 1rem 2rem 1rem;
+  min-height: 300px;
+}
+
+.search-client {
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 22px;
+}
+
+.list-client-card {
+  padding: 1rem 0 0 0;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 17px;
+}
+
+.close-icon-div {
+  padding: 5px;
+  border-radius: 50px;
+  background: var(--gray-2);
+}
+
+.modal-body {
+  padding: 1rem;
 }

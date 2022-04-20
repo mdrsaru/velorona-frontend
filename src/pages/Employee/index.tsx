@@ -51,7 +51,7 @@ export const USER = gql`
     }
 `
 
-export const EMPLOYEE_UPDATE = gql`
+export const USER_UPDATE = gql`
   mutation UserUpdate($input: UserUpdateInput!) {
       UserUpdate(input: $input) {
           id
@@ -85,7 +85,7 @@ const archiveBody = () => {
 const Employee = () => {
   const loggedInUser = authVar();
   const navigate = useNavigate();
-  const [EmployeeUpdate] = useMutation(EMPLOYEE_UPDATE);
+  const [EmployeeUpdate] = useMutation(USER_UPDATE);
   const [visibility, setVisibility] = useState(false);
   const [showArchive, setArchiveModal] = useState(false);
   const setModalVisibility = (value: boolean) => {

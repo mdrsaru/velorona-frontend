@@ -4,12 +4,12 @@ import { ArrowLeftOutlined, UploadOutlined } from "@ant-design/icons";
 import moment from 'moment';
 
 import { useNavigate, useParams } from "react-router-dom";
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { notifyGraphqlError } from "../../../utils/error";
 
 import { mediaServices } from "../../../services/MediaService";
 import { IRole } from "../../../interfaces/IRole";
-import {EMPLOYEE_UPDATE, USER} from "..";
+import {USER_UPDATE, USER} from "..";
 import { ROLES } from "../../Role";
 import { CHANGE_PROFILE_IMAGE } from "../NewEmployee";
 
@@ -27,7 +27,7 @@ const profileFile = (e: any) => {
 const EditEmployee = () => {
   let params = useParams();
   const navigate = useNavigate();
-  const [UserUpdate] = useMutation(EMPLOYEE_UPDATE);
+  const [UserUpdate] = useMutation(USER_UPDATE);
   const [ChangeProfilePictureInput] = useMutation(CHANGE_PROFILE_IMAGE);
   const {data: roles} = useQuery(ROLES, {
     fetchPolicy: "cache-first"

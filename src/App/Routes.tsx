@@ -164,6 +164,14 @@ const _Routes = () => {
                 }/>
 
               <Route
+                path={routes.attachClient.childPath}
+                element={
+                  <Suspense fallback={<RouteLoader/>}>
+                    <routes.attachClient.component/>
+                  </Suspense>
+                }/>
+
+              <Route
                 path={routes.editEmployee.childPath}
                 element={
                   <Suspense fallback={<RouteLoader/>}>

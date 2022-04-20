@@ -72,7 +72,7 @@ const routes = {
   },
   employee: {
     childPath: 'employee',
-    path: (id: string) => `${id}/employee`,
+    path: (id: string) => `/${id}/employee`,
     component: lazy(() => import('../pages/Employee')),
     name: 'Employee',
     key: 'side2'
@@ -97,6 +97,13 @@ const routes = {
     component: lazy(() => import('../pages/Employee/NewEmployee')),
     name: 'New Employee',
     key: 'side2'
+  },
+  attachClient: {
+    childPath: 'add-client',
+    path: (id: string) => `/${id}/employee/add-client`,
+    component: lazy(() => import('../pages/Employee/EditEmployee/AttachClient')),
+    name: 'Add Client',
+    key: 'side4'
   },
   timesheet: {
     childPath: null,

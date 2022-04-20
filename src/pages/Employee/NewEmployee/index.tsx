@@ -1,4 +1,4 @@
-import React from "react";
+import React  from "react";
 
 import { Button, Card, Col, Form, Input, message, Row, Select, Space, Upload } from "antd";
 import { ArrowLeftOutlined, UploadOutlined } from "@ant-design/icons";
@@ -11,6 +11,7 @@ import { notifyGraphqlError } from "../../../utils/error";
 import { authVar } from "../../../App/link";
 
 import styles from "../style.module.scss";
+import routes from "../../../config/routes";
 
 const normFile = (e: any) => {
   if (Array.isArray(e)) {
@@ -29,7 +30,7 @@ export const CHANGE_PROFILE_IMAGE = gql`
   }
 `
 
-const EMPLOYEE_CREATE = gql`
+export const USER_CREATE = gql`
   mutation UserCreate($input: UserCreateInput!) {
       UserCreate(input: $input) {
           id
@@ -41,18 +42,13 @@ const EMPLOYEE_CREATE = gql`
 const NewEmployee = () => {
   const navigate = useNavigate();
   const authData = authVar();
-  const [UserCreate] = useMutation(EMPLOYEE_CREATE);
+  const [UserCreate] = useMutation(USER_CREATE);
   const [ChangeProfilePictureInput] = useMutation(CHANGE_PROFILE_IMAGE);
   const [form] = Form.useForm();
   const { Option } = Select;
 
   const cancelAddEmployee = () => {
     navigate(-1);
-  }
-
-  const successMessage = () => {
-    navigate(-1)
-    message.success({content: `New Employee is created successfully!`, className: 'custom-message'});
   }
 
   const onSubmitForm = (values: any) => {
@@ -97,12 +93,12 @@ const NewEmployee = () => {
                 if(response.errors) {
                   return notifyGraphqlError((response.errors))
                 } else if (response?.data) {
-                  successMessage()
+                  navigate(routes.attachClient.path(authData?.company?.code ? authData?.company?.code : ''))
                 }
               }).catch(notifyGraphqlError))
             })
         } else {
-          successMessage()
+          navigate(routes.attachClient.path(authData?.company?.code ? authData?.company?.code : ''))
         }
       }
     }).catch(notifyGraphqlError))
@@ -220,13 +216,12 @@ const NewEmployee = () => {
               </Form.Item>
             </Col>
           </Row>
-          <br/><br/>
           <Row justify="end">
-            <Col>
+            <Col style={{padding: '0 1rem 1rem 0'}}>
               <Form.Item>
                 <Space>
                   <Button type="default" htmlType="button" onClick={cancelAddEmployee}>Cancel</Button>
-                  <Button type="primary" htmlType="submit">Create Employee</Button>
+                  <Button type="primary" htmlType="submit">Continue</Button>
                 </Space>
               </Form.Item>
             </Col>

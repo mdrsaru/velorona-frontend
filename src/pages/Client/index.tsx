@@ -5,11 +5,12 @@ import { Link } from "react-router-dom";
 import routes from "../../config/routes";
 import { authVar } from "../../App/link";
 
-import { gql, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import { MoreOutlined } from "@ant-design/icons";
 
 import styles from "./style.module.scss";
 import {USER} from "../Employee";
+import constants from "../../config/constants";
 
 const { SubMenu } = Menu;
 
@@ -21,6 +22,7 @@ const Client = () => {
     variables: {
       input: {
         query: {
+          role: constants.roles.Client
         },
         paging: {
           order: ['updatedAt:DESC']
