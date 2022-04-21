@@ -25819,7 +25819,6 @@ input {
   font-weight: normal;
   font-size: 14px;
   line-height: 17px;
-  cursor: pointer;
 }
 .ant-table .ant-table-thead > tr > th:not(:last-child):not(.ant-table-selection-column):not(.ant-table-row-expand-icon-cell):not([colspan])::before {
   width: 0;
@@ -25855,4 +25854,39 @@ input {
 .ant-form-item-has-error .ant-input:focus,
 .ant-form-item-has-error .ant-select:focus {
   border: 1px solid var(--primary-red) !important;
+}
+.ant-message {
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 29px;
+}
+.ant-message .anticon {
+  margin-right: 2rem;
+}
+.ant-message-custom-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.ant-message-notice-content {
+  min-width: 35VW;
+}
+@media only screen and (max-width: 1025px) {
+  .ant-message-notice-content {
+    min-width: 60VW;
+  }
+}
+.ant-message-loading .anticon svg,
+.ant-message-success .anticon svg,
+.ant-message-error .anticon svg {
+  font-size: 35px;
+}
+.ant-message-success {
+  color: var(--primary-green);
+}
+.ant-message-loading {
+  color: var(--primary-blue);
+}
+.ant-message-error {
+  color: var(--primary-red);
 }

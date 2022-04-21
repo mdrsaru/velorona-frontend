@@ -111,7 +111,6 @@
     font-weight: normal;
     font-size: 14px;
     line-height: 17px;
-    cursor: pointer;
   }
 
   .ant-table-thead > tr > th:not(:last-child):not(.ant-table-selection-column):not(.ant-table-row-expand-icon-cell):not([colspan])::before {
@@ -158,3 +157,44 @@
   }
 }
 
+.ant-message {
+  font-weight: 600;
+  font-size: 15px;
+  line-height: 29px;
+}
+
+.ant-message .anticon {
+  margin-right: 2rem;
+}
+
+.ant-message-custom-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.ant-message-notice-content {
+  min-width: 35VW;
+  @media only screen and (max-width: 1025px) {
+    min-width: 60VW;
+  }
+}
+
+.ant-message-loading, .ant-message-success, .ant-message-error  {
+  .anticon svg {
+    font-size: 35px;
+  }
+}
+
+.ant-message-success {
+  color: var(--primary-green);
+}
+
+.ant-message-loading {
+  color: var(--primary-blue);
+}
+
+
+.ant-message-error {
+  color: var(--primary-red);
+}

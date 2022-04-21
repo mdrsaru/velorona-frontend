@@ -1,19 +1,21 @@
-import { Card, Row, Col, Table, Dropdown, Menu } from 'antd';
+import {Card, Row, Col, Table, Dropdown, Menu, message} from 'antd';
 import { MoreOutlined } from "@ant-design/icons";
 
 import { Link, useNavigate } from "react-router-dom";
 import routes from "../../config/routes";
 
-import styles from './style.module.scss';
+import moment from "moment";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { authVar } from "../../App/link";
 import { useState } from "react";
-import deleteImg from "../../assets/images/delete_btn.svg";
-import archiveImg from "../../assets/images/archive_btn.svg";
+
 import ModalConfirm from "../../components/Modal";
-import moment from "moment";
 import { notifyGraphqlError } from "../../utils/error";
 import AppLoader from "../../components/Skeleton/AppLoader";
+
+import deleteImg from "../../assets/images/delete_btn.svg";
+import archiveImg from "../../assets/images/archive_btn.svg";
+import styles from './style.module.scss';
 
 const {SubMenu} = Menu;
 
@@ -101,6 +103,7 @@ const Employee = () => {
   })
 
   const changeStatus = (value: string, id: string) => {
+    message.loading({content: "Updating status of employee..", className: 'custom-message'}).then(() =>
     EmployeeUpdate({
       variables: {
         input: {
@@ -112,23 +115,23 @@ const Employee = () => {
       if (response.errors) {
         return notifyGraphqlError((response.errors))
       }
-    }).catch(notifyGraphqlError)
+    }).catch(notifyGraphqlError))
   }
-
-  const onRowClick = (record: any, rowIndex: any) => {
-    return {
-      onClick: (event: any) => {
-        navigate(routes.detailEmployee.path(loggedInUser?.company?.code ?? '', record?.id ?? ''));
-      },
-    };
-  };
 
   const menu = (data: any) => (
     <Menu>
       <SubMenu title="Change status" key="mainMenu">
-        <Menu.Item key="active" onClick={() => changeStatus('Active', data?.id)}>Active</Menu.Item>
+        <Menu.Item key="active" onClick={() => {
+          if(data?.status === 'Inactive') {
+            changeStatus('Active', data?.id)
+          }
+        }}>Active</Menu.Item>
         <Menu.Divider/>
-        <Menu.Item key="inactive" onClick={() => changeStatus('Inactive', data?.id)}>Inactive</Menu.Item>
+        <Menu.Item key="inactive" onClick={() => {
+          if(data?.status === 'Active') {
+            changeStatus('Inactive', data?.id)
+          }
+        }}>Inactive</Menu.Item>
       </SubMenu>
       <Menu.Divider/>
       <Menu.Item key="edit">
@@ -146,8 +149,19 @@ const Employee = () => {
   const columns = [
     {
       title: 'Name',
-      dataIndex: 'fullName',
       key: 'fullName',
+      render: (user: any) => {
+        return <div className={styles['user-name']}>
+          <p>{user?.fullName}</p>
+        </div>
+      },
+      onCell: (record: any) => {
+        return {
+          onClick: () => {
+            navigate(routes.detailEmployee.path(loggedInUser?.company?.code ?? '', record?.id ?? ''));
+          },
+        };
+      },
     },
     {
       title: 'Role',
@@ -221,8 +235,7 @@ const Employee = () => {
           </Row>
           <Row>
             <Col span={24}>
-              <Table dataSource={employeeData?.User?.data} columns={columns} rowKey={(record => record?.id)}
-                     onRow={onRowClick}/>
+              <Table dataSource={employeeData?.User?.data} columns={columns} rowKey={(record => record?.id)}/>
             </Col>
           </Row>
         </Card>}
