@@ -12,6 +12,7 @@ import { authVar } from "../../../App/link";
 
 import styles from "../style.module.scss";
 import routes from "../../../config/routes";
+import { User } from "../../../interfaces/graphql";
 
 const normFile = (e: any) => {
   if (Array.isArray(e)) {
@@ -38,11 +39,14 @@ export const USER_CREATE = gql`
       }
   }
 `
+interface UserResponse {
+  UserCreate: User
+}
 
 const NewEmployee = () => {
   const navigate = useNavigate();
   const authData = authVar();
-  const [UserCreate] = useMutation(USER_CREATE);
+  const [UserCreate] = useMutation<UserResponse>(USER_CREATE);
   const [ChangeProfilePictureInput] = useMutation(CHANGE_PROFILE_IMAGE);
   const [form] = Form.useForm();
   const { Option } = Select;
@@ -75,7 +79,7 @@ const NewEmployee = () => {
     }).then((response) => {
       if(response.errors) {
         return notifyGraphqlError((response.errors))
-      } else if (response?.data?.UserCreate) {
+      } else if (response?.data) {
         if (values?.upload) {
           const formData = new FormData();
           formData.append('file', values?.upload[0]?.originFileObj)

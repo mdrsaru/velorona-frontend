@@ -11,6 +11,8 @@ import routes from '../../config/routes';
 
 import logo from '../../assets/images/main_logo.svg';
 import highFiveImg from '../../assets/images/High_five.svg';
+import { LoginResponse } from "../../interfaces/graphql";
+
 import styles from './style.module.scss';
 
 const LOGIN = gql`
@@ -37,13 +39,17 @@ const FORGOT_PASSWORD = gql`
   }
 `
 
+interface LoginResponseData {
+    Login: LoginResponse
+}
+
 const Login = () => {
+  let { role } = useParams();
   const [form] = Form.useForm();
   const [forgetForm] = Form.useForm();
   const navigate = useNavigate();
-  const [Login] = useMutation(LOGIN);
+  const [Login] = useMutation<LoginResponseData>(LOGIN);
   const [ForgotPassword] = useMutation(FORGOT_PASSWORD);
-  let { role } = useParams();
   const [modalVisible, setModalVisible] = useState<boolean>(false);
 
 
@@ -63,7 +69,7 @@ const Login = () => {
       if(response.errors) {
         return notifyGraphqlError((response?.errors))
       } 
-      if (response?.data?.Login) {
+      if (response?.data) {
         message.success( {content: `LoggedIn successfully!`, className: 'custom-message'})
         const loginData = response?.data?.Login;
         const roles = loginData?.roles?.map((role: any) => role?.name);
@@ -75,8 +81,8 @@ const Login = () => {
             roles,
           },
           company: {
-            id: loginData?.company?.id,
-            code: loginData?.company?.companyCode
+            id: loginData?.company?.id ?? '',
+            code: loginData?.company?.companyCode ?? ''
           },
           isLoggedIn: true,
         });

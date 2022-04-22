@@ -15,8 +15,10 @@ import AppLoader from "../../components/Skeleton/AppLoader";
 
 import deleteImg from "../../assets/images/delete_btn.svg";
 import archiveImg from "../../assets/images/archive_btn.svg";
-import styles from './style.module.scss';
 import constants from "../../config/constants";
+import {UserData} from "../Client";
+
+import styles from './style.module.scss';
 
 const {SubMenu} = Menu;
 
@@ -95,7 +97,7 @@ const Employee = () => {
     setArchiveModal(value)
   }
 
-  const { loading: employeeLoading, data: employeeData } = useQuery(USER, {
+  const { loading: employeeLoading, data: employeeData } = useQuery<UserData>(USER, {
     variables: {
       input: {
         query: {
@@ -117,7 +119,7 @@ const Employee = () => {
           id: id
         }
       }
-    }).then((response: any) => {
+    }).then((response) => {
       if (response.errors) {
         return notifyGraphqlError((response.errors))
       }

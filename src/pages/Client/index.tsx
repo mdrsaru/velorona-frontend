@@ -11,14 +11,19 @@ import { MoreOutlined } from "@ant-design/icons";
 import styles from "./style.module.scss";
 import {USER} from "../Employee";
 import constants from "../../config/constants";
+import { User } from "../../interfaces/graphql";
 
 const { SubMenu } = Menu;
 
-
+export interface UserData {
+  User: {
+    data : User[]
+  }
+}
 
 const Client = () => {
   const loggedInUser = authVar();
-  const { data: clientData } = useQuery(USER, {
+  const { data: clientData } = useQuery<UserData>(USER, {
     variables: {
       input: {
         query: {

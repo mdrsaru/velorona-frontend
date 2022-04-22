@@ -11,13 +11,18 @@ import {authVar} from "../../../App/link";
 import constants from "../../../config/constants";
 import AddClientForm from "./AddClientForm";
 
+import { User } from "../../../interfaces/graphql";
+
 import styles from "../style.module.scss";
 
+interface ClientResponseData {
+  ClientCreate: User
+}
 
 const NewClient = () => {
   const authData = authVar();
   const navigate = useNavigate();
-  const [UserCreate] = useMutation(USER_CREATE);
+  const [UserCreate] = useMutation<ClientResponseData>(USER_CREATE);
   const [form] = Form.useForm();
   
   const cancelAddClient = () => {
@@ -47,7 +52,7 @@ const NewClient = () => {
       }).then((response) => {
         if (response.errors) {
           return notifyGraphqlError((response.errors))
-        } else if (response?.data?.UserCreate) {
+        } else if (response?.data) {
           navigate(-1)
           message.success({content: `New Client is created successfully!`, className: 'custom-message'});
         }
