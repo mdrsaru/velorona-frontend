@@ -1,8 +1,9 @@
 :global {
   .ant-modal-footer {
     border: none;
-    text-align: center;
     padding-bottom: 5rem;
+    padding-right: 3rem;
+    text-align: center;
   }
 
   .ant-modal-close-x {
@@ -24,22 +25,25 @@
   }
 }
 
+.modal-footer {
+  text-align: right;
+}
+
+
 .modal-body {
   .client-col {
     padding: 1rem 0 1rem 1rem;
+    margin-bottom: 1rem;
     line-height: 20px;
+    border: 2px solid #F2F2F2;
     width: 100%;
-    border: 1px solid #F2F2F2;
-    box-sizing: border-box;
-    cursor: pointer;
-    box-shadow: 0 7px 4px rgba(231, 231, 231, 0.25);
 
     b {
       font-weight: 600;
       font-size: 14px;
       line-height: 17px;
     }
-    div {
+    span {
       font-weight: 400;
       font-size: 12px;
       line-height: 15px;
@@ -47,6 +51,21 @@
   }
 
   :global {
+    .ant-radio-button-wrapper {
+      height: auto;
+      color: var(--black-1);
+    }
+
+    .ant-radio-group {
+      width: 100%;
+    }
+
+    .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled) {
+      border: 2px solid var(--primary-blue);
+      box-sizing: border-box;
+      box-shadow: 0 7px 4px rgba(231, 231, 231, 0.25);
+    }
+
     .ant-input-affix-wrapper {
       padding: 0.7rem 1rem 0.7rem 1rem;
       background-color: var(--gray-2) !important;
@@ -259,6 +278,13 @@
   font-weight: 400;
   font-size: 14px;
   line-height: 17px;
+
+  .client-row {
+    width: 100%;
+    max-height: 22vh;
+    height: 22vh;
+    overflow-y: auto;
+  }
 }
 
 .close-icon-div {

@@ -47,7 +47,7 @@ const Sidebar = (props: any) => {
       key: routes.companyDashboard.key,
       name: routes.companyDashboard.name,
       icon: <DashboardOutlined />,
-      route: routes.company.path(loggedInUser?.company?.code ? loggedInUser?.company?.code : ''),
+      route: routes.company.path(loggedInUser?.company?.code ?? ''),
       accessRoles: [constants.roles.CompanyAdmin]
     },
     {
@@ -68,14 +68,14 @@ const Sidebar = (props: any) => {
       key: routes.employee.key,
       name: routes.employee.name,
       icon: <UsergroupAddOutlined />,
-      route: routes.employee.path(loggedInUser?.company?.code ? loggedInUser?.company?.code : ''),
+      route: routes.employee.path(loggedInUser?.company?.code ?? ''),
       accessRoles: [constants.roles.CompanyAdmin]
     },
     {
       key: routes.client.key,
       name: routes.client.name,
       icon: <SolutionOutlined />,
-      route: routes.client.path(loggedInUser?.company?.code ? loggedInUser?.company?.code : ''),
+      route: routes.client.path(loggedInUser?.company?.code ?? ''),
       accessRoles: [constants.roles.CompanyAdmin]
     },
     {
@@ -103,14 +103,14 @@ const Sidebar = (props: any) => {
       key: routes.projects.key,
       name: routes.projects.name,
       icon: <FundProjectionScreenOutlined />,
-      route: routes.projects.path(loggedInUser?.company?.code ? loggedInUser?.company?.code : ''),
+      route: routes.projects.path(loggedInUser?.company?.code ?? ''),
       accessRoles: [constants.roles.CompanyAdmin]
     },
     {
       key: routes.invoice.key,
       name: routes.invoice.name,
       icon: <ProfileOutlined />,
-      route: routes.invoice.path(loggedInUser?.company?.code ? loggedInUser?.company?.code : ''),
+      route: routes.invoice.path(loggedInUser?.company?.code ?? ''),
       accessRoles: [constants.roles.CompanyAdmin]
     },
     {

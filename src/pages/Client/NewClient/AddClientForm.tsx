@@ -14,12 +14,12 @@ const AddClientForm = (props: any) => {
         <Row>
           <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
             <Form.Item label="First Name" name='firstName' rules={[{ required: true, message: 'Please enter firstname!' }]}>
-              <Input placeholder="Enter the first name"/>
+              <Input placeholder="Enter the first name" autoComplete="off"/>
             </Form.Item>
           </Col>
           <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
             <Form.Item label="Last Name" name='lastName' rules={[{ required: true, message: 'Please enter lastname!' }]}>
-              <Input placeholder="Enter the last name"/>
+              <Input placeholder="Enter the last name" autoComplete="off"/>
             </Form.Item>
           </Col>
         </Row>
@@ -27,20 +27,20 @@ const AddClientForm = (props: any) => {
           <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
             <Form.Item label="Email Address" name='email'  rules={[{type: 'email', message: 'The input is not valid E-mail!',},
               {required: true, message: 'Please input your E-mail!'},]}>
-              <Input placeholder="Enter your email" />
+              <Input placeholder="Enter your email" autoComplete="off" />
             </Form.Item>
           </Col>
           <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
             <Form.Item label="Phone Number" name='phone' rules={[{ required: true, message: 'Please input your phone number!' },
               {max: 10, message: "Phone number should be less than 10 digits"}]}>
-              <Input placeholder="Enter your phone number"/>
+              <Input placeholder="Enter your phone number" autoComplete="off"/>
             </Form.Item>
           </Col>
         </Row>
         <Row>
           <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
             <Form.Item label="Address" name='streetAddress' rules={[{ required: true, message: 'Please enter address!' }]}>
-              <Input placeholder="Enter the address of the client" name='address'/>
+              <Input placeholder="Enter the address of the client" name='address' autoComplete="off"/>
             </Form.Item>
           </Col>
           <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
@@ -55,12 +55,12 @@ const AddClientForm = (props: any) => {
         <Row>
           <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
             <Form.Item label="Zip Code" name='zipcode' rules={[{ required: true, message: 'Please enter zipcode!' }]}>
-              <Input placeholder="Enter the zipcode"/>
+              <Input placeholder="Enter the zipcode" autoComplete="off"/>
             </Form.Item>
           </Col>
           <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
             <Form.Item label="Apartment/Suite" name='apartment'>
-              <Input placeholder="Enter your apartment no" name=''/>
+              <Input placeholder="Enter your apartment no" name='' autoComplete="off"/>
             </Form.Item>
           </Col>
         </Row>

@@ -99,8 +99,8 @@ const routes = {
     key: 'side2'
   },
   attachClient: {
-    childPath: 'add-client',
-    path: (id: string) => `/${id}/employee/add-client`,
+    childPath: ':eid/add-client',
+    path: (id: string, eid: string) => `/${id}/employee/${eid}/add-client`,
     component: lazy(() => import('../pages/Employee/EditEmployee/AttachClient')),
     name: 'Add Client',
     key: 'side4'

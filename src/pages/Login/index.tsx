@@ -180,11 +180,11 @@ const Login = () => {
             {role !=='admin' &&
               <Form.Item label="Company Code" name="code" rules={[{required: role !== 'admin', message: 'Company Code is required'},
                 {max: 10, message: "Code should be less than 10 character"}]}>
-                <Input placeholder="Enter Company Code" />
+                <Input placeholder="Enter Company Code" autoComplete="off"/>
               </Form.Item>}
               <Form.Item label="Email Address" name="email" rules={[{type: 'email', message: 'The input is not valid E-mail!',},
                 {required: true, message: 'Please enter your E-mail!'},]}>
-                <Input placeholder="Enter Email Address" />
+                <Input placeholder="Enter Email Address" autoComplete="off"/>
               </Form.Item>
               <Form.Item>
                 <Button type="primary" htmlType="submit">Proceed</Button><br/><br/>

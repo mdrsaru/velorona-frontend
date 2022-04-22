@@ -140,17 +140,17 @@ const EditEmployee = () => {
             <Row>
               <Col xs={24} sm={24} md={8} lg={8} className={styles.formCol}>
                 <Form.Item label="First Name" name='firstName' rules={[{ required: true, message: 'Please enter the firstname' }]}>
-                  <Input placeholder="Enter firstname"/>
+                  <Input placeholder="Enter firstname" autoComplete="off"/>
                 </Form.Item>
               </Col>
               <Col xs={24} sm={24} md={8} lg={8} className={styles.formCol}>
                 <Form.Item label="Middle Name" name='middleName'>
-                  <Input placeholder="Enter middle name"/>
+                  <Input placeholder="Enter middle name" autoComplete="off"/>
                 </Form.Item>
               </Col>
               <Col xs={24} sm={24} md={8} lg={8} className={styles.formCol}>
                 <Form.Item label="Last Name" name='lastName' rules={[{ required: true, message: 'Please select the lastname' }]}>
-                  <Input placeholder="Enter lastname"/>
+                  <Input placeholder="Enter lastname" autoComplete="off"/>
                 </Form.Item>
               </Col>
             </Row>
@@ -158,13 +158,13 @@ const EditEmployee = () => {
               <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
                 <Form.Item label="Email" name='email' rules={[{type: 'email', message: 'The input is not valid E-mail!'},
                   { required: true, message: 'Please input your E-mail!'},]}>
-                  <Input placeholder="Enter your email"/>
+                  <Input placeholder="Enter your email" autoComplete="off"/>
                 </Form.Item>
               </Col>
               <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
                 <Form.Item label="Phone Number" name='phone' rules={[{ required: true, message: 'Please input your phone number!' },
                   {max: 10, message: "Phone number should be less than 10 digits"}]}>
-                  <Input placeholder="Enter your phone number" />
+                  <Input placeholder="Enter your phone number" autoComplete="off"/>
                 </Form.Item>
               </Col>
             </Row>
@@ -176,30 +176,30 @@ const EditEmployee = () => {
             <Row>
               <Col xs={24} sm={24} md={8} lg={8} className={styles.formCol}>
                 <Form.Item label="State" name='state'>
-                  <Input placeholder="Enter the state name"/>
+                  <Input placeholder="Enter the state name"autoComplete="off"/>
                 </Form.Item>
               </Col>
               <Col xs={24} sm={24} md={8} lg={8} className={styles.formCol}>
                 <Form.Item label="City" name='city'>
-                  <Input placeholder="Enter city name"/>
+                  <Input placeholder="Enter city name" autoComplete="off"/>
                 </Form.Item>
               </Col>
               <Col xs={24} sm={24} md={8} lg={8} className={styles.formCol}>
                 <Form.Item label="Street Address" name='streetAddress' rules={[{ required: true, message: 'Please select the ' +
                     'street address' }]}>
-                  <Input placeholder="Enter street address"/>
+                  <Input placeholder="Enter street address" autoComplete="off"/>
                 </Form.Item>
               </Col>
             </Row>
             <Row>
               <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
                 <Form.Item label="Apartment/Suite" name='apartment'>
-                  <Input placeholder="Enter your apartment no"/>
+                  <Input placeholder="Enter your apartment no" autoComplete="off"/>
                 </Form.Item>
               </Col>
               <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
                 <Form.Item label="Zip Code" name='zipcode'>
-                  <Input placeholder="Enter the zipcode"/>
+                  <Input placeholder="Enter the zipcode" autoComplete="off"/>
                 </Form.Item>
               </Col>
             </Row>
@@ -234,7 +234,7 @@ const EditEmployee = () => {
               </Col>
               <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
                 <Form.Item label="Pay Rate" name='payRate' rules={[{ required: true, message: 'Please enter the pay rate' }]}>
-                  <InputNumber placeholder="$20"/>
+                  <InputNumber placeholder="$20" autoComplete="off"/>
                 </Form.Item>
               </Col>
             </Row>

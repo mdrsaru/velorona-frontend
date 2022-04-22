@@ -73,20 +73,20 @@ const NewInvoice = () => {
             </Col>
             <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
               <Form.Item label="Invoice Payment" name='payment'>
-                <Input placeholder="Select Field" />
+                <Input placeholder="Select Field" autoComplete="off"/>
               </Form.Item>
             </Col>
           </Row>
           <Row>
             <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
               <Form.Item label="Invoice Rate" name='rate'>
-                <Input placeholder="Enter invoice rate" />
+                <Input placeholder="Enter invoice rate" autoComplete="off"/>
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
               <Form.Item label="PO Number" name='number' rules={[{ required: true, message: 'Please enter PO Number!' },
                 {max: 10, message: "Phone number should be less than 10 digits"}]}>
-                <Input placeholder="Enter PO Number"/>
+                <Input placeholder="Enter PO Number" autoComplete="off"/>
               </Form.Item>
             </Col>
           </Row>
@@ -108,7 +108,7 @@ const NewInvoice = () => {
               </div>
               <br/> <br/>
               <Form.Item name='note' className={styles['form-item-note']}>
-                <Input placeholder="Notes"/>
+                <Input placeholder="Notes" autoComplete="off"/>
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={5} lg={5}>
@@ -116,11 +116,11 @@ const NewInvoice = () => {
                 <p>Total Hour</p>
               </div>
               <Form.Item name='hour' className={styles['form-items']}>
-                <Input placeholder="Total Hours"/>
+                <Input placeholder="Total Hours" autoComplete="off"/>
               </Form.Item>
               <br/> <br/> <br/>
               <Form.Item name='hour' className={styles['form-items']} label={'Total Hours'}>
-                <Input placeholder="Total Hours"/>
+                <Input placeholder="Total Hours" autoComplete="off"/>
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={5} lg={5}>
@@ -128,7 +128,7 @@ const NewInvoice = () => {
                 <p>Rates</p>
               </div>
               <Form.Item name='rate' className={styles['form-items']}>
-                <Input placeholder="Total Rate"/>
+                <Input placeholder="Total Rate" autoComplete="off"/>
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={5} lg={5}>
@@ -136,18 +136,18 @@ const NewInvoice = () => {
                 <p>Amount</p>
               </div>
               <Form.Item name='amount' className={styles['form-items']}>
-                <Input placeholder="Enter Amount"/>
+                <Input placeholder="Enter Amount" autoComplete="off"/>
               </Form.Item>
               <br/> <br/> <br/>
               <Form.Item name='amount' className={styles['form-items']} label={'Total Amount'}>
-                <Input placeholder="Total Amount"/>
+                <Input placeholder="Total Amount" autoComplete="off"/>
               </Form.Item>
               <Form.Item name='tax' className={styles['form-items']} label={'Tax %'}>
-                <Input placeholder="Enter Tax Percent"/>
+                <Input placeholder="Enter Tax Percent" autoComplete="off"/>
               </Form.Item>
               <br/><br/>
               <Form.Item name='sub-total' className={styles['form-items']} label={'SubTotal'}>
-                <Input placeholder="Subtotal"/>
+                <Input placeholder="Subtotal" autoComplete="off"/>
               </Form.Item>
             </Col>
           </Row>

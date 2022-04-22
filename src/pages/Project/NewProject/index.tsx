@@ -100,7 +100,7 @@ const NewProject = () => {
           <Row>
             <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
               <Form.Item label="Project Name" name='name' rules={[{ required: true, message: 'Please enter project name!' }]}>
-                <Input placeholder="Enter the project name" />
+                <Input placeholder="Enter the project name" autoComplete="off"/>
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
@@ -130,7 +130,7 @@ const NewProject = () => {
             <>
               <Col xs={24} sm={24} md={12} lg={12} className={styles['form-col-task']}>
                 <Form.Item label="Task Name" name='task-name'>
-                  <InputNumber placeholder="Enter the Name of the Task" />
+                  <InputNumber placeholder="Enter the Name of the Task" autoComplete="off"/>
                 </Form.Item>
               </Col>
               <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>

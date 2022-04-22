@@ -94,10 +94,10 @@ const Role = () => {
         </div>
         <Form form={form} layout="vertical" onFinish={handleSubmit}>
           <Form.Item label="Role Title" name="title" rules={[{required: true, message: 'Enter a role name.'}]}>
-            <Input placeholder="Enter a role title" />
+            <Input placeholder="Enter a role title" autoComplete="off"/>
           </Form.Item>
           <Form.Item label="Description" name="description" rules={[{required: true, message: 'Role description is required.'}]}>
-            <Input placeholder="Enter role description" />
+            <Input placeholder="Enter role description" autoComplete="off"/>
           </Form.Item>
         </Form>
       </Modal>
