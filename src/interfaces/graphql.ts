@@ -23,7 +23,6 @@ export type Address = {
   state?: Maybe<Scalars['String']>;
   streetAddress: Scalars['String'];
   updatedAt: Scalars['DateTime'];
-  user_id: Scalars['String'];
   zipcode?: Maybe<Scalars['String']>;
 };
 
@@ -35,13 +34,21 @@ export type AddressCreateInput = {
   zipcode: Scalars['String'];
 };
 
+export type AddressInput = {
+  aptOrSuite?: InputMaybe<Scalars['String']>;
+  city: Scalars['String'];
+  state: Scalars['String'];
+  streetAddress: Scalars['String'];
+  zipcode: Scalars['String'];
+};
+
 export type AddressUpdateInput = {
   aptOrSuite?: InputMaybe<Scalars['String']>;
-  city?: InputMaybe<Scalars['String']>;
+  city: Scalars['String'];
   id?: InputMaybe<Scalars['String']>;
-  state?: InputMaybe<Scalars['String']>;
-  streetAddress?: InputMaybe<Scalars['String']>;
-  zipcode?: InputMaybe<Scalars['String']>;
+  state: Scalars['String'];
+  streetAddress: Scalars['String'];
+  zipcode: Scalars['String'];
 };
 
 export enum AdminRole {
@@ -66,6 +73,68 @@ export type AssociateUserClientInput = {
 export type ChangeProfilePictureInput = {
   avatar_id: Scalars['String'];
   id: Scalars['String'];
+};
+
+export type Client = {
+  __typename?: 'Client';
+  address: Address;
+  address_id: Scalars['String'];
+  archived: Scalars['Boolean'];
+  company?: Maybe<Company>;
+  company_id: Scalars['String'];
+  createdAt: Scalars['DateTime'];
+  email: Scalars['String'];
+  id: Scalars['ID'];
+  invoicingEmail: Scalars['String'];
+  name: Scalars['String'];
+  status: ClientStatus;
+  updatedAt: Scalars['DateTime'];
+};
+
+export type ClientCreateInput = {
+  address: AddressInput;
+  archived?: InputMaybe<Scalars['Boolean']>;
+  company_id: Scalars['String'];
+  email: Scalars['String'];
+  invoicingEmail: Scalars['String'];
+  name: Scalars['String'];
+  status?: InputMaybe<ClientStatus>;
+};
+
+export type ClientDeleteInput = {
+  company_id: Scalars['String'];
+  id: Scalars['String'];
+};
+
+export type ClientPagingResult = {
+  __typename?: 'ClientPagingResult';
+  data: Array<Client>;
+  paging: PagingResult;
+};
+
+export type ClientQuery = {
+  archived?: InputMaybe<Scalars['Boolean']>;
+  company_id: Scalars['String'];
+  id?: InputMaybe<Scalars['String']>;
+};
+
+export type ClientQueryInput = {
+  paging?: InputMaybe<PagingInput>;
+  query: ClientQuery;
+};
+
+export enum ClientStatus {
+  Active = 'Active',
+  Inactive = 'Inactive'
+}
+
+export type ClientUpdateInput = {
+  address?: InputMaybe<AddressInput>;
+  archived?: InputMaybe<Scalars['Boolean']>;
+  company_id: Scalars['String'];
+  id: Scalars['String'];
+  name?: InputMaybe<Scalars['String']>;
+  status?: InputMaybe<ClientStatus>;
 };
 
 export type Company = {
@@ -232,6 +301,9 @@ export type Mutation = {
   AssignTask: Task;
   AssociateUserWithClient: UserClient;
   ChangeProfilePicture: User;
+  ClientCreate: Client;
+  ClientDelete: Client;
+  ClientUpdate: Client;
   CompanyCreate: Company;
   CompanyDelete: Company;
   CompanyUpdate: Company;
@@ -247,9 +319,13 @@ export type Mutation = {
   RoleCreate: Role;
   RoleDelete: Role;
   RoleUpdate: Role;
+  StopTimesheet: Timesheet;
   TaskCreate: Task;
   TaskDelete: Task;
   TaskUpdate: Task;
+  TimesheetCreate: Timesheet;
+  TimesheetDelete: Timesheet;
+  TimesheetUpdate: Timesheet;
   UserAdminCreate: User;
   UserArchive: User;
   /** Create user related to company */
@@ -273,6 +349,21 @@ export type MutationAssociateUserWithClientArgs = {
 
 export type MutationChangeProfilePictureArgs = {
   input: ChangeProfilePictureInput;
+};
+
+
+export type MutationClientCreateArgs = {
+  input: ClientCreateInput;
+};
+
+
+export type MutationClientDeleteArgs = {
+  input: ClientDeleteInput;
+};
+
+
+export type MutationClientUpdateArgs = {
+  input: ClientUpdateInput;
 };
 
 
@@ -346,6 +437,11 @@ export type MutationRoleUpdateArgs = {
 };
 
 
+export type MutationStopTimesheetArgs = {
+  input: StopTimesheetInput;
+};
+
+
 export type MutationTaskCreateArgs = {
   input: TaskCreateInput;
 };
@@ -358,6 +454,21 @@ export type MutationTaskDeleteArgs = {
 
 export type MutationTaskUpdateArgs = {
   input: TaskUpdateInput;
+};
+
+
+export type MutationTimesheetCreateArgs = {
+  input: TimesheetCreateInput;
+};
+
+
+export type MutationTimesheetDeleteArgs = {
+  input: DeleteInput;
+};
+
+
+export type MutationTimesheetUpdateArgs = {
+  input: TimesheetUpdateInput;
 };
 
 
@@ -422,6 +533,8 @@ export type Project = {
   createdAt: Scalars['DateTime'];
   id: Scalars['ID'];
   name: Scalars['String'];
+  /** Field for timesheet */
+  timesheet?: Maybe<Timesheet>;
   updatedAt: Scalars['DateTime'];
 };
 
@@ -458,12 +571,14 @@ export type ProjectUpdateInput = {
 export type Query = {
   __typename?: 'Query';
   AssignedUser: Array<User>;
+  Client: ClientPagingResult;
   Company: CompanyPagingResult;
   Invitation: InvitationPagingResult;
   Project: ProjectPagingResult;
   Role: RolePagingResult;
   SearchClient: UserPagingResult;
   Task: TaskPagingResult;
+  Timesheet: TimesheetPagingResult;
   User: UserPagingResult;
   Workschedule: WorkschedulePagingResult;
   me: User;
@@ -472,6 +587,11 @@ export type Query = {
 
 export type QueryAssignedUserArgs = {
   input?: InputMaybe<AssignedUserQueryInput>;
+};
+
+
+export type QueryClientArgs = {
+  input: ClientQueryInput;
 };
 
 
@@ -502,6 +622,11 @@ export type QuerySearchClientArgs = {
 
 export type QueryTaskArgs = {
   input: TaskQueryInput;
+};
+
+
+export type QueryTimesheetArgs = {
+  input: TimesheetQueryInput;
 };
 
 
@@ -563,6 +688,12 @@ export type RoleUpdateInput = {
   name: RoleName;
 };
 
+export type StopTimesheetInput = {
+  company_id: Scalars['String'];
+  end: Scalars['DateTime'];
+  id: Scalars['String'];
+};
+
 export type Task = {
   __typename?: 'Task';
   archived: Scalars['Boolean'];
@@ -572,6 +703,8 @@ export type Task = {
   manager_id: Scalars['String'];
   name: Scalars['String'];
   status: TaskStatus;
+  /** Field for timesheet */
+  timesheet?: Maybe<Timesheet>;
   updatedAt: Scalars['DateTime'];
   users: Array<User>;
   workschedules?: Maybe<Workschedule>;
@@ -618,6 +751,65 @@ export type TaskUpdateInput = {
   status?: InputMaybe<TaskStatus>;
 };
 
+export type Timesheet = {
+  __typename?: 'Timesheet';
+  approver?: Maybe<User>;
+  approver_id?: Maybe<Scalars['String']>;
+  clientLocation?: Maybe<Scalars['String']>;
+  company: Company;
+  company_id: Scalars['String'];
+  createdAt: Scalars['DateTime'];
+  created_by: Scalars['String'];
+  creator: User;
+  end?: Maybe<Scalars['DateTime']>;
+  id: Scalars['ID'];
+  project: Project;
+  project_id: Scalars['String'];
+  start: Scalars['DateTime'];
+  task: Task;
+  task_id: Scalars['String'];
+  updatedAt: Scalars['DateTime'];
+};
+
+export type TimesheetCreateInput = {
+  clientLocation?: InputMaybe<Scalars['String']>;
+  company_id: Scalars['String'];
+  created_by: Scalars['String'];
+  end?: InputMaybe<Scalars['DateTime']>;
+  project_id: Scalars['String'];
+  start: Scalars['DateTime'];
+  task_id: Scalars['String'];
+};
+
+export type TimesheetPagingResult = {
+  __typename?: 'TimesheetPagingResult';
+  data: Array<Timesheet>;
+  paging: PagingResult;
+};
+
+export type TimesheetQuery = {
+  company_id: Scalars['String'];
+  id?: InputMaybe<Scalars['String']>;
+  task_id?: InputMaybe<Scalars['String']>;
+};
+
+export type TimesheetQueryInput = {
+  paging?: InputMaybe<PagingInput>;
+  query: TimesheetQuery;
+};
+
+export type TimesheetUpdateInput = {
+  approver_id?: InputMaybe<Scalars['String']>;
+  clientLocation?: InputMaybe<Scalars['String']>;
+  company_id?: InputMaybe<Scalars['String']>;
+  created_by?: InputMaybe<Scalars['String']>;
+  end?: InputMaybe<Scalars['DateTime']>;
+  id: Scalars['String'];
+  project_id?: InputMaybe<Scalars['String']>;
+  start?: InputMaybe<Scalars['DateTime']>;
+  task_id?: InputMaybe<Scalars['String']>;
+};
+
 export enum TokenType {
   Refresh = 'refresh',
   ResetPassword = 'resetPassword'
@@ -626,6 +818,7 @@ export enum TokenType {
 export type User = {
   __typename?: 'User';
   address: Address;
+  address_id: Scalars['String'];
   archived: Scalars['Boolean'];
   avatar?: Maybe<Media>;
   avatar_id?: Maybe<Scalars['String']>;

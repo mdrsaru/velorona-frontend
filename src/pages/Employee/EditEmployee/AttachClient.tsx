@@ -1,10 +1,9 @@
 import React, {useEffect, useState} from "react";
 import { Card, Col, Form, message, Modal, Row, Input, Button, Space, Radio, Skeleton } from "antd";
 import { ArrowLeftOutlined, CloseOutlined, SearchOutlined } from "@ant-design/icons";
-import {useNavigate, useParams} from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
-import {gql, useLazyQuery, useMutation, useQuery} from "@apollo/client";
-import { USER_CREATE } from "../NewEmployee";
+import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import { notifyGraphqlError } from "../../../utils/error";
 import debounce from 'lodash.debounce';
 
@@ -13,8 +12,10 @@ import AddClientForm from "../../Client/NewClient/AddClientForm";
 
 import constants from "../../../config/constants";
 import routes from "../../../config/routes";
+import { USER } from "../index";
+import { CLIENT_CREATE } from "../../Client/NewClient";
+
 import styles from "../style.module.scss";
-import {USER} from "../index";
 
 export const SEARCH_CLIENT = gql`
     query SearchClient($input: UserQueryInput) {
@@ -61,7 +62,7 @@ const AttachClient = () => {
   const [form] = Form.useForm();
   const [client, setClient] = useState('');
   const [AssociateClient] = useMutation(ASSOCIATE_USER_WITH_CLIENT);
-  const [UserCreate] = useMutation(USER_CREATE);
+  const [ClientCreate] = useMutation(CLIENT_CREATE);
   const [visible, setVisible] = useState(false);
   const [searchClients, { loading, data: clientData1 }] = useLazyQuery(
     SEARCH_CLIENT,
@@ -91,7 +92,6 @@ const AttachClient = () => {
   })
 
   const inputChangeSearch =  debounce((e: any) => {
-    console.log(`radio checked:${e.target.value}`);
     searchClients({
       variables: {
         input: {
@@ -119,16 +119,13 @@ const AttachClient = () => {
 
   const onSubmitForm = (values: any) => {
     message.loading({content: "Adding client in progress..", className: 'custom-message'}).then(() =>
-      UserCreate({
+      ClientCreate({
         variables: {
           input: {
+            name: values.name,
             email: values.email,
-            phone: values.phone,
-            firstName: values.firstName,
-            lastName: values.lastName,
-            status: values.status,
+            invoicingEmail: values.invoiceEmail,
             company_id: authData?.company?.id,
-            roles: [constants?.roles?.Client],
             address: {
               streetAddress: values.streetAddress,
               state: values.state,

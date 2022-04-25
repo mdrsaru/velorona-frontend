@@ -3,14 +3,11 @@ import { Card, Col, Form, message, Row } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import { useNavigate } from "react-router-dom";
 
-import { useMutation } from "@apollo/client";
-import { USER_CREATE } from "../../Employee/NewEmployee";
-import {notifyGraphqlError} from "../../../utils/error";
-import {authVar} from "../../../App/link";
+import { gql, useMutation } from "@apollo/client";
+import { notifyGraphqlError } from "../../../utils/error";
+import { authVar } from "../../../App/link";
 
-import constants from "../../../config/constants";
 import AddClientForm from "./AddClientForm";
-
 import { User } from "../../../interfaces/graphql";
 
 import styles from "../style.module.scss";
@@ -19,10 +16,21 @@ interface ClientResponseData {
   ClientCreate: User
 }
 
+export const CLIENT_CREATE = gql`
+    mutation ClientCreate($input: ClientCreateInput!) {
+        ClientCreate(input: $input) {
+            id
+            name
+            email
+            invoicingEmail
+        }
+    }
+`
+
 const NewClient = () => {
   const authData = authVar();
   const navigate = useNavigate();
-  const [UserCreate] = useMutation<ClientResponseData>(USER_CREATE);
+  const [ClientCreate] = useMutation<ClientResponseData>(CLIENT_CREATE);
   const [form] = Form.useForm();
   
   const cancelAddClient = () => {
@@ -31,16 +39,13 @@ const NewClient = () => {
 
   const onSubmitForm = (values: any) => {
     message.loading({content: "New client adding in progress..", className: 'custom-message'}).then(() =>
-      UserCreate({
+      ClientCreate({
         variables: {
           input: {
+            name: values.name,
             email: values.email,
-            phone: values.phone,
-            firstName: values.firstName,
-            lastName: values.lastName,
-            status: values.status,
+            invoicingEmail: values.invoiceEmail,
             company_id: authData?.company?.id,
-            roles: [constants?.roles?.Client],
             address: {
               streetAddress: values.streetAddress,
               state: values.state,

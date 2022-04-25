@@ -5,12 +5,10 @@ import { Link } from "react-router-dom";
 import routes from "../../config/routes";
 import { authVar } from "../../App/link";
 
-import { useQuery } from "@apollo/client";
+import {gql, useQuery} from "@apollo/client";
 import { MoreOutlined } from "@ant-design/icons";
 
 import styles from "./style.module.scss";
-import {USER} from "../Employee";
-import constants from "../../config/constants";
 import { User } from "../../interfaces/graphql";
 
 const { SubMenu } = Menu;
@@ -21,13 +19,32 @@ export interface UserData {
   }
 }
 
+export const CLIENT = gql`
+    query Client($input: ClientQueryInput!) {
+        Client(input: $input) {
+            data {
+                id
+                name
+                email
+                invoicingEmail
+            }
+            paging {
+                total
+                startIndex
+                endIndex
+                hasNextPage
+            }
+        }
+    }
+`
+
 const Client = () => {
   const loggedInUser = authVar();
-  const { data: clientData } = useQuery<UserData>(USER, {
+  const { data: clientData } = useQuery(CLIENT, {
     variables: {
       input: {
         query: {
-          role: constants.roles.Client
+          company_id: loggedInUser?.company?.id
         },
         paging: {
           order: ['updatedAt:DESC']
@@ -53,8 +70,8 @@ const Client = () => {
   const columns = [
     {
       title: 'Client Name',
-      dataIndex: 'fullName',
-      key: 'fullName',
+      dataIndex: 'name',
+      key: 'name',
     },
     {
       title: 'Email Address',
@@ -62,18 +79,9 @@ const Client = () => {
       key: 'email'
     },
     {
-      title: 'Phone Number',
-      dataIndex: 'phone',
-      key: 'phone'
-    },
-    {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      render: (status: string) =>
-        <span className={status === 'Active' ? styles['active-status'] : styles['inactive-status']}>
-          {status}
-        </span>
+      title: 'Invoicing Email',
+      dataIndex: 'invoicingEmail',
+      key: 'invoicingEmail'
     },
     {
       title: 'Actions',
@@ -106,7 +114,7 @@ const Client = () => {
           </Row>
           <Row>
             <Col span={24}>
-              <Table dataSource={clientData?.User?.data} columns={columns} rowKey={(record => record?.id)}/>
+              <Table dataSource={clientData?.Client?.data} columns={columns} rowKey={(record => record?.id)}/>
             </Col>
           </Row>
         </Card>

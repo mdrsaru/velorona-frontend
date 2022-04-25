@@ -13,34 +13,38 @@ const AddClientForm = (props: any) => {
       <Form form={form} layout="vertical" onFinish={onSubmitForm}>
         <Row>
           <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-            <Form.Item label="First Name" name='firstName' rules={[{ required: true, message: 'Please enter firstname!' }]}>
-              <Input placeholder="Enter the first name" autoComplete="off"/>
+            <Form.Item label="Full Name" name='name' rules={[{ required: true, message: 'Please enter full name!' }]}>
+              <Input placeholder="Enter the full name" autoComplete="off"/>
             </Form.Item>
           </Col>
-          <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-            <Form.Item label="Last Name" name='lastName' rules={[{ required: true, message: 'Please enter lastname!' }]}>
-              <Input placeholder="Enter the last name" autoComplete="off"/>
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row>
           <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
             <Form.Item label="Email Address" name='email'  rules={[{type: 'email', message: 'The input is not valid E-mail!',},
               {required: true, message: 'Please input your E-mail!'},]}>
-              <Input placeholder="Enter your email" autoComplete="off" />
-            </Form.Item>
-          </Col>
-          <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-            <Form.Item label="Phone Number" name='phone' rules={[{ required: true, message: 'Please input your phone number!' },
-              {max: 10, message: "Phone number should be less than 10 digits"}]}>
-              <Input placeholder="Enter your phone number" autoComplete="off"/>
+              <Input placeholder="Enter your email" autoComplete="off"/>
             </Form.Item>
           </Col>
         </Row>
         <Row>
           <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-            <Form.Item label="Address" name='streetAddress' rules={[{ required: true, message: 'Please enter address!' }]}>
+            <Form.Item label="Invoice Email" name='invoiceEmail'  rules={[{type: 'email', message: 'The input is not ' +
+                'valid Invoice E-mail!',},
+              {required: true, message: 'Please input your invoice E-mail!'},]}>
+              <Input placeholder="Enter your invoice email" autoComplete="off"/>
+            </Form.Item>
+          </Col>
+          <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+            <Form.Item label="Street Address" name='streetAddress' rules={[{ required: true, message: 'Please enter address!' }]}>
               <Input placeholder="Enter the address of the client" name='address' autoComplete="off"/>
+            </Form.Item>
+          </Col>
+        </Row>
+        <Row>
+          <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+            <Form.Item name="state" label="State" rules={[{ required: true, message: 'Please enter state!' }]}>
+              <Select placeholder="Select State">
+                <Option value="Arkansas">Arkansas</Option>
+                <Option value="NewYork">New york</Option>
+              </Select>
             </Form.Item>
           </Col>
           <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
@@ -56,29 +60,6 @@ const AddClientForm = (props: any) => {
           <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
             <Form.Item label="Zip Code" name='zipcode' rules={[{ required: true, message: 'Please enter zipcode!' }]}>
               <Input placeholder="Enter the zipcode" autoComplete="off"/>
-            </Form.Item>
-          </Col>
-          <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-            <Form.Item label="Apartment/Suite" name='apartment'>
-              <Input placeholder="Enter your apartment no" name='' autoComplete="off"/>
-            </Form.Item>
-          </Col>
-        </Row>
-        <Row>
-          <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-            <Form.Item name="state" label="State" rules={[{ required: true, message: 'Please enter state!' }]}>
-              <Select placeholder="Select State">
-                <Option value="Arkansas">Arkansas</Option>
-                <Option value="NewYork">New york</Option>
-              </Select>
-            </Form.Item>
-          </Col>
-          <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-            <Form.Item name="status" label="Client Status" rules={[{ required: true, message: 'Please select a status!' }]}>
-              <Select placeholder="Select Status">
-                <Option value="Active">Active</Option>
-                <Option value="Inactive">Inactive</Option>
-              </Select>
             </Form.Item>
           </Col>
         </Row>
