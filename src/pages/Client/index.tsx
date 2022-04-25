@@ -5,13 +5,12 @@ import { Link } from "react-router-dom";
 import routes from "../../config/routes";
 import { authVar } from "../../App/link";
 
-import {gql, useQuery} from "@apollo/client";
+import { gql, useQuery } from "@apollo/client";
 import { MoreOutlined } from "@ant-design/icons";
 
-import styles from "./style.module.scss";
 import { User } from "../../interfaces/graphql";
 
-const { SubMenu } = Menu;
+import styles from "./style.module.scss";
 
 export interface UserData {
   User: {
@@ -27,6 +26,12 @@ export const CLIENT = gql`
                 name
                 email
                 invoicingEmail
+                address {
+                    streetAddress
+                    state
+                    zipcode
+                    city
+                }
             }
             paging {
                 total
@@ -55,11 +60,13 @@ const Client = () => {
 
   const menu = (data: any) => (
     <Menu>
-      <SubMenu title="Change status" key="mainMenu">
-        <Menu.Item key="active">Active</Menu.Item>
-        <Menu.Divider/>
-        <Menu.Item key="inactive">Inactive</Menu.Item>
-      </SubMenu>
+      <Menu.Item key="edit">
+        <div>
+          <Link to={routes.editClient.path(loggedInUser?.company?.code ?? '1', data?.id ?? '1')}>
+            Edit Client
+          </Link>
+        </div>
+      </Menu.Item>
       <Menu.Divider/>
       <Menu.Item key="archive">
         <div>Archive Client</div>

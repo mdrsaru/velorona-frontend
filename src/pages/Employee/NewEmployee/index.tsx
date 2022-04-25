@@ -3,16 +3,16 @@ import React  from "react";
 import { Button, Card, Col, Form, Input, message, Row, Select, Space, Upload } from "antd";
 import { ArrowLeftOutlined, UploadOutlined } from "@ant-design/icons";
 import { mediaServices } from '../../../services/MediaService';
-import { roles_user } from "../../../config/constants";
+import constants, { roles_user } from "../../../config/constants";
 
 import { useNavigate } from "react-router-dom";
 import { gql, useMutation } from "@apollo/client";
 import { notifyGraphqlError } from "../../../utils/error";
 import { authVar } from "../../../App/link";
 
-import styles from "../style.module.scss";
 import routes from "../../../config/routes";
 import { User } from "../../../interfaces/graphql";
+import styles from "../style.module.scss";
 
 const normFile = (e: any) => {
   if (Array.isArray(e)) {
@@ -55,6 +55,12 @@ const NewEmployee = () => {
     navigate(-1);
   }
 
+  const redirectTo = (role: string, user: string) => {
+      role === constants?.roles?.Employee ?
+      navigate(routes.attachClient.path(authData?.company?.code ?? "", user ?? "")) :
+      navigate(routes.employee.path(authData?.company?.code ?? ''));
+  }
+
   const onSubmitForm = (values: any) => {
     message.loading({content: "New employee adding in progress..", className: 'custom-message'}).then(() =>
     UserCreate({
@@ -80,11 +86,11 @@ const NewEmployee = () => {
       if(response.errors) {
         return notifyGraphqlError((response.errors))
       } else if (response?.data) {
+        const user = response?.data?.UserCreate?.id;
         if (values?.upload) {
           const formData = new FormData();
           formData.append('file', values?.upload[0]?.originFileObj)
           mediaServices.uploadProfileImage(formData).then((res: any) => {
-              const user = response?.data?.UserCreate?.id;
               const avatar = res?.data?.id;
               message.loading({content: "Uploading user's profile image..", className: 'custom-message'}).then(() =>
               ChangeProfilePictureInput({
@@ -97,12 +103,12 @@ const NewEmployee = () => {
                 if(imageRes.errors) {
                   return notifyGraphqlError((response.errors))
                 } else {
-                  navigate(routes.attachClient.path(authData?.company?.code ?? "", user ?? ""));
+                  redirectTo(values?.roles, user);
                 }
               }).catch(notifyGraphqlError))
             })
         } else {
-          navigate(routes.attachClient.path(authData?.company?.code ?? "", response?.data?.UserCreate?.id) ?? "")
+          redirectTo(values?.roles, user);
         }
       }
     }).catch(notifyGraphqlError))

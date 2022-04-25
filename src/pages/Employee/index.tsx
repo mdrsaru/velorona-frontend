@@ -34,6 +34,10 @@ export const USER = gql`
                 lastName
                 fullName
                 status
+                activeClient {
+                    id
+                    name
+                }
                 address {
                     city
                     streetAddress
@@ -126,6 +130,8 @@ const Employee = () => {
     }).catch(notifyGraphqlError))
   }
 
+  console.log(employeeData)
+
   const menu = (data: any) => (
     <Menu>
       <SubMenu title="Change status" key="mainMenu">
@@ -181,7 +187,7 @@ const Employee = () => {
       title: 'Start Date',
       render: (user: any) => {
         return <div>
-          <p>{moment(user?.record?.startDate).format('Do MMMM YYYY') ?? 'N/A'}</p>
+          <p>{moment(user?.record?.startDate).format('Do MMMM YYYY') ?? <span className={styles['blankSpan']}> N/A </span>}</p>
         </div>
       }
     },
@@ -189,7 +195,7 @@ const Employee = () => {
       title: 'End Date',
       render: (user: any) => {
         return <div>
-          <p>{moment(user?.record?.endDate).format('Do MMMM YYYY') ?? 'N/A'}</p>
+          <p>{moment(user?.record?.endDate).format('Do MMMM YYYY') ?? <span className={styles['blankSpan']}> N/A </span>}</p>
         </div>
       }
     },
@@ -197,9 +203,17 @@ const Employee = () => {
       title: 'Pay Rate',
       render: (user: any) => {
         return <div>
-          <p>{user?.record?.payRate ?? 'N/A'}</p>
+          <p>{user?.record?.payRate ?? <span className={styles['blankSpan']}> N/A </span>}</p>
         </div>
       }
+    },
+    {
+      title: 'Client',
+      key: 'client',
+      render: (client: any) =>
+        <span>
+          {client?.activeClient?.name ?? <span className={styles['blankSpan']}> N/A </span>}
+        </span>
     },
     {
       title: 'Status',

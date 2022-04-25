@@ -144,6 +144,13 @@ const _Routes = () => {
                     <routes.addClient.component/>
                   </Suspense>
                 }/>
+              <Route
+                path={routes.editClient.childPath}
+                element={
+                  <Suspense fallback={<RouteLoader/>}>
+                    <routes.editClient.component/>
+                  </Suspense>
+                }/>
             </Route>
 
             <Route path={routes.employee.childPath}>

@@ -18,7 +18,7 @@ const config = {
   }
 };
 
-export const roles_user = ['CompanyAdmin', 'Client', 'Employee', 'TaskManager']
+export const roles_user = ['CompanyAdmin', 'Employee', 'TaskManager']
 
 
 export default config;

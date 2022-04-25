@@ -7,7 +7,7 @@ import { gql, useMutation } from "@apollo/client";
 import { notifyGraphqlError } from "../../../utils/error";
 import { authVar } from "../../../App/link";
 
-import AddClientForm from "./AddClientForm";
+import ClientForm from "./ClientForm";
 import { User } from "../../../interfaces/graphql";
 
 import styles from "../style.module.scss";
@@ -72,7 +72,7 @@ const NewClient = () => {
               <h1><ArrowLeftOutlined onClick={() => navigate(-1)}/> &nbsp; Add New Client</h1>
             </Col>
           </Row>
-          <AddClientForm onSubmitForm={onSubmitForm} btnText={'Create Client'} form={form} cancelAddClient={cancelAddClient}/>
+          <ClientForm onSubmitForm={onSubmitForm} btnText={'Create Client'} form={form} cancelAddClient={cancelAddClient}/>
         </Card>
       </div>
   )

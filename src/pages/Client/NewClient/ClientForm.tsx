@@ -4,7 +4,7 @@ import {Button, Col, Form, Input, Row, Select, Space} from "antd";
 import styles from "../style.module.scss";
 
 
-const AddClientForm = (props: any) => {
+const ClientForm = (props: any) => {
   const {form, onSubmitForm, btnText, cancelAddClient} = props;
   const { Option } = Select;
 
@@ -78,4 +78,4 @@ const AddClientForm = (props: any) => {
   )
 }
 
-export default AddClientForm;
+export default ClientForm;

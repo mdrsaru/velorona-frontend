@@ -175,6 +175,13 @@ const routes = {
     name: 'New Client',
     key: 'side13'
   },
+  editClient: {
+    childPath: ':cid',
+    path: (id: string, cid: string) => `/${id}/clients/${cid}`,
+    component: lazy(() => import('../pages/Client/EditClient')),
+    name: 'Edit Client',
+    key: 'side13'
+  },
   newTimesheet: {
     childPath: 'add',
     path: '/timesheet/add',
