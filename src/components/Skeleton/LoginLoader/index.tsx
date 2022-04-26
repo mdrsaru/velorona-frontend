@@ -4,7 +4,7 @@ const LoginLoader = (props: {loading?: boolean}) => {
   const {loading} = props
 
   return (
-    <Card bordered={false}>
+    <Card bordered={false} style={{padding: '3rem'}}>
       <br/><br/>
       <Row style={{paddingTop: '2rem'}}>
         <Col span={6}>

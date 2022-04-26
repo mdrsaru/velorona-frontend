@@ -24,7 +24,7 @@ const ResetPassword = () => {
   const [ searchParams ] = useSearchParams();
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const [ResetPassword] = useMutation(RESET_PASSWORD);
-  console.log(searchParams.get("token"));
+
   const onFinish = (values: any) => {
     ResetPassword({
       variables: {

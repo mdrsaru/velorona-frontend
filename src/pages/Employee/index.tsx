@@ -1,4 +1,4 @@
-import {Card, Row, Col, Table, Dropdown, Menu, message} from 'antd';
+import { Card, Row, Col, Table, Dropdown, Menu, message } from 'antd';
 import { MoreOutlined } from "@ant-design/icons";
 
 import { Link, useNavigate } from "react-router-dom";
@@ -11,41 +11,53 @@ import { useState } from "react";
 
 import ModalConfirm from "../../components/Modal";
 import { notifyGraphqlError } from "../../utils/error";
-import AppLoader from "../../components/Skeleton/AppLoader";
 
 import deleteImg from "../../assets/images/delete_btn.svg";
 import archiveImg from "../../assets/images/archive_btn.svg";
+import constants from "../../config/constants";
+import {UserData} from "../Client";
+
+import RouteLoader from "../../components/Skeleton/RouteLoader";
 import styles from './style.module.scss';
 
 const {SubMenu} = Menu;
 
-const USER = gql`
-  query User($input: UserQueryInput) {
-    User(input: $input) {
-      data {
-        id
-        email
-        phone
-        fullName
-        status
-        roles {
-          id
-          name
+export const USER = gql`
+    query User($input: UserQueryInput!) {
+        User(input: $input) {
+            data {
+                id
+                email
+                phone
+                firstName
+                middleName
+                lastName
+                fullName
+                status
+                activeClient {
+                    id
+                    name
+                }
+                address {
+                    city
+                    streetAddress
+                    zipcode
+                    state
+                }
+                company {
+                    id
+                    name
+                }
+                roles {
+                    id
+                    name
+                }
+            }
         }
-        address {
-          streetAddress
-        }
-        record {
-          startDate 
-          endDate
-          payRate
-        }
-      }
     }
-  }
 `
 
-const EMPLOYEE_UPDATE = gql`
+export const USER_UPDATE = gql`
   mutation UserUpdate($input: UserUpdateInput!) {
       UserUpdate(input: $input) {
           id
@@ -79,7 +91,7 @@ const archiveBody = () => {
 const Employee = () => {
   const loggedInUser = authVar();
   const navigate = useNavigate();
-  const [EmployeeUpdate] = useMutation(EMPLOYEE_UPDATE);
+  const [EmployeeUpdate] = useMutation(USER_UPDATE);
   const [visibility, setVisibility] = useState(false);
   const [showArchive, setArchiveModal] = useState(false);
   const setModalVisibility = (value: boolean) => {
@@ -89,11 +101,13 @@ const Employee = () => {
     setArchiveModal(value)
   }
 
-  const { loading: employeeLoading, data: employeeData } = useQuery(USER, {
+  const { loading: employeeLoading, data: employeeData } = useQuery<UserData>(USER, {
+    fetchPolicy: "network-only",
+    nextFetchPolicy: "cache-first",
     variables: {
       input: {
         query: {
-          // name: constants.roles.Employee
+          role: constants.roles.Employee
         },
         paging: {
           order: ['updatedAt:DESC']
@@ -111,12 +125,13 @@ const Employee = () => {
           id: id
         }
       }
-    }).then((response: any) => {
+    }).then((response) => {
       if (response.errors) {
         return notifyGraphqlError((response.errors))
       }
     }).catch(notifyGraphqlError))
   }
+
 
   const menu = (data: any) => (
     <Menu>
@@ -173,7 +188,7 @@ const Employee = () => {
       title: 'Start Date',
       render: (user: any) => {
         return <div>
-          <p>{moment(user?.record?.startDate).format('Do MMMM YYYY') ?? 'N/A'}</p>
+          <p>{moment(user?.record?.startDate).format('Do MMMM YYYY') ?? <span className={styles['blankSpan']}> N/A </span>}</p>
         </div>
       }
     },
@@ -181,7 +196,7 @@ const Employee = () => {
       title: 'End Date',
       render: (user: any) => {
         return <div>
-          <p>{moment(user?.record?.endDate).format('Do MMMM YYYY') ?? 'N/A'}</p>
+          <p>{moment(user?.record?.endDate).format('Do MMMM YYYY') ?? <span className={styles['blankSpan']}> N/A </span>}</p>
         </div>
       }
     },
@@ -189,9 +204,17 @@ const Employee = () => {
       title: 'Pay Rate',
       render: (user: any) => {
         return <div>
-          <p>{user?.record?.payRate ?? 'N/A'}</p>
+          <p>{user?.record?.payRate ?? <span className={styles['blankSpan']}> N/A </span>}</p>
         </div>
       }
+    },
+    {
+      title: 'Client',
+      key: 'client',
+      render: (client: any) =>
+        <span>
+          {client?.activeClient?.name ?? <span className={styles['blankSpan']}> N/A </span>}
+        </span>
     },
     {
       title: 'Status',
@@ -217,33 +240,35 @@ const Employee = () => {
   ];
 
   return (
-    <div className={styles['main-div']}>
-      {employeeLoading ?
-        <AppLoader loading={employeeLoading} count={14}/> :
-        <Card bordered={false}>
-          <Row>
-            <Col span={12} className={styles['employee-col']}>
-              <h1>Employee</h1>
-            </Col>
-            <Col span={12} className={styles['employee-col']}>
-              <div className={styles['add-new-employee']}>
-                <Link to={routes.addEmployee.path(loggedInUser?.company?.code ? loggedInUser?.company?.code : '')}>Add
-                  New Employee
-                </Link>
-              </div>
-            </Col>
-          </Row>
-          <Row>
-            <Col span={24}>
-              <Table dataSource={employeeData?.User?.data} columns={columns} rowKey={(record => record?.id)}/>
-            </Col>
-          </Row>
-        </Card>}
-      <ModalConfirm visibility={visibility} setModalVisibility={setModalVisibility} imgSrc={deleteImg}
-                    okText={'Delete'} modalBody={deleteBody}/>
-      <ModalConfirm visibility={showArchive} setModalVisibility={setArchiveVisibility} imgSrc={archiveImg}
-                    okText={'Archive'} modalBody={archiveBody}/>
-    </div>
+   <>
+     {employeeLoading ?
+       <RouteLoader/> :
+       <div className={styles['main-div']}>
+         <Card bordered={false}>
+           <Row>
+             <Col span={12} className={styles['employee-col']}>
+               <h1>Employee</h1>
+             </Col>
+             <Col span={12} className={styles['employee-col']}>
+               <div className={styles['add-new-employee']}>
+                 <Link to={routes.addEmployee.path(loggedInUser?.company?.code ? loggedInUser?.company?.code : '')}>Add
+                   New Employee
+                 </Link>
+               </div>
+             </Col>
+           </Row>
+           <Row>
+             <Col span={24}>
+               <Table dataSource={employeeData?.User?.data} columns={columns} rowKey={(record => record?.id)}/>
+             </Col>
+           </Row>
+         </Card>
+         <ModalConfirm visibility={visibility} setModalVisibility={setModalVisibility} imgSrc={deleteImg}
+                       okText={'Delete'} modalBody={deleteBody}/>
+         <ModalConfirm visibility={showArchive} setModalVisibility={setArchiveVisibility} imgSrc={archiveImg}
+                       okText={'Archive'} modalBody={archiveBody}/>
+       </div>}
+   </>
   )
 }
 

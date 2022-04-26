@@ -1,17 +1,17 @@
 import { Card, Col, Row, Modal, Form, Input, message } from "antd";
 // import { Link } from "react-router-dom";
 
-import React, {useState} from "react";
+import React, { useState } from "react";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { IRole } from "../../interfaces/IRole";
 
 import { useMediaQuery } from "../../utils/responsive";
 // import routes from "../../config/routes";
 
-import styles from "./style.module.scss";
 import { notifyGraphqlError } from "../../utils/error";
+import styles from "./style.module.scss";
 
-const ROLES = gql`
+export const ROLES = gql`
   query Role {
     Role {
       data {
@@ -94,10 +94,10 @@ const Role = () => {
         </div>
         <Form form={form} layout="vertical" onFinish={handleSubmit}>
           <Form.Item label="Role Title" name="title" rules={[{required: true, message: 'Enter a role name.'}]}>
-            <Input placeholder="Enter a role title" />
+            <Input placeholder="Enter a role title" autoComplete="off"/>
           </Form.Item>
           <Form.Item label="Description" name="description" rules={[{required: true, message: 'Role description is required.'}]}>
-            <Input placeholder="Enter role description" />
+            <Input placeholder="Enter role description" autoComplete="off"/>
           </Form.Item>
         </Form>
       </Modal>

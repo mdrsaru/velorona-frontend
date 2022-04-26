@@ -1,5 +1,5 @@
 import React from 'react';
-import {Card, Col, Row, Form, DatePicker, Input, Button, Space, TimePicker, Select} from "antd";
+import { Card, Col, Row, Form, DatePicker, Input, Button, Space, TimePicker, Select } from "antd";
 import { ArrowLeftOutlined, DownOutlined } from '@ant-design/icons';
 
 import { useNavigate } from 'react-router-dom';
@@ -39,7 +39,7 @@ const NewTimesheet = () => {
           <Row>
             <Col span={24} className={styles.formCol}>
               <Form.Item label="Task">
-                <Input placeholder="Enter Task"/>
+                <Input placeholder="Enter Task" autoComplete="off"/>
               </Form.Item>
             </Col>
           </Row>

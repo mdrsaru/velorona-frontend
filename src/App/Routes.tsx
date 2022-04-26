@@ -8,11 +8,25 @@ import CheckRoles from "../components/CheckRoles";
 import routes from '../config/routes';
 import constants from "../config/constants";
 
-import AppLoader from "../components/Skeleton/AppLoader";
 import LoginLoader from "../components/Skeleton/LoginLoader";
 import RouteLoader from "../components/Skeleton/RouteLoader";
+import PublicRoutes from "../components/PublicRoutes";
+import {authVar} from "./link";
+
 
 const _Routes = () => {
+  const loginData = authVar();
+  const roles = loginData?.user?.roles;
+  const getRoute = () => {
+    if (roles.includes(constants.roles.SuperAdmin)) {
+      return routes.dashboard.path
+    } else if(roles.includes(constants.roles.CompanyAdmin)) {
+      return routes.company.path(loginData?.company?.code)
+    } else {
+      return routes.home.path
+    }
+  }
+
   return (
     <Router>
       <Routes>
@@ -21,16 +35,20 @@ const _Routes = () => {
           <Route
             index
             element={
-              <Suspense fallback={<LoginLoader/>}>
-                <routes.login.component/>
-              </Suspense>
+              <PublicRoutes>
+                <Suspense fallback={<LoginLoader/>}>
+                  <routes.login.component/>
+                </Suspense>
+              </PublicRoutes>
             }/>
           <Route
             path={routes.loginAdmin.childPath}
             element={
-              <Suspense fallback={<LoginLoader/>}>
-                <routes.login.component/>
-              </Suspense>
+              <PublicRoutes>
+                <Suspense fallback={<LoginLoader/>}>
+                  <routes.login.component/>
+                </Suspense>
+              </PublicRoutes>
             }/>
         </Route>
 
@@ -38,15 +56,16 @@ const _Routes = () => {
           <Route
             index
             element={
-              <Suspense fallback={<LoginLoader/>}>
-                <routes.resetPassword.component/>
-              </Suspense>
+              <PublicRoutes>
+                <Suspense fallback={<LoginLoader/>}>
+                  <routes.resetPassword.component/>
+                </Suspense>
+              </PublicRoutes>
             }/>
         </Route>
 
         {/* protected routes */}
         <Route path={routes.home.path} element={<Layout/>}>
-
           <Route
             path={routes.role.path}
             element={
@@ -83,6 +102,13 @@ const _Routes = () => {
                     <routes.addProject.component/>
                   </Suspense>
                 }/>
+              <Route
+                path={routes.editProject.childPath}
+                element={
+                  <Suspense fallback={<RouteLoader/>}>
+                    <routes.editProject.component/>
+                  </Suspense>
+                }/>
             </Route>
 
             <Route path={routes.invoice.childPath}>
@@ -117,13 +143,20 @@ const _Routes = () => {
                     <routes.addClient.component/>
                   </Suspense>
                 }/>
+              <Route
+                path={routes.editClient.childPath}
+                element={
+                  <Suspense fallback={<RouteLoader/>}>
+                    <routes.editClient.component/>
+                  </Suspense>
+                }/>
             </Route>
 
             <Route path={routes.employee.childPath}>
               <Route
                 index
                 element={
-                  <Suspense fallback={<AppLoader count={14}/>}>
+                  <Suspense fallback={<RouteLoader/>}>
                     <routes.employee.component/>
                   </Suspense>
                 }/>
@@ -133,6 +166,14 @@ const _Routes = () => {
                 element={
                   <Suspense fallback={<RouteLoader/>}>
                     <routes.addEmployee.component/>
+                  </Suspense>
+                }/>
+
+              <Route
+                path={routes.attachClient.childPath}
+                element={
+                  <Suspense fallback={<RouteLoader/>}>
+                    <routes.attachClient.component/>
                   </Suspense>
                 }/>
 
@@ -189,7 +230,7 @@ const _Routes = () => {
           <Route
             index
             element={
-              <CheckRoles allowedRoles={[constants.roles.Employee]}>
+              <CheckRoles allowedRoles={[constants.roles.Employee]} redirect_to={getRoute()}>
                 <Suspense fallback={<RouteLoader/>}>
                   <routes.home.component/>
                 </Suspense>

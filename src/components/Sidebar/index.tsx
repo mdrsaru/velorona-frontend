@@ -37,72 +37,84 @@ const Sidebar = (props: any) => {
   const loggedInUser = authVar();
   const menuItems = [
     {
+      key: routes.dashboard.key,
       name: routes.dashboard.name,
       icon: <DashboardOutlined />,
       route: routes.dashboard.path,
       accessRoles: [constants.roles.SuperAdmin]
     },
     {
+      key: routes.companyDashboard.key,
       name: routes.companyDashboard.name,
       icon: <DashboardOutlined />,
-      route: routes.company.path(loggedInUser?.company?.code ? loggedInUser?.company?.code : ''),
+      route: routes.company.path(loggedInUser?.company?.code ?? ''),
       accessRoles: [constants.roles.CompanyAdmin]
     },
     {
+      key: routes.role.name,
       name: routes.role.name,
       icon: <UserSwitchOutlined />,
       route: routes.role.path,
       accessRoles: [constants.roles.SuperAdmin]
     },
     {
+      key: routes.companyAdmin.key,
       name: routes.companyAdmin.name,
       icon: <BankOutlined />,
       route: routes.companyAdmin.path,
       accessRoles: [constants.roles.SuperAdmin]
     },
     {
+      key: routes.employee.key,
       name: routes.employee.name,
       icon: <UsergroupAddOutlined />,
-      route: routes.employee.path(loggedInUser?.company?.code ? loggedInUser?.company?.code : ''),
+      route: routes.employee.path(loggedInUser?.company?.code ?? ''),
       accessRoles: [constants.roles.CompanyAdmin]
     },
     {
+      key: routes.client.key,
       name: routes.client.name,
       icon: <SolutionOutlined />,
-      route: routes.client.path(loggedInUser?.company?.code ? loggedInUser?.company?.code : ''),
+      route: routes.client.path(loggedInUser?.company?.code ?? ''),
       accessRoles: [constants.roles.CompanyAdmin]
     },
     {
+      key: routes.home.key,
       name: routes.home.name,
       icon: <HomeOutlined />,
       route: routes.home.path,
       accessRoles: [constants.roles.Employee, constants.roles.TaskManager]
     },
     {
+      key: routes.timesheet.key,
       name: routes.timesheet.name,
       icon: <FieldTimeOutlined />,
       route: routes.timesheet.path,
       accessRoles: [constants.roles.Employee, constants.roles.TaskManager]
     },
     {
+      key: routes.tasks.key,
       name: routes.tasks.name,
       icon: <OrderedListOutlined />,
       route: routes.tasks.path,
       accessRoles: [constants.roles.Employee, constants.roles.TaskManager]
     },
     {
+      key: routes.projects.key,
       name: routes.projects.name,
       icon: <FundProjectionScreenOutlined />,
-      route: routes.projects.path(loggedInUser?.company?.code ? loggedInUser?.company?.code : ''),
+      route: routes.projects.path(loggedInUser?.company?.code ?? ''),
       accessRoles: [constants.roles.CompanyAdmin]
     },
     {
+      key: routes.invoice.key,
       name: routes.invoice.name,
       icon: <ProfileOutlined />,
-      route: routes.invoice.path(loggedInUser?.company?.code ? loggedInUser?.company?.code : ''),
+      route: routes.invoice.path(loggedInUser?.company?.code ?? ''),
       accessRoles: [constants.roles.CompanyAdmin]
     },
     {
+      key: routes.schedule.key,
       name: routes.schedule.name,
       icon: <ScheduleOutlined />,
       route: routes.schedule.path,
@@ -129,7 +141,7 @@ const Sidebar = (props: any) => {
         style={{ height: '100%', borderRight: 0 }}
         selectedKeys={[selectedMenuKey]}>
         {menuArray && menuArray.map((menu, index) => (
-          <Menu.Item key={index} icon={menu?.icon}>
+          <Menu.Item key={menu?.key} icon={menu?.icon}>
             <Link to={menu.route}>{menu.name}</Link>
           </Menu.Item>
         ))}

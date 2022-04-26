@@ -1,5 +1,5 @@
 import { message } from 'antd';
-import {CloseCircleOutlined} from "@ant-design/icons";
+import { CloseCircleOutlined } from "@ant-design/icons";
 
 export function notifyGraphqlError(err: any) {
   let error = err?.graphQLErrors?.[0] ?? err?.networkError?.result?.errors?.[0];

@@ -4,13 +4,13 @@ import { useState } from "react";
 import { Card, Row, Col, Table, Menu, Dropdown } from 'antd';
 import { MoreOutlined } from '@ant-design/icons';
 
-import {Link} from "react-router-dom";
+import { Link } from "react-router-dom";
 import routes from "../../config/routes";
 
 import deleteImg from "./../../assets/images/delete_btn.svg";
 import archiveImg from "./../../assets/images/archive_btn.svg";
-import styles from "./style.module.scss";
 import ModalConfirm from "../../components/Modal";
+import styles from "./style.module.scss";
 
 
 const {SubMenu} = Menu;

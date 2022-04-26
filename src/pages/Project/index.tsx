@@ -17,7 +17,7 @@ import styles from "./style.module.scss";
 
 
 
-const PROJECT = gql`
+export const PROJECT = gql`
     query Project($input: ProjectQueryInput!) {
       Project(input: $input) {
         data {
@@ -69,6 +69,8 @@ const Project = () => {
   }
 
   const { data: projectData } = useQuery(PROJECT, {
+    fetchPolicy: "network-only",
+    nextFetchPolicy: "cache-first",
     variables: {
       input: {
         query: {
@@ -84,7 +86,7 @@ const Project = () => {
   const menu = (data: any) => (
     <Menu>
       <Menu.Item key="edit">
-        <div>Edit Project</div>
+        <Link to={routes.editProject.path(loggedInUser?.company?.code ?? '1', data?.id ?? '1')}>Edit Project</Link>
       </Menu.Item>
       <Menu.Divider/>
       <Menu.Item key="archive">

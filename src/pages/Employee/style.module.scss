@@ -1,8 +1,14 @@
 :global {
   .ant-modal-footer {
     border: none;
-    text-align: center;
     padding-bottom: 5rem;
+    padding-right: 3rem;
+    text-align: center;
+  }
+
+  .ant-modal-close-x {
+    padding-top: 1rem;
+    padding-right: 1rem;
   }
 
   .ant-upload-span {
@@ -15,6 +21,78 @@
     .ant-avatar .ant-avatar-circle .ant-avatar-image .ant-avatar-icon {
       height: 122px;
       width: 122px;
+    }
+  }
+}
+
+.modal-footer {
+  text-align: right;
+}
+
+
+.modal-body {
+  .client-col {
+    padding: 1rem 0 1rem 1rem;
+    margin-bottom: 1rem;
+    line-height: 20px;
+    border: 2px solid #F2F2F2;
+    width: 100%;
+
+    b {
+      font-weight: 600;
+      font-size: 14px;
+      line-height: 17px;
+    }
+    span {
+      font-weight: 400;
+      font-size: 12px;
+      line-height: 15px;
+    }
+  }
+
+  :global {
+    .ant-radio-button-wrapper {
+      height: auto;
+      color: var(--black-1);
+    }
+
+    .ant-radio-group {
+      width: 100%;
+    }
+
+    .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled) {
+      border: 2px solid var(--primary-blue);
+      box-sizing: border-box;
+      box-shadow: 0 7px 4px rgba(231, 231, 231, 0.25);
+    }
+
+    .ant-input-affix-wrapper {
+      padding: 0.7rem 1rem 0.7rem 1rem;
+      background-color: var(--gray-2) !important;
+    }
+
+    .anticon svg {
+      font-size: 21px;
+    }
+
+    .ant-input-affix-wrapper > input.ant-input  {
+      padding-left: 1.5rem;
+    }
+
+    .ant-input::placeholder {
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 17px;
+      color: var(--black-1);
+    }
+
+    .ant-input-affix-wrapper {
+      border: none;
+
+      &:hover, &:focus {
+        border: none;
+        outline: none !important;
+      }
     }
   }
 }
@@ -39,6 +117,7 @@
     line-height: 22px;
     color: var(--primary-blue);
   }
+
 }
 
 .formCol {
@@ -164,4 +243,61 @@
 
 .user-name {
   cursor: pointer;
+}
+
+.add-existing-col h1 {
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 22px;
+  float: right;
+  color: var(--primary-blue);
+  cursor: pointer;
+  padding-right: 1rem;
+  padding-top: 1.5rem;
+}
+
+.add-title {
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 29px;
+}
+
+.add-body {
+  padding: 2rem 1rem 2rem 1rem;
+  min-height: 300px;
+}
+
+.search-client {
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 22px;
+}
+
+.list-client-card {
+  padding: 1rem 0 0 0;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 17px;
+
+  .client-row {
+    width: 100%;
+    max-height: 22vh;
+    height: 22vh;
+    overflow-y: auto;
+  }
+}
+
+.close-icon-div {
+  padding: 5px;
+  border-radius: 50px;
+  background: var(--gray-2);
+}
+
+.modal-body {
+  padding: 1rem;
+}
+
+.blankSpan {
+  color: var(--gray-secondary);
+  font-size: 14px;
 }

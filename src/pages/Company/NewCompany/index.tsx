@@ -2,8 +2,8 @@ import React from "react";
 import { Card, Col, Row, Form, Input, Space, Button, Select, message } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 
-import {gql} from "@apollo/client";
-import {useMutation} from "@apollo/client";
+import { gql } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 
 import { useNavigate } from "react-router-dom";
 import { notifyGraphqlError } from "../../../utils/error";
@@ -58,7 +58,7 @@ const NewCompany = () => {
             <Col xs={24} sm={24} md={12} className={styles['form-col2']}>
               <Form.Item label="Company Name" name="name" rules={[{required: true, message: 'Enter a company name.'},
                 {max: 50, message: "Name should be less than 50 character"}]}>
-                <Input placeholder="Enter Name of the company"/>
+                <Input placeholder="Enter Name of the company" autoComplete="off"/>
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={12} className={styles['form-col2']}>
@@ -74,7 +74,7 @@ const NewCompany = () => {
             <Col span={24} className={styles['form-col2']}>
               <Form.Item label="Email" name='email' rules={[{type: 'email', message: 'The input is not valid E-mail!',},
                 {required: true, message: 'Please input your E-mail!'},]}>
-                <Input placeholder="Company Admin Email"/>
+                <Input placeholder="Company Admin Email" autoComplete="off"/>
               </Form.Item>
             </Col>
           </Row>

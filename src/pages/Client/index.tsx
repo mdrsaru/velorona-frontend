@@ -5,33 +5,53 @@ import { Link } from "react-router-dom";
 import routes from "../../config/routes";
 import { authVar } from "../../App/link";
 
-import styles from "./style.module.scss";
-import {gql, useQuery} from "@apollo/client";
+import { gql, useQuery } from "@apollo/client";
 import { MoreOutlined } from "@ant-design/icons";
 
-const {SubMenu} = Menu;
+import { User } from "../../interfaces/graphql";
 
-const CLIENT = gql`
-  query User($input: UserQueryInput) {
-    User(input: $input) {
-      data {
-        id
-        email
-        phone
-        fullName
-        status
-      }
-    }
+import styles from "./style.module.scss";
+
+export interface UserData {
+  User: {
+    data : User[]
   }
-`
+}
 
+export const CLIENT = gql`
+    query Client($input: ClientQueryInput!) {
+        Client(input: $input) {
+            data {
+                id
+                name
+                email
+                invoicingEmail
+                address {
+                    streetAddress
+                    state
+                    zipcode
+                    city
+                }
+            }
+            paging {
+                total
+                startIndex
+                endIndex
+                hasNextPage
+            }
+        }
+    }
+`
 
 const Client = () => {
   const loggedInUser = authVar();
-  const { loading: clientLoading, data: clientData } = useQuery(CLIENT, {
+  const { data: clientData } = useQuery(CLIENT, {
+    fetchPolicy: "network-only",
+    nextFetchPolicy: "cache-first",
     variables: {
       input: {
         query: {
+          company_id: loggedInUser?.company?.id
         },
         paging: {
           order: ['updatedAt:DESC']
@@ -42,11 +62,13 @@ const Client = () => {
 
   const menu = (data: any) => (
     <Menu>
-      <SubMenu title="Change status" key="mainMenu">
-        <Menu.Item key="active">Active</Menu.Item>
-        <Menu.Divider/>
-        <Menu.Item key="inactive">Inactive</Menu.Item>
-      </SubMenu>
+      <Menu.Item key="edit">
+        <div>
+          <Link to={routes.editClient.path(loggedInUser?.company?.code ?? '1', data?.id ?? '1')}>
+            Edit Client
+          </Link>
+        </div>
+      </Menu.Item>
       <Menu.Divider/>
       <Menu.Item key="archive">
         <div>Archive Client</div>
@@ -57,8 +79,8 @@ const Client = () => {
   const columns = [
     {
       title: 'Client Name',
-      dataIndex: 'fullName',
-      key: 'fullName',
+      dataIndex: 'name',
+      key: 'name',
     },
     {
       title: 'Email Address',
@@ -66,18 +88,9 @@ const Client = () => {
       key: 'email'
     },
     {
-      title: 'Phone Number',
-      dataIndex: 'phone',
-      key: 'phone'
-    },
-    {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
-      render: (status: string) =>
-        <span className={status === 'Active' ? styles['active-status'] : styles['inactive-status']}>
-          {status}
-        </span>
+      title: 'Invoicing Email',
+      dataIndex: 'invoicingEmail',
+      key: 'invoicingEmail'
     },
     {
       title: 'Actions',
@@ -110,7 +123,7 @@ const Client = () => {
           </Row>
           <Row>
             <Col span={24}>
-              <Table dataSource={clientData?.User?.data} columns={columns} rowKey={(record => record?.id)}/>
+              <Table dataSource={clientData?.Client?.data} columns={columns} rowKey={(record => record?.id)}/>
             </Col>
           </Row>
         </Card>

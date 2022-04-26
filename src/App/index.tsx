@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { ApolloProvider, ApolloClient, ApolloLink, InMemoryCache } from '@apollo/client';
-import { Skeleton } from 'antd';
 
 import * as link from './link';
 import { authVar } from './link';
@@ -10,9 +9,9 @@ import {
   typeDefs,
 } from '../gql/schema.gql';
 
-import './App.scss'
-
 import Routes from './Routes';
+import AppLoader from "../components/Skeleton/AppLoader";
+import './App.scss'
 
 const client = new ApolloClient({
   link: ApolloLink.from([
@@ -49,29 +48,30 @@ function App() {
     TokenService.renewAccessToken()
       .then((response) => response.json())
       .then((response) => {
-        authVar({
-          isLoggedIn: true,
-          token: response?.data?.accessToken,
-          user: {
-            id: response?.data?.id ?? null,
-            roles: response?.data?.roles?.map((role: any) => role.name),
-          },
-          company: {
-            id: response?.data?.company?.id ?? null,
-            code: response?.data?.company?.companyCode ?? null,
-          }
-        });
+        if (response?.data) {
+          authVar({
+            isLoggedIn: true,
+            token: response?.data?.accessToken,
+            user: {
+              id: response?.data?.id ?? null,
+              roles: response?.data?.roles?.map((role: any) => role.name),
+            },
+            company: {
+              id: response?.data?.company?.id ?? null,
+              code: response?.data?.company?.companyCode ?? null,
+            }
+          })}
       })
       .finally(() => {
-        setAppLoading(false);
+        setTimeout(() => {
+          setAppLoading(false);
+        }, 3000)
       });
   }, []);
-
   return (
     <>
-      {appLoading ? (
-        <Skeleton />
-      ) : (
+      {appLoading ?
+        <AppLoader/> : (
         <ApolloProvider client={client}>
           <Routes />
         </ApolloProvider>

@@ -1,12 +1,15 @@
-import { Button, Card, Col, Form, Input, InputNumber, Row, Select, Space } from "antd";
+import { Button, Card, Col, Form, Input, InputNumber, message, Row, Select, Space } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import React from "react";
-import {Link, useNavigate} from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import routes from "../../../config/routes";
+
+import { authVar } from "../../../App/link";
+import { gql, useMutation, useQuery } from "@apollo/client";
+
+import { CLIENT } from "../../Client";
+import { notifyGraphqlError } from "../../../utils/error";
 import styles from "../style.module.scss";
-import {authVar} from "../../../App/link";
-import {gql, useMutation, useQuery} from "@apollo/client";
-import {notifyGraphqlError} from "../../../utils/error";
 
 interface ItemProps {
   label: string;
@@ -23,31 +26,6 @@ for (let i = 10; i < 36; i++) {
   });
 }
 
-const USER = gql`
-  query User($input: UserQueryInput) {
-    User(input: $input) {
-      data {
-        id
-        email
-        phone
-        fullName
-        status
-        roles {
-          id
-          name
-        }
-        address {
-          streetAddress
-        }
-        record {
-          startDate 
-          endDate
-          payRate
-        }
-      }
-    }
-  }
-`
 
 const PROJECT_CREATE = gql`
   mutation ProjectCreate($input: ProjectCreateInput!) {
@@ -65,11 +43,13 @@ const NewProject = () => {
   const { Option } = Select;
   const [ProjectCreate] = useMutation(PROJECT_CREATE);
 
-  const { data: clientData } = useQuery(USER, {
+  const { data: clientData } = useQuery(CLIENT, {
+    fetchPolicy: "network-only",
+    nextFetchPolicy: "cache-first",
     variables: {
       input: {
         query: {
-          // name: constants.roles.Employee
+          company_id: loggedInUser?.company?.id
         },
         paging: {
           order: ['updatedAt:DESC']
@@ -89,20 +69,23 @@ const NewProject = () => {
   }
 
   const onSubmitForm = (values: any) => {
-    ProjectCreate({
-      variables: {
-        input: {
-          name: values.name,
-          company_id: loggedInUser?.company?.id,
-          vendor_id: values.client,
+    message.loading({content: "Creating project in progress..", className: 'custom-message'}).then(() =>
+      ProjectCreate({
+        variables: {
+          input: {
+            name: values.name,
+            company_id: loggedInUser?.company?.id,
+            client_id: values.client,
+          }
         }
-      }
-    }).then((response) => {
-      if(response.errors) {
-        return notifyGraphqlError((response.errors))
-      } else if (response?.data?.ProjectCreate) {
-      }
-    }).catch(notifyGraphqlError)
+      }).then((response) => {
+        if(response.errors) {
+          return notifyGraphqlError((response.errors))
+        } else if (response?.data?.ProjectCreate) {
+          navigate(-1)
+          message.success({content: `New Project is created successfully!`, className: 'custom-message'});
+        }
+      }).catch(notifyGraphqlError))
   }
 
 
@@ -118,14 +101,14 @@ const NewProject = () => {
           <Row>
             <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
               <Form.Item label="Project Name" name='name' rules={[{ required: true, message: 'Please enter project name!' }]}>
-                <Input placeholder="Enter the project name" />
+                <Input placeholder="Enter the project name" autoComplete="off"/>
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
               <Form.Item name="client" label="Client Name" rules={[{ required: true, message: 'Please enter client name!' }]}>
                 <Select placeholder="Select Name of the Client">
-                  {clientData && clientData.User.data.map((user: any, index:number) => (
-                    <Option value={user?.id} key={index}>{user?.fullName}</Option>
+                  {clientData && clientData.Client.data.map((user: any, index:number) => (
+                    <Option value={user?.id} key={index}>{user?.name} / {user?.email}</Option>
                   ))}
                 </Select>
               </Form.Item>
@@ -147,8 +130,8 @@ const NewProject = () => {
             </Col>
             <>
               <Col xs={24} sm={24} md={12} lg={12} className={styles['form-col-task']}>
-                <Form.Item label="Task Name" name='name'>
-                  <InputNumber placeholder="Enter the Name of the Task" />
+                <Form.Item label="Task Name" name='task-name'>
+                  <InputNumber placeholder="Enter the Name of the Task" autoComplete="off"/>
                 </Form.Item>
               </Col>
               <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>

@@ -1,5 +1,21 @@
 :global {
+
+  .ant-modal-close {
+    padding: 1rem;
+  }
+
+  .ant-modal-close-x {
+    padding-top: 0.3rem;
+  }
+
+  .ant-modal-footer {
+    border: none;
+    padding-bottom: 2rem;
+    padding-right: 3rem;
+  }
+
   :local(.site-card-wrapper) {
+
     .ant-card-grid {
       padding-left: 7px;
       padding-right: 7px;
@@ -7,49 +23,44 @@
 
     .ant-table-wrapper {
       padding: 1rem;
+      font-size: 30px;
     }
 
     .anticon svg {
       color: var(--primary-blue);
     }
-  }
 
-  :local(.grid-style) {
-    .ant-picker {
-      .ant-picker-input input::placeholder {
-        color: var(--gray-1);
+    .anticon-left, .anticon-right {
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .anticon-close-circle {
+      cursor: pointer;
+      background: var(--gray-2);
+    }
+
+    .anticon-close-circle svg {
+      color: var(--gray-secondary);
+      &:hover {
+        color: var(--primary-blue);
       }
     }
-    .ant-select-selection-placeholder {
-      font-weight: 600;
-      font-size: 14px;
-      line-height: 18px;
-      color: var(--gray-1);
+
+    .ant-picker {
+      .ant-picker-input input::placeholder {
+        font-weight: 600;
+        font-size: 18px;
+        line-height: 22px;
+        color: var(--gray-secondary);
+      }
     }
   }
 }
 
-.grid-style {
-  width: 27%;
-  box-shadow: none;
-  padding-top: 3.5rem;
-}
-
-.grid-style2 {
-  width: 19%;
-  box-shadow: none;
-  padding-top: 3.5rem;
-  font-size: 16px;
-
-  @media screen and (max-width: 1521px) {
-    padding-top: 2.9rem;
-    font-size: 20px;
-  }
-}
-
-.grid-style-full {
-  width: 100%;
-  box-shadow: none;
+.card-col-timesheet {
+  overflow-x: auto;
+  overflow-y: auto;
 }
 
 .site-card-wrapper {
@@ -70,6 +81,7 @@
     font-weight: 600;
     padding: 1rem;
     font-size: 20px;
+    float: right;
     @media screen and (max-width: 1281px) {
       font-size: 14px;
     }
@@ -83,7 +95,24 @@
 
 .formCol {
   padding-left: 1rem;
-  padding-right: 1rem;
+  padding-top: 1rem;
+
+  span {
+    font-weight: 600;
+    font-size: 24px;
+    line-height: 29px;
+  }
+}
+
+.formCol1 {
+  padding-left: 1rem;
+  padding-top: 1.5rem;
+
+  span {
+    font-weight: 600;
+    font-size: 24px;
+    line-height: 29px;
+  }
 }
 
 .cardHeaderRow {
@@ -95,6 +124,37 @@
     font-size: 24px;
     line-height: 29px;
   }
+}
+
+.cardBody {
+  padding: 1rem;
+
+  span {
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 17px;
+  }
+
+  .header {
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 17px;
+  }
+}
+
+.timesheetDiv {
+  display: flex;
+  padding: 0.7rem;
+  margin-right: 1.5rem;
+  justify-content: center;
+  align-items: center;
+  div {
+    width: 50%;
+  }
+}
+
+.timesheetDiv:nth-child(odd) {
+  background: var(--gray-2);
 }
 
 .totalTimeDiv {
@@ -125,12 +185,6 @@
 .timesheetCard {
   padding: 1rem .5rem .5rem 0;
 
-  span {
-    font-weight: 600;
-    font-size: 24px;
-    line-height: 29px;
-  }
-
   .dateSpan {
     font-weight: 600;
     font-size: 18px;
@@ -141,17 +195,6 @@
 }
 
 .timeSheetDetail {
-  padding: .5rem 0 0.7rem 0;
-  span {
-    font-weight: 600;
-    font-size: 24px;
-    line-height: 29px;
-  }
-
-  .status {
-    float: right;
-    color: var(--primary-orange);
-  }
 }
 
 .totalRow {
@@ -166,4 +209,78 @@
   .totalCount {
     float: right;
   }
+}
+
+.data-picker {
+  padding: 1rem;
+}
+
+.next-icon {
+  text-align: center;
+  height: 54px;
+  display: flex;
+  margin-top: 1rem;
+  margin-right: 1rem;
+  justify-content: center;
+  align-items: center;
+  background: var(--gray-2);
+  cursor: pointer;
+}
+
+.dropdown-menu {
+  cursor: pointer;
+
+  span {
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 17px;
+  }
+}
+
+.resp-table-header, .resp-table-body {
+  display: flex;
+}
+
+.resp-table-header {
+  background: var(--gray-secondary);
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 17px;
+  color: var(--white)
+}
+
+.resp-table-body {
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 17px;
+}
+
+.table-header-cell, .table-body-cell {
+  width: 15%;
+  padding: 1rem;
+}
+
+.table-body-cell {
+  display: flex;
+  align-items: center;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 17px;
+}
+
+.modal-title {
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 29px;
+  padding: 1rem;
+}
+
+.form-modal {
+  padding: 2rem;
+}
+
+.close-icon-div {
+  padding: 5px;
+  border-radius: 50px;
+  background: var(--gray-2);
 }
