@@ -69,6 +69,8 @@ const Project = () => {
   }
 
   const { data: projectData } = useQuery(PROJECT, {
+    fetchPolicy: "network-only",
+    nextFetchPolicy: "cache-first",
     variables: {
       input: {
         query: {

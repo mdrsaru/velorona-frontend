@@ -8,7 +8,6 @@ import CheckRoles from "../components/CheckRoles";
 import routes from '../config/routes';
 import constants from "../config/constants";
 
-import AppLoader from "../components/Skeleton/AppLoader";
 import LoginLoader from "../components/Skeleton/LoginLoader";
 import RouteLoader from "../components/Skeleton/RouteLoader";
 import PublicRoutes from "../components/PublicRoutes";
@@ -157,7 +156,7 @@ const _Routes = () => {
               <Route
                 index
                 element={
-                  <Suspense fallback={<AppLoader count={14}/>}>
+                  <Suspense fallback={<RouteLoader/>}>
                     <routes.employee.component/>
                   </Suspense>
                 }/>

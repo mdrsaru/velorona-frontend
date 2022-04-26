@@ -6,13 +6,13 @@ import {useNavigate, useParams} from "react-router-dom";
 import {gql, useMutation, useQuery} from "@apollo/client";
 import { notifyGraphqlError } from "../../../utils/error";
 import { authVar } from "../../../App/link";
-import { User } from "../../../interfaces/graphql";
+import { Client } from "../../../interfaces/graphql";
 import { CLIENT } from "../index";
 
 import styles from "../style.module.scss";
 
 interface ClientResponseData {
-  ClientCreate: User
+  ClientCreate: Client
 }
 
 export const CLIENT_UPDATE = gql`

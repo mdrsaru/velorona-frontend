@@ -11,8 +11,9 @@ import { notifyGraphqlError } from "../../../utils/error";
 import { authVar } from "../../../App/link";
 
 import routes from "../../../config/routes";
-import { User } from "../../../interfaces/graphql";
+import {User, UserPagingResult} from "../../../interfaces/graphql";
 import styles from "../style.module.scss";
+import {USER} from "../index";
 
 const normFile = (e: any) => {
   if (Array.isArray(e)) {
@@ -35,7 +36,31 @@ export const USER_CREATE = gql`
   mutation UserCreate($input: UserCreateInput!) {
       UserCreate(input: $input) {
           id
+          email
+          phone
           firstName
+          middleName
+          lastName
+          fullName
+          status
+          activeClient {
+              id
+              name
+          }
+          address {
+              city
+              streetAddress
+              zipcode
+              state
+          }
+          company {
+              id
+              name
+          }
+          roles {
+              id
+              name
+          }
       }
   }
 `
@@ -43,10 +68,40 @@ interface UserResponse {
   UserCreate: User
 }
 
+interface UserResponseArray {
+  User: UserPagingResult
+}
+
 const NewEmployee = () => {
   const navigate = useNavigate();
   const authData = authVar();
-  const [UserCreate] = useMutation<UserResponse>(USER_CREATE);
+
+  const [UserCreate] = useMutation<UserResponse>(USER_CREATE, {
+    update(cache, {data}) {
+      const userResponse = data?.UserCreate;
+      const existingUser = cache.readQuery<UserResponseArray>({
+        query: USER,
+        variables: {
+          input: {
+            query: {
+              role: constants.roles.Employee
+            },
+            paging: {
+              order: ['updatedAt:DESC']
+            }
+          }
+        }
+      });
+      if (existingUser && userResponse) {
+        cache.writeQuery({
+          query: USER,
+          data: {
+            User: {
+              data: [...existingUser?.User?.data, userResponse]
+            }
+          }
+        })}
+    }})
   const [ChangeProfilePictureInput] = useMutation(CHANGE_PROFILE_IMAGE);
   const [form] = Form.useForm();
   const { Option } = Select;

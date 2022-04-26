@@ -46,6 +46,8 @@ export const CLIENT = gql`
 const Client = () => {
   const loggedInUser = authVar();
   const { data: clientData } = useQuery(CLIENT, {
+    fetchPolicy: "network-only",
+    nextFetchPolicy: "cache-first",
     variables: {
       input: {
         query: {

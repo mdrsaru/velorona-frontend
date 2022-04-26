@@ -6,10 +6,9 @@ import routes from "../../../config/routes";
 
 import { authVar } from "../../../App/link";
 import { gql, useMutation, useQuery } from "@apollo/client";
-import { notifyGraphqlError } from "../../../utils/error";
-import constants from "../../../config/constants";
 
-import {USER} from "../../Employee";
+import { CLIENT } from "../../Client";
+import { notifyGraphqlError } from "../../../utils/error";
 import styles from "../style.module.scss";
 
 interface ItemProps {
@@ -44,11 +43,13 @@ const NewProject = () => {
   const { Option } = Select;
   const [ProjectCreate] = useMutation(PROJECT_CREATE);
 
-  const { data: clientData } = useQuery(USER, {
+  const { data: clientData } = useQuery(CLIENT, {
+    fetchPolicy: "network-only",
+    nextFetchPolicy: "cache-first",
     variables: {
       input: {
         query: {
-          role: constants.roles.Client
+          company_id: loggedInUser?.company?.id
         },
         paging: {
           order: ['updatedAt:DESC']
@@ -106,8 +107,8 @@ const NewProject = () => {
             <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
               <Form.Item name="client" label="Client Name" rules={[{ required: true, message: 'Please enter client name!' }]}>
                 <Select placeholder="Select Name of the Client">
-                  {clientData && clientData.User.data.map((user: any, index:number) => (
-                    <Option value={user?.id} key={index}>{user?.fullName}</Option>
+                  {clientData && clientData.Client.data.map((user: any, index:number) => (
+                    <Option value={user?.id} key={index}>{user?.name} / {user?.email}</Option>
                   ))}
                 </Select>
               </Form.Item>

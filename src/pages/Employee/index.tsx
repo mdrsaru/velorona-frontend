@@ -11,13 +11,13 @@ import { useState } from "react";
 
 import ModalConfirm from "../../components/Modal";
 import { notifyGraphqlError } from "../../utils/error";
-import AppLoader from "../../components/Skeleton/AppLoader";
 
 import deleteImg from "../../assets/images/delete_btn.svg";
 import archiveImg from "../../assets/images/archive_btn.svg";
 import constants from "../../config/constants";
 import {UserData} from "../Client";
 
+import RouteLoader from "../../components/Skeleton/RouteLoader";
 import styles from './style.module.scss';
 
 const {SubMenu} = Menu;
@@ -102,6 +102,8 @@ const Employee = () => {
   }
 
   const { loading: employeeLoading, data: employeeData } = useQuery<UserData>(USER, {
+    fetchPolicy: "network-only",
+    nextFetchPolicy: "cache-first",
     variables: {
       input: {
         query: {
@@ -130,7 +132,6 @@ const Employee = () => {
     }).catch(notifyGraphqlError))
   }
 
-  console.log(employeeData)
 
   const menu = (data: any) => (
     <Menu>
@@ -239,33 +240,35 @@ const Employee = () => {
   ];
 
   return (
-    <div className={styles['main-div']}>
-      {employeeLoading ?
-        <AppLoader loading={employeeLoading} count={14}/> :
-        <Card bordered={false}>
-          <Row>
-            <Col span={12} className={styles['employee-col']}>
-              <h1>Employee</h1>
-            </Col>
-            <Col span={12} className={styles['employee-col']}>
-              <div className={styles['add-new-employee']}>
-                <Link to={routes.addEmployee.path(loggedInUser?.company?.code ? loggedInUser?.company?.code : '')}>Add
-                  New Employee
-                </Link>
-              </div>
-            </Col>
-          </Row>
-          <Row>
-            <Col span={24}>
-              <Table dataSource={employeeData?.User?.data} columns={columns} rowKey={(record => record?.id)}/>
-            </Col>
-          </Row>
-        </Card>}
-      <ModalConfirm visibility={visibility} setModalVisibility={setModalVisibility} imgSrc={deleteImg}
-                    okText={'Delete'} modalBody={deleteBody}/>
-      <ModalConfirm visibility={showArchive} setModalVisibility={setArchiveVisibility} imgSrc={archiveImg}
-                    okText={'Archive'} modalBody={archiveBody}/>
-    </div>
+   <>
+     {employeeLoading ?
+       <RouteLoader/> :
+       <div className={styles['main-div']}>
+         <Card bordered={false}>
+           <Row>
+             <Col span={12} className={styles['employee-col']}>
+               <h1>Employee</h1>
+             </Col>
+             <Col span={12} className={styles['employee-col']}>
+               <div className={styles['add-new-employee']}>
+                 <Link to={routes.addEmployee.path(loggedInUser?.company?.code ? loggedInUser?.company?.code : '')}>Add
+                   New Employee
+                 </Link>
+               </div>
+             </Col>
+           </Row>
+           <Row>
+             <Col span={24}>
+               <Table dataSource={employeeData?.User?.data} columns={columns} rowKey={(record => record?.id)}/>
+             </Col>
+           </Row>
+         </Card>
+         <ModalConfirm visibility={visibility} setModalVisibility={setModalVisibility} imgSrc={deleteImg}
+                       okText={'Delete'} modalBody={deleteBody}/>
+         <ModalConfirm visibility={showArchive} setModalVisibility={setArchiveVisibility} imgSrc={archiveImg}
+                       okText={'Archive'} modalBody={archiveBody}/>
+       </div>}
+   </>
   )
 }
 
