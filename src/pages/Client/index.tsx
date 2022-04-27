@@ -69,10 +69,6 @@ const Client = () => {
           </Link>
         </div>
       </Menu.Item>
-      <Menu.Divider/>
-      <Menu.Item key="archive">
-        <div>Archive Client</div>
-      </Menu.Item>
     </Menu>
   );
 

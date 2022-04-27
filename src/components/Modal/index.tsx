@@ -1,6 +1,8 @@
-import {Modal} from "antd";
+import { Modal } from "antd";
+import styles from "./style.module.scss";
 
-const ModalConfirm = (props: {visibility: boolean, setModalVisibility: any, imgSrc: string, okText: string, modalBody: any}) => {
+const ModalConfirm = (props: {visibility: boolean, setModalVisibility: any, imgSrc: string, okText: string, modalBody: any
+  onOkClick?: any}) => {
   return(
     <Modal
       title=""
@@ -8,9 +10,9 @@ const ModalConfirm = (props: {visibility: boolean, setModalVisibility: any, imgS
       visible={props.visibility}
       okText={props.okText}
       closable={false}
-      onOk={() => props.setModalVisibility(false)}
+      onOk={() => props.onOkClick()}
       onCancel={() => props.setModalVisibility(false)}
-      width={1000}>
+      width={1000} className={styles['confirmModal']}>
       {<props.modalBody/>}
     </Modal>
   )

@@ -114,6 +114,7 @@ const NewEmployee = () => {
       role === constants?.roles?.Employee ?
       navigate(routes.attachClient.path(authData?.company?.code ?? "", user ?? "")) :
       navigate(routes.employee.path(authData?.company?.code ?? ''));
+      message.success({content: `New Employee is created successfully!`, className: 'custom-message'});
   }
 
   const onSubmitForm = (values: any) => {
