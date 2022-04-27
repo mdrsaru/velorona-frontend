@@ -80,9 +80,57 @@ const _Routes = () => {
             <Route
               index
               element={
-                <CheckRoles allowedRoles={[constants.roles.CompanyAdmin]}>
+                <CheckRoles allowedRoles={[constants.roles.CompanyAdmin, constants.roles.Employee]}>
                   <Suspense fallback={<RouteLoader/>}>
-                    <routes.dashboard.component/>
+                    {roles.includes(constants.roles.CompanyAdmin) ? <routes.dashboard.component/> : <routes.home.component/>}
+                  </Suspense>
+                </CheckRoles>
+              }/>
+            <Route path={routes.timesheet.childPath}>
+              <Route
+                index
+                element={
+                  <CheckRoles allowedRoles={[constants.roles.Employee]}>
+                    <Suspense fallback={<RouteLoader/>}>
+                      <routes.timesheet.component/>
+                    </Suspense>
+                  </CheckRoles>
+                }/>
+
+              <Route
+                path={routes.newTimesheet.childPath}
+                element={
+                  <Suspense fallback={<RouteLoader/>}>
+                    <routes.newTimesheet.component/>
+                  </Suspense>
+                }/>
+
+              <Route
+                path={routes.detailTimesheet.childPath}
+                element={
+                  <Suspense fallback={<RouteLoader/>}>
+                    <routes.detailTimesheet.component/>
+                  </Suspense>
+                }/>
+
+            </Route>
+
+            <Route
+              path={routes.tasks.childPath}
+              element={
+                <CheckRoles allowedRoles={[constants.roles.Employee]}>
+                  <Suspense fallback={<RouteLoader/>}>
+                    <routes.tasks.component/>
+                  </Suspense>
+                </CheckRoles>
+              }/>
+
+            <Route
+              path={routes.schedule.childPath}
+              element={
+                <CheckRoles allowedRoles={[constants.roles.Employee]}>
+                  <Suspense fallback={<RouteLoader/>}>
+                    <routes.schedule.component/>
                   </Suspense>
                 </CheckRoles>
               }/>
@@ -233,55 +281,6 @@ const _Routes = () => {
               <CheckRoles allowedRoles={[constants.roles.Employee]} redirect_to={getRoute()}>
                 <Suspense fallback={<RouteLoader/>}>
                   <routes.home.component/>
-                </Suspense>
-              </CheckRoles>
-            }/>
-
-          <Route path={routes.timesheet.path}>
-            <Route
-              index
-              element={
-                <CheckRoles allowedRoles={[constants.roles.Employee]}>
-                  <Suspense fallback={<RouteLoader/>}>
-                    <routes.timesheet.component/>
-                  </Suspense>
-                </CheckRoles>
-              }/>
-
-            <Route
-              path={routes.newTimesheet.childPath}
-              element={
-                <Suspense fallback={<RouteLoader/>}>
-                  <routes.newTimesheet.component/>
-                </Suspense>
-              }/>
-
-            <Route
-              path={routes.detailTimesheet.childPath}
-              element={
-                <Suspense fallback={<RouteLoader/>}>
-                  <routes.detailTimesheet.component/>
-                </Suspense>
-              }/>
-
-          </Route>
-
-          <Route
-            path={routes.tasks.path}
-            element={
-              <CheckRoles allowedRoles={[constants.roles.Employee]}>
-                <Suspense fallback={<RouteLoader/>}>
-                  <routes.tasks.component/>
-                </Suspense>
-              </CheckRoles>
-            }/>
-
-          <Route
-            path={routes.schedule.path}
-            element={
-              <CheckRoles allowedRoles={[constants.roles.Employee]}>
-                <Suspense fallback={<RouteLoader/>}>
-                  <routes.schedule.component/>
                 </Suspense>
               </CheckRoles>
             }/>

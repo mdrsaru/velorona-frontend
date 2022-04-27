@@ -27,20 +27,21 @@ const routes = {
     path: '/login/admin',
     component: lazy(() => import('../pages/Login')),
     name: 'Login',
-    key: 'side0'
+    key: 'side15'
   },
   resetPassword: {
     childPath: null,
     path: '/reset-password',
     component: lazy(() => import('../pages/ResetPassword')),
     name: 'Reset Password',
+    key: 'side16'
   },
   home: {
     childPath: null,
     path: '/',
     component: lazy(() => import('../pages/Home')),
     name: 'Home',
-    key: 'side1'
+    key: 'side17'
   },
   role: {
     childPath: 'role',
@@ -54,35 +55,35 @@ const routes = {
     path:  (company: string) => `/${company}/dashboard`,
     component: lazy(() => import('../pages/Dashboard')),
     name: 'Dashboard',
-    key: 'side1'
+    key: 'side18'
   },
   company: {
     childPath: ':id',
     path: (id: string | undefined) => `/${id}`,
     component: lazy(() => import('../pages/Company')),
     name: 'Company',
-    key: 'side2'
+    key: 'side19'
   },
   addCompany: {
     childPath: ':add',
     path: `/company/add`,
     component: lazy(() => import('../pages/Company/NewCompany')),
     name: 'New Company',
-    key: 'side2'
+    key: 'side20'
   },
   employee: {
     childPath: 'employee',
     path: (id: string) => `/${id}/employee`,
     component: lazy(() => import('../pages/Employee')),
     name: 'Employee',
-    key: 'side2'
+    key: 'side21'
   },
   editEmployee: {
     childPath: ':eid',
     path: (id: string, eid: string) => `/${id}/employee/${eid}`,
     component: lazy(() => import('../pages/Employee/EditEmployee')),
     name: 'Edit Employee',
-    key: 'side2'
+    key: 'side22'
   },
   detailEmployee: {
     childPath: ':eid/detail',
@@ -96,7 +97,7 @@ const routes = {
     path: (id: string) => `/${id}/employee/add`,
     component: lazy(() => import('../pages/Employee/NewEmployee')),
     name: 'New Employee',
-    key: 'side2'
+    key: 'side23'
   },
   attachClient: {
     childPath: ':eid/add-client',
@@ -106,22 +107,22 @@ const routes = {
     key: 'side4'
   },
   timesheet: {
-    childPath: null,
-    path: '/timesheet',
+    childPath: 'timesheet',
+    path: (id: string) => `/${id}/timesheet`,
     component: lazy(() => import('../pages/Timesheet')),
     name: 'Timesheet',
     key: 'side4'
   },
   schedule: {
-    childPath: '/schedule',
-    path: '/schedule',
+    childPath: 'schedule',
+    path: (id: string) => `/${id}/schedule`,
     component: lazy(() => import('../pages/Schedule')),
     name: 'Schedule',
     key: 'side5'
   },
   tasks: {
     childPath: 'tasks',
-    path: '/tasks',
+    path: (id: string) => `/${id}/tasks`,
     component: lazy(() => import('../pages/Tasks')),
     name: 'Task',
     key: 'side6'
@@ -163,7 +164,7 @@ const routes = {
   },
   client: {
     childPath: 'clients',
-    path: (id: string) => `${id}/clients`,
+    path: (id: string) => `/${id}/clients`,
     component: lazy(() => import('../pages/Client')),
     name: 'Client',
     key: 'side12'
@@ -180,21 +181,21 @@ const routes = {
     path: (id: string, cid: string) => `/${id}/clients/${cid}`,
     component: lazy(() => import('../pages/Client/EditClient')),
     name: 'Edit Client',
-    key: 'side13'
+    key: 'side14'
   },
   newTimesheet: {
     childPath: 'add',
-    path: '/timesheet/add',
+    path: (id: string) => `/${id}/timesheet/add`,
     component: lazy(() => import('../pages/Timesheet/NewTimesheet')),
     name: 'New Timesheet',
-    key: 'side14'
+    key: 'side15'
   },
   detailTimesheet: {
-    childPath: ':id',
-    path: (id: string) => id,
+    childPath: ':id/detail',
+    path: (id: string, tid: string) => `/${id}/timesheet/${tid}/detail`,
     component: lazy(() => import('../pages/Timesheet/DetailTimesheet')),
     name: 'Detail Timesheet',
-    key: 'side15'
+    key: 'side16'
   },
 };
 

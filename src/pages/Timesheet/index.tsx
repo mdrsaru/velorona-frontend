@@ -9,11 +9,13 @@ import {
 import routes from "../../config/routes";
 import { useNavigate } from "react-router-dom";
 import styles from "./style.module.scss";
+import {authVar} from "../../App/link";
 
 
 
 const Timesheet = () => {
   let navigate = useNavigate();
+  const authData = authVar();
   const { Option } = Select;
   const [form] = Form.useForm();
   const [visible, setVisible] = useState(false);
@@ -53,7 +55,7 @@ const Timesheet = () => {
       key: 'actions',
       render: (record: any) =>
         <div className={styles['dropdown-menu']} onClick={(e) => {
-          navigate(routes.detailTimesheet.path(record?.key))
+          navigate(routes.detailTimesheet.path(authData?.company?.code ?? '', record?.key))
         }}>
           <PlusCircleOutlined /> &nbsp; &nbsp; <span>Add</span>
         </div>,
