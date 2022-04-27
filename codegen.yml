@@ -1,6 +1,6 @@
 overwrite: true
-schema: "http://localhost:8080/v1/graphql"
+schema: ${REACT_APP_GRAPHQL_ENDPOINT}
 generates:
-  src/interfaces/graphql.ts:
+  src/interfaces/generated.ts:
     plugins:
       - "typescript"

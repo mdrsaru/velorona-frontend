@@ -8,7 +8,7 @@ import { notifyGraphqlError } from "../../../utils/error";
 import { authVar } from "../../../App/link";
 
 import ClientForm from "./ClientForm";
-import { User } from "../../../interfaces/graphql";
+import { User } from "../../../interfaces/generated";
 
 import styles from "../style.module.scss";
 

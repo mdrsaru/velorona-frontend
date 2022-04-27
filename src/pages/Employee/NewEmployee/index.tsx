@@ -11,7 +11,7 @@ import { notifyGraphqlError } from "../../../utils/error";
 import { authVar } from "../../../App/link";
 
 import routes from "../../../config/routes";
-import {User, UserPagingResult} from "../../../interfaces/graphql";
+import {User, UserPagingResult} from "../../../interfaces/generated";
 import styles from "../style.module.scss";
 import {USER} from "../index";
 
@@ -114,6 +114,7 @@ const NewEmployee = () => {
       role === constants?.roles?.Employee ?
       navigate(routes.attachClient.path(authData?.company?.code ?? "", user ?? "")) :
       navigate(routes.employee.path(authData?.company?.code ?? ''));
+      message.success({content: `New Employee is created successfully!`, className: 'custom-message'});
   }
 
   const onSubmitForm = (values: any) => {

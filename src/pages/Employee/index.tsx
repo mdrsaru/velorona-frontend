@@ -34,6 +34,8 @@ export const USER = gql`
                 lastName
                 fullName
                 status
+                archived
+                avatar_id
                 activeClient {
                     id
                     name
@@ -65,40 +67,56 @@ export const USER_UPDATE = gql`
           lastName
           email
           status
+          archived
       }
   }
 `
-const deleteBody = () => {
-  return (
-    <div className={styles['modal-message']}>
-      <div><img src={deleteImg} alt="confirm" /></div><br/>
-      <p>Are you sure you want to delete <strong>Insight Workshop Pvt. Ltd?</strong></p>
-      <p className={styles['warning-text']}>All the data associated with the employee will be deleted permanently.</p>
-    </div>
-  )
-}
 
-const archiveBody = () => {
-  return (
-    <div className={styles['modal-message']}>
-      <div><img src={archiveImg} alt="archive-confirm"/></div> <br/>
-      <p>Are you sure you want to archive <strong>Insight Workshop Pvt. Ltd?</strong></p>
-      <p className={styles['archive-text']}>Employee will not be able to login to the system.</p>
-    </div>
-  )
-}
+export const USER_ARCHIVE = gql`
+    mutation UserArchive($input: UserArchiveInput!) {
+        UserArchive(input: $input) {
+            id
+            firstName
+            lastName
+            email
+            archived
+        }
+    }
+`
 
 const Employee = () => {
   const loggedInUser = authVar();
   const navigate = useNavigate();
   const [EmployeeUpdate] = useMutation(USER_UPDATE);
-  const [visibility, setVisibility] = useState(false);
-  const [showArchive, setArchiveModal] = useState(false);
+  const [EmployeeArchive] = useMutation(USER_ARCHIVE);
+  const [employee, setEmployee] = useState<any>('');
+  const [visibility, setVisibility] = useState<boolean>(false);
+  const [showArchive, setArchiveModal] = useState<boolean>(false);
   const setModalVisibility = (value: boolean) => {
     setVisibility(value)
   }
   const setArchiveVisibility = (value: boolean) => {
     setArchiveModal(value)
+  }
+
+  const deleteBody = () => {
+    return (
+      <div className={styles['modal-message']}>
+        <div><img src={deleteImg} alt="confirm" /></div><br/>
+        <p>Are you sure you want to delete <strong>Insight Workshop Pvt. Ltd?</strong></p>
+        <p className={styles['warning-text']}>All the data associated with the employee will be deleted permanently.</p>
+      </div>
+    )
+  }
+
+  const archiveBody = () => {
+    return (
+      <div className={styles['modal-message']}>
+        <div><img src={archiveImg} alt="archive-confirm"/></div> <br/>
+        <p>Are you sure you want to {employee?.archived ? "unarchive" : "archive"} <strong>Insight Workshop Pvt. Ltd?</strong></p>
+        <p className={styles['archive-text']}>Employee will {employee?.archived ? "" : "not"} be able to login to the system.</p>
+      </div>
+    )
   }
 
   const { loading: employeeLoading, data: employeeData } = useQuery<UserData>(USER, {
@@ -116,6 +134,25 @@ const Employee = () => {
     }
   })
 
+  const archiveUser = () => {
+    message.loading({content: "Archiving employee in progress..", className: 'custom-message'}).then(() =>
+      EmployeeArchive({
+        variables: {
+          input: {
+            id: employee?.id,
+            archived: !employee?.archived,
+            company_id: loggedInUser?.company?.id
+          }
+        }
+      }).then((response) => {
+        if (response.errors) {
+          return notifyGraphqlError((response.errors))
+        }
+        message.success({content: `Employee is archived successfully!`, className: 'custom-message'});
+        setArchiveVisibility(false)
+      }).catch(notifyGraphqlError))
+  }
+
   const changeStatus = (value: string, id: string) => {
     message.loading({content: "Updating status of employee..", className: 'custom-message'}).then(() =>
     EmployeeUpdate({
@@ -129,6 +166,7 @@ const Employee = () => {
       if (response.errors) {
         return notifyGraphqlError((response.errors))
       }
+      message.success({content: `Employee is updated successfully!`, className: 'custom-message'});
     }).catch(notifyGraphqlError))
   }
 
@@ -154,7 +192,12 @@ const Employee = () => {
       </Menu.Item>
       <Menu.Divider/>
       <Menu.Item key="archive">
-        <div onClick={() => setArchiveVisibility(true)}>Archive Employee</div>
+        <div onClick={() => {
+          setEmployee(data)
+          setArchiveVisibility(true)
+        }}>
+          {data?.archived ? "Unarchive Employee" : "Archive Employee"}
+        </div>
       </Menu.Item>
       <Menu.Divider/>
       <Menu.Item key="delete"><div onClick={() => setModalVisibility(true)}>Delete Employee</div></Menu.Item>
@@ -266,7 +309,7 @@ const Employee = () => {
          <ModalConfirm visibility={visibility} setModalVisibility={setModalVisibility} imgSrc={deleteImg}
                        okText={'Delete'} modalBody={deleteBody}/>
          <ModalConfirm visibility={showArchive} setModalVisibility={setArchiveVisibility} imgSrc={archiveImg}
-                       okText={'Archive'} modalBody={archiveBody}/>
+                       okText={employee?.archived ? "Unarchive" : "Archive"} modalBody={archiveBody} onOkClick={archiveUser}/>
        </div>}
    </>
   )
