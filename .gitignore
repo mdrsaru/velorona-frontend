@@ -6,7 +6,7 @@
 /node_modules
 /.pnp
 .pnp.js
-/src/interfaces/graphql.ts
+/src/interfaces/generated.ts
 # testing
 /coverage
 

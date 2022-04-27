@@ -11,7 +11,7 @@ import { notifyGraphqlError } from "../../../utils/error";
 import { authVar } from "../../../App/link";
 
 import routes from "../../../config/routes";
-import {User, UserPagingResult} from "../../../interfaces/graphql";
+import {User, UserPagingResult} from "../../../interfaces/generated";
 import styles from "../style.module.scss";
 import {USER} from "../index";
 

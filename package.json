@@ -34,7 +34,7 @@
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
-    "code-gen": "graphql-codegen --config codegen.yml"
+    "code-gen": "graphql-codegen --require dotenv/config --config codegen.yml"
   },
   "eslintConfig": {
     "extends": [

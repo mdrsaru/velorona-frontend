@@ -8,7 +8,7 @@ import { authVar } from "../../App/link";
 import { gql, useQuery } from "@apollo/client";
 import { MoreOutlined } from "@ant-design/icons";
 
-import { User } from "../../interfaces/graphql";
+import { User } from "../../interfaces/generated";
 
 import styles from "./style.module.scss";
 

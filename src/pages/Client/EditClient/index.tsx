@@ -6,7 +6,7 @@ import {useNavigate, useParams} from "react-router-dom";
 import {gql, useMutation, useQuery} from "@apollo/client";
 import { notifyGraphqlError } from "../../../utils/error";
 import { authVar } from "../../../App/link";
-import { Client } from "../../../interfaces/graphql";
+import { Client } from "../../../interfaces/generated";
 import { CLIENT } from "../index";
 
 import styles from "../style.module.scss";

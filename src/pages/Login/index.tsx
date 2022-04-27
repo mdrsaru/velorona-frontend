@@ -11,7 +11,7 @@ import routes from '../../config/routes';
 
 import logo from '../../assets/images/main_logo.svg';
 import highFiveImg from '../../assets/images/High_five.svg';
-import { LoginResponse } from "../../interfaces/graphql";
+import { LoginResponse } from "../../interfaces/generated";
 
 import styles from './style.module.scss';
 
