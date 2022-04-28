@@ -72,6 +72,8 @@ const EditEmployee = () => {
       }
     }
 
+    console.log(formData.record.startDate);
+
     UserUpdate({
       variables: {
         input: formData
@@ -176,7 +178,7 @@ const EditEmployee = () => {
             <Row>
               <Col xs={24} sm={24} md={8} lg={8} className={styles.formCol}>
                 <Form.Item label="State" name='state'>
-                  <Input placeholder="Enter the state name"autoComplete="off"/>
+                  <Input placeholder="Enter the state name" autoComplete="off"/>
                 </Form.Item>
               </Col>
               <Col xs={24} sm={24} md={8} lg={8} className={styles.formCol}>

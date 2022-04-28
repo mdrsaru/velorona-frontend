@@ -15,6 +15,13 @@
   }
 
   :local(.site-card-wrapper) {
+    .ant-card-body {
+      padding: 0;
+    }
+
+    .ant-form-item {
+      margin-bottom: 0;
+    }
 
     .ant-card-grid {
       padding-left: 7px;
@@ -94,13 +101,15 @@
 /*** NewTimeSheet CSS ***/
 
 .formCol {
-  padding-left: 1rem;
-  padding-top: 1rem;
+  padding: 1.5rem;
+  border: 1px solid #E0E0E0;
+  box-sizing: border-box;
+  box-shadow: 0 7px 4px rgba(231, 231, 231, 0.25);
 
   span {
     font-weight: 600;
-    font-size: 24px;
-    line-height: 29px;
+    font-size: 18px;
+    line-height: 23px;
   }
 }
 

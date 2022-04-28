@@ -1,16 +1,94 @@
 import React, { useState } from "react";
-import { Card, Col, Row, Table, DatePicker, Modal, Form, Select } from 'antd';
+import {
+  Card,
+  Col,
+  Row,
+  Table,
+  DatePicker,
+  Modal,
+  Form,
+  Select,
+  Button, message
+} from 'antd';
 import {
   CloseOutlined,
-  LeftOutlined, PlusCircleOutlined,
+  LeftOutlined,
+  PlusCircleOutlined,
   RightOutlined
 } from '@ant-design/icons';
 
 import routes from "../../config/routes";
 import { useNavigate } from "react-router-dom";
-import styles from "./style.module.scss";
-import {authVar} from "../../App/link";
+import { authVar } from "../../App/link";
+import { gql, useMutation, useQuery } from "@apollo/client";
+import { useStopwatch } from 'react-timer-hook';
+import { notifyGraphqlError } from "../../utils/error";
+import { PROJECT } from "../Project";
+import {CLIENT} from "../Client";
 
+import moment from "moment";
+import styles from "./style.module.scss";
+import {TASK} from "../Tasks";
+
+
+export const CREATE_TIMESHEET = gql`
+    mutation TimesheetCreate($input: TimesheetCreateInput!) {
+        TimesheetCreate(input: $input) {
+            id
+            project {
+                id
+                name
+            }
+            approver {
+                id
+                fullName
+            }
+            company{
+                id
+                name
+            }
+            created_by
+        }
+    }
+`
+
+export const UPDATE_TIMESHEET = gql`
+    mutation TimesheetUpdate($input: TimesheetUpdateInput!) {
+        TimesheetUpdate(input: $input) {
+            id
+            company_id
+        }
+    }
+`
+
+export const TIMESHEET = gql`
+    query Timesheet($input: TimesheetQueryInput!) {
+        Timesheet(input: $input) {
+            paging {
+                total
+                startIndex
+                endIndex
+                hasNextPage
+            }
+            data {
+                id
+                clientLocation
+                company {
+                    id
+                    name
+                }
+                approver {
+                    firstName
+                }
+                project {
+                    id
+                    name
+                }
+
+            }
+        }
+    }
+`;
 
 
 const Timesheet = () => {
@@ -18,37 +96,47 @@ const Timesheet = () => {
   const authData = authVar();
   const { Option } = Select;
   const [form] = Form.useForm();
+  const { data: timesheetData } = useQuery(TIMESHEET, {
+    fetchPolicy: "network-only",
+    nextFetchPolicy: "cache-first",
+    variables: {
+      input: {
+        query: {
+          company_id: authData?.company?.id,
+        }
+      }
+    }
+  });
+  const [CreateTimesheet] = useMutation(CREATE_TIMESHEET);
+  const [UpdateTimesheet] = useMutation(UPDATE_TIMESHEET);
   const [visible, setVisible] = useState(false);
+  const [currentDate, setCurrentDate] = useState<Date>(new Date());
+  const {
+    seconds,
+    minutes,
+    hours,
+    isRunning,
+    start,
+    reset
+  } = useStopwatch({ autoStart: false });
   const columns = [
     {
       title: 'Project Name',
-      dataIndex: 'project',
       key: 'project',
     },
     {
-      title: 'Client',
-      dataIndex: 'client',
-      key: 'client',
+      title: 'Company',
+      key: 'company',
     },
     {
-      title: 'Time Period',
+      title: 'Location',
+      dataIndex: 'clientLocation',
+      key: 'clientLocation',
+    },
+    {
+      title: 'Approved by',
       dataIndex: 'time_period',
       key: 'time_period',
-    },
-    {
-      title: 'Total Hours',
-      dataIndex: 'total_hours',
-      key: 'total_hours',
-    },
-    {
-      title: 'Total Expense',
-      dataIndex: 'total_expense',
-      key: 'total_expense',
-    },
-    {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
     },
     {
       title: 'Actions',
@@ -62,48 +150,161 @@ const Timesheet = () => {
     },
   ];
 
-  const data = [
-    {
-      key: '1',
-      project: 'Vellorum',
-      client: 'Spark',
-      time_period: '2',
-      total_hours: '45',
-      total_expense: '$45',
-      status: 'Pending'
-    },
-    {
-      key: '2',
-      project: 'Vellorum',
-      client: 'Spark',
-      time_period: '2',
-      total_hours: '22',
-      total_expense: '$45',
-      status: 'Pending'
-    },
-    {
-      key: '3',
-      project: 'Data Visualization',
-      client: 'Spark',
-      time_period: '2',
-      total_hours: '43',
-      total_expense: '$45',
-      status: 'Pending'
-    },
-    {
-      key: '4',
-      project: 'School Management',
-      client: 'Spark',
-      time_period: '2',
-      total_hours: '88',
-      total_expense: '$45',
-      status: 'Pending'
-    },
-  ];
+  const { data: clientData } = useQuery(CLIENT, {
+    fetchPolicy: "network-only",
+    nextFetchPolicy: "cache-first",
+    variables: {
+      input: {
+        query: {
+          company_id: authData?.company?.id
+        },
+        paging: {
+          order: ['updatedAt:DESC']
+        }
+      }
+    }
+  })
+
+  const { data: projectData } = useQuery(PROJECT, {
+    fetchPolicy: "network-only",
+    nextFetchPolicy: "cache-first",
+    variables: {
+      input: {
+        query: {
+          company_id: authData?.company?.id
+        },
+        paging: {
+          order: ['updatedAt:DESC']
+        }
+      }
+    }
+  })
+
+  const { data: taskData } = useQuery(TASK, {
+    fetchPolicy: "network-only",
+    nextFetchPolicy: "cache-first",
+    variables: {
+      input: {
+        query: {
+          company_id: authData?.company?.id
+        },
+        paging: {
+          order: ['updatedAt:DESC']
+        }
+      }
+    }
+  })
+
+
+  const onSubmitForm = (values: any) => {
+    isRunning ? reset(undefined, false) : start();
+    setCurrentDate(new Date())
+    if (isRunning) {
+      CreateTimesheet({
+        variables: {
+          input: {
+            start: moment(currentDate, "YYYY-MM-DD HH:mm:ss"),
+            task_id: values.task,
+            project_id: values.project,
+            company_id: authData?.company?.id,
+            created_by: ''
+          }
+        }
+      }).then((response) => {
+        if (response.errors) {
+          return notifyGraphqlError((response.errors))
+        } else if (response?.data) {
+          navigate(-1)
+          message.success({content: `Client is updated successfully!`, className: 'custom-message'});
+        }
+      }).catch(notifyGraphqlError)
+    } else {
+      UpdateTimesheet({
+        variables: {
+          input: {
+            id: '',
+            end: moment(currentDate, "YYYY-MM-DD HH:mm:ss"),
+            company_id: authData?.company?.id
+          }
+        }
+      }).then((response) => {
+        if (response.errors) {
+          return notifyGraphqlError((response.errors))
+        } else if (response?.data) {
+          navigate(-1)
+          message.success({content: `Client is updated successfully!`, className: 'custom-message'});
+        }
+      }).catch(notifyGraphqlError)
+    }
+  }
 
   return (
     <div className={styles['site-card-wrapper']}>
       <Card bordered={false}>
+        <Form form={form} layout="vertical" onFinish={onSubmitForm}>
+          <Row>
+            <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+              <Form.Item name="client" label="Client">
+                <Select placeholder="Select Client">
+                  {clientData && clientData?.Client?.data.map((client: any, index:number) => (
+                    <Option value={client?.id} key={index}>
+                      <span>
+                        <b>{client?.name}</b> &nbsp; / &nbsp;
+                      </span>
+                      <span>{client?.email}</span>
+                    </Option>))}
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+              <Form.Item name="project" label="Project">
+                <Select placeholder="Select Project">
+                  {projectData && projectData?.Project?.data.map((project: any, index: number) => (
+                    <Option value={project?.id} key={index}>
+                      {project?.name}
+                    </Option>)
+                  )}
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row justify="center">
+            <Col span={18} className={styles.formCol}>
+              <Form.Item name="task" label="Task">
+                <Select placeholder="Select Task">
+                  {taskData && taskData?.Task?.data.map((task: any, index: number) => (
+                    <Option value={task?.id} key={index}>
+                      {task?.name}
+                    </Option>)
+                  )}
+                </Select>
+              </Form.Item>
+            </Col>
+            <Col span={6} className={styles.formCol} style={{display: 'flex', alignItems: 'end', justifyContent: 'center'}}>
+              <Form.Item>
+                <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
+                  <div style={{width: '50%'}}>
+                    <div style={{textAlign: 'center'}}>
+                        <span>
+                          {(hours > 9 ? hours : '0' + hours) + ':' +
+                            (minutes > 9 ? minutes : '0' + minutes) + ':'
+                            + (seconds > 9 ? seconds : '0' + seconds)}
+                        </span>
+                    </div>
+                  </div>&nbsp; &nbsp; &nbsp; &nbsp;
+                  <div style={{width: '50%'}}>
+                    {isRunning ?
+                      <Button type="primary" htmlType="submit" danger>Stop</Button> :
+                      <Button type="primary" htmlType="submit">Start</Button>}
+                  </div>
+                </div>
+              </Form.Item>
+            </Col>
+          </Row>
+        </Form>
+      </Card>
+      <br/>
+      <Card bordered={false} style={{padding: '2rem 1rem 2rem 1rem'}}>
         <Row>
           <Col span={12}>
             <div className={styles['timesheet']}>My Timesheet</div>
@@ -129,7 +330,7 @@ const Timesheet = () => {
             </div>
           </Col>
           <Col span={24} className={styles['card-col-timesheet']}>
-            <Table dataSource={data} columns={columns}/>
+            <Table dataSource={timesheetData?.Timesheet?.data} columns={columns}/>
           </Col>
         </Row>
       </Card>
@@ -138,7 +339,7 @@ const Timesheet = () => {
         centered
         visible={visible}
         closeIcon={[
-          <div onClick={() => setVisible(false)}>
+          <div onClick={() => setVisible(false)} key={1}>
               <span className={styles['close-icon-div']}>
                 <CloseOutlined />
               </span>
