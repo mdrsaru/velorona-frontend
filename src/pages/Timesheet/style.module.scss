@@ -102,9 +102,30 @@
 
 .formCol {
   padding: 1.5rem;
+}
+
+.formRow {
   border: 1px solid #E0E0E0;
   box-sizing: border-box;
   box-shadow: 0 7px 4px rgba(231, 231, 231, 0.25);
+}
+
+.taskCol {
+  padding: 1.5rem;
+  border-top: 1px solid #E0E0E0;
+  box-sizing: border-box;
+  box-shadow: 0 7px 4px rgba(231, 231, 231, 0.25);
+}
+
+.timeStartCol {
+  padding: 1.5rem;
+  border-top: 1px solid #E0E0E0;
+  border-left: 1px solid #E0E0E0;
+  box-sizing: border-box;
+  box-shadow: 0 7px 4px rgba(231, 231, 231, 0.25);
+  display: flex;
+  justify-content: center;
+  align-items: end;
 
   span {
     font-weight: 600;

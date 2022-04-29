@@ -138,8 +138,15 @@ const routes = {
     childPath: 'add',
     path: (id: string) => `/${id}/projects/add`,
     component: lazy(() => import('../pages/Project/NewProject')),
-    name: 'New Company',
+    name: 'Add Projects',
     key: 'side8'
+  },
+  addTasksProject: {
+    childPath: ':pid/add-tasks',
+    path: (id: string, pid: string) => `/${id}/projects/${pid}/add-tasks`,
+    component: lazy(() => import('../pages/Project/AddTasks')),
+    name: 'Add Tasks',
+    key: 'side17'
   },
   editProject: {
     childPath: ':pid',

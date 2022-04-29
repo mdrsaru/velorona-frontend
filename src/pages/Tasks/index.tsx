@@ -7,7 +7,7 @@ import {
   // useQuery
 } from "@apollo/client";
 import styles from "./style.module.scss";
-import {authVar} from "../../App/link";
+// import {authVar} from "../../App/link";
 
 
 export const TASK = gql`

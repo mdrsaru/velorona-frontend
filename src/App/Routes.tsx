@@ -151,6 +151,13 @@ const _Routes = () => {
                   </Suspense>
                 }/>
               <Route
+                path={routes.addTasksProject.childPath}
+                element={
+                  <Suspense fallback={<RouteLoader/>}>
+                    <routes.addTasksProject.component/>
+                  </Suspense>
+                }/>
+              <Route
                 path={routes.editProject.childPath}
                 element={
                   <Suspense fallback={<RouteLoader/>}>

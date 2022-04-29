@@ -70,6 +70,10 @@
   padding: 2rem 0 0 0;
 }
 
+.dropdown-menu {
+  display: flex;
+}
+
 .add-new {
   float: right;
   font-weight: 600;
@@ -161,6 +165,9 @@
   }
 }
 
+.form-submit {
+  padding-right: 3rem;
+}
 
 .Active-text {
   color: var(--primary-green);
@@ -177,13 +184,54 @@
 .add-task-row {
   margin-left: 1rem;
   margin-right: 1rem;
-  padding-right: 1.5rem;
-  padding-left: 1.5rem;
-  padding-bottom: 1rem;
-  border: 1px solid var(--gray-secondary);
-  box-sizing: border-box;
+  padding: 1rem 1.5rem 1rem 1.5rem;
+}
+
+.upload-file {
+  padding: 1rem;
+  display: flex;
+  background: var(--gray-2);
+
+  div {
+    width: 50%;
+  }
+
+  .browse-file {
+    text-align: end;
+    cursor: pointer;
+    span {
+      color: var(--primary-blue);
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 17px;
+    }
+  }
+
+  span {
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 22px;
+    color: var(--gray-secondary);
+  }
 }
 
 .form-col-task {
   padding: 0 1rem 0 0;
+  :global {
+    .ant-upload-list {
+      display: none;
+    }
+  }
+}
+
+.add-task {
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 17px;
+}
+
+.plus-circle-outline {
+  color: var(--primary-blue);
+  font-size: 18px;
 }

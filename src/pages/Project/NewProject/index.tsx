@@ -1,15 +1,15 @@
-import { Button, Card, Col, Form, Input, InputNumber, message, Row, Select, Space } from "antd";
+import { Button, Card, Col, Form, Input, message, Row, Select, Space } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
-import routes from "../../../config/routes";
+import { useNavigate } from "react-router-dom";
 
 import { authVar } from "../../../App/link";
 import { gql, useMutation, useQuery } from "@apollo/client";
-
 import { CLIENT } from "../../Client";
 import { notifyGraphqlError } from "../../../utils/error";
+
 import styles from "../style.module.scss";
+import routes from "../../../config/routes";
 
 interface ItemProps {
   label: string;
@@ -58,16 +58,6 @@ const NewProject = () => {
     }
   })
 
-  const selectProps = {
-    placeholder:"Select Employees",
-    mode: 'multiple' as const,
-    style: { width: '100%' },
-    options,
-    onChange: (newValue: string[]) => {
-    },
-    maxTagCount: 'responsive' as const
-  }
-
   const onSubmitForm = (values: any) => {
     message.loading({content: "Creating project in progress..", className: 'custom-message'}).then(() =>
       ProjectCreate({
@@ -82,7 +72,7 @@ const NewProject = () => {
         if(response.errors) {
           return notifyGraphqlError((response.errors))
         } else if (response?.data?.ProjectCreate) {
-          navigate(-1)
+          navigate(routes.addTasksProject.path(loggedInUser?.company?.code ?? '', response?.data?.ProjectCreate?.id ?? ''))
           message.success({content: `New Project is created successfully!`, className: 'custom-message'});
         }
       }).catch(notifyGraphqlError))
@@ -94,7 +84,7 @@ const NewProject = () => {
       <Card bordered={false}>
         <Row>
           <Col span={12} className={styles['project-col']}>
-            <h1><ArrowLeftOutlined onClick={() => navigate(-1)}/> &nbsp; Add New Project</h1>
+            <h1><ArrowLeftOutlined onClick={() => navigate(-1)}/> &nbsp; Add New Tasks</h1>
           </Col>
         </Row>
         <Form form={form} layout="vertical" onFinish={onSubmitForm}>
@@ -113,38 +103,6 @@ const NewProject = () => {
                 </Select>
               </Form.Item>
             </Col>
-          </Row>
-          <Row>
-            <Col className={`${styles.formHeader}`}>
-              <p>Tasks</p>
-            </Col>
-          </Row>
-          <Row className={styles['add-task-row']}>
-            <Col span={12} className={styles['form-col']}>
-              <h1>Add Tasks</h1>
-            </Col>
-            <Col span={12} className={styles['form-col']}>
-              <div className={styles['add-new-task']}>
-                <Link to={routes.addProject.path(loggedInUser?.company?.code ? loggedInUser?.company?.code : '')}>Add New Tasks</Link>
-              </div>
-            </Col>
-            <>
-              <Col xs={24} sm={24} md={12} lg={12} className={styles['form-col-task']}>
-                <Form.Item label="Task Name" name='task-name'>
-                  <InputNumber placeholder="Enter the Name of the Task" autoComplete="off"/>
-                </Form.Item>
-              </Col>
-              <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-                <Form.Item name="assignee" label="Tasks Assigned to"
-                           style={{ position: 'relative' }}>
-                  <Select {...selectProps} dropdownStyle={{ maxHeight: 100, overflowY: 'hidden' }}>
-                    <Option value={1}>Employee 1</Option>
-                    <Option value={2}>Employee 2</Option>
-                    <Option value={3}>Employee 3</Option>
-                  </Select>
-                </Form.Item>
-              </Col>
-            </>
           </Row>
           <br/><br/>
           <Row justify="end">

@@ -30,6 +30,14 @@
   }
 }
 
+.dashboard-row {
+  b {
+    font-weight: 600;
+    font-size: 24px;
+    line-height: 29px;
+  }
+}
+
 .analytics {
   word-break: break-word;
   padding-left: 1rem;
@@ -67,12 +75,6 @@
   width: 50%;
   height: 50px;
   box-shadow: none;
-}
-
-b {
-  font-weight: 600;
-  font-size: 24px;
-  line-height: 29px;
 }
 
 .grid-style-second {

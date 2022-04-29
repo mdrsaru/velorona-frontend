@@ -24,11 +24,12 @@ import { gql, useMutation, useQuery } from "@apollo/client";
 import { useStopwatch } from 'react-timer-hook';
 import { notifyGraphqlError } from "../../utils/error";
 import { PROJECT } from "../Project";
-import {CLIENT} from "../Client";
+import { CLIENT } from "../Client";
 
 import moment from "moment";
+import { TASK } from "../Tasks";
+
 import styles from "./style.module.scss";
-import {TASK} from "../Tasks";
 
 
 export const CREATE_TIMESHEET = gql`
@@ -110,6 +111,7 @@ const Timesheet = () => {
   const [CreateTimesheet] = useMutation(CREATE_TIMESHEET);
   const [UpdateTimesheet] = useMutation(UPDATE_TIMESHEET);
   const [visible, setVisible] = useState(false);
+  const [showDetailTimeSheet, setDetailVisible] = useState(false);
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
   const {
     seconds,
@@ -197,9 +199,8 @@ const Timesheet = () => {
 
 
   const onSubmitForm = (values: any) => {
-    isRunning ? reset(undefined, false) : start();
     setCurrentDate(new Date())
-    if (isRunning) {
+    if (!isRunning) {
       CreateTimesheet({
         variables: {
           input: {
@@ -214,8 +215,9 @@ const Timesheet = () => {
         if (response.errors) {
           return notifyGraphqlError((response.errors))
         } else if (response?.data) {
-          navigate(-1)
-          message.success({content: `Client is updated successfully!`, className: 'custom-message'});
+          console.log(response);
+           start();
+          setDetailVisible(true);
         }
       }).catch(notifyGraphqlError)
     } else {
@@ -231,8 +233,8 @@ const Timesheet = () => {
         if (response.errors) {
           return notifyGraphqlError((response.errors))
         } else if (response?.data) {
-          navigate(-1)
-          message.success({content: `Client is updated successfully!`, className: 'custom-message'});
+          reset(undefined, false)
+          message.success({content: `Timesheet is updated successfully!`, className: 'custom-message'});
         }
       }).catch(notifyGraphqlError)
     }
@@ -240,24 +242,28 @@ const Timesheet = () => {
 
   return (
     <div className={styles['site-card-wrapper']}>
-      <Card bordered={false}>
+      <Card bordered={false} className={styles.formRow}>
         <Form form={form} layout="vertical" onFinish={onSubmitForm}>
           <Row>
-            <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-              <Form.Item name="client" label="Client">
-                <Select placeholder="Select Client">
-                  {clientData && clientData?.Client?.data.map((client: any, index:number) => (
-                    <Option value={client?.id} key={index}>
+            {showDetailTimeSheet ?
+              <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+                <b>Vellorum: Website Design</b>
+              </Col>:
+              <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+                <Form.Item name="client" label="Client" rules={[{ required: true, message: 'Choose the client' }]}>
+                  <Select placeholder="Select Client">
+                    {clientData && clientData?.Client?.data.map((client: any, index:number) => (
+                      <Option value={client?.id} key={index}>
                       <span>
                         <b>{client?.name}</b> &nbsp; / &nbsp;
                       </span>
-                      <span>{client?.email}</span>
-                    </Option>))}
-                </Select>
-              </Form.Item>
-            </Col>
+                        <span>{client?.email}</span>
+                      </Option>))}
+                  </Select>
+                </Form.Item>
+              </Col>}
             <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-              <Form.Item name="project" label="Project">
+              <Form.Item name="project" label="Project" rules={[{ required: true, message: 'Choose the project' }]}>
                 <Select placeholder="Select Project">
                   {projectData && projectData?.Project?.data.map((project: any, index: number) => (
                     <Option value={project?.id} key={index}>
@@ -269,8 +275,8 @@ const Timesheet = () => {
             </Col>
           </Row>
           <Row justify="center">
-            <Col span={18} className={styles.formCol}>
-              <Form.Item name="task" label="Task">
+            <Col xs={24} sm={24} md={12} lg={16} xl={18} className={styles.taskCol}>
+              <Form.Item name="task" label="Task" rules={[{ required: false, message: 'Choose the task' }]}>
                 <Select placeholder="Select Task">
                   {taskData && taskData?.Task?.data.map((task: any, index: number) => (
                     <Option value={task?.id} key={index}>
@@ -280,7 +286,7 @@ const Timesheet = () => {
                 </Select>
               </Form.Item>
             </Col>
-            <Col span={6} className={styles.formCol} style={{display: 'flex', alignItems: 'end', justifyContent: 'center'}}>
+            <Col xs={24} sm={24} md={12} lg={8} xl={6} className={styles.timeStartCol}>
               <Form.Item>
                 <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
                   <div style={{width: '50%'}}>
