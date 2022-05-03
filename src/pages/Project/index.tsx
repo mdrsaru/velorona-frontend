@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { gql, useQuery } from "@apollo/client";
 
 import { Card, Col, Dropdown, Menu, Row, Table } from "antd";
-import { Link } from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import routes from "../../config/routes";
 import { MoreOutlined, PlusCircleOutlined } from "@ant-design/icons";
 
@@ -13,7 +13,6 @@ import deleteImg from "../../assets/images/delete_btn.svg";
 import archiveImg from "../../assets/images/archive_btn.svg";
 
 import styles from "./style.module.scss";
-
 
 
 
@@ -59,6 +58,7 @@ const archiveBody = () => {
 
 const Project = () => {
   const loggedInUser = authVar();
+  const navigate = useNavigate();
   const [visibility, setVisibility] = useState(false);
   const [showArchive, setArchiveModal] = useState(false);
   const setModalVisibility = (value: boolean) => {
@@ -100,8 +100,18 @@ const Project = () => {
   const columns = [
     {
       title: 'Project Name',
-      dataIndex: 'name',
-      key: 'name',
+      render: (task: any) => {
+        return <div className={styles['task-name']}>
+          <p>{task?.name}</p>
+        </div>
+      },
+      onCell: (record: any) => {
+        return {
+          onClick: () => {
+            navigate(routes.detailProject.path(loggedInUser?.company?.code ?? '', record?.id ?? ''));
+          },
+        };
+      },
     },
     {
       title: 'Client',
@@ -175,7 +185,7 @@ const Project = () => {
           </Row>
           <Row>
             <Col span={24}>
-              <Table dataSource={projectData?.Project?.data} columns={columns}/>
+              <Table dataSource={projectData?.Project?.data} columns={columns} rowKey={(record => record?.id)}/>
             </Col>
           </Row>
         </Card>

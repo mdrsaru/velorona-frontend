@@ -129,7 +129,7 @@ const routes = {
   },
   projects: {
     childPath: 'projects',
-    path: (id: string) => `${id}/projects`,
+    path: (id: string) => `/${id}/projects`,
     component: lazy(() => import('../pages/Project')),
     name: 'Project',
     key: 'side7'
@@ -140,6 +140,13 @@ const routes = {
     component: lazy(() => import('../pages/Project/NewProject')),
     name: 'Add Projects',
     key: 'side8'
+  },
+  detailProject: {
+    childPath: ':pid/detail',
+    path: (id: string, pid: string) => `/${id}/projects/${pid}/detail`,
+    component: lazy(() => import('../pages/Project/DetailProject')),
+    name: 'Project Detail',
+    key: 'side2'
   },
   addTasksProject: {
     childPath: ':pid/add-tasks',

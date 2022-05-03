@@ -102,6 +102,120 @@
 
 .formCol {
   padding: 1.5rem;
+  .date-view {
+      font-weight: 600;
+      font-size: 18px;
+      line-height: 22px;
+  }
+}
+
+.formColDetail {
+  padding: 1.5rem;
+  span {
+    font-weight: 600;
+    font-size: 24px;
+    line-height: 29px;
+  }
+}
+
+.task-card {
+  padding: 2rem 1rem 2rem 1rem;
+
+  :global {
+    .ant-form-item-control {
+      margin-right: 2rem;
+    }
+    .ant-input {
+      font-weight: 600;
+      font-size: 18px;
+      width: 100%;
+      line-height: 22px;
+    }
+  }
+
+  .total-time {
+    padding-left: 2rem;
+    padding-top: 1rem;
+  }
+
+  .task-row {
+    padding: 0 1.2rem 0 1.2rem;
+  }
+
+  .start-time, .end-time {
+    width: 15%;
+    :global {
+      .ant-input {
+        color: var(--primary-blue);
+      }
+    }
+  }
+
+  .task-div-list {
+    display: flex;
+    padding: 0.7rem;
+    width: 100%;
+    margin-top: 1rem;
+    border: 1px solid var(--gray-secondary);
+    box-sizing: border-box;
+
+    div {
+      font-weight: 600;
+      font-size: 18px;
+      line-height: 22px;
+    }
+
+    span {
+      font-weight: 600;
+      font-size: 18px;
+      line-height: 22px;
+      color: var(--primary-blue);
+    }
+  }
+
+  .task-div-header {
+    display: flex;
+    padding: 0 1.2rem 0.2rem 1.2rem;
+
+    div {
+      color: var(--white);
+      font-weight: 600;
+      font-size: 14px;
+      line-height: 17px;
+      padding: 0.8rem 0 0.8rem 1.4rem;
+      background: var(--gray-secondary);
+    }
+
+    .start-header, .end-header {
+      width: 16%;
+    }
+
+    .total-header {
+      width: 24%;
+    }
+
+    .task-header, .client-header {
+      width: 22%;
+    }
+  }
+}
+
+.formColHeader {
+  padding: 2rem;
+  b {
+    font-weight: 600;
+    font-size: 24px;
+    line-height: 29px;
+    span {
+      color: var(--primary-blue);
+    }
+  }
+}
+
+.null-span {
+  font-size: 15px;
+  text-align: center;
+  color: var(--gray-secondary);
 }
 
 .formRow {
@@ -135,7 +249,7 @@
 }
 
 .formCol1 {
-  padding-left: 1rem;
+  padding-left: 1.5rem;
   padding-top: 1.5rem;
 
   span {
@@ -225,6 +339,8 @@
 }
 
 .timeSheetDetail {
+  padding-top: 1.5rem;
+  padding-right: 0.5rem;
 }
 
 .totalRow {

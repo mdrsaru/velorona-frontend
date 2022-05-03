@@ -141,6 +141,9 @@
     font-weight: 600;
     font-size: 24px;
     line-height: 29px;
+    span {
+      color: var(--primary-blue);
+    }
   }
 }
 
@@ -222,6 +225,22 @@
       display: none;
     }
   }
+}
+
+.project-add-task {
+  display: flex;
+  cursor: pointer;
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 22px;
+  color: var(--primary-blue);
+  align-items: center;
+  padding-right: 1rem;
+  justify-content: end;
+}
+
+.task-name {
+  cursor: pointer;
 }
 
 .add-task {

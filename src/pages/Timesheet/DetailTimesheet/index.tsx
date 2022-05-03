@@ -16,7 +16,7 @@ const DetailTimesheet = () => {
     <div className={styles['site-card-wrapper']}>
       <Card bordered={false} className={styles.timesheetCard}>
         <Row className={styles.cardHeader}>
-          <Col span={24} className={styles.formCol}>
+          <Col span={24} className={styles.formColDetail}>
             <ArrowLeftOutlined onClick={() => navigate(-1)}/> &nbsp; &nbsp; <span> My Timesheet</span>
           </Col>
         </Row>
@@ -88,7 +88,7 @@ const DetailTimesheet = () => {
           </Col>
         </Row>
         <Row>
-          <Col span={24}>
+          <Col span={24} className={styles.formCol}>
             <div className={styles['resp-table']}>
               <div className={styles["resp-table-header"]}>
                 <div className={styles['table-header-cell']}>
@@ -153,7 +153,7 @@ const DetailTimesheet = () => {
         </Row>
         <br/>
         <Row justify={"end"}>
-          <Col>
+          <Col className={styles.formCol}>
            <Space>
              <Button type="primary" htmlType="button">
                Save and Exit
