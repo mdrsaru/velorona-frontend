@@ -22,7 +22,7 @@ import {
 import routes from "../../config/routes";
 import { useNavigate } from "react-router-dom";
 import { authVar } from "../../App/link";
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import { useStopwatch } from 'react-timer-hook';
 import { notifyGraphqlError } from "../../utils/error";
 import { PROJECT } from "../Project";
@@ -66,6 +66,7 @@ export const UPDATE_TIMESHEET = gql`
         TimesheetUpdate(input: $input) {
             id
             company_id
+            end
         }
     }
 `
@@ -101,9 +102,9 @@ export const TIMESHEET = gql`
 
 const computeDiff = (date: Date) => {
   const currentDate = new Date();
-  const futureDate = new Date(2028, 0, 1, 12, 0, 0);
-  const diff = futureDate.getTime() - currentDate.getTime();
-  return diff / (1000 * 60 * 60 * 24);
+  const pastDate = new Date(date);
+  const diff = (currentDate.getTime()- pastDate.getTime())/1000;
+  return diff
 };
 
 interface TimesheetResponseArray {
@@ -124,7 +125,8 @@ const Timesheet = () => {
   const [newTimeSheet, setTimesheet] = useState({
     id: '',
     name: '',
-    project: ''
+    project: '',
+    task: ''
   });
 
   const columns = [
@@ -173,8 +175,7 @@ const Timesheet = () => {
       key: 'actions',
       render: (record: any) =>
         <div className={styles['dropdown-menu']} onClick={(e) => {
-          navigate(routes.detailTimesheet.path(authData?.company?.code ?? '', record?.id))
-        }}>
+          navigate(routes.detailTimesheet.path(authData?.company?.code ?? '', record?.id))}}>
           <PlusCircleOutlined /> &nbsp; &nbsp; <span>Edit</span>
         </div>,
     },
@@ -195,13 +196,14 @@ const Timesheet = () => {
     }
   })
 
-  const { data: projectData } = useQuery(PROJECT, {
+  const [ getProject, { data: projectData }] = useLazyQuery(PROJECT, {
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
     variables: {
       input: {
         query: {
-          company_id: authData?.company?.id
+          company_id: authData?.company?.id,
+          client_id: ''
         },
         paging: {
           order: ['updatedAt:DESC']
@@ -210,13 +212,14 @@ const Timesheet = () => {
     }
   })
 
-  const { data: taskData } = useQuery(TASK, {
+  const [getTask, { data: taskData }] = useLazyQuery(TASK, {
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
     variables: {
       input: {
         query: {
-          company_id: authData?.company?.id
+          company_id: authData?.company?.id,
+          project_id: ''
         },
         paging: {
           order: ['updatedAt:DESC']
@@ -232,9 +235,11 @@ const Timesheet = () => {
     isRunning,
     start,
     reset
-  } = useStopwatch({ autoStart: showDetailTimeSheet, offsetTimestamp: stopwatchOffset});
+  } = useStopwatch({autoStart: showDetailTimeSheet});
 
   const { data: timesheetData } = useQuery(TIMESHEET, {
+    fetchPolicy: "network-only",
+    nextFetchPolicy: "cache-first",
     variables: {
       input: {
         query: {
@@ -246,13 +251,15 @@ const Timesheet = () => {
       }
     },
     onCompleted: (timesheet) => {
+      console.log("On Complete Trigger", timesheet?.Timesheet?.data[0]?.end)
       if (timesheet?.Timesheet?.data[0]?.end === null) {
-        stopwatchOffset.setSeconds(stopwatchOffset.getSeconds() + computeDiff(timesheet?.Timesheet?.data[0]?.start))
         setDetailVisible(true)
+        stopwatchOffset.setSeconds(stopwatchOffset.getSeconds() + computeDiff(timesheet?.Timesheet?.data[0]?.start))
         setTimesheet({
           id: timesheet?.Timesheet?.data[0]?.id,
           name: timesheet?.Timesheet?.data[0]?.company?.name,
-          project: timesheet?.Timesheet?.data[0]?.project?.name
+          project: timesheet?.Timesheet?.data[0]?.project?.name,
+          task: timesheet?.Timesheet?.data[0]?.task?.name
         })
         reset(stopwatchOffset)
       }
@@ -307,6 +314,38 @@ const Timesheet = () => {
     console.log(values);
   };
 
+  const onChangeClientSelect = (value: string) => {
+      getProject({
+        variables: {
+          input: {
+            query: {
+              company_id: authData?.company?.id,
+              client_id: value
+            },
+            paging: {
+              order: ['updatedAt:DESC']
+            }
+          }
+        }
+      }).then(r => {})
+  }
+
+  const onChangeProjectSelect = (value: string) => {
+    getTask({
+      variables: {
+        input: {
+          query: {
+            company_id: authData?.company?.id,
+            project_id: value
+          },
+          paging: {
+            order: ['updatedAt:DESC']
+          }
+        }
+      }
+    }).then(r => {})
+}
+
   const onSubmitForm = (values: any) => {
     setCurrentDate(new Date())
     if (!isRunning) {
@@ -327,7 +366,8 @@ const Timesheet = () => {
           setTimesheet({
             id: response?.data?.TimesheetCreate?.id,
             name: response?.data?.TimesheetCreate?.company?.name,
-            project: response?.data?.TimesheetCreate?.project?.name
+            project: response?.data?.TimesheetCreate?.project?.name,
+            task: response?.data?.TimesheetCreate?.task?.name
           });
           setDetailVisible(true);
         }
@@ -358,8 +398,7 @@ const Timesheet = () => {
     <div className={styles['site-card-wrapper']}>
       <Card bordered={false} className={styles.formRow}>
         {timesheetData &&
-          <Form form={form} layout="vertical" onFinish={onSubmitForm} initialValues={{
-            task: showDetailTimeSheet ? timesheetData?.Timesheet?.data[0]?.task?.id : taskData?.Task?.data[0]?.id}}>
+          <Form form={form} layout="vertical" onFinish={onSubmitForm}>
             {showDetailTimeSheet ?
               <Row>
                 <Col xs={24} sm={24} md={12} lg={12} className={styles.formColHeader}>
@@ -372,7 +411,7 @@ const Timesheet = () => {
               <Row>
                 <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
                   <Form.Item name="client" label="Client" rules={[{ required: true, message: 'Choose the client' }]}>
-                    <Select placeholder="Select Client">
+                    <Select placeholder="Select Client" onChange={onChangeClientSelect}>
                       {clientData && clientData?.Client?.data.map((client: any, index:number) => (
                         <Option value={client?.id} key={index}>
                       <span>
@@ -385,26 +424,29 @@ const Timesheet = () => {
                 </Col>
                 <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
                   <Form.Item name="project" label="Project" rules={[{ required: true, message: 'Choose the project' }]}>
-                    <Select placeholder="Select Project">
+                    <Select placeholder="Select Project" onChange={onChangeProjectSelect}>
                       {projectData && projectData?.Project?.data.map((project: any, index: number) => (
                         <Option value={project?.id} key={index}>
                           {project?.name}
-                        </Option>)
-                      )}
+                        </Option>))}
                     </Select>
                   </Form.Item>
                 </Col>
               </Row>}
             <Row>
               <Col xs={24} sm={24} md={12} lg={16} xl={18} className={styles.taskCol}>
-                <Form.Item name="task" label="Task" rules={[{ required: true, message: 'Choose the task' }]}>
+                <Form.Item name="task" label="Task" rules={[{ required: !showDetailTimeSheet, message: 'Choose the task' }]}>
+                  {showDetailTimeSheet ? 
+                  <div className={styles['timesheetTask']}>
+                    {newTimeSheet?.task}
+                  </div>: 
                   <Select placeholder="Select Task">
-                    {taskData && taskData?.Task?.data.map((task: any, index: number) => (
-                      <Option value={task?.id} key={index}>
-                        {task?.name}
-                      </Option>)
-                    )}
-                  </Select>
+                  {taskData && taskData?.Task?.data.map((task: any, index: number) => (
+                    <Option value={task?.id} key={index}>
+                      {task?.name}
+                    </Option>)
+                  )}
+                </Select>}
                 </Form.Item>
               </Col>
               <Col xs={24} sm={24} md={12} lg={8} xl={6} className={styles.timeStartCol}>

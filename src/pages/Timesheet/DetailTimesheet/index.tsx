@@ -3,14 +3,37 @@ import { Card, Col, DatePicker, Row, TimePicker, Button, Space } from "antd";
 import { ArrowLeftOutlined, LeftOutlined, RightOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import moment from 'moment';
 
-import { useNavigate } from "react-router-dom";
+import { useQuery } from '@apollo/client';
+import { useNavigate, useParams } from "react-router-dom";
+import { authVar } from '../../../App/link';
+import { TIMESHEET } from '../index';
 
 import styles from "../style.module.scss";
 
 
 
 const DetailTimesheet = () => {
+  let params = useParams();
   const navigate = useNavigate();
+  const authData = authVar();
+  console.log(params);
+  const { data: timesheetData } = useQuery(TIMESHEET, {
+    fetchPolicy: "network-only",
+    nextFetchPolicy: "cache-first",
+    variables: {
+      input: {
+        query: {
+          company_id: authData?.company?.id,
+          id: params?.id
+        },
+        paging: {
+          order: ['createdAt:DESC']
+        }
+      }
+    }
+  });
+
+  console.log(timesheetData);
 
   return (
     <div className={styles['site-card-wrapper']}>
@@ -24,7 +47,7 @@ const DetailTimesheet = () => {
           <Col span={12}>
             <div className={styles.timesheetDiv}>
               <div className={styles.header}>Candidate Name</div>
-              <div>Nisha Dhungana</div>
+              <div>{timesheetData?.Timesheet?.data[0]?.company?.name}</div>
             </div>
             <div className={styles.timesheetDiv}>
               <div className={styles.header}>Time Period</div>
@@ -46,7 +69,7 @@ const DetailTimesheet = () => {
           <Col span={12}>
             <div className={styles.timesheetDiv}>
               <div className={styles.header}>Project Name</div>
-              <div>SASS Project</div>
+              <div>{timesheetData?.Timesheet?.data[0]?.project?.name}</div>
             </div>
             <div className={styles.timesheetDiv}>
               <div className={styles.header}>Client Name</div>
@@ -54,15 +77,15 @@ const DetailTimesheet = () => {
             </div>
             <div className={styles.timesheetDiv}>
               <div className={styles.header}>Client Location</div>
-              <div>Gongabu, Kathmandu</div>
+              <div>{timesheetData?.Timesheet?.data[0]?.clientLocation ?? 'N/A'}</div>
             </div>
             <div className={styles.timesheetDiv}>
               <div className={styles.header}>Last Submitted</div>
-              <div>April 9-2022, 6:35 PM</div>
+              <div>{moment(timesheetData?.Timesheet?.data[0]?.end).format('L')}</div>
             </div>
             <div className={styles.timesheetDiv}>
-              <div className={styles.header}>Last Approved</div>
-              <div>April 8-2022, 8:24 PM</div>
+              <div className={styles.header}>Approved By</div>
+              <div>{timesheetData?.Timesheet?.data[0]?.approver ?? 'N/A'}</div>
             </div>
           </Col>
         </Row>

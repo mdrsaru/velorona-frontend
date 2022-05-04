@@ -7,6 +7,7 @@ import { authVar } from "../../../App/link";
 import { useQuery } from "@apollo/client";
 
 import { PROJECT } from "../index";
+import { TASK } from "../../Tasks";
 import routes from "../../../config/routes";
 
 import styles from "../style.module.scss";
@@ -93,6 +94,22 @@ const DetailProject = () => {
     
   }
 
+  const { data: taskData } = useQuery(TASK, {
+    fetchPolicy: "network-only",
+    nextFetchPolicy: "cache-first",
+    variables: {
+      input: {
+        query: {
+          company_id: loggedInUser?.company?.id,
+          project_id: params?.pid
+        },
+        paging: {
+          order: ['updatedAt:DESC']
+        }
+      }
+    }
+  })
+
   return (
     <div className={styles['main-div']}>
       <Card bordered={false}>
@@ -124,7 +141,7 @@ const DetailProject = () => {
         <br/>
         <Row>
           <Col span={24}>
-            <Table dataSource={projectData?.Project?.data} columns={columns} rowKey={(record => record?.id)}/>
+            <Table dataSource={taskData?.Task?.data} columns={columns} rowKey={(record => record?.id)}/>
           </Col>
         </Row>
       </Card>
