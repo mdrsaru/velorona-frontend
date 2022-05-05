@@ -31,12 +31,12 @@ import { CLIENT } from "../Client";
 import moment from "moment";
 import { TASK } from "../Tasks";
 
-import { TimesheetPagingResult } from "../../interfaces/generated";
+import { TimeEntryPagingResult } from "../../interfaces/generated";
 import styles from "./style.module.scss";
 
-export const CREATE_TIMESHEET = gql`
-    mutation TimesheetCreate($input: TimesheetCreateInput!) {
-        TimesheetCreate(input: $input) {
+export const CREATE_TIME_ENTRY = gql`
+    mutation TimeEntryCreate($input: TimeEntryCreateInput!) {
+      TimeEntryCreate(input: $input) {
             id
             start
             end
@@ -61,9 +61,9 @@ export const CREATE_TIMESHEET = gql`
     }
 `
 
-export const UPDATE_TIMESHEET = gql`
-    mutation TimesheetUpdate($input: TimesheetUpdateInput!) {
-        TimesheetUpdate(input: $input) {
+export const UPDATE_TIME_ENTRY = gql`
+    mutation TimeEntryUpdate($input: TimeEntryUpdateInput!) {
+      TimeEntryUpdate(input: $input) {
             id
             company_id
             end
@@ -71,9 +71,9 @@ export const UPDATE_TIMESHEET = gql`
     }
 `
 
-export const TIMESHEET = gql`
-    query Timesheet($input: TimesheetQueryInput!) {
-        Timesheet(input: $input) {
+export const TIME_ENTRY = gql`
+    query TimeEntry($input: TimeEntryQueryInput!) {
+      TimeEntry(input: $input) {
             data {
                 id
                 start
@@ -103,12 +103,12 @@ export const TIMESHEET = gql`
 const computeDiff = (date: Date) => {
   const currentDate = new Date();
   const pastDate = new Date(date);
-  const diff = (currentDate.getTime()- pastDate.getTime())/1000;
+  const diff = (currentDate.getTime() - pastDate.getTime()) / 1000;
   return diff
 };
 
-interface TimesheetResponseArray {
-  Timesheet: TimesheetPagingResult
+interface TimeEntryResponseArray {
+  TimeEntry: TimeEntryPagingResult
 }
 
 
@@ -118,11 +118,11 @@ const Timesheet = () => {
   let navigate = useNavigate();
   const [form] = Form.useForm();
   const stopwatchOffset = new Date();
-  const [UpdateTimesheet] = useMutation(UPDATE_TIMESHEET);
+  const [UpdateTimeEntry] = useMutation(UPDATE_TIME_ENTRY);
   const [visible, setVisible] = useState(false);
-  const [showDetailTimeSheet, setDetailVisible] = useState(false);
+  const [showDetailTimeEntry, setDetailVisible] = useState(false);
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
-  const [newTimeSheet, setTimesheet] = useState({
+  const [newTimeEntry, setTimeEntry] = useState({
     id: '',
     name: '',
     project: '',
@@ -133,7 +133,7 @@ const Timesheet = () => {
     {
       title: 'Project Name',
       key: 'project',
-      render: (record:any) =>
+      render: (record: any) =>
         <div>
           {record?.project?.name}
         </div>
@@ -141,7 +141,7 @@ const Timesheet = () => {
     {
       title: 'Company',
       key: 'company',
-      render: (record:any) =>
+      render: (record: any) =>
         <div>
           {record?.company?.name}
         </div>
@@ -149,7 +149,7 @@ const Timesheet = () => {
     {
       title: 'Location',
       key: 'clientLocation',
-      render: (record:any) =>
+      render: (record: any) =>
         <div>
           {record?.clientLocation ?? <span className={styles['null-span']}>N/A</span>}
         </div>
@@ -157,7 +157,7 @@ const Timesheet = () => {
     {
       title: 'Approved by',
       key: 'approver',
-      render: (record:any) =>
+      render: (record: any) =>
         <div>
           {record?.approver ?? <span className={styles['null-span']}>N/A</span>}
         </div>
@@ -165,7 +165,7 @@ const Timesheet = () => {
     {
       title: 'Created At',
       key: 'createdAt',
-      render: (record:any) =>
+      render: (record: any) =>
         <div>
           {moment(record?.createdAt).format('MMMM Do YYYY, h:mm:ss a')}
         </div>
@@ -175,7 +175,8 @@ const Timesheet = () => {
       key: 'actions',
       render: (record: any) =>
         <div className={styles['dropdown-menu']} onClick={(e) => {
-          navigate(routes.detailTimesheet.path(authData?.company?.code ?? '', record?.id))}}>
+          navigate(routes.detailTimesheet.path(authData?.company?.code ?? '', record?.id))
+        }}>
           <PlusCircleOutlined /> &nbsp; &nbsp; <span>Edit</span>
         </div>,
     },
@@ -196,7 +197,7 @@ const Timesheet = () => {
     }
   })
 
-  const [ getProject, { data: projectData }] = useLazyQuery(PROJECT, {
+  const [getProject, { data: projectData }] = useLazyQuery(PROJECT, {
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
     variables: {
@@ -235,9 +236,9 @@ const Timesheet = () => {
     isRunning,
     start,
     reset
-  } = useStopwatch({autoStart: showDetailTimeSheet});
+  } = useStopwatch({ autoStart: showDetailTimeEntry });
 
-  const { data: timesheetData } = useQuery(TIMESHEET, {
+  const { data: timeEntryData } = useQuery(TIME_ENTRY, {
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
     variables: {
@@ -250,16 +251,16 @@ const Timesheet = () => {
         }
       }
     },
-    onCompleted: (timesheet) => {
-      console.log("On Complete Trigger", timesheet?.Timesheet?.data[0]?.end)
-      if (timesheet?.Timesheet?.data[0]?.end === null) {
+    onCompleted: (timeEntry) => {
+      console.log("On Complete Trigger", timeEntry?.TimeEntry?.data[0]?.end)
+      if (timeEntry?.TimeEntry?.data[0]?.end === null) {
         setDetailVisible(true)
-        stopwatchOffset.setSeconds(stopwatchOffset.getSeconds() + computeDiff(timesheet?.Timesheet?.data[0]?.start))
-        setTimesheet({
-          id: timesheet?.Timesheet?.data[0]?.id,
-          name: timesheet?.Timesheet?.data[0]?.company?.name,
-          project: timesheet?.Timesheet?.data[0]?.project?.name,
-          task: timesheet?.Timesheet?.data[0]?.task?.name
+        stopwatchOffset.setSeconds(stopwatchOffset.getSeconds() + computeDiff(timeEntry?.TimeEntry?.data[0]?.start))
+        setTimeEntry({
+          id: timeEntry?.TimeEntry?.data[0]?.id,
+          name: timeEntry?.TimeEntry?.data[0]?.company?.name,
+          project: timeEntry?.TimeEntry?.data[0]?.project?.name,
+          task: timeEntry?.TimeEntry?.data[0]?.task?.name
         })
         reset(stopwatchOffset)
       }
@@ -268,11 +269,11 @@ const Timesheet = () => {
 
 
 
-  const [CreateTimesheet] = useMutation(CREATE_TIMESHEET, {
-    update(cache, {data}) {
-      const response = data?.TimesheetCreate;
-      const timeSheets = cache.readQuery<TimesheetResponseArray>({
-        query: TIMESHEET,
+  const [CreateTimeEntry] = useMutation(CREATE_TIME_ENTRY, {
+    update(cache, { data }) {
+      const response = data?.TimeEntryCreate;
+      const timeEntry = cache.readQuery<TimeEntryResponseArray>({
+        query: TIME_ENTRY,
         variables: {
           input: {
             query: {
@@ -284,19 +285,20 @@ const Timesheet = () => {
           }
         }
       });
-      if (timeSheets) {
-        let arrayData = timeSheets?.Timesheet?.data
-        console.log('arrayData',  arrayData?.length, [...arrayData, response].length);
+      if (timeEntry) {
+        let arrayData = timeEntry?.TimeEntry?.data
+        console.log('arrayData', arrayData?.length, [...arrayData, response].length);
         cache.writeQuery({
-          query: TIMESHEET,
+          query: TIME_ENTRY,
           data: {
-            Timesheet: {
+            TimeEntry: {
               data: [response, ...arrayData]
             }
           }
         })
       }
-    }})
+    }
+  })
 
   /* eslint-disable no-template-curly-in-string */
   const validateMessages = {
@@ -315,19 +317,19 @@ const Timesheet = () => {
   };
 
   const onChangeClientSelect = (value: string) => {
-      getProject({
-        variables: {
-          input: {
-            query: {
-              company_id: authData?.company?.id,
-              client_id: value
-            },
-            paging: {
-              order: ['updatedAt:DESC']
-            }
+    getProject({
+      variables: {
+        input: {
+          query: {
+            company_id: authData?.company?.id,
+            client_id: value
+          },
+          paging: {
+            order: ['updatedAt:DESC']
           }
         }
-      }).then(r => {})
+      }
+    }).then(r => { })
   }
 
   const onChangeProjectSelect = (value: string) => {
@@ -343,13 +345,13 @@ const Timesheet = () => {
           }
         }
       }
-    }).then(r => {})
-}
+    }).then(r => { })
+  }
 
   const onSubmitForm = (values: any) => {
     setCurrentDate(new Date())
     if (!isRunning) {
-      CreateTimesheet({
+      CreateTimeEntry({
         variables: {
           input: {
             start: moment(currentDate, "YYYY-MM-DD HH:mm:ss"),
@@ -363,20 +365,20 @@ const Timesheet = () => {
           return notifyGraphqlError((response.errors))
         } else if (response?.data) {
           start();
-          setTimesheet({
-            id: response?.data?.TimesheetCreate?.id,
-            name: response?.data?.TimesheetCreate?.company?.name,
-            project: response?.data?.TimesheetCreate?.project?.name,
-            task: response?.data?.TimesheetCreate?.task?.name
+          setTimeEntry({
+            id: response?.data?.TimeEntryCreate?.id,
+            name: response?.data?.TimeEntryCreate?.company?.name,
+            project: response?.data?.TimeEntryCreate?.project?.name,
+            task: response?.data?.TimeEntryCreate?.task?.name
           });
           setDetailVisible(true);
         }
       }).catch(notifyGraphqlError)
     } else {
-      UpdateTimesheet({
+      UpdateTimeEntry({
         variables: {
           input: {
-            id: newTimeSheet?.id,
+            id: newTimeEntry?.id,
             end: moment(currentDate, "YYYY-MM-DD HH:mm:ss"),
             company_id: authData?.company?.id
           }
@@ -388,7 +390,7 @@ const Timesheet = () => {
           reset(undefined, false)
           setDetailVisible(false);
           form.resetFields();
-          message.success({content: `Timesheet is updated successfully!`, className: 'custom-message'});
+          message.success({ content: `Time Entry is updated successfully!`, className: 'custom-message' });
         }
       }).catch(notifyGraphqlError)
     }
@@ -396,35 +398,58 @@ const Timesheet = () => {
 
   return (
     <div className={styles['site-card-wrapper']}>
-      <Card bordered={false} className={styles.formRow}>
-        {timesheetData &&
-          <Form form={form} layout="vertical" onFinish={onSubmitForm}>
-            {showDetailTimeSheet ?
+      <Card
+        bordered={false}
+        className={styles.formRow}>
+        {timeEntryData &&
+          <Form
+            form={form}
+            layout="vertical"
+            onFinish={onSubmitForm}>
+
+            {showDetailTimeEntry ?
               <Row>
                 <Col xs={24} sm={24} md={12} lg={12} className={styles.formColHeader}>
                   <b>
-                    <span>{newTimeSheet?.name ?? timesheetData?.Timesheet?.data[0]?.name}</span> :
-                    &nbsp;{newTimeSheet?.project ?? timesheetData?.Timesheet?.data[0]?.project?.name}
+                    <span>{newTimeEntry?.name ?? timeEntryData?.TimeEntry?.data[0]?.name}</span> :
+                    &nbsp;{newTimeEntry?.project ?? timeEntryData?.TimeEntry?.data[0]?.project?.name}
                   </b>
                 </Col>
-              </Row>:
+              </Row> :
               <Row>
                 <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-                  <Form.Item name="client" label="Client" rules={[{ required: true, message: 'Choose the client' }]}>
-                    <Select placeholder="Select Client" onChange={onChangeClientSelect}>
-                      {clientData && clientData?.Client?.data.map((client: any, index:number) => (
+                  <Form.Item
+                    name="client"
+                    label="Client"
+                    rules={[{
+                      required: true,
+                      message: 'Choose the client'
+                    }]}>
+                    <Select
+                      placeholder="Select Client"
+                      onChange={onChangeClientSelect}>
+                      {clientData && clientData?.Client?.data.map((client: any, index: number) => (
                         <Option value={client?.id} key={index}>
-                      <span>
-                        <b>{client?.name}</b> &nbsp; / &nbsp;
-                      </span>
+                          <span>
+                            <b>{client?.name}</b> &nbsp; / &nbsp;
+                          </span>
                           <span>{client?.email}</span>
                         </Option>))}
                     </Select>
                   </Form.Item>
                 </Col>
+
                 <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-                  <Form.Item name="project" label="Project" rules={[{ required: true, message: 'Choose the project' }]}>
-                    <Select placeholder="Select Project" onChange={onChangeProjectSelect}>
+                  <Form.Item
+                    name="project"
+                    label="Project"
+                    rules={[{
+                      required: true,
+                      message: 'Choose the project'
+                    }]}>
+                    <Select
+                      placeholder="Select Project"
+                      onChange={onChangeProjectSelect}>
                       {projectData && projectData?.Project?.data.map((project: any, index: number) => (
                         <Option value={project?.id} key={index}>
                           {project?.name}
@@ -433,35 +458,48 @@ const Timesheet = () => {
                   </Form.Item>
                 </Col>
               </Row>}
+
             <Row>
               <Col xs={24} sm={24} md={12} lg={16} xl={18} className={styles.taskCol}>
-                <Form.Item name="task" label="Task" rules={[{ required: !showDetailTimeSheet, message: 'Choose the task' }]}>
-                  {showDetailTimeSheet ? 
-                  <div className={styles['timesheetTask']}>
-                    {newTimeSheet?.task}
-                  </div>: 
-                  <Select placeholder="Select Task">
-                  {taskData && taskData?.Task?.data.map((task: any, index: number) => (
-                    <Option value={task?.id} key={index}>
-                      {task?.name}
-                    </Option>)
-                  )}
-                </Select>}
+                <Form.Item
+                  name="task"
+                  label="Task"
+                  rules={[{
+                    required: !showDetailTimeEntry,
+                    message: 'Choose the task'
+                  }]}>
+                  {showDetailTimeEntry ?
+                    <div className={styles['timesheetTask']}>
+                      {newTimeEntry?.task}
+                    </div> :
+                    <Select placeholder="Select Task">
+                      {taskData && taskData?.Task?.data.map((task: any, index: number) => (
+                        <Option value={task?.id} key={index}>
+                          {task?.name}
+                        </Option>)
+                      )}
+                    </Select>}
                 </Form.Item>
               </Col>
+
               <Col xs={24} sm={24} md={12} lg={8} xl={6} className={styles.timeStartCol}>
                 <Form.Item>
-                  <div style={{display: 'flex', alignItems: 'center', justifyContent: 'center'}}>
-                    <div style={{width: '50%'}}>
-                      <div style={{textAlign: 'center'}}>
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center'
+                    }}>
+                    <div style={{ width: '50%' }}>
+                      <div style={{ textAlign: 'center' }}>
                         <span>
                           {(hours > 9 ? hours : '0' + hours) + ':' +
                             (minutes > 9 ? minutes : '0' + minutes) + ':'
                             + (seconds > 9 ? seconds : '0' + seconds)}
                         </span>
                       </div>
-                    </div>&nbsp; &nbsp; &nbsp; &nbsp;
-                    <div style={{width: '50%'}}>
+                    </div> &nbsp; &nbsp; &nbsp; &nbsp;
+                    <div style={{ width: '50%' }}>
                       {isRunning ?
                         <Button type="primary" htmlType="submit" danger>Stop</Button> :
                         <Button type="primary" htmlType="submit">Start</Button>}
@@ -472,8 +510,10 @@ const Timesheet = () => {
             </Row>
           </Form>}
       </Card>
-      <br/>
-      <Card bordered={false} className={styles['task-card']}>
+      <br />
+      <Card
+        bordered={false}
+        className={styles['task-card']}>
         <Row>
           <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
             <span className={styles['date-view']}>April 26, 2022</span>
@@ -501,36 +541,54 @@ const Timesheet = () => {
             total: ''
           }}>
           <Row className={styles['task-row']}>
-            <Col span={24} className={styles['task-div-list']}>
+            <Col
+              span={24}
+              className={styles['task-div-list']}>
+
               <div className={styles['task-name']}>
-                <Form.Item name="name" rules={[{ required: true }]}>
-                  <Input type="text" value="Homepage Design"/>
+                <Form.Item
+                  name="name"
+                  rules={[{ required: true }]}>
+                  <Input type="text" value="Homepage Design" />
                 </Form.Item>
               </div>
+
               <div className={styles['client-name']}>
-                <Form.Item name="client" rules={[{ required: true }]}>
-                  <Input type="text" value="Homepage Design"/>
+                <Form.Item
+                  name="client"
+                  rules={[{ required: true }]}>
+                  <Input type="text" value="Homepage Design" />
                 </Form.Item>
               </div>
+
               <div className={styles['start-time']}>
-                <Form.Item name="start" rules={[{ required: true }]}>
-                  <Input type="text" value="Homepage Design"/>
+                <Form.Item
+                  name="start"
+                  rules={[{ required: true }]}>
+                  <Input type="text" value="Homepage Design" />
                 </Form.Item>
               </div>
+
               <div className={styles['end-time']}>
-                <Form.Item name="end" rules={[{ required: true }]}>
-                  <Input type="text" value="Homepage Design"/>
+                <Form.Item
+                  name="end"
+                  rules={[{ required: true }]}>
+                  <Input type="text" value="Homepage Design" />
                 </Form.Item>
               </div>
+
               <div className={styles['total-time']}>
                 <span>00:05:00</span>
               </div>
+
             </Col>
           </Row>
         </Form>
       </Card>
-      <br/>
-      <Card bordered={false} style={{padding: '2rem 1rem 2rem 1rem'}}>
+      <br />
+      <Card
+        bordered={false}
+        style={{ padding: '2rem 1rem 2rem 1rem' }}>
         <Row>
           <Col span={12}>
             <div className={styles['timesheet']}>My Timesheet</div>
@@ -556,7 +614,11 @@ const Timesheet = () => {
             </div>
           </Col>
           <Col span={24} className={styles['card-col-timesheet']}>
-            <Table dataSource={timesheetData?.Timesheet?.data} columns={columns} rowKey={record => record?.id}/>
+            <Table
+              dataSource={timeEntryData?.TimeEntry?.data}
+              columns={columns}
+              rowKey={record => record?.id}
+            />
           </Col>
         </Row>
       </Card>
@@ -566,9 +628,9 @@ const Timesheet = () => {
         visible={visible}
         closeIcon={[
           <div onClick={() => setVisible(false)} key={1}>
-              <span className={styles['close-icon-div']}>
-                <CloseOutlined />
-              </span>
+            <span className={styles['close-icon-div']}>
+              <CloseOutlined />
+            </span>
           </div>
         ]}
         onOk={() => setVisible(false)}

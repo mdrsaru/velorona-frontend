@@ -17,18 +17,24 @@ const NewTimesheet = () => {
       <Card bordered={false}>
         <Row className={styles.cardHeaderRow}>
           <Col span={24}>
-            <ArrowLeftOutlined onClick={() => navigate(-1)}/> &nbsp; &nbsp; <span>Add Timesheet</span>
+            <ArrowLeftOutlined onClick={() => navigate(-1)} /> &nbsp; &nbsp; <span>Add Timesheet</span>
           </Col>
         </Row>
+        
         <Form form={form} layout="vertical">
           <Row>
             <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
               <Form.Item name="date-picker" label="Date">
-                <DatePicker bordered={false} placeholder={'Select Date'} suffixIcon={<DownOutlined/>}/>
+                <DatePicker
+                  bordered={false}
+                  placeholder={'Select Date'}
+                  suffixIcon={<DownOutlined />} />
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-              <Form.Item name="project" label="Project">
+              <Form.Item
+                name="project"
+                label="Project">
                 <Select placeholder="Select Project">
                   <Option value="project1">Project 1</Option>
                   <Option value="project2">Project 2</Option>
@@ -39,19 +45,29 @@ const NewTimesheet = () => {
           <Row>
             <Col span={24} className={styles.formCol}>
               <Form.Item label="Task">
-                <Input placeholder="Enter Task" autoComplete="off"/>
+                <Input
+                  placeholder="Enter Task"
+                  autoComplete="off" />
               </Form.Item>
             </Col>
           </Row>
           <Row>
             <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-              <Form.Item name="start-time-picker" label="Start Time">
-                <TimePicker placeholder={"Enter Start Time"} suffixIcon={""} />
+              <Form.Item
+                name="start-time-picker"
+                label="Start Time">
+                <TimePicker
+                  placeholder={"Enter Start Time"}
+                  suffixIcon={""} />
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-              <Form.Item name="end-time-picker" label="End Time">
-                <TimePicker placeholder={"Enter End Time"} suffixIcon={""} />
+              <Form.Item
+                name="end-time-picker"
+                label="End Time">
+                <TimePicker
+                  placeholder={"Enter End Time"}
+                  suffixIcon={""} />
               </Form.Item>
             </Col>
           </Row>
@@ -62,6 +78,7 @@ const NewTimesheet = () => {
                 <span className={styles.hours}>0 Hrs</span>
               </div>
             </Col>
+
             <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
               <div className={styles.totalTimeDiv}>
                 <span>Total Expense</span>
@@ -69,7 +86,7 @@ const NewTimesheet = () => {
               </div>
             </Col>
           </Row>
-          <br/><br/>
+          <br /><br />
           <Row justify="end">
             <Col>
               <Form.Item>

@@ -1,23 +1,45 @@
-import React  from 'react';
-import { Card, Col, DatePicker, Row, TimePicker, Button, Space } from "antd";
+import React from 'react';
+import { Card, Col, DatePicker, Row, Button, Space, Input } from "antd";
 import { ArrowLeftOutlined, LeftOutlined, RightOutlined, CloseCircleOutlined } from "@ant-design/icons";
 import moment from 'moment';
 
-import { useQuery } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import { useNavigate, useParams } from "react-router-dom";
 import { authVar } from '../../../App/link';
-import { TIMESHEET } from '../index';
+import { TIME_ENTRY } from '../index';
+// import _ from 'lodash';
 
 import styles from "../style.module.scss";
 
+
+// function getPreviousMonday() {
+//   var date = new Date();
+//   var day = date.getDay();
+//   var prevMonday = new Date();
+//   date.getDay() === 0 ? prevMonday.setDate(date.getDate() - 7) : prevMonday.setDate(date.getDate() - (day - 1))
+//   return prevMonday;
+// }
+
+export const TIME_ENTRY_WEEKLY_DETAILS = gql`
+query TimesheetWeeklyDetails($input: TimeEntryWeeklyDetailsInput!) {
+  TimeEntryWeeklyDetails(input: $input) {
+    id
+    start
+    duration
+    end
+    project {
+      id
+    }
+  }
+}
+`
 
 
 const DetailTimesheet = () => {
   let params = useParams();
   const navigate = useNavigate();
   const authData = authVar();
-  console.log(params);
-  const { data: timesheetData } = useQuery(TIMESHEET, {
+  const { data: timeEntryData } = useQuery(TIME_ENTRY, {
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
     variables: {
@@ -33,21 +55,52 @@ const DetailTimesheet = () => {
     }
   });
 
-  console.log(timesheetData);
+  // const { data: timeEntryWeeklyDetails } = useQuery(TIME_ENTRY_WEEKLY_DETAILS, {
+  //   variables: {
+  //     input: {
+  //       company_id: authData?.company?.id ?? '',
+  //     }
+  //   }
+  // });
+
+  // function getDaysInMonth(month: any, year: any, day: any) {
+  //   var date = new Date(year, month, day);
+  //   var days = [];
+  //   while (date.getMonth() === month) {
+  //     days.push(new Date(date));
+  //     date.setDate(date.getDate() + 1);
+  //   }
+  //   return days;
+  // }
+
+  // function groupByDate() {
+  //   let filteredDates = []
+  //   filteredDates = timeEntryWeeklyDetails?.TimeEntryWeeklyDetails.filter((data: any) =>
+  //     moment(data?.start).format('l') >= moment(getPreviousMonday()).format('l')
+  //   )
+  //   const monthDate = (entry: any) => moment(entry?.start, 'MMM Do').format('l');
+  //   const result = _.groupBy(filteredDates, monthDate);
+  //   console.log(result);
+  //   let array = Object.keys(result).map((key) => [result[key]]);
+  //   return array
+  // }
 
   return (
     <div className={styles['site-card-wrapper']}>
-      <Card bordered={false} className={styles.timesheetCard}>
+      <Card
+        bordered={false}
+        className={styles.timesheetCard}>
         <Row className={styles.cardHeader}>
           <Col span={24} className={styles.formColDetail}>
-            <ArrowLeftOutlined onClick={() => navigate(-1)}/> &nbsp; &nbsp; <span> My Timesheet</span>
+            <ArrowLeftOutlined onClick={() => navigate(-1)} /> &nbsp; &nbsp; <span> My Timesheet</span>
           </Col>
         </Row>
+
         <Row className={styles.cardBody}>
-          <Col span={12}>
+          <Col xs={24} sm={24} md={24} lg={12} xl={12}>
             <div className={styles.timesheetDiv}>
               <div className={styles.header}>Candidate Name</div>
-              <div>{timesheetData?.Timesheet?.data[0]?.company?.name}</div>
+              <div>{timeEntryData?.TimeEntry?.data[0]?.company?.name}</div>
             </div>
             <div className={styles.timesheetDiv}>
               <div className={styles.header}>Time Period</div>
@@ -66,38 +119,60 @@ const DetailTimesheet = () => {
               <div>Open</div>
             </div>
           </Col>
-          <Col span={12}>
+          <Col xs={24} sm={24} md={24} lg={12} xl={12}>
             <div className={styles.timesheetDiv}>
-              <div className={styles.header}>Project Name</div>
-              <div>{timesheetData?.Timesheet?.data[0]?.project?.name}</div>
+              <div className={styles.header}>
+                Project Name
+              </div>
+              <div>
+                {timeEntryData?.TimeEntry?.data[0]?.project?.name}
+              </div>
             </div>
             <div className={styles.timesheetDiv}>
-              <div className={styles.header}>Client Name</div>
-              <div>Araniko College Pvt Ltd</div>
+              <div className={styles.header}>
+                Client Name
+              </div>
+              <div>
+                Araniko College Pvt Ltd
+              </div>
             </div>
             <div className={styles.timesheetDiv}>
-              <div className={styles.header}>Client Location</div>
-              <div>{timesheetData?.Timesheet?.data[0]?.clientLocation ?? 'N/A'}</div>
+              <div className={styles.header}>
+                Client Location
+              </div>
+              <div>
+                {timeEntryData?.TimeEntry?.data[0]?.clientLocation ?? 'N/A'}
+              </div>
             </div>
             <div className={styles.timesheetDiv}>
-              <div className={styles.header}>Last Submitted</div>
-              <div>{moment(timesheetData?.Timesheet?.data[0]?.end).format('L')}</div>
+              <div className={styles.header}>
+                Last Submitted
+              </div>
+              <div>
+                {moment(timeEntryData?.TimeEntry?.data[0]?.end).format('L')}
+              </div>
             </div>
             <div className={styles.timesheetDiv}>
-              <div className={styles.header}>Approved By</div>
-              <div>{timesheetData?.Timesheet?.data[0]?.approver ?? 'N/A'}</div>
+              <div className={styles.header}>
+                Last Approved
+              </div>
+              <div>
+                {timeEntryData?.TimeEntry?.data[0]?.approver ?? 'N/A'}
+              </div>
             </div>
           </Col>
         </Row>
       </Card>
-      <br/>
+      <br />
       <Card bordered={false}>
         <Row className={styles.timeSheetDetail}>
           <Col span={6} className={styles.formCol1}>
             <span>Time Entry Details</span>
           </Col>
           <Col span={12}>
-            <div className={styles['data-picker']}><DatePicker.RangePicker style={{ width: '100%' }} /></div>
+            <div className={styles['data-picker']}>
+              <DatePicker.RangePicker style={{ width: '100%' }} />
+            </div>
           </Col>
           <Col span={3}>
             <div className={styles['next-icon']}>
@@ -111,7 +186,9 @@ const DetailTimesheet = () => {
           </Col>
         </Row>
         <Row>
-          <Col span={24} className={styles.formCol}>
+          <Col
+            span={24}
+            className={styles.formCol}>
             <div className={styles['resp-table']}>
               <div className={styles["resp-table-header"]}>
                 <div className={styles['table-header-cell']}>
@@ -146,26 +223,27 @@ const DetailTimesheet = () => {
                 <div className={styles["table-body-cell"]}>
                   Data 1
                 </div>
+
                 <div className={styles["table-body-cell"]}>
-                  <TimePicker defaultValue={moment('02:03:00', 'HH:mm:ss')} suffixIcon={null}/>
+                  <Input value={"20:30:44"} />
                 </div>
                 <div className={styles["table-body-cell"]}>
-                  <TimePicker defaultValue={moment('02:05:00', 'HH:mm:ss')} suffixIcon={null}/>
+                  <Input value={"20:30:44"} />
                 </div>
                 <div className={styles["table-body-cell"]}>
-                  <TimePicker defaultValue={moment('06:00:00', 'HH:mm:ss')} suffixIcon={null}/>
+                  <Input value={"20:30:44"} />
                 </div>
                 <div className={styles["table-body-cell"]}>
-                  <TimePicker defaultValue={moment('00:30:00', 'HH:mm:ss')} suffixIcon={null}/>
+                  <Input value={"20:30:44"} />
                 </div>
                 <div className={styles["table-body-cell"]}>
-                  <TimePicker defaultValue={moment('00:03:00', 'HH:mm:ss')} suffixIcon={null}/>
+                  <Input value={"20:30:44"} />
                 </div>
                 <div className={styles["table-body-cell"]}>
-                  <TimePicker defaultValue={moment('02:50:20', 'HH:mm:ss')} suffixIcon={null}/>
+                  <Input value={"20:30:44"} />
                 </div>
                 <div className={styles["table-body-cell"]}>
-                  <TimePicker defaultValue={moment('07:23:00', 'HH:mm:ss')} suffixIcon={null}/>
+                  <Input value={"20:30:44"} />
                 </div>
                 <div className={styles["table-body-cell"]}>
                   <span>40:00:00 </span> &nbsp; &nbsp; <CloseCircleOutlined />
@@ -174,20 +252,20 @@ const DetailTimesheet = () => {
             </div>
           </Col>
         </Row>
-        <br/>
+        <br />
         <Row justify={"end"}>
           <Col className={styles.formCol}>
-           <Space>
-             <Button type="primary" htmlType="button">
-               Save and Exit
-             </Button>
-             <Button type="default" htmlType="button">
-               Submit
-             </Button>
-           </Space>
+            <Space>
+              <Button type="primary" htmlType="button">
+                Save and Exit
+              </Button>
+              <Button type="default" htmlType="button">
+                Submit
+              </Button>
+            </Space>
           </Col>
         </Row>
-        <br/>
+        <br />
       </Card>
     </div>
   )
