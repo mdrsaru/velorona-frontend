@@ -2,9 +2,9 @@ import React, { useState } from "react";
 import { gql, useQuery } from "@apollo/client";
 
 import { Card, Col, Dropdown, Menu, Row, Table } from "antd";
-import { Link } from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 import routes from "../../config/routes";
-import { MoreOutlined } from "@ant-design/icons";
+import { MoreOutlined, PlusCircleOutlined } from "@ant-design/icons";
 
 import { authVar } from "../../App/link";
 import ModalConfirm from "../../components/Modal";
@@ -16,25 +16,24 @@ import styles from "./style.module.scss";
 
 
 
-
 export const PROJECT = gql`
     query Project($input: ProjectQueryInput!) {
-      Project(input: $input) {
-        data {
-          id
-          name
-          client {
-            id
-            email
-          }
-          company {
-            id
-            name
-          }
+        Project(input: $input) {
+            data {
+                id
+                name
+                client {
+                    id
+                    email
+                }
+                company {
+                    id
+                    name
+                }
+            }
         }
-      }
     }
-   `
+`
 
 
 const deleteBody = () => {
@@ -59,6 +58,7 @@ const archiveBody = () => {
 
 const Project = () => {
   const loggedInUser = authVar();
+  const navigate = useNavigate();
   const [visibility, setVisibility] = useState(false);
   const [showArchive, setArchiveModal] = useState(false);
   const setModalVisibility = (value: boolean) => {
@@ -100,8 +100,18 @@ const Project = () => {
   const columns = [
     {
       title: 'Project Name',
-      dataIndex: 'name',
-      key: 'name',
+      render: (task: any) => {
+        return <div className={styles['task-name']}>
+          <p>{task?.name}</p>
+        </div>
+      },
+      onCell: (record: any) => {
+        return {
+          onClick: () => {
+            navigate(routes.detailProject.path(loggedInUser?.company?.code ?? '', record?.id ?? ''));
+          },
+        };
+      },
     },
     {
       title: 'Client',
@@ -143,6 +153,11 @@ const Project = () => {
       key: 'actions',
       render: (record: any) =>
         <div className={styles['dropdown-menu']} onClick={(event) => event.stopPropagation()}>
+            <Link to={routes.addTasksProject.path(loggedInUser?.company?.code ? loggedInUser?.company?.code : '',
+              record?.id ?? '')}>
+              <span className={styles['plus-circle-outline']}><PlusCircleOutlined/></span> &nbsp;
+              <span className={styles['add-task']}>Add Task</span> &nbsp; &nbsp;
+            </Link>
           <Dropdown overlay={menu(record)} trigger={['click']} placement="bottomRight">
             <div className="ant-dropdown-link" onClick={e => e.preventDefault()} style={{paddingLeft: '1rem'}}>
               <MoreOutlined />
@@ -162,13 +177,15 @@ const Project = () => {
             </Col>
             <Col span={12} className={styles['form-col']}>
               <div className={styles['add-new']}>
-                <Link to={routes.addProject.path(loggedInUser?.company?.code ? loggedInUser?.company?.code : '')}>Add new project</Link>
+                <Link to={routes.addProject.path(loggedInUser?.company?.code ? loggedInUser?.company?.code : '')}>
+                  Add new project
+                </Link>
               </div>
             </Col>
           </Row>
           <Row>
             <Col span={24}>
-              <Table dataSource={projectData?.Project?.data} columns={columns}/>
+              <Table dataSource={projectData?.Project?.data} columns={columns} rowKey={(record => record?.id)}/>
             </Col>
           </Row>
         </Card>

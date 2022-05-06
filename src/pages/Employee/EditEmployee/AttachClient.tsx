@@ -6,16 +6,13 @@ import { useNavigate, useParams } from "react-router-dom";
 import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import { notifyGraphqlError } from "../../../utils/error";
 import debounce from 'lodash.debounce';
-
 import { authVar } from "../../../App/link";
+
 import ClientForm from "../../Client/NewClient/ClientForm";
-
-import constants from "../../../config/constants";
 import routes from "../../../config/routes";
-import { USER } from "../index";
 import { CLIENT_CREATE } from "../../Client/NewClient";
-
 import { CLIENT } from "../../Client";
+
 import styles from "../style.module.scss";
 
 export const ASSOCIATE_USER_WITH_CLIENT = gql`
@@ -47,7 +44,7 @@ const AttachClient = () => {
   const [AssociateClient] = useMutation(ASSOCIATE_USER_WITH_CLIENT);
   const [ClientCreate] = useMutation(CLIENT_CREATE);
   const [visible, setVisible] = useState(false);
-  const [searchClients, { loading, data: clientData1 }] = useLazyQuery(
+  const [searchClients, { loading, data: searchClientData }] = useLazyQuery(
     CLIENT,
     {
       fetchPolicy: "network-only",
@@ -62,11 +59,13 @@ const AttachClient = () => {
     }
   );
 
-  const { data: clientData } = useQuery(USER, {
+  const { data: clientData } = useQuery(CLIENT, {
+    fetchPolicy: "network-only",
+    nextFetchPolicy: "cache-first",
     variables: {
       input: {
         query: {
-          role: constants.roles.Client
+          company_id: authData?.company?.id
         },
         paging: {
           order: ['updatedAt:DESC']
@@ -208,7 +207,7 @@ const AttachClient = () => {
                     <Col xs={24} sm={12} md={8} lg={8} key={index}>
                       <Skeleton paragraph={{ rows: 3 }}  />
                     </Col>)) :
-                    clientData1?.Client?.data?.map((client: any, index: number) =>
+                    searchClientData?.Client?.data?.map((client: any, index: number) =>
                     <Col xs={24} sm={12} md={8} lg={8} key={index}>
                       <Radio.Button value={client?.id} className={styles['client-col']}>
                         <div>

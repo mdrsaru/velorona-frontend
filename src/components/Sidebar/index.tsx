@@ -1,4 +1,7 @@
-import { Link, useLocation } from 'react-router-dom';
+import {
+  Link,
+  // useLocation
+} from 'react-router-dom';
 import { Menu, Layout } from 'antd';
 import {
   BankOutlined,
@@ -19,21 +22,23 @@ import routes from '../../config/routes';
 import { authVar } from '../../App/link';
 
 import styles from './style.module.scss';
+import {useState} from "react";
 
 const { Sider } = Layout;
 
-const menuKeys = [
-  routes.dashboard.path,
-  routes.home.path,
-  routes.timesheet.path,
-  routes.tasks.path,
-  routes.schedule.path,
-];
+// const menuKeys = [
+//   routes.dashboard.path,
+//   routes.home.path,
+//   routes.timesheet.path,
+//   routes.tasks.path,
+//   routes.schedule.path,
+// ];
 
 
 const Sidebar = (props: any) => {
   const { collapsed, onCollapse } = props
-  const location = useLocation();
+  const [selectedMenuKey, setMenuKey] = useState('')
+  // const location = useLocation();
   const loggedInUser = authVar();
   const menuItems = [
     {
@@ -89,14 +94,14 @@ const Sidebar = (props: any) => {
       key: routes.timesheet.key,
       name: routes.timesheet.name,
       icon: <FieldTimeOutlined />,
-      route: routes.timesheet.path,
+      route: routes.timesheet.path(loggedInUser?.company?.code ?? ''),
       accessRoles: [constants.roles.Employee, constants.roles.TaskManager]
     },
     {
       key: routes.tasks.key,
       name: routes.tasks.name,
       icon: <OrderedListOutlined />,
-      route: routes.tasks.path,
+      route: routes.tasks.path(loggedInUser?.company?.code ?? ''),
       accessRoles: [constants.roles.Employee, constants.roles.TaskManager]
     },
     {
@@ -117,12 +122,12 @@ const Sidebar = (props: any) => {
       key: routes.schedule.key,
       name: routes.schedule.name,
       icon: <ScheduleOutlined />,
-      route: routes.schedule.path,
+      route: routes.schedule.path(loggedInUser?.company?.code ?? ''),
       accessRoles: [constants.roles.Employee, constants.roles.TaskManager]
     }
   ]
   const menuArray = menuItems.filter(menu => {return loggedInUser?.user?.roles?.some(role => menu.accessRoles.includes(role))})
-  const selectedMenuKey = menuKeys.find(key => key.split('/')?.[1] === location.pathname?.split('/')?.[1]) ?? '';
+  // const selectedMenuKey = menuKeys.find(key => key.split('/')?.[1] === location.pathname?.split('/')?.[1]) ?? '';
 
   return (
     <Sider
@@ -140,8 +145,8 @@ const Sidebar = (props: any) => {
         defaultOpenKeys={['sub1']}
         style={{ height: '100%', borderRight: 0 }}
         selectedKeys={[selectedMenuKey]}>
-        {menuArray && menuArray.map((menu, index) => (
-          <Menu.Item key={menu?.key} icon={menu?.icon}>
+        {menuArray && menuArray.map((menu) => (
+          <Menu.Item key={menu?.key} icon={menu?.icon} onClick={(e: any) =>{setMenuKey(e.key)}}>
             <Link to={menu.route}>{menu.name}</Link>
           </Menu.Item>
         ))}

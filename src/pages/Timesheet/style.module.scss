@@ -15,6 +15,13 @@
   }
 
   :local(.site-card-wrapper) {
+    .ant-card-body {
+      padding: 0;
+    }
+
+    .ant-form-item {
+      margin-bottom: 0;
+    }
 
     .ant-card-grid {
       padding-left: 7px;
@@ -30,7 +37,8 @@
       color: var(--primary-blue);
     }
 
-    .anticon-left, .anticon-right {
+    .anticon-left,
+    .anticon-right {
       font-size: 16px;
       font-weight: 800;
     }
@@ -42,6 +50,7 @@
 
     .anticon-close-circle svg {
       color: var(--gray-secondary);
+
       &:hover {
         color: var(--primary-blue);
       }
@@ -72,6 +81,7 @@
     font-weight: 600;
     font-size: 28px;
     line-height: 29px;
+
     @media screen and (max-width: 1282px) {
       font-size: 20px;
     }
@@ -82,9 +92,11 @@
     padding: 1rem;
     font-size: 20px;
     float: right;
+
     @media screen and (max-width: 1281px) {
       font-size: 14px;
     }
+
     line-height: 22px;
     cursor: pointer;
     color: var(--primary-blue);
@@ -94,8 +106,17 @@
 /*** NewTimeSheet CSS ***/
 
 .formCol {
-  padding-left: 1rem;
-  padding-top: 1rem;
+  padding: 1.5rem;
+
+  .date-view {
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 22px;
+  }
+}
+
+.formColDetail {
+  padding: 1.5rem;
 
   span {
     font-weight: 600;
@@ -104,8 +125,145 @@
   }
 }
 
+.task-card {
+  padding: 2rem 1rem 2rem 1rem;
+
+  :global {
+    .ant-form-item-control {
+      margin-right: 2rem;
+    }
+
+    .ant-input {
+      font-weight: 600;
+      font-size: 18px;
+      width: 100%;
+      line-height: 22px;
+    }
+  }
+
+  .total-time {
+    padding-left: 2rem;
+    padding-top: 1rem;
+  }
+
+  .task-row {
+    padding: 0 1.2rem 0 1.2rem;
+  }
+
+  .start-time,
+  .end-time {
+    width: 15%;
+
+    :global {
+      .ant-input {
+        color: var(--primary-blue);
+      }
+    }
+  }
+
+  .task-div-list {
+    display: flex;
+    padding: 0.7rem;
+    width: 100%;
+    margin-top: 1rem;
+    border: 1px solid var(--gray-secondary);
+    box-sizing: border-box;
+
+    div {
+      font-weight: 600;
+      font-size: 18px;
+      line-height: 22px;
+    }
+
+    span {
+      font-weight: 600;
+      font-size: 18px;
+      line-height: 22px;
+      color: var(--primary-blue);
+    }
+  }
+
+  .task-div-header {
+    display: flex;
+    padding: 0 1.2rem 0.2rem 1.2rem;
+
+    div {
+      color: var(--white);
+      font-weight: 600;
+      font-size: 14px;
+      line-height: 17px;
+      padding: 0.8rem 0 0.8rem 1.4rem;
+      background: var(--gray-secondary);
+    }
+
+    .start-header,
+    .end-header {
+      width: 16%;
+    }
+
+    .total-header {
+      width: 24%;
+    }
+
+    .task-header,
+    .client-header {
+      width: 22%;
+    }
+  }
+}
+
+.formColHeader {
+  padding: 2rem;
+
+  b {
+    font-weight: 600;
+    font-size: 24px;
+    line-height: 29px;
+
+    span {
+      color: var(--primary-blue);
+    }
+  }
+}
+
+.null-span {
+  font-size: 15px;
+  text-align: center;
+  color: var(--gray-secondary);
+}
+
+.formRow {
+  border: 1px solid #E0E0E0;
+  box-sizing: border-box;
+  box-shadow: 0 7px 4px rgba(231, 231, 231, 0.25);
+}
+
+.taskCol {
+  padding: 1.5rem;
+  border-top: 1px solid #E0E0E0;
+  box-sizing: border-box;
+  box-shadow: 0 7px 4px rgba(231, 231, 231, 0.25);
+}
+
+.timeStartCol {
+  padding: 1.5rem;
+  border-top: 1px solid #E0E0E0;
+  border-left: 1px solid #E0E0E0;
+  box-sizing: border-box;
+  box-shadow: 0 7px 4px rgba(231, 231, 231, 0.25);
+  display: flex;
+  justify-content: center;
+  align-items: end;
+
+  span {
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 23px;
+  }
+}
+
 .formCol1 {
-  padding-left: 1rem;
+  padding-left: 1.5rem;
   padding-top: 1.5rem;
 
   span {
@@ -148,6 +306,7 @@
   margin-right: 1.5rem;
   justify-content: center;
   align-items: center;
+
   div {
     width: 50%;
   }
@@ -163,6 +322,7 @@
   border: 1px solid #F2F2F2;
   box-sizing: border-box;
   box-shadow: 0 7px 4px rgba(231, 231, 231, 0.25);
+
   @media only screen and (max-width: 767px) {
     margin-bottom: 1.4rem;
   }
@@ -195,17 +355,21 @@
 }
 
 .timeSheetDetail {
+  padding-top: 1.5rem;
+  padding-right: 0.5rem;
 }
 
 .totalRow {
   padding-left: 3rem;
   padding-top: 0.6rem;
   padding-right: 1rem;
+
   span {
-      font-weight: 600;
-      font-size: 18px;
-      line-height: 22px;
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 22px;
   }
+
   .totalCount {
     float: right;
   }
@@ -237,7 +401,8 @@
   }
 }
 
-.resp-table-header, .resp-table-body {
+.resp-table-header,
+.resp-table-body {
   display: flex;
 }
 
@@ -255,7 +420,8 @@
   line-height: 17px;
 }
 
-.table-header-cell, .table-body-cell {
+.table-header-cell,
+.table-body-cell {
   width: 15%;
   padding: 1rem;
 }
@@ -283,4 +449,12 @@
   padding: 5px;
   border-radius: 50px;
   background: var(--gray-2);
+}
+
+.timesheetTask {
+  background-color: var(--gray-2);
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 22px;
+  padding: 1rem;
 }

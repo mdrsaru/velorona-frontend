@@ -2,11 +2,46 @@ import React, { useState } from "react";
 import { Card, Col, Row, Avatar, Modal } from "antd";
 import { UserOutlined, LinkOutlined, CloseOutlined } from '@ant-design/icons';
 
+import {
+  gql,
+  // useQuery
+} from "@apollo/client";
 import styles from "./style.module.scss";
+// import {authVar} from "../../App/link";
 
+
+export const TASK = gql`
+    query Task($input: TaskQueryInput!) {
+        Task(input: $input) {
+            data {
+                id
+                name
+                status
+                archived
+                company_id
+                project_id
+            }
+        }
+    }
+`
 
 const Tasks = () => {
+  // const authData = authVar();
   const [visibility, setVisibility] = useState(false);
+  // const { data: taskData } = useQuery(TASK, {
+  //   fetchPolicy: "network-only",
+  //   nextFetchPolicy: "cache-first",
+  //   variables: {
+  //     input: {
+  //       query: {
+  //         company_id: authData?.company?.id
+  //       },
+  //       paging: {
+  //         order: ['updatedAt:DESC']
+  //       }
+  //     }
+  //   }
+  // })
 
   return (
     <>
