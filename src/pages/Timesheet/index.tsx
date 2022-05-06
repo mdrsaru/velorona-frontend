@@ -80,6 +80,7 @@ export const TIME_ENTRY = gql`
                 start
                 end
                 createdAt
+                duration
                 clientLocation
                 task {
                     id 
@@ -107,6 +108,19 @@ const computeDiff = (date: Date) => {
   const diff = (currentDate.getTime() - pastDate.getTime()) / 1000;
   return diff
 };
+
+const getTimeFormat = (seconds: any) => {
+  let second = parseInt(seconds, 10); 
+  let sec_num = Math.abs(second);
+  let hours: any = Math.floor(sec_num / 3600);
+  let minutes: any = Math.floor((sec_num - (hours * 3600)) / 60);
+  let secs: any = sec_num - (hours * 3600) - (minutes * 60);
+
+  if (hours   < 10) {hours   = "0"+hours;}
+  if (minutes < 10) {minutes = "0"+minutes;}
+  if (secs < 10) {secs = "0"+secs;}
+  return hours+':'+minutes+':'+secs;
+}
 
 interface TimeEntryResponseArray {
   TimeEntry: TimeEntryPagingResult
@@ -248,9 +262,10 @@ const Timesheet = () => {
       input: {
         query: {
           company_id: authData?.company?.id,
+          afterStart: moment().startOf('day')
         },
         paging: {
-          order: ['createdAt:DESC']
+          order: ['start:DESC']
         }
       }
     },
@@ -469,7 +484,7 @@ const Timesheet = () => {
                     name="task"
                     label="Task"
                     rules={[{
-                      required: !showDetailTimeEntry,
+                      required: !showDetailTimeEntry, 
                       message: 'Choose the task'
                     }]}>
                     {showDetailTimeEntry ?
@@ -520,7 +535,9 @@ const Timesheet = () => {
             className={styles['task-card']}>
             <Row>
               <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-                <span className={styles['date-view']}>April 26, 2022</span>
+                <span className={styles['date-view']}>
+                  April 26, 2022
+                  </span>
               </Col>
             </Row>
             <Row>
@@ -536,57 +553,49 @@ const Timesheet = () => {
             </Row>
             <Form
               onFinish={onFinish}
-              validateMessages={validateMessages}
-              initialValues={{
-                name: "Homepage Design",
-                client: "Vellorum: Website Design",
-                start: '9:25PM',
-                end: '12:20PM',
-                total: ''
-              }}>
-              <Row className={styles['task-row']}>
-                <Col
-                  span={24}
-                  className={styles['task-div-list']}>
-
-                  <div className={styles['task-name']}>
-                    <Form.Item
-                      name="name"
-                      rules={[{ required: true }]}>
-                      <Input type="text" value="Homepage Design" />
-                    </Form.Item>
-                  </div>
-
-                  <div className={styles['client-name']}>
-                    <Form.Item
-                      name="client"
-                      rules={[{ required: true }]}>
-                      <Input type="text" value="Homepage Design" />
-                    </Form.Item>
-                  </div>
-
-                  <div className={styles['start-time']}>
-                    <Form.Item
-                      name="start"
-                      rules={[{ required: true }]}>
-                      <Input type="text" value="Homepage Design" />
-                    </Form.Item>
-                  </div>
-
-                  <div className={styles['end-time']}>
-                    <Form.Item
-                      name="end"
-                      rules={[{ required: true }]}>
-                      <Input type="text" value="Homepage Design" />
-                    </Form.Item>
-                  </div>
-
-                  <div className={styles['total-time']}>
-                    <span>00:05:00</span>
-                  </div>
-
-                </Col>
-              </Row>
+              validateMessages={validateMessages}>
+                {timeEntryData && timeEntryData?.TimeEntry?.data.map((entry: any, index: number) => (
+                    <Row className={styles['task-row']} key={index}>
+                      <Col span={24} className={styles['task-div-list']}>
+                        <div className={styles['task-name']}>
+                          <Form.Item
+                            name={`name${index}`}
+                            rules={[{ required: true }]}>
+                            <Input type="text" defaultValue={entry?.task?.name ?? ''} />
+                          </Form.Item>
+                        </div>
+    
+                        <div className={styles['client-name']}>
+                          <Form.Item
+                            name={`client${index}`}
+                            rules={[{ required: true }]}>
+                            <Input type="text" defaultValue={entry?.project?.name ?? ''} />
+                          </Form.Item>
+                        </div>
+    
+                        <div className={styles['start-time']}>
+                          <Form.Item
+                            name={`start${index}`}
+                            rules={[{ required: true }]}>
+                            <Input type="text" defaultValue={moment(entry?.start).format('LT')} />
+                          </Form.Item>
+                        </div>
+    
+                        <div className={styles['end-time']}>
+                        <Form.Item
+                          name={`end${index}`}
+                          rules={[{ required: true }]}>
+                          <Input type="text" defaultValue={moment(entry?.end).format('LT')} />
+                        </Form.Item>
+                        </div>
+    
+                        <div className={styles['total-time']}>
+                        <span>{getTimeFormat(entry?.duration)}</span>
+                        </div>
+    
+                      </Col>
+                  </Row>
+                ))}
             </Form>
           </Card>
           <br />
@@ -595,17 +604,23 @@ const Timesheet = () => {
             style={{ padding: '2rem 1rem 2rem 1rem' }}>
             <Row>
               <Col span={12}>
-                <div className={styles['timesheet']}>My Timesheet</div>
+                <div className={styles['timesheet']}>
+                  My Timesheet
+                </div>
               </Col>
               <Col span={12}>
-                <div className={styles['add-time-stamp']} onClick={() => setVisible(true)}>
+                <div
+                  className={styles['add-time-stamp']}
+                  onClick={() => setVisible(true)}>
                   Add Project
                 </div>
               </Col>
             </Row>
             <Row>
               <Col xs={12} sm={16} md={18} lg={20}>
-                <div className={styles['data-picker']}><DatePicker.RangePicker style={{ width: '100%' }} /></div>
+                <div className={styles['data-picker']}>
+                  <DatePicker.RangePicker style={{ width: '100%' }} />
+                </div>
               </Col>
               <Col xs={6} sm={4} md={3} lg={2}>
                 <div className={styles['next-icon']}>
@@ -643,14 +658,20 @@ const Timesheet = () => {
             width={1000}>
             <div className={styles['modal-title']}>Select Project</div>
             <div className={styles['form-modal']}>
-              <Form form={form} layout="vertical">
-                <Form.Item name="client" label="Client">
+              <Form
+                form={form}
+                layout="vertical">
+                <Form.Item
+                  name="client"
+                  label="Client">
                   <Select placeholder="Select Client">
                     <Option value="client1">Client 1</Option>
                     <Option value="client2">Client 2</Option>
                   </Select>
                 </Form.Item>
-                <Form.Item name="project" label="Project">
+                <Form.Item
+                  name="project"
+                  label="Project">
                   <Select placeholder="Select Project">
                     <Option value="project1">Project 1</Option>
                     <Option value="project2">Project 2</Option>
