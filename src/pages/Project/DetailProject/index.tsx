@@ -23,15 +23,19 @@ const DetailProject = () => {
     <Menu>
       <SubMenu title="Change status" key="mainMenu">
         <Menu.Item key="active">Active</Menu.Item>
-        <Menu.Divider/>
+        <Menu.Divider />
         <Menu.Item key="inactive">Inactive</Menu.Item>
       </SubMenu>
-      <Menu.Divider/>
+      <Menu.Divider />
+
       <Menu.Item key="archive">
         <div>Archive Project</div>
       </Menu.Item>
-      <Menu.Divider/>
-      <Menu.Item key="delete"><div>Delete Project</div></Menu.Item>
+      <Menu.Divider />
+      
+      <Menu.Item key="delete">
+        <div>Delete Project</div>
+      </Menu.Item>
     </Menu>
   );
   const columns = [
@@ -69,9 +73,17 @@ const DetailProject = () => {
       title: 'Actions',
       key: 'actions',
       render: (record: any) =>
-        <div className={styles['dropdown-menu']} onClick={(event) => event.stopPropagation()}>
-          <Dropdown overlay={menu(record)} trigger={['click']} placement="bottomRight">
-            <div className="ant-dropdown-link" onClick={e => e.preventDefault()} style={{paddingLeft: '1rem'}}>
+        <div
+          className={styles['dropdown-menu']}
+          onClick={(event) => event.stopPropagation()}>
+          <Dropdown
+            overlay={menu(record)}
+            trigger={['click']}
+            placement="bottomRight">
+            <div
+              className="ant-dropdown-link"
+              onClick={e => e.preventDefault()}
+              style={{ paddingLeft: '1rem' }}>
               <MoreOutlined />
             </div>
           </Dropdown>
@@ -89,10 +101,6 @@ const DetailProject = () => {
       }
     }
   })
-  
-  const navigateToAdd = () => {
-    
-  }
 
   const { data: taskData } = useQuery(TASK, {
     fetchPolicy: "network-only",
@@ -116,7 +124,7 @@ const DetailProject = () => {
         <Row>
           <Col span={12} className={styles['project-col']}>
             <h1>
-              <ArrowLeftOutlined onClick={() => navigate(-1)}/>
+              <ArrowLeftOutlined onClick={() => navigate(-1)} />
               &nbsp; Project :&nbsp;
               <span>{projectData?.Project?.data[0]?.name ?? ''}</span>
             </h1>
@@ -131,17 +139,20 @@ const DetailProject = () => {
           </Col>
         </Row>
       </Card>
-      <br/>
+      <br />
       <Card bordered={false}>
         <Row>
           <Col span={24} className={styles['project-col']}>
             <h1>Task List</h1>
           </Col>
         </Row>
-        <br/>
+        <br />
         <Row>
           <Col span={24}>
-            <Table dataSource={taskData?.Task?.data} columns={columns} rowKey={(record => record?.id)}/>
+            <Table
+              dataSource={taskData?.Task?.data}
+              columns={columns}
+              rowKey={(record => record?.id)} />
           </Col>
         </Row>
       </Card>

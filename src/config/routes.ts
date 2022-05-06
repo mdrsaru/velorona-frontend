@@ -45,14 +45,14 @@ const routes = {
   },
   role: {
     childPath: 'role',
-    path:  '/role',
+    path: '/role',
     component: lazy(() => import('../pages/Role')),
     name: 'Role',
     key: 'side3'
   },
   companyDashboard: {
     childPath: 'dashboard',
-    path:  (company: string) => `/${company}/dashboard`,
+    path: (company: string) => `/${company}/dashboard`,
     component: lazy(() => import('../pages/Dashboard')),
     name: 'Dashboard',
     key: 'side18'

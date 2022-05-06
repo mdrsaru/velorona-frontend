@@ -14,7 +14,7 @@ import styles from "./style.module.scss";
 
 export interface UserData {
   User: {
-    data : User[]
+    data: User[]
   }
 }
 
@@ -92,9 +92,16 @@ const Client = () => {
       title: 'Actions',
       key: 'actions',
       render: (record: any) =>
-        <div className={styles['dropdown-menu']} onClick={(event) => event.stopPropagation()}>
-          <Dropdown overlay={menu(record)} trigger={['click']} placement="bottomRight">
-            <div className="ant-dropdown-link" onClick={e => e.preventDefault()} style={{paddingLeft: '1rem'}}>
+        <div
+          className={styles['dropdown-menu']}
+          onClick={(event) => event.stopPropagation()}>
+          <Dropdown
+            overlay={menu(record)}
+            trigger={['click']} placement="bottomRight">
+            <div
+              className="ant-dropdown-link"
+              onClick={e => e.preventDefault()}
+              style={{ paddingLeft: '1rem' }}>
               <MoreOutlined />
             </div>
           </Dropdown>
@@ -105,24 +112,26 @@ const Client = () => {
   return (
     <div className={styles['main-div']}>
       <Card bordered={false}>
-          <Row>
-            <Col span={12} className={styles['client-col']}>
-              <h1>Client</h1>
-            </Col>
-            <Col span={12} className={styles['client-col']}>
-              <div className={styles['add-new-client']}>
-                <Link to={routes.addClient.path(loggedInUser?.company?.code ? loggedInUser?.company?.code : '')}>
-                  Add New Client
-                </Link>
-              </div>
-            </Col>
-          </Row>
-          <Row>
-            <Col span={24}>
-              <Table dataSource={clientData?.Client?.data} columns={columns} rowKey={(record => record?.id)}/>
-            </Col>
-          </Row>
-        </Card>
+        <Row>
+          <Col span={12} className={styles['client-col']}>
+            <h1>Client</h1>
+          </Col>
+          <Col span={12} className={styles['client-col']}>
+            <div className={styles['add-new-client']}>
+              <Link to={routes.addClient.path(loggedInUser?.company?.code ? loggedInUser?.company?.code : '')}>
+                Add New Client
+              </Link>
+            </div>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={24}>
+            <Table
+              dataSource={clientData?.Client?.data} columns={columns}
+              rowKey={(record => record?.id)} />
+          </Col>
+        </Row>
+      </Card>
     </div>
   )
 }

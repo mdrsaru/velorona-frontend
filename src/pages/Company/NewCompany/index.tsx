@@ -36,11 +36,11 @@ const NewCompany = () => {
         }
       }
     }).then((response) => {
-      if(response.errors) {
-         return notifyGraphqlError((response.errors))
+      if (response.errors) {
+        return notifyGraphqlError((response.errors))
       } else if (response?.data?.CompanyCreate) {
-          message.success(`Company admin ${response?.data?.CompanyCreate?.name} is created successfully!`).then(r => {});
-          navigate(-1)
+        message.success(`Company admin ${response?.data?.CompanyCreate?.name} is created successfully!`).then(r => { });
+        navigate(-1)
       }
     }).catch(notifyGraphqlError)
   }
@@ -50,19 +50,35 @@ const NewCompany = () => {
       <Card bordered={false}>
         <Row>
           <Col span={24} className={styles['form-col']}>
-            <h1><ArrowLeftOutlined onClick={() => navigate(-1)}/> &nbsp; Add New Company</h1>
+            <h1>
+              <ArrowLeftOutlined onClick={() => navigate(-1)} /> &nbsp; Add New Company
+            </h1>
           </Col>
         </Row>
         <Form form={form} layout="vertical" onFinish={onSubmitForm}>
           <Row>
             <Col xs={24} sm={24} md={12} className={styles['form-col2']}>
-              <Form.Item label="Company Name" name="name" rules={[{required: true, message: 'Enter a company name.'},
-                {max: 50, message: "Name should be less than 50 character"}]}>
-                <Input placeholder="Enter Name of the company" autoComplete="off"/>
+              <Form.Item
+                label="Company Name"
+                name="name"
+                rules={[{
+                  required: true,
+                  message: 'Enter a company name.'
+                }, {
+                  max: 50,
+                  message: "Name should be less than 50 character"
+                }]}>
+                <Input placeholder="Enter Name of the company" autoComplete="off" />
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={12} className={styles['form-col2']}>
-              <Form.Item name="status" label="Company Status" rules={[{required: true, message: 'Select a company status.'}]}>
+              <Form.Item
+                name="status"
+                label="Company Status"
+                rules={[{
+                  required: true,
+                  message: 'Select a company status.'
+                }]}>
                 <Select placeholder="Active">
                   <Option value="Active">Active</Option>
                   <Option value="Inactive">In Active</Option>
@@ -72,13 +88,21 @@ const NewCompany = () => {
           </Row>
           <Row>
             <Col span={24} className={styles['form-col2']}>
-              <Form.Item label="Email" name='email' rules={[{type: 'email', message: 'The input is not valid E-mail!',},
-                {required: true, message: 'Please input your E-mail!'},]}>
-                <Input placeholder="Company Admin Email" autoComplete="off"/>
+              <Form.Item
+                label="Email"
+                name='email'
+                rules={[{
+                  type: 'email',
+                  message: 'The input is not valid E-mail!'
+                }, {
+                  required: true,
+                  message: 'Please input your E-mail!'
+                },]}>
+                <Input placeholder="Company Admin Email" autoComplete="off" />
               </Form.Item>
             </Col>
           </Row>
-          <br/><br/>
+          <br /><br />
           <Row justify="end">
             <Col>
               <Form.Item>

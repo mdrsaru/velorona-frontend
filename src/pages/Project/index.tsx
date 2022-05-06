@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { gql, useQuery } from "@apollo/client";
 
 import { Card, Col, Dropdown, Menu, Row, Table } from "antd";
-import {Link, useNavigate} from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import routes from "../../config/routes";
 import { MoreOutlined, PlusCircleOutlined } from "@ant-design/icons";
 
@@ -39,9 +39,15 @@ export const PROJECT = gql`
 const deleteBody = () => {
   return (
     <div className={styles['modal-message']}>
-      <div><img src={deleteImg} alt="confirm" /></div><br/>
-      <p>Are you sure you want to delete <strong>Insight Workshop Pvt. Ltd?</strong></p>
-      <p className={styles['warning-text']}>All the data associated with the project will be deleted permanently.</p>
+      <div>
+        <img src={deleteImg} alt="confirm" />
+      </div><br />
+      <p>Are you sure you want to delete
+        <strong>Insight Workshop Pvt. Ltd?</strong>
+      </p>
+      <p className={styles['warning-text']}>
+        All the data associated with the project will be deleted permanently.
+      </p>
     </div>
   )
 }
@@ -49,9 +55,15 @@ const deleteBody = () => {
 const archiveBody = () => {
   return (
     <div className={styles['modal-message']}>
-      <div><img src={archiveImg} alt="archive-confirm"/></div> <br/>
-      <p>Are you sure you want to archive <strong>Insight Workshop Pvt. Ltd?</strong></p>
-      <p className={styles['archive-text']}>Project will not be able to login to the system.</p>
+      <div>
+        <img src={archiveImg} alt="archive-confirm" />
+      </div> <br />
+      <p>Are you sure you want to archive
+        <strong>Insight Workshop Pvt. Ltd?</strong>
+      </p>
+      <p className={styles['archive-text']}>
+        Project will not be able to login to the system.
+      </p>
     </div>
   )
 }
@@ -86,14 +98,24 @@ const Project = () => {
   const menu = (data: any) => (
     <Menu>
       <Menu.Item key="edit">
-        <Link to={routes.editProject.path(loggedInUser?.company?.code ?? '1', data?.id ?? '1')}>Edit Project</Link>
+        <Link to={routes.editProject.path(loggedInUser?.company?.code ?? '1', data?.id ?? '1')}>
+          Edit Project
+        </Link>
       </Menu.Item>
-      <Menu.Divider/>
+      <Menu.Divider />
+
       <Menu.Item key="archive">
-        <div onClick={() => setArchiveVisibility(true)}>Archive Project</div>
+        <div onClick={() => setArchiveVisibility(true)}>
+          Archive Project
+        </div>
       </Menu.Item>
-      <Menu.Divider/>
-      <Menu.Item key="delete"><div onClick={() => setModalVisibility(true)}>Delete Project</div></Menu.Item>
+      <Menu.Divider />
+
+      <Menu.Item key="delete">
+        <div onClick={() => setModalVisibility(true)}>
+          Delete Project
+        </div>
+      </Menu.Item>
     </Menu>
   );
 
@@ -116,7 +138,7 @@ const Project = () => {
     {
       title: 'Client',
       key: 'client',
-      render: (record:any) =>
+      render: (record: any) =>
         <div>
           {record?.client?.email}
         </div>
@@ -152,14 +174,26 @@ const Project = () => {
       title: 'Actions',
       key: 'actions',
       render: (record: any) =>
-        <div className={styles['dropdown-menu']} onClick={(event) => event.stopPropagation()}>
-            <Link to={routes.addTasksProject.path(loggedInUser?.company?.code ? loggedInUser?.company?.code : '',
-              record?.id ?? '')}>
-              <span className={styles['plus-circle-outline']}><PlusCircleOutlined/></span> &nbsp;
-              <span className={styles['add-task']}>Add Task</span> &nbsp; &nbsp;
-            </Link>
-          <Dropdown overlay={menu(record)} trigger={['click']} placement="bottomRight">
-            <div className="ant-dropdown-link" onClick={e => e.preventDefault()} style={{paddingLeft: '1rem'}}>
+        <div
+          className={styles['dropdown-menu']}
+          onClick={(event) => event.stopPropagation()}>
+          <Link to={routes.addTasksProject.path(loggedInUser?.company?.code ? loggedInUser?.company?.code : '',
+            record?.id ?? '')}>
+            <span className={styles['plus-circle-outline']}>
+              <PlusCircleOutlined />
+            </span> &nbsp;
+            <span className={styles['add-task']}>
+              Add Task
+            </span> &nbsp; &nbsp;
+          </Link>
+          <Dropdown
+            overlay={menu(record)}
+            trigger={['click']}
+            placement="bottomRight">
+            <div
+              className="ant-dropdown-link"
+              onClick={e => e.preventDefault()}
+              style={{ paddingLeft: '1rem' }}>
               <MoreOutlined />
             </div>
           </Dropdown>
@@ -185,15 +219,26 @@ const Project = () => {
           </Row>
           <Row>
             <Col span={24}>
-              <Table dataSource={projectData?.Project?.data} columns={columns} rowKey={(record => record?.id)}/>
+              <Table
+                dataSource={projectData?.Project?.data}
+                columns={columns}
+                rowKey={(record => record?.id)} />
             </Col>
           </Row>
         </Card>
       </div>
-      <ModalConfirm visibility={visibility} setModalVisibility={setModalVisibility} imgSrc={deleteImg}
-                    okText={'Delete'} modalBody={deleteBody}/>
-      <ModalConfirm visibility={showArchive} setModalVisibility={setArchiveVisibility} imgSrc={archiveImg}
-                    okText={'Archive'} modalBody={archiveBody}/>
+      <ModalConfirm
+        visibility={visibility}
+        setModalVisibility={setModalVisibility}
+        imgSrc={deleteImg}
+        okText={'Delete'}
+        modalBody={deleteBody} />
+      <ModalConfirm
+        visibility={showArchive}
+        setModalVisibility={setArchiveVisibility}
+        imgSrc={archiveImg}
+        okText={'Archive'}
+        modalBody={archiveBody} />
     </>
   )
 }

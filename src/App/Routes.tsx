@@ -12,6 +12,7 @@ import LoginLoader from "../components/Skeleton/LoginLoader";
 import RouteLoader from "../components/Skeleton/RouteLoader";
 import PublicRoutes from "../components/PublicRoutes";
 import {authVar} from "./link";
+import TimeSheetLoader from '../components/Skeleton/TimeSheetLoader';
 
 
 const _Routes = () => {
@@ -91,7 +92,7 @@ const _Routes = () => {
                 index
                 element={
                   <CheckRoles allowedRoles={[constants.roles.Employee]}>
-                    <Suspense fallback={<RouteLoader/>}>
+                    <Suspense fallback={<TimeSheetLoader/>}>
                       <routes.timesheet.component/>
                     </Suspense>
                   </CheckRoles>
@@ -100,7 +101,7 @@ const _Routes = () => {
               <Route
                 path={routes.newTimesheet.childPath}
                 element={
-                  <Suspense fallback={<RouteLoader/>}>
+                  <Suspense fallback={<TimeSheetLoader/>}>
                     <routes.newTimesheet.component/>
                   </Suspense>
                 }/>
@@ -108,7 +109,7 @@ const _Routes = () => {
               <Route
                 path={routes.detailTimesheet.childPath}
                 element={
-                  <Suspense fallback={<RouteLoader/>}>
+                  <Suspense fallback={<TimeSheetLoader/>}>
                     <routes.detailTimesheet.component/>
                   </Suspense>
                 }/>
