@@ -29,6 +29,11 @@ $yarn build
 ## Antd
 - Uses antd for the design system
 
+## Using Docker
+- For stage, use the following command:
+
+`docker-compose -f ${path-to-docker-compose-file} up -d`
+
 ### Customization
 
 Install less and lessc globally
@@ -39,5 +44,6 @@ Cmd: `lessc` is used to compile the src/App/antd.less to css file in order to ov
 `$ lessc src/App/antd.less src/App/antd.css --js`
 
 
-Install code-generator for graphql interfaces
+### Install code-generator for graphql interfaces
 `yarn code-gen`
+
