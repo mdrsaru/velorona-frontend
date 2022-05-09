@@ -24,9 +24,9 @@ export const TIME_ENTRY_WEEKLY_DETAILS = gql`
 query TimesheetWeeklyDetails($input: TimeEntryWeeklyDetailsInput!) {
   TimeEntryWeeklyDetails(input: $input) {
     id
-    start
+    startTime
     duration
-    end
+    endTime
     project {
       id
     }

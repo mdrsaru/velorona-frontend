@@ -34,13 +34,14 @@ import { TimeEntryPagingResult } from "../../interfaces/generated";
 import TimeSheetLoader from "../../components/Skeleton/TimeSheetLoader";
 
 import styles from "./style.module.scss";
+import NoContent from "../../components/NoContent";
 
 export const CREATE_TIME_ENTRY = gql`
     mutation TimeEntryCreate($input: TimeEntryCreateInput!) {
       TimeEntryCreate(input: $input) {
             id
-            start
-            end
+            startTime
+            endTime
             createdAt
             clientLocation
             task {
@@ -50,9 +51,6 @@ export const CREATE_TIME_ENTRY = gql`
             company {
                 id
                 name
-            }
-            approver {
-                firstName
             }
             project {
                 id
@@ -77,8 +75,8 @@ export const TIME_ENTRY = gql`
       TimeEntry(input: $input) {
             data {
                 id
-                start
-                end
+                startTime
+                endTime
                 createdAt
                 duration
                 clientLocation
@@ -89,9 +87,6 @@ export const TIME_ENTRY = gql`
                 company {
                     id
                     name
-                }
-                approver {
-                    firstName
                 }
                 project {
                     id
@@ -265,7 +260,7 @@ const Timesheet = () => {
           afterStart: moment().startOf('day')
         },
         paging: {
-          order: ['start:DESC']
+          order: ['startTime:DESC']
         }
       }
     },
@@ -273,7 +268,7 @@ const Timesheet = () => {
       console.log("On Complete Trigger", timeEntry?.TimeEntry?.data[0]?.end)
       if (timeEntry?.TimeEntry?.data[0]?.end === null) {
         setDetailVisible(true)
-        stopwatchOffset.setSeconds(stopwatchOffset.getSeconds() + computeDiff(timeEntry?.TimeEntry?.data[0]?.start))
+        stopwatchOffset.setSeconds(stopwatchOffset.getSeconds() + computeDiff(timeEntry?.TimeEntry?.data[0]?.startTime))
         setTimeEntry({
           id: timeEntry?.TimeEntry?.data[0]?.id,
           name: timeEntry?.TimeEntry?.data[0]?.company?.name,
@@ -372,7 +367,7 @@ const Timesheet = () => {
       CreateTimeEntry({
         variables: {
           input: {
-            start: moment(currentDate, "YYYY-MM-DD HH:mm:ss"),
+            startTime: moment(currentDate, "YYYY-MM-DD HH:mm:ss"),
             task_id: values.task,
             project_id: values.project,
             company_id: authData?.company?.id,
@@ -551,6 +546,7 @@ const Timesheet = () => {
                 </div>
               </Col>
             </Row>
+            {timeEntryData?.TimeEntry?.data?.length === 0 && <NoContent title={"Time Entry"}/>}
             <Form
               onFinish={onFinish}
               validateMessages={validateMessages}>
@@ -577,7 +573,7 @@ const Timesheet = () => {
                           <Form.Item
                             name={`start${index}`}
                             rules={[{ required: true }]}>
-                            <Input type="text" defaultValue={moment(entry?.start).format('LT')} />
+                            <Input type="text" defaultValue={moment(entry?.startTime).format('LT')} />
                           </Form.Item>
                         </div>
     
