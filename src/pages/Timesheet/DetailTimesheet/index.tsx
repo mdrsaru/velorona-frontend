@@ -149,7 +149,7 @@ const DetailTimesheet = () => {
                 Last Submitted
               </div>
               <div>
-                {moment(timeEntryData?.TimeEntry?.data[0]?.end).format('L')}
+                {moment(timeEntryData?.TimeEntry?.data[0]?.endTime).format('L')}
               </div>
             </div>
             <div className={styles.timesheetDiv}>
