@@ -19,76 +19,128 @@ const Schedule = () => {
             <Col span={24} className={styles['schedule-list']}>
               <div className={styles['schedule-col']}>
                 <div className={styles['schedule-header']}>
-                  <div className={styles['schedule-status']}>Monday</div>
-                  <div className={styles['duration']}>(Feb 14)</div>
+                  <div className={styles['schedule-status']}>
+                    Monday
+                  </div>
+                  <div className={styles['duration']}>
+                    (Feb 14)
+                  </div>
                 </div>
                 <Card className={styles['schedule-card']}>
-                  <Card.Grid hoverable={false} className={styles.gridStyle70}>
-                    <span className={styles['schedule-name']}>Chat UI Design</span>
+                  <Card.Grid
+                    hoverable={false}
+                    className={styles.gridStyle70}>
+                    <span className={styles['schedule-name']}>
+                      Chat UI Design
+                    </span>
                   </Card.Grid>
                 </Card>
                 <Card className={styles['schedule-card']} >
-                  <Card.Grid hoverable={false} className={styles.gridStyle70}>
-                    <span className={styles['schedule-name']}>Chat UI Design</span>
+                  <Card.Grid
+                    hoverable={false}
+                    className={styles.gridStyle70}>
+                    <span className={styles['schedule-name']}>
+                      Chat UI Design
+                    </span>
                   </Card.Grid>
                 </Card>
                 <Card className={styles['schedule-card']}>
                   <Card.Grid hoverable={false} className={styles.gridStyle70}>
-                    <span className={styles['schedule-name']}>Chat UI Design</span>
+                    <span className={styles['schedule-name']}>
+                      Chat UI Design
+                    </span>
                   </Card.Grid>
                 </Card>
                 <Card className={styles['schedule-card']}>
                   <Card.Grid hoverable={false} className={styles.gridStyle70}>
-                    <span className={styles['schedule-name']}>Chat UI Design</span>
-                  </Card.Grid>
-                </Card>
-              </div>
-              <div className={styles['schedule-col']}>
-                <div className={styles['schedule-header']}>
-                  <div className={styles['schedule-status']}>Tuesday</div>
-                  <div className={styles['duration']}>(Feb 14)</div>
-                </div>
-                <Card className={styles['schedule-card']}>
-                  <Card.Grid hoverable={false} className={styles.gridStyle70}>
-                    <span className={styles['schedule-name']}>Chat UI Design</span>
-                  </Card.Grid>
-                </Card>
-                <Card className={styles['schedule-card']}>
-                  <Card.Grid hoverable={false} className={styles.gridStyle70}>
-                    <span className={styles['schedule-name']}>Chat UI Design</span>
+                    <span className={styles['schedule-name']}>
+                      Chat UI Design
+                    </span>
                   </Card.Grid>
                 </Card>
               </div>
               <div className={styles['schedule-col']}>
                 <div className={styles['schedule-header']}>
-                  <div className={styles['schedule-status']}>Wednesday</div>
-                  <div className={styles['duration']}>(Feb 15)</div>
+                  <div className={styles['schedule-status']}>
+                    Tuesday
+                  </div>
+                  <div className={styles['duration']}>
+                    (Feb 14)
+                  </div>
                 </div>
                 <Card className={styles['schedule-card']}>
-                  <Card.Grid hoverable={false} className={styles.gridStyle70}>
-                    <span className={styles['schedule-name']}>Chat UI Design</span>
+                  <Card.Grid
+                    hoverable={false}
+                    className={styles.gridStyle70}>
+                    <span className={styles['schedule-name']}>
+                      Chat UI Design
+                    </span>
+                  </Card.Grid>
+                </Card>
+                <Card className={styles['schedule-card']}>
+                  <Card.Grid
+                    hoverable={false}
+                    className={styles.gridStyle70}>
+                    <span className={styles['schedule-name']}>
+                      Chat UI Design
+                    </span>
                   </Card.Grid>
                 </Card>
               </div>
               <div className={styles['schedule-col']}>
                 <div className={styles['schedule-header']}>
-                  <div className={styles['schedule-status']}>Thurday</div>
-                  <div className={styles['duration']}>(Feb 14)</div>
+                  <div className={styles['schedule-status']}>
+                    Wednesday
+                  </div>
+                  <div className={styles['duration']}>
+                    (Feb 15)
+                  </div>
                 </div>
                 <Card className={styles['schedule-card']}>
-                  <Card.Grid hoverable={false} className={styles.gridStyle70}>
-                    <span className={styles['schedule-name']}>Chat UI Design</span>
+                  <Card.Grid
+                    hoverable={false}
+                    className={styles.gridStyle70}>
+                    <span className={styles['schedule-name']}>
+                      Chat UI Design
+                    </span>
                   </Card.Grid>
                 </Card>
               </div>
               <div className={styles['schedule-col']}>
                 <div className={styles['schedule-header']}>
-                  <div className={styles['schedule-status']}>Friday</div>
-                  <div className={styles['duration']}>(Feb 14)</div>
+                  <div className={styles['schedule-status']}>
+                    Thurday
+                  </div>
+                  <div className={styles['duration']}>
+                    (Feb 14)
+                  </div>
                 </div>
                 <Card className={styles['schedule-card']}>
-                  <Card.Grid hoverable={false} className={styles.gridStyle70}>
-                    <span className={styles['schedule-name']}>Chat UI Design</span>
+                  <Card.Grid
+                    hoverable={false}
+                    className={styles.gridStyle70}>
+                    <span className={styles['schedule-name']}>
+                      Chat UI Design
+                    </span>
+                  </Card.Grid>
+                </Card>
+              </div>
+              <div className={styles['schedule-col']}>
+                <div className={styles['schedule-header']}>
+                  <div className={styles['schedule-status']}>
+                    Friday
+                  </div>
+                  <div className={styles['duration']}>
+                    (Feb 14)
+                  </div>
+                </div>
+                <Card className={styles['schedule-card']}>
+                  <Card.Grid
+                    hoverable={false}
+                    className={styles.gridStyle70}>
+                    <span className={styles['schedule-name']}>
+                      Chat UI Design
+                    </span>
                   </Card.Grid>
                 </Card>
               </div>

@@ -8,8 +8,8 @@ import { gql, useMutation, useQuery } from "@apollo/client";
 import { CLIENT } from "../../Client";
 import { notifyGraphqlError } from "../../../utils/error";
 
-import styles from "../style.module.scss";
 import routes from "../../../config/routes";
+import styles from "../style.module.scss";
 
 interface ItemProps {
   label: string;
@@ -59,7 +59,10 @@ const NewProject = () => {
   })
 
   const onSubmitForm = (values: any) => {
-    message.loading({content: "Creating project in progress..", className: 'custom-message'}).then(() =>
+    message.loading({
+      content: "Creating project in progress..",
+      className: 'custom-message'
+    }).then(() =>
       ProjectCreate({
         variables: {
           input: {
@@ -69,11 +72,14 @@ const NewProject = () => {
           }
         }
       }).then((response) => {
-        if(response.errors) {
+        if (response.errors) {
           return notifyGraphqlError((response.errors))
         } else if (response?.data?.ProjectCreate) {
           navigate(routes.addTasksProject.path(loggedInUser?.company?.code ?? '', response?.data?.ProjectCreate?.id ?? ''))
-          message.success({content: `New Project is created successfully!`, className: 'custom-message'});
+          message.success({
+            content: `New Project is created successfully!`,
+            className: 'custom-message'
+          });
         }
       }).catch(notifyGraphqlError))
   }
@@ -84,27 +90,45 @@ const NewProject = () => {
       <Card bordered={false}>
         <Row>
           <Col span={12} className={styles['project-col']}>
-            <h1><ArrowLeftOutlined onClick={() => navigate(-1)}/> &nbsp; Add New Tasks</h1>
+            <h1><ArrowLeftOutlined onClick={() => navigate(-1)} /> &nbsp; Add New Tasks</h1>
           </Col>
         </Row>
-        <Form form={form} layout="vertical" onFinish={onSubmitForm}>
+        
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={onSubmitForm}>
           <Row>
             <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-              <Form.Item label="Project Name" name='name' rules={[{ required: true, message: 'Please enter project name!' }]}>
-                <Input placeholder="Enter the project name" autoComplete="off"/>
+              <Form.Item
+                label="Project Name"
+                name='name'
+                rules={[{
+                  required: true,
+                  message: 'Please enter project name!'
+                }]}>
+                <Input
+                  placeholder="Enter the project name"
+                  autoComplete="off" />
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-              <Form.Item name="client" label="Client Name" rules={[{ required: true, message: 'Please enter client name!' }]}>
+              <Form.Item
+                name="client"
+                label="Client Name"
+                rules={[{
+                  required: true,
+                  message: 'Please enter client name!'
+                }]}>
                 <Select placeholder="Select Name of the Client">
-                  {clientData && clientData.Client.data.map((user: any, index:number) => (
+                  {clientData && clientData.Client.data.map((user: any, index: number) => (
                     <Option value={user?.id} key={index}>{user?.name} / {user?.email}</Option>
                   ))}
                 </Select>
               </Form.Item>
             </Col>
           </Row>
-          <br/><br/>
+          <br /><br />
           <Row justify="end">
             <Col>
               <Form.Item>

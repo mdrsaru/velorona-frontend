@@ -37,7 +37,7 @@ const AppLoader = (props: {loading?: boolean, count?: number}) => {
            </Row>
            <br/><br/>
            <Row>
-             {Array.from({ length: count ?? 10 }, (_, i) =>
+             {Array.from({ length: count ?? 15 }, (_, i) =>
                <Col span={24} style={{width: '100%', paddingBottom: '0.5rem'}} key={i}>
                  <Skeleton.Button active={loading ?? true} size={'large'} block={true} />
                </Col>)}

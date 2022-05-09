@@ -9,9 +9,9 @@ import { notifyGraphqlError } from "../../../utils/error";
 
 import constants from "../../../config/constants";
 import { PROJECT } from "../index";
+import { USER } from "../../Employee";
 
 import styles from "../style.module.scss";
-import {USER} from "../../Employee";
 
 interface ItemProps {
   label: string;
@@ -70,7 +70,7 @@ const EditProject = () => {
   })
 
   const onSubmitForm = (values: any) => {
-    message.loading({content: "Editing project in progress..", className: 'custom-message'}).then(() =>
+    message.loading({ content: "Editing project in progress..", className: 'custom-message' }).then(() =>
       ProjectUpdate({
         variables: {
           input: {
@@ -80,11 +80,11 @@ const EditProject = () => {
           }
         }
       }).then((response) => {
-        if(response.errors) {
+        if (response.errors) {
           return notifyGraphqlError((response.errors))
         } else if (response?.data?.ProjectUpdate) {
           navigate(-1)
-          message.success({content: `Project is updated successfully!`, className: 'custom-message'});
+          message.success({ content: `Project is updated successfully!`, className: 'custom-message' });
         }
       }).catch(notifyGraphqlError))
   }
@@ -94,31 +94,50 @@ const EditProject = () => {
       <Card bordered={false}>
         <Row>
           <Col span={12} className={styles['project-col']}>
-            <h1><ArrowLeftOutlined onClick={() => navigate(-1)}/> &nbsp; Edit Project</h1>
+            <h1>
+              <ArrowLeftOutlined onClick={() => navigate(-1)} />
+              &nbsp; Edit Project
+            </h1>
           </Col>
         </Row>
         {projectData &&
-          <Form form={form} layout="vertical" onFinish={onSubmitForm} initialValues={{
-            name: projectData?.Project?.data[0]?.name ?? '',
-            client: projectData?.Project?.data[0]?.client?.id ?? '',
-          }}>
+          <Form
+            form={form}
+            layout="vertical"
+            onFinish={onSubmitForm}
+            initialValues={{
+              name: projectData?.Project?.data[0]?.name ?? '',
+              client: projectData?.Project?.data[0]?.client?.id ?? '',
+            }}>
             <Row>
               <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-                <Form.Item label="Project Name" name='name' rules={[{ required: true, message: 'Please enter project name!' }]}>
+                <Form.Item
+                  label="Project Name"
+                  name='name'
+                  rules={[{
+                    required: true,
+                    message: 'Please enter project name!'
+                  }]}>
                   <Input placeholder="Enter the project name" />
                 </Form.Item>
               </Col>
               <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-                <Form.Item name="client" label="Client Name" rules={[{ required: true, message: 'Please enter client name!' }]}>
+                <Form.Item
+                  name="client"
+                  label="Client Name"
+                  rules={[{
+                    required: true,
+                    message: 'Please enter client name!'
+                  }]}>
                   <Select placeholder="Select Name of the Client" disabled>
-                    {clientData && clientData.User.data.map((user: any, index:number) => (
+                    {clientData && clientData.User.data.map((user: any, index: number) => (
                       <Option value={user?.id} key={index}>{user?.fullName}</Option>
                     ))}
                   </Select>
                 </Form.Item>
               </Col>
             </Row>
-            <br/><br/>
+            <br /><br />
             <Row justify="end">
               <Col>
                 <Form.Item>

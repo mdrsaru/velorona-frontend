@@ -19,7 +19,7 @@ const DetailEmployee = () => {
   const navigate = useNavigate();
   const loggedInUser = authVar();
   let params = useParams();
-  const {data: userData} = useQuery(USER, {
+  const { data: userData } = useQuery(USER, {
     variables: {
       input: {
         query: {
@@ -35,63 +35,92 @@ const DetailEmployee = () => {
         <Card bordered={false}>
           <Row>
             <Col span={12} className={styles['employee-col']}>
-              <h1><ArrowLeftOutlined onClick={() => navigate(-1)}/> &nbsp; Employee</h1>
+              <h1>
+                <ArrowLeftOutlined onClick={() => navigate(-1)} /> &nbsp; Employee
+              </h1>
             </Col>
           </Row>
+          
           <Row justify="center">
             <Col className={styles['avatar-col']}>
               <div className={styles['avatar-image']}>
-                <Avatar src={image}  size={{ xs: 100, sm: 100, md: 100, lg: 100, xl: 100, xxl: 100 }} icon={<AntDesignOutlined />}/>
+                <Avatar
+                  src={image}
+                  size={{ xs: 100, sm: 100, md: 100, lg: 100, xl: 100, xxl: 100 }}
+                  icon={<AntDesignOutlined />} />
               </div>
-              <div className={styles['name-tag']}><span>Employee</span></div>
+              <div className={styles['name-tag']}>
+                <span>Employee</span>
+              </div>
             </Col>
           </Row>
-          <br/>
+          <br />
+
           <Row justify="center">
             <Col className={styles['avatar-col']}>
-              <div className={styles['employee-name']}>{userData?.User?.data[0]?.fullName ?? 'N/A'}</div>
-              <div className={styles['employee-title']}>UX/UI Designer</div>
+              <div className={styles['employee-name']}>
+                {userData?.User?.data[0]?.fullName ?? 'N/A'}
+              </div>
+              <div className={styles['employee-title']}>
+                UX/UI Designer
+              </div>
             </Col>
           </Row>
-          <br/>
+          <br />
+
           <Row className={styles['detail-row']}>
             <Col xs={24} sm={24} md={12} lg={12}>
               <div>
                 <div>Email</div>
-                <span className={styles.detailValue}>{userData?.User?.data[0]?.email ?? 'N/A'}</span>
+                <span className={styles.detailValue}>
+                  {userData?.User?.data[0]?.email ?? 'N/A'}
+                </span>
               </div>
               <div>
                 <div>Address</div>
-                <span className={styles.detailValue}>{userData?.User?.data[0]?.address?.streetAddress ?? 'N/A'}
-                  {userData?.User?.data[0]?.address?.city ? ' ,' + userData?.User?.data[0]?.address?.city : ''}</span>
+                <span className={styles.detailValue}>
+                  {userData?.User?.data[0]?.address?.streetAddress ?? 'N/A'}
+                  {userData?.User?.data[0]?.address?.city ? ' ,' + userData?.User?.data[0]?.address?.city : ''}
+                </span>
               </div>
               <div>
                 <div>Employee Start Date</div>
-                <span className={styles.detailValue}>{userData?.User?.data[0]?.record?.startDate ?
-                  moment(userData?.User?.data[0]?.record?.startDate).format('L') : 'N/A'}</span>
+                <span className={styles.detailValue}>
+                  {userData?.User?.data[0]?.record?.startDate ? moment(userData?.User?.data[0]?.record?.startDate).format('L') : 'N/A'}
+                </span>
               </div>
               <div>
                 <div>PayRate</div>
-                <span className={styles.detailValue}>{userData?.User?.data[0]?.record?.payRate ?? 0}</span>
+                <span className={styles.detailValue}>
+                  {userData?.User?.data[0]?.record?.payRate ?? 0}
+                </span>
               </div>
             </Col>
             <Col xs={24} sm={24} md={12} lg={12}>
               <div>
                 <div>Phone Number</div>
-                <span className={styles.detailValue}>{userData?.User?.data[0]?.phone}</span>
+                <span className={styles.detailValue}>
+                  {userData?.User?.data[0]?.phone}
+                </span>
               </div>
               <div>
                 <div>Status</div>
-                <span className={styles.detailValue}>{userData?.User?.data[0]?.status}</span>
+                <span className={styles.detailValue}>
+                  {userData?.User?.data[0]?.status}
+                </span>
               </div>
               <div>
                 <div>Employee End Date</div>
-                <span className={styles.detailValue}>{userData?.User?.data[0]?.record?.endDate ?
-                  moment(userData?.User?.data[0]?.record?.endDate).format('L') : 'N/A'}</span>
+                <span className={styles.detailValue}>
+                  {userData?.User?.data[0]?.record?.endDate ? moment(userData?.User?.data[0]?.record?.endDate).format('L') : 'N/A'}
+                </span>
               </div>
             </Col>
           </Row>
-          <Row justify="end" className={styles['footer-btn']}>
+
+          <Row
+            justify="end"
+            className={styles['footer-btn']}>
             <Col>
               <Button type="primary">
                 <Link to={routes.editEmployee.path(loggedInUser?.company?.code ?? '1', params?.eid ?? '1')}>Edit Employee</Link>

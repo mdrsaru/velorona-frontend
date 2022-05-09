@@ -30,8 +30,9 @@ import { CLIENT } from "../Client";
 
 import moment from "moment";
 import { TASK } from "../Tasks";
-
 import { TimeEntryPagingResult } from "../../interfaces/generated";
+import TimeSheetLoader from "../../components/Skeleton/TimeSheetLoader";
+
 import styles from "./style.module.scss";
 
 export const CREATE_TIME_ENTRY = gql`
@@ -79,6 +80,7 @@ export const TIME_ENTRY = gql`
                 start
                 end
                 createdAt
+                duration
                 clientLocation
                 task {
                     id 
@@ -106,6 +108,19 @@ const computeDiff = (date: Date) => {
   const diff = (currentDate.getTime() - pastDate.getTime()) / 1000;
   return diff
 };
+
+const getTimeFormat = (seconds: any) => {
+  let second = parseInt(seconds, 10); 
+  let sec_num = Math.abs(second);
+  let hours: any = Math.floor(sec_num / 3600);
+  let minutes: any = Math.floor((sec_num - (hours * 3600)) / 60);
+  let secs: any = sec_num - (hours * 3600) - (minutes * 60);
+
+  if (hours   < 10) {hours   = "0"+hours;}
+  if (minutes < 10) {minutes = "0"+minutes;}
+  if (secs < 10) {secs = "0"+secs;}
+  return hours+':'+minutes+':'+secs;
+}
 
 interface TimeEntryResponseArray {
   TimeEntry: TimeEntryPagingResult
@@ -174,9 +189,11 @@ const Timesheet = () => {
       title: 'Actions',
       key: 'actions',
       render: (record: any) =>
-        <div className={styles['dropdown-menu']} onClick={(e) => {
-          navigate(routes.detailTimesheet.path(authData?.company?.code ?? '', record?.id))
-        }}>
+        <div
+          className={styles['dropdown-menu']}
+          onClick={(e) => {
+            navigate(routes.detailTimesheet.path(authData?.company?.code ?? '', record?.id))
+          }}>
           <PlusCircleOutlined /> &nbsp; &nbsp; <span>Edit</span>
         </div>,
     },
@@ -238,16 +255,17 @@ const Timesheet = () => {
     reset
   } = useStopwatch({ autoStart: showDetailTimeEntry });
 
-  const { data: timeEntryData } = useQuery(TIME_ENTRY, {
+  const { loading, data: timeEntryData } = useQuery(TIME_ENTRY, {
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
     variables: {
       input: {
         query: {
           company_id: authData?.company?.id,
+          afterStart: moment().startOf('day')
         },
         paging: {
-          order: ['createdAt:DESC']
+          order: ['start:DESC']
         }
       }
     },
@@ -397,265 +415,273 @@ const Timesheet = () => {
   }
 
   return (
-    <div className={styles['site-card-wrapper']}>
-      <Card
-        bordered={false}
-        className={styles.formRow}>
-        {timeEntryData &&
-          <Form
-            form={form}
-            layout="vertical"
-            onFinish={onSubmitForm}>
+    <>
+      {loading ? <TimeSheetLoader /> :
+        <div className={styles['site-card-wrapper']}>
+          <Card
+            bordered={false}
+            className={styles.formRow}>
+            <Form
+              form={form}
+              layout="vertical"
+              onFinish={onSubmitForm}>
 
-            {showDetailTimeEntry ?
+              {showDetailTimeEntry ?
+                <Row>
+                  <Col xs={24} sm={24} md={12} lg={12} className={styles.formColHeader}>
+                    <b>
+                      <span>{newTimeEntry?.name ?? timeEntryData?.TimeEntry?.data[0]?.name}</span> :
+                      &nbsp;{newTimeEntry?.project ?? timeEntryData?.TimeEntry?.data[0]?.project?.name}
+                    </b>
+                  </Col>
+                </Row> :
+                <Row>
+                  <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+                    <Form.Item
+                      name="client"
+                      label="Client"
+                      rules={[{
+                        required: true,
+                        message: 'Choose the client'
+                      }]}>
+                      <Select
+                        placeholder="Select Client"
+                        onChange={onChangeClientSelect}>
+                        {clientData && clientData?.Client?.data.map((client: any, index: number) => (
+                          <Option value={client?.id} key={index}>
+                            <span>
+                              <b>{client?.name}</b> &nbsp; / &nbsp;
+                            </span>
+                            <span>{client?.email}</span>
+                          </Option>))}
+                      </Select>
+                    </Form.Item>
+                  </Col>
+
+                  <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+                    <Form.Item
+                      name="project"
+                      label="Project"
+                      rules={[{
+                        required: true,
+                        message: 'Choose the project'
+                      }]}>
+                      <Select
+                        placeholder="Select Project"
+                        onChange={onChangeProjectSelect}>
+                        {projectData && projectData?.Project?.data.map((project: any, index: number) => (
+                          <Option value={project?.id} key={index}>
+                            {project?.name}
+                          </Option>))}
+                      </Select>
+                    </Form.Item>
+                  </Col>
+                </Row>}
+
               <Row>
-                <Col xs={24} sm={24} md={12} lg={12} className={styles.formColHeader}>
-                  <b>
-                    <span>{newTimeEntry?.name ?? timeEntryData?.TimeEntry?.data[0]?.name}</span> :
-                    &nbsp;{newTimeEntry?.project ?? timeEntryData?.TimeEntry?.data[0]?.project?.name}
-                  </b>
-                </Col>
-              </Row> :
-              <Row>
-                <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+                <Col xs={24} sm={24} md={12} lg={16} xl={18} className={styles.taskCol}>
                   <Form.Item
-                    name="client"
-                    label="Client"
+                    name="task"
+                    label="Task"
                     rules={[{
-                      required: true,
-                      message: 'Choose the client'
+                      required: !showDetailTimeEntry, 
+                      message: 'Choose the task'
                     }]}>
-                    <Select
-                      placeholder="Select Client"
-                      onChange={onChangeClientSelect}>
-                      {clientData && clientData?.Client?.data.map((client: any, index: number) => (
-                        <Option value={client?.id} key={index}>
+                    {showDetailTimeEntry ?
+                      <div className={styles['timesheetTask']}>
+                        {newTimeEntry?.task}
+                      </div> :
+                      <Select placeholder="Select Task">
+                        {taskData && taskData?.Task?.data.map((task: any, index: number) => (
+                          <Option value={task?.id} key={index}>
+                            {task?.name}
+                          </Option>)
+                        )}
+                      </Select>}
+                  </Form.Item>
+                </Col>
+
+                <Col xs={24} sm={24} md={12} lg={8} xl={6} className={styles.timeStartCol}>
+                  <Form.Item>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center'
+                      }}>
+                      <div style={{ width: '50%' }}>
+                        <div style={{ textAlign: 'center' }}>
                           <span>
-                            <b>{client?.name}</b> &nbsp; / &nbsp;
+                            {(hours > 9 ? hours : '0' + hours) + ':' +
+                              (minutes > 9 ? minutes : '0' + minutes) + ':'
+                              + (seconds > 9 ? seconds : '0' + seconds)}
                           </span>
-                          <span>{client?.email}</span>
-                        </Option>))}
-                    </Select>
-                  </Form.Item>
-                </Col>
-
-                <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-                  <Form.Item
-                    name="project"
-                    label="Project"
-                    rules={[{
-                      required: true,
-                      message: 'Choose the project'
-                    }]}>
-                    <Select
-                      placeholder="Select Project"
-                      onChange={onChangeProjectSelect}>
-                      {projectData && projectData?.Project?.data.map((project: any, index: number) => (
-                        <Option value={project?.id} key={index}>
-                          {project?.name}
-                        </Option>))}
-                    </Select>
-                  </Form.Item>
-                </Col>
-              </Row>}
-
-            <Row>
-              <Col xs={24} sm={24} md={12} lg={16} xl={18} className={styles.taskCol}>
-                <Form.Item
-                  name="task"
-                  label="Task"
-                  rules={[{
-                    required: !showDetailTimeEntry,
-                    message: 'Choose the task'
-                  }]}>
-                  {showDetailTimeEntry ?
-                    <div className={styles['timesheetTask']}>
-                      {newTimeEntry?.task}
-                    </div> :
-                    <Select placeholder="Select Task">
-                      {taskData && taskData?.Task?.data.map((task: any, index: number) => (
-                        <Option value={task?.id} key={index}>
-                          {task?.name}
-                        </Option>)
-                      )}
-                    </Select>}
-                </Form.Item>
-              </Col>
-
-              <Col xs={24} sm={24} md={12} lg={8} xl={6} className={styles.timeStartCol}>
-                <Form.Item>
-                  <div
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center'
-                    }}>
-                    <div style={{ width: '50%' }}>
-                      <div style={{ textAlign: 'center' }}>
-                        <span>
-                          {(hours > 9 ? hours : '0' + hours) + ':' +
-                            (minutes > 9 ? minutes : '0' + minutes) + ':'
-                            + (seconds > 9 ? seconds : '0' + seconds)}
-                        </span>
+                        </div>
+                      </div> &nbsp; &nbsp; &nbsp; &nbsp;
+                      <div style={{ width: '50%' }}>
+                        {isRunning ?
+                          <Button type="primary" htmlType="submit" danger>Stop</Button> :
+                          <Button type="primary" htmlType="submit">Start</Button>}
                       </div>
-                    </div> &nbsp; &nbsp; &nbsp; &nbsp;
-                    <div style={{ width: '50%' }}>
-                      {isRunning ?
-                        <Button type="primary" htmlType="submit" danger>Stop</Button> :
-                        <Button type="primary" htmlType="submit">Start</Button>}
                     </div>
-                  </div>
-                </Form.Item>
+                  </Form.Item>
+                </Col>
+              </Row>
+            </Form>
+          </Card>
+          <br />
+          <Card
+            bordered={false}
+            className={styles['task-card']}>
+            <Row>
+              <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+                <span className={styles['date-view']}>
+                  April 26, 2022
+                  </span>
               </Col>
             </Row>
-          </Form>}
-      </Card>
-      <br />
-      <Card
-        bordered={false}
-        className={styles['task-card']}>
-        <Row>
-          <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-            <span className={styles['date-view']}>April 26, 2022</span>
-          </Col>
-        </Row>
-        <Row>
-          <Col span={24}>
-            <div className={styles['task-div-header']}>
-              <div className={styles['task-header']}>Task</div>
-              <div className={styles['client-header']}>Client: Project</div>
-              <div className={styles['start-header']}>Start Time</div>
-              <div className={styles['end-header']}>End Time</div>
-              <div className={styles['total-header']}>Total</div>
-            </div>
-          </Col>
-        </Row>
-        <Form
-          onFinish={onFinish}
-          validateMessages={validateMessages}
-          initialValues={{
-            name: "Homepage Design",
-            client: "Vellorum: Website Design",
-            start: '9:25PM',
-            end: '12:20PM',
-            total: ''
-          }}>
-          <Row className={styles['task-row']}>
-            <Col
-              span={24}
-              className={styles['task-div-list']}>
-
-              <div className={styles['task-name']}>
-                <Form.Item
-                  name="name"
-                  rules={[{ required: true }]}>
-                  <Input type="text" value="Homepage Design" />
-                </Form.Item>
+            <Row>
+              <Col span={24}>
+                <div className={styles['task-div-header']}>
+                  <div className={styles['task-header']}>Task</div>
+                  <div className={styles['client-header']}>Client: Project</div>
+                  <div className={styles['start-header']}>Start Time</div>
+                  <div className={styles['end-header']}>End Time</div>
+                  <div className={styles['total-header']}>Total</div>
+                </div>
+              </Col>
+            </Row>
+            <Form
+              onFinish={onFinish}
+              validateMessages={validateMessages}>
+                {timeEntryData && timeEntryData?.TimeEntry?.data.map((entry: any, index: number) => (
+                    <Row className={styles['task-row']} key={index}>
+                      <Col span={24} className={styles['task-div-list']}>
+                        <div className={styles['task-name']}>
+                          <Form.Item
+                            name={`name${index}`}
+                            rules={[{ required: true }]}>
+                            <Input type="text" defaultValue={entry?.task?.name ?? ''} />
+                          </Form.Item>
+                        </div>
+    
+                        <div className={styles['client-name']}>
+                          <Form.Item
+                            name={`client${index}`}
+                            rules={[{ required: true }]}>
+                            <Input type="text" defaultValue={entry?.project?.name ?? ''} />
+                          </Form.Item>
+                        </div>
+    
+                        <div className={styles['start-time']}>
+                          <Form.Item
+                            name={`start${index}`}
+                            rules={[{ required: true }]}>
+                            <Input type="text" defaultValue={moment(entry?.start).format('LT')} />
+                          </Form.Item>
+                        </div>
+    
+                        <div className={styles['end-time']}>
+                        <Form.Item
+                          name={`end${index}`}
+                          rules={[{ required: true }]}>
+                          <Input type="text" defaultValue={moment(entry?.end).format('LT')} />
+                        </Form.Item>
+                        </div>
+    
+                        <div className={styles['total-time']}>
+                        <span>{getTimeFormat(entry?.duration)}</span>
+                        </div>
+    
+                      </Col>
+                  </Row>
+                ))}
+            </Form>
+          </Card>
+          <br />
+          <Card
+            bordered={false}
+            style={{ padding: '2rem 1rem 2rem 1rem' }}>
+            <Row>
+              <Col span={12}>
+                <div className={styles['timesheet']}>
+                  My Timesheet
+                </div>
+              </Col>
+              <Col span={12}>
+                <div
+                  className={styles['add-time-stamp']}
+                  onClick={() => setVisible(true)}>
+                  Add Project
+                </div>
+              </Col>
+            </Row>
+            <Row>
+              <Col xs={12} sm={16} md={18} lg={20}>
+                <div className={styles['data-picker']}>
+                  <DatePicker.RangePicker style={{ width: '100%' }} />
+                </div>
+              </Col>
+              <Col xs={6} sm={4} md={3} lg={2}>
+                <div className={styles['next-icon']}>
+                  <LeftOutlined />
+                </div>
+              </Col>
+              <Col xs={6} sm={4} md={3} lg={2}>
+                <div className={styles['next-icon']}>
+                  <RightOutlined />
+                </div>
+              </Col>
+              <Col span={24} className={styles['card-col-timesheet']}>
+                <Table
+                  dataSource={timeEntryData?.TimeEntry?.data}
+                  columns={columns}
+                  rowKey={record => record?.id}
+                />
+              </Col>
+            </Row>
+          </Card>
+          <Modal
+            title=""
+            centered
+            visible={visible}
+            closeIcon={[
+              <div onClick={() => setVisible(false)} key={1}>
+                <span className={styles['close-icon-div']}>
+                  <CloseOutlined />
+                </span>
               </div>
-
-              <div className={styles['client-name']}>
+            ]}
+            onOk={() => setVisible(false)}
+            onCancel={() => setVisible(false)}
+            okText={'Proceed'}
+            width={1000}>
+            <div className={styles['modal-title']}>Select Project</div>
+            <div className={styles['form-modal']}>
+              <Form
+                form={form}
+                layout="vertical">
                 <Form.Item
                   name="client"
-                  rules={[{ required: true }]}>
-                  <Input type="text" value="Homepage Design" />
+                  label="Client">
+                  <Select placeholder="Select Client">
+                    <Option value="client1">Client 1</Option>
+                    <Option value="client2">Client 2</Option>
+                  </Select>
                 </Form.Item>
-              </div>
-
-              <div className={styles['start-time']}>
                 <Form.Item
-                  name="start"
-                  rules={[{ required: true }]}>
-                  <Input type="text" value="Homepage Design" />
+                  name="project"
+                  label="Project">
+                  <Select placeholder="Select Project">
+                    <Option value="project1">Project 1</Option>
+                    <Option value="project2">Project 2</Option>
+                  </Select>
                 </Form.Item>
-              </div>
-
-              <div className={styles['end-time']}>
-                <Form.Item
-                  name="end"
-                  rules={[{ required: true }]}>
-                  <Input type="text" value="Homepage Design" />
-                </Form.Item>
-              </div>
-
-              <div className={styles['total-time']}>
-                <span>00:05:00</span>
-              </div>
-
-            </Col>
-          </Row>
-        </Form>
-      </Card>
-      <br />
-      <Card
-        bordered={false}
-        style={{ padding: '2rem 1rem 2rem 1rem' }}>
-        <Row>
-          <Col span={12}>
-            <div className={styles['timesheet']}>My Timesheet</div>
-          </Col>
-          <Col span={12}>
-            <div className={styles['add-time-stamp']} onClick={() => setVisible(true)}>
-              Add Project
+              </Form>
             </div>
-          </Col>
-        </Row>
-        <Row>
-          <Col xs={12} sm={16} md={18} lg={20}>
-            <div className={styles['data-picker']}><DatePicker.RangePicker style={{ width: '100%' }} /></div>
-          </Col>
-          <Col xs={6} sm={4} md={3} lg={2}>
-            <div className={styles['next-icon']}>
-              <LeftOutlined />
-            </div>
-          </Col>
-          <Col xs={6} sm={4} md={3} lg={2}>
-            <div className={styles['next-icon']}>
-              <RightOutlined />
-            </div>
-          </Col>
-          <Col span={24} className={styles['card-col-timesheet']}>
-            <Table
-              dataSource={timeEntryData?.TimeEntry?.data}
-              columns={columns}
-              rowKey={record => record?.id}
-            />
-          </Col>
-        </Row>
-      </Card>
-      <Modal
-        title=""
-        centered
-        visible={visible}
-        closeIcon={[
-          <div onClick={() => setVisible(false)} key={1}>
-            <span className={styles['close-icon-div']}>
-              <CloseOutlined />
-            </span>
-          </div>
-        ]}
-        onOk={() => setVisible(false)}
-        onCancel={() => setVisible(false)}
-        okText={'Proceed'}
-        width={1000}>
-        <div className={styles['modal-title']}>Select Project</div>
-        <div className={styles['form-modal']}>
-          <Form form={form} layout="vertical">
-            <Form.Item name="client" label="Client">
-              <Select placeholder="Select Client">
-                <Option value="client1">Client 1</Option>
-                <Option value="client2">Client 2</Option>
-              </Select>
-            </Form.Item>
-            <Form.Item name="project" label="Project">
-              <Select placeholder="Select Project">
-                <Option value="project1">Project 1</Option>
-                <Option value="project2">Project 2</Option>
-              </Select>
-            </Form.Item>
-          </Form>
-        </div>
-      </Modal>
-    </div>
+          </Modal>
+        </div>}
+    </>
   )
 }
 

@@ -9,7 +9,7 @@ import routes from "../../config/routes";
 import styles from "./style.module.scss";
 
 
-const {SubMenu} = Menu;
+const { SubMenu } = Menu;
 
 const Invoice = () => {
   const loggedInUser = authVar();
@@ -18,10 +18,10 @@ const Invoice = () => {
     <Menu>
       <SubMenu title="Change status" key="mainMenu">
         <Menu.Item key="active">Active</Menu.Item>
-        <Menu.Divider/>
+        <Menu.Divider />
         <Menu.Item key="inactive">Inactive</Menu.Item>
       </SubMenu>
-      <Menu.Divider/>
+      <Menu.Divider />
       <Menu.Item key="archive">
         <div>Archive Invoice</div>
       </Menu.Item>
@@ -108,8 +108,14 @@ const Invoice = () => {
       key: 'actions',
       render: (record: any) =>
         <div className={styles['dropdown-menu']} onClick={(event) => event.stopPropagation()}>
-          <Dropdown overlay={menu(record)} trigger={['click']} placement="bottomRight">
-            <div className="ant-dropdown-link" onClick={e => e.preventDefault()} style={{paddingLeft: '1rem'}}>
+          <Dropdown
+            overlay={menu(record)}
+            trigger={['click']}
+            placement="bottomRight">
+            <div
+              className="ant-dropdown-link"
+              onClick={e => e.preventDefault()}
+              style={{ paddingLeft: '1rem' }}>
               <MoreOutlined />
             </div>
           </Dropdown>
@@ -134,7 +140,10 @@ const Invoice = () => {
         </Row>
         <Row>
           <Col span={24}>
-            <Table dataSource={data} columns={columns} rowKey={(record => record?.key)}/>
+            <Table
+              dataSource={data}
+              columns={columns}
+              rowKey={(record => record?.key)} />
           </Col>
         </Row>
       </Card>

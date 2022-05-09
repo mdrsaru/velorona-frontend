@@ -81,7 +81,7 @@ const AddTasks = () => {
 
 
   const selectProps = {
-    placeholder:"Select Employees",
+    placeholder: "Select Employees",
     mode: 'multiple' as const,
     style: { width: '100%' },
     maxTagCount: 'responsive' as const
@@ -90,7 +90,10 @@ const AddTasks = () => {
 
   const onSubmitForm = (values: any) => {
     console.log(values);
-    message.loading({content: "Adding task in progress..", className: 'custom-message'}).then(() =>
+    message.loading({
+      content: "Adding task in progress..",
+      className: 'custom-message'
+    }).then(() =>
       TaskCreate({
         variables: {
           input: {
@@ -102,11 +105,14 @@ const AddTasks = () => {
           }
         }
       }).then((response) => {
-        if(response.errors) {
+        if (response.errors) {
           return notifyGraphqlError((response.errors))
         } else if (response?.data?.TaskCreate) {
           navigate(routes.detailProject.path(loggedInUser?.company?.code ?? '', params?.pid ?? ''));
-          message.success({content: `New task is added successfully!`, className: 'custom-message'});
+          message.success({
+            content: `New task is added successfully!`,
+            className: 'custom-message'
+          });
         }
       }).catch(notifyGraphqlError))
   }
@@ -117,27 +123,42 @@ const AddTasks = () => {
       <Card bordered={false}>
         <Row>
           <Col span={12} className={styles['project-col']}>
-            <h1><ArrowLeftOutlined onClick={() => navigate(-1)}/> &nbsp; Add New Tasks</h1>
+            <h1>
+              <ArrowLeftOutlined onClick={() => navigate(-1)} />
+              &nbsp; Add New Tasks
+            </h1>
           </Col>
         </Row>
-        <Form form={form} layout="vertical" onFinish={onSubmitForm}>
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={onSubmitForm}>
           <Row className={styles['add-task-row']}>
             <Col span={24} className={styles['form-col-task']}>
-              <Form.Item label="Task Name" name='name'>
-                <Input placeholder="Enter the Name of the Task" autoComplete="off"/>
+              <Form.Item
+                label="Task Name"
+                name='name'>
+                <Input
+                  placeholder="Enter the Name of the Task"
+                  autoComplete="off" />
               </Form.Item>
             </Col>
             <Col span={24} className={styles['form-col-task']}>
-              <Form.Item label="Description Name" name='description'>
+              <Form.Item
+                label="Description Name"
+                name='description'>
                 <Input.TextArea />
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={12} lg={12} className={styles['form-col-task']}>
-              <Form.Item name="assignmentFile" label="Assignment Files" style={{ position: 'relative' }}>
+              <Form.Item
+                name="assignmentFile"
+                label="Assignment Files"
+                style={{ position: 'relative' }}>
                 <div className={styles['upload-file']}>
                   <div>
                     <span>
-                     {fileName ? fileName : " Attach your files here"}
+                      {fileName ? fileName : " Attach your files here"}
                     </span>
                   </div>
                   <div className={styles['browse-file']}>
@@ -155,20 +176,29 @@ const AddTasks = () => {
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={12} lg={12} className={styles['form-col-task']}>
-              <Form.Item name="assignee" label="Tasks Assigned to"
-                         style={{ position: 'relative' }}>
-                <Select {...selectProps} dropdownStyle={{ maxHeight: 100, overflowY: 'hidden' }}>
+              <Form.Item
+                name="assignee"
+                label="Tasks Assigned to"
+                style={{ position: 'relative' }}>
+                <Select
+                  {...selectProps}
+                  dropdownStyle={{ maxHeight: 100, overflowY: 'hidden' }}>
                   {employeeData && employeeData?.User?.data?.map((employee, index) => (
                     <Option value={employee?.id} key={index}>
                       <b>{employee?.fullName}</b> / {employee?.email}
                     </Option>
-                    ))}
+                  ))}
                 </Select>
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={12} lg={12} className={styles['form-col-task']}>
-              <Form.Item name="taskManager" label="Task Manager" rules={[{ required: true,
-                message: 'Choose the task manager' }]}>
+              <Form.Item
+                name="taskManager"
+                label="Task Manager"
+                rules={[{
+                  required: true,
+                  message: 'Choose the task manager'
+                }]}>
                 <Select
                   showArrow
                   placeholder="Select Task Manager">
@@ -181,7 +211,13 @@ const AddTasks = () => {
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={12} lg={12} className={styles['form-col-task']}>
-              <Form.Item name="status" label="Status" rules={[{ required: true, message: 'Choose the status' }]}>
+              <Form.Item
+                name="status"
+                label="Status"
+                rules={[{
+                  required: true,
+                  message: 'Choose the status'
+                }]}>
                 <Select placeholder="Select status">
                   <Option value={'Active'}>Active</Option>
                   <Option value={'Inactive'}>Inactive</Option>
@@ -189,7 +225,7 @@ const AddTasks = () => {
               </Form.Item>
             </Col>
           </Row>
-          <br/><br/>
+          <br /><br />
           <Row justify="end">
             <Col className={styles['form-submit']}>
               <Form.Item>

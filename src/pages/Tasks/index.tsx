@@ -55,60 +55,126 @@ const Tasks = () => {
           <Row>
             <Col xs={24} sm={24} md={8} lg={8}>
               <div className={styles['task-header']}>
-                <div className={styles['task-status']}>Scheduled Tasks</div>
-                <div className={styles['count']}>4</div>
+                <div className={styles['task-status']}>
+                  Scheduled Tasks
+                </div>
+                <div className={styles['count']}>
+                  4
+                </div>
               </div>
-              <Card className={styles['task-card']} onClick={() => {setVisibility(true)}}>
-                <Card.Grid hoverable={false} className={styles.gridStyle70}>
-                  <span className={styles['task-name']}>Chat UI Design</span>
+              <Card
+                className={styles['task-card']}
+                onClick={() => { setVisibility(true) }}>
+
+                <Card.Grid
+                  hoverable={false}
+                  className={styles.gridStyle70}>
+                  <span className={styles['task-name']}>
+                    Chat UI Design
+                  </span>
                 </Card.Grid>
-                <Card.Grid hoverable={false} className={styles.gridStyle30}>
+
+                <Card.Grid
+                  hoverable={false}
+                  className={styles.gridStyle30}>
                   <Avatar icon={<UserOutlined />} />
                 </Card.Grid>
-                <Card.Grid hoverable={false} className={styles.gridStyle}>
-                  <span className={styles['file-attach']}><LinkOutlined /></span> &nbsp;
+
+                <Card.Grid
+                  hoverable={false}
+                  className={styles.gridStyle}>
+                  <span className={styles['file-attach']}>
+                    <LinkOutlined />
+                  </span> &nbsp;
+                  <span className={styles['file-name']}>
+                    Project.docx
+                  </span>
+                </Card.Grid>
+
+              </Card>
+
+              <Card
+                className={styles['task-card']}
+                onClick={() => { setVisibility(true) }}>
+
+                <Card.Grid
+                  hoverable={false}
+                  className={styles.gridStyle70}>
+                  <span className={styles['task-name']}>
+                    Chat UI Design
+                  </span>
+                </Card.Grid>
+
+                <Card.Grid
+                  hoverable={false}
+                  className={styles.gridStyle30}>
+                  <Avatar icon={<UserOutlined />} />
+                </Card.Grid>
+
+                <Card.Grid
+                  hoverable={false}
+                  className={styles.gridStyle}>
+                  <span className={styles['file-attach']}>
+                    <LinkOutlined />
+                  </span> &nbsp;
                   <span className={styles['file-name']}>
                     Project.docx
                   </span>
                 </Card.Grid>
               </Card>
-              <Card className={styles['task-card']} onClick={() => {setVisibility(true)}}>
-                <Card.Grid hoverable={false} className={styles.gridStyle70}>
-                  <span className={styles['task-name']}>Chat UI Design</span>
+
+              <Card
+                className={styles['task-card']}
+                onClick={() => { setVisibility(true) }}>
+                <Card.Grid
+                  hoverable={false}
+                  className={styles.gridStyle70}>
+                  <span className={styles['task-name']}>
+                    Chat UI Design
+                  </span>
                 </Card.Grid>
-                <Card.Grid hoverable={false} className={styles.gridStyle30}>
+
+                <Card.Grid
+                  hoverable={false}
+                  className={styles.gridStyle30}>
                   <Avatar icon={<UserOutlined />} />
                 </Card.Grid>
-                <Card.Grid hoverable={false} className={styles.gridStyle}>
-                  <span className={styles['file-attach']}><LinkOutlined /></span> &nbsp;
+
+                <Card.Grid
+                  hoverable={false}
+                  className={styles.gridStyle}>
+                  <span className={styles['file-attach']}>
+                    <LinkOutlined />
+                  </span> &nbsp;
                   <span className={styles['file-name']}>
                     Project.docx
                   </span>
                 </Card.Grid>
               </Card>
-              <Card className={styles['task-card']} onClick={() => {setVisibility(true)}}>
-                <Card.Grid hoverable={false} className={styles.gridStyle70}>
-                  <span className={styles['task-name']}>Chat UI Design</span>
-                </Card.Grid>
-                <Card.Grid hoverable={false} className={styles.gridStyle30}>
-                  <Avatar icon={<UserOutlined />} />
-                </Card.Grid>
-                <Card.Grid hoverable={false} className={styles.gridStyle}>
-                  <span className={styles['file-attach']}><LinkOutlined /></span> &nbsp;
-                  <span className={styles['file-name']}>
-                    Project.docx
+
+              <Card
+                className={styles['task-card']}
+                onClick={() => { setVisibility(true) }}>
+                <Card.Grid
+                  hoverable={false}
+                  className={styles.gridStyle70}>
+                  <span className={styles['task-name']}>
+                    Chat UI Design
                   </span>
                 </Card.Grid>
-              </Card>
-              <Card className={styles['task-card']} onClick={() => {setVisibility(true)}}>
-                <Card.Grid hoverable={false} className={styles.gridStyle70}>
-                  <span className={styles['task-name']}>Chat UI Design</span>
-                </Card.Grid>
-                <Card.Grid hoverable={false} className={styles.gridStyle30}>
+
+                <Card.Grid
+                  hoverable={false}
+                  className={styles.gridStyle30}>
                   <Avatar icon={<UserOutlined />} />
                 </Card.Grid>
-                <Card.Grid hoverable={false} className={styles.gridStyle}>
-                  <span className={styles['file-attach']}><LinkOutlined /></span> &nbsp;
+
+                <Card.Grid
+                  hoverable={false}
+                  className={styles.gridStyle}>
+                  <span className={styles['file-attach']}>
+                    <LinkOutlined />
+                  </span> &nbsp;
                   <span className={styles['file-name']}>
                     Project.docx
                   </span>
@@ -117,52 +183,98 @@ const Tasks = () => {
             </Col>
             <Col xs={24} sm={24} md={8} lg={8}>
               <div className={styles['task-header']}>
-                <div className={styles['task-status']}>On Going Tasks</div>
-                <div className={styles['count']}>2</div>
+                <div className={styles['task-status']}>
+                  On Going Tasks
+                </div>
+                <div className={styles['count']}>
+                  2
+                </div>
               </div>
-              <Card className={styles['task-card']} onClick={() => {setVisibility(true)}}>
-                <Card.Grid hoverable={false} className={styles.gridStyle70}>
-                  <span className={styles['task-name']}>Chat UI Design</span>
+              <Card
+                className={styles['task-card']}
+                onClick={() => { setVisibility(true) }}>
+                <Card.Grid
+                  hoverable={false}
+                  className={styles.gridStyle70}>
+                  <span className={styles['task-name']}>
+                    Chat UI Design
+                  </span>
                 </Card.Grid>
-                <Card.Grid hoverable={false} className={styles.gridStyle30}>
+
+                <Card.Grid
+                  hoverable={false}
+                  className={styles.gridStyle30}>
                   <Avatar icon={<UserOutlined />} />
                 </Card.Grid>
-                <Card.Grid hoverable={false} className={styles.gridStyle}>
-                  <span className={styles['file-attach']}><LinkOutlined /></span> &nbsp;
+
+                <Card.Grid
+                  hoverable={false}
+                  className={styles.gridStyle}>
+                  <span className={styles['file-attach']}>
+                    <LinkOutlined />
+                  </span> &nbsp;
                   <span className={styles['file-name']}>
                     Project.docx
                   </span>
                 </Card.Grid>
               </Card>
-              <Card className={styles['task-card']} onClick={() => {setVisibility(true)}}>
+
+              <Card
+                className={styles['task-card']}
+                onClick={() => { setVisibility(true) }}>
                 <Card.Grid hoverable={false} className={styles.gridStyle70}>
-                  <span className={styles['task-name']}>Chat UI Design</span>
+                  <span className={styles['task-name']}>
+                    Chat UI Design
+                  </span>
                 </Card.Grid>
+
                 <Card.Grid hoverable={false} className={styles.gridStyle30}>
                   <Avatar icon={<UserOutlined />} />
                 </Card.Grid>
+
                 <Card.Grid hoverable={false} className={styles.gridStyle}>
-                  <span className={styles['file-attach']}><LinkOutlined /></span> &nbsp;
+                  <span className={styles['file-attach']}>
+                    <LinkOutlined />
+                  </span> &nbsp;
                   <span className={styles['file-name']}>
                     Project.docx
                   </span>
                 </Card.Grid>
               </Card>
             </Col>
+
             <Col xs={24} sm={24} md={8} lg={8}>
               <div className={styles['task-header']}>
-                <div className={styles['task-status']}>Completed Tasks</div>
-                <div className={styles['count']}>1</div>
+                <div className={styles['task-status']}>
+                  Completed Tasks
+                </div>
+                <div className={styles['count']}>
+                  1
+                </div>
               </div>
-              <Card className={styles['task-card']} onClick={() => {setVisibility(true)}}>
-                <Card.Grid hoverable={false} className={styles.gridStyle70}>
-                  <span className={styles['task-name']}>Chat UI Design</span>
+
+              <Card
+                className={styles['task-card']}
+                onClick={() => { setVisibility(true) }}>
+                <Card.Grid
+                  hoverable={false}
+                  className={styles.gridStyle70}>
+                  <span className={styles['task-name']}>
+                    Chat UI Design
+                  </span>
                 </Card.Grid>
-                <Card.Grid hoverable={false} className={styles.gridStyle30}>
+                <Card.Grid
+                  hoverable={false}
+                  className={styles.gridStyle30}>
                   <Avatar icon={<UserOutlined />} />
                 </Card.Grid>
-                <Card.Grid hoverable={false} className={styles.gridStyle}>
-                  <span className={styles['file-attach']}><LinkOutlined /></span> &nbsp;
+
+                <Card.Grid
+                  hoverable={false}
+                  className={styles.gridStyle}>
+                  <span className={styles['file-attach']}>
+                    <LinkOutlined />
+                  </span> &nbsp;
                   <span className={styles['file-name']}>
                     Project.docx
                   </span>
@@ -172,14 +284,15 @@ const Tasks = () => {
           </Row>
         </Card>
       </div>
+
       <Modal
         centered
         visible={visibility}
         closeIcon={[
           <div onClick={() => setVisibility(false)}>
-              <span className={styles['close-icon-div']}>
-                <CloseOutlined />
-              </span>
+            <span className={styles['close-icon-div']}>
+              <CloseOutlined />
+            </span>
           </div>
         ]}
         footer={[
@@ -187,12 +300,12 @@ const Tasks = () => {
             <span>Attachments</span> &nbsp; &nbsp;
             <span className={styles['file-attach']}><LinkOutlined /></span> &nbsp;
             <span className={styles['file-name']}>
-                    Project.docx
-              </span>  &nbsp; &nbsp;
+              Project.docx
+            </span>  &nbsp; &nbsp;
             <span className={styles['file-attach']}><LinkOutlined /></span> &nbsp;
             <span className={styles['file-name']}>
-                    Sample.docx
-              </span>
+              Sample.docx
+            </span>
           </div>
         ]}
         width={869}>
@@ -200,7 +313,7 @@ const Tasks = () => {
           <div>
             <span className={styles['task-title']}>Chat UI Design</span>
           </div>
-          <br/><br/>
+          <br /><br />
           <div className={styles['task-body']}>
             <div className={styles['task-subtitle']}>Design UI for Chat feature.</div>
             <div className={styles['description']}>

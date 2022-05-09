@@ -15,12 +15,12 @@ import { notifyGraphqlError } from "../../utils/error";
 import deleteImg from "../../assets/images/delete_btn.svg";
 import archiveImg from "../../assets/images/archive_btn.svg";
 import constants from "../../config/constants";
-import {UserData} from "../Client";
+import { UserData } from "../Client";
 
 import RouteLoader from "../../components/Skeleton/RouteLoader";
 import styles from './style.module.scss';
 
-const {SubMenu} = Menu;
+const { SubMenu } = Menu;
 
 export const USER = gql`
     query User($input: UserQueryInput!) {
@@ -102,9 +102,16 @@ const Employee = () => {
   const deleteBody = () => {
     return (
       <div className={styles['modal-message']}>
-        <div><img src={deleteImg} alt="confirm" /></div><br/>
-        <p>Are you sure you want to delete <strong>Insight Workshop Pvt. Ltd?</strong></p>
-        <p className={styles['warning-text']}>All the data associated with the employee will be deleted permanently.</p>
+        <div>
+          <img src={deleteImg} alt="confirm" />
+        </div><br />
+        <p>
+          Are you sure you want to delete
+          <strong>Insight Workshop Pvt. Ltd?</strong>
+        </p>
+        <p className={styles['warning-text']}>
+          All the data associated with the employee will be deleted permanently.
+        </p>
       </div>
     )
   }
@@ -112,9 +119,16 @@ const Employee = () => {
   const archiveBody = () => {
     return (
       <div className={styles['modal-message']}>
-        <div><img src={archiveImg} alt="archive-confirm"/></div> <br/>
-        <p>Are you sure you want to {employee?.archived ? "unarchive" : "archive"} <strong>Insight Workshop Pvt. Ltd?</strong></p>
-        <p className={styles['archive-text']}>Employee will {employee?.archived ? "" : "not"} be able to login to the system.</p>
+        <div>
+          <img src={archiveImg} alt="archive-confirm" />
+        </div> <br />
+        <p>
+          Are you sure you want to {employee?.archived ? "unarchive" : "archive"}
+          <strong>Insight Workshop Pvt. Ltd?</strong>
+        </p>
+        <p className={styles['archive-text']}>
+          Employee will {employee?.archived ? "" : "not"} be able to login to the system.
+        </p>
       </div>
     )
   }
@@ -135,7 +149,10 @@ const Employee = () => {
   })
 
   const archiveUser = () => {
-    message.loading({content: "Archiving employee in progress..", className: 'custom-message'}).then(() =>
+    message.loading({
+      content: "Archiving employee in progress..",
+      className: 'custom-message'
+    }).then(() =>
       EmployeeArchive({
         variables: {
           input: {
@@ -148,49 +165,72 @@ const Employee = () => {
         if (response.errors) {
           return notifyGraphqlError((response.errors))
         }
-        message.success({content: `Employee is archived successfully!`, className: 'custom-message'});
+        message.success({
+          content: `Employee is archived successfully!`,
+          className: 'custom-message'
+        });
         setArchiveVisibility(false)
       }).catch(notifyGraphqlError))
   }
 
   const changeStatus = (value: string, id: string) => {
-    message.loading({content: "Updating status of employee..", className: 'custom-message'}).then(() =>
-    EmployeeUpdate({
-      variables: {
-        input: {
-          status: value,
-          id: id
+    message.loading({
+      content: "Updating status of employee..",
+      className: 'custom-message'
+    }).then(() =>
+      EmployeeUpdate({
+        variables: {
+          input: {
+            status: value,
+            id: id
+          }
         }
-      }
-    }).then((response) => {
-      if (response.errors) {
-        return notifyGraphqlError((response.errors))
-      }
-      message.success({content: `Employee is updated successfully!`, className: 'custom-message'});
-    }).catch(notifyGraphqlError))
+      }).then((response) => {
+        if (response.errors) {
+          return notifyGraphqlError((response.errors))
+        }
+        message.success({ content: `Employee is updated successfully!`, className: 'custom-message' });
+      }).catch(notifyGraphqlError))
   }
 
 
   const menu = (data: any) => (
     <Menu>
-      <SubMenu title="Change status" key="mainMenu">
-        <Menu.Item key="active" onClick={() => {
-          if(data?.status === 'Inactive') {
-            changeStatus('Active', data?.id)
-          }
-        }}>Active</Menu.Item>
-        <Menu.Divider/>
-        <Menu.Item key="inactive" onClick={() => {
-          if(data?.status === 'Active') {
-            changeStatus('Inactive', data?.id)
-          }
-        }}>Inactive</Menu.Item>
+      <SubMenu
+        title="Change status"
+        key="mainMenu">
+        <Menu.Item
+          key="active"
+          onClick={() => {
+            if (data?.status === 'Inactive') {
+              changeStatus('Active', data?.id)
+            }
+          }}>
+          Active
+        </Menu.Item>
+        <Menu.Divider />
+
+        <Menu.Item
+          key="inactive"
+          onClick={() => {
+            if (data?.status === 'Active') {
+              changeStatus('Inactive', data?.id)
+            }
+          }}>
+          Inactive
+        </Menu.Item>
       </SubMenu>
-      <Menu.Divider/>
+      <Menu.Divider />
+
       <Menu.Item key="edit">
-        <div><Link to={routes.editEmployee.path(loggedInUser?.company?.code ?? '1', data?.id ?? '1')}>Edit Employee</Link></div>
+        <div>
+          <Link to={routes.editEmployee.path(loggedInUser?.company?.code ?? '1', data?.id ?? '1')}>
+            Edit Employee
+          </Link>
+        </div>
       </Menu.Item>
-      <Menu.Divider/>
+      <Menu.Divider />
+
       <Menu.Item key="archive">
         <div onClick={() => {
           setEmployee(data)
@@ -199,8 +239,13 @@ const Employee = () => {
           {data?.archived ? "Unarchive Employee" : "Archive Employee"}
         </div>
       </Menu.Item>
-      <Menu.Divider/>
-      <Menu.Item key="delete"><div onClick={() => setModalVisibility(true)}>Delete Employee</div></Menu.Item>
+      <Menu.Divider />
+
+      <Menu.Item key="delete">
+        <div onClick={() => setModalVisibility(true)}>
+          Delete Employee
+        </div>
+      </Menu.Item>
     </Menu>
   );
 
@@ -225,7 +270,7 @@ const Employee = () => {
       title: 'Role',
       dataIndex: 'roles',
       key: 'roles',
-      render: (roles: { name: string; id: string;}[]) => `${roles[0]?.name}`
+      render: (roles: { name: string; id: string; }[]) => `${roles[0]?.name}`
     },
     {
       title: 'Start Date',
@@ -272,9 +317,16 @@ const Employee = () => {
       title: 'Actions',
       key: 'actions',
       render: (record: any) =>
-        <div className={styles['dropdown-menu']} onClick={(event) => event.stopPropagation()}>
-          <Dropdown overlay={menu(record)} trigger={['click']} placement="bottomRight">
-            <div className="ant-dropdown-link" onClick={e => e.preventDefault()} style={{paddingLeft: '1rem'}}>
+        <div
+          className={styles['dropdown-menu']}
+          onClick={(event) => event.stopPropagation()}>
+          <Dropdown
+            overlay={menu(record)}
+            trigger={['click']} placement="bottomRight">
+            <div
+              className="ant-dropdown-link"
+              onClick={e => e.preventDefault()}
+              style={{ paddingLeft: '1rem' }}>
               <MoreOutlined />
             </div>
           </Dropdown>
@@ -283,35 +335,48 @@ const Employee = () => {
   ];
 
   return (
-   <>
-     {employeeLoading ?
-       <RouteLoader/> :
-       <div className={styles['main-div']}>
-         <Card bordered={false}>
-           <Row>
-             <Col span={12} className={styles['employee-col']}>
-               <h1>Employee</h1>
-             </Col>
-             <Col span={12} className={styles['employee-col']}>
-               <div className={styles['add-new-employee']}>
-                 <Link to={routes.addEmployee.path(loggedInUser?.company?.code ? loggedInUser?.company?.code : '')}>Add
-                   New Employee
-                 </Link>
-               </div>
-             </Col>
-           </Row>
-           <Row>
-             <Col span={24}>
-               <Table dataSource={employeeData?.User?.data} columns={columns} rowKey={(record => record?.id)}/>
-             </Col>
-           </Row>
-         </Card>
-         <ModalConfirm visibility={visibility} setModalVisibility={setModalVisibility} imgSrc={deleteImg}
-                       okText={'Delete'} modalBody={deleteBody}/>
-         <ModalConfirm visibility={showArchive} setModalVisibility={setArchiveVisibility} imgSrc={archiveImg}
-                       okText={employee?.archived ? "Unarchive" : "Archive"} modalBody={archiveBody} onOkClick={archiveUser}/>
-       </div>}
-   </>
+    <>
+      {employeeLoading ?
+        <RouteLoader /> :
+        <div className={styles['main-div']}>
+          <Card bordered={false}>
+            <Row>
+              <Col span={12} className={styles['employee-col']}>
+                <h1>Employee</h1>
+              </Col>
+              <Col span={12} className={styles['employee-col']}>
+                <div className={styles['add-new-employee']}>
+                  <Link to={routes.addEmployee.path(loggedInUser?.company?.code ? loggedInUser?.company?.code : '')}>
+                    Add New Employee
+                  </Link>
+                </div>
+              </Col>
+            </Row>
+            <Row>
+              <Col span={24}>
+                <Table
+                  dataSource={employeeData?.User?.data}
+                  columns={columns}
+                  rowKey={(record => record?.id)} />
+              </Col>
+            </Row>
+          </Card>
+          <ModalConfirm
+            visibility={visibility}
+            setModalVisibility={setModalVisibility}
+            imgSrc={deleteImg}
+            okText={'Delete'}
+            modalBody={deleteBody} />
+
+          <ModalConfirm
+            visibility={showArchive}
+            setModalVisibility={setArchiveVisibility}
+            imgSrc={archiveImg}
+            okText={employee?.archived ? "Unarchive" : "Archive"}
+            modalBody={archiveBody}
+            onOkClick={archiveUser} />
+        </div>}
+    </>
   )
 }
 

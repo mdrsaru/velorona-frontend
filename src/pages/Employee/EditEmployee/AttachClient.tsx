@@ -1,4 +1,4 @@
-import React, {useEffect, useState} from "react";
+import React, { useEffect, useState } from "react";
 import { Card, Col, Form, message, Modal, Row, Input, Button, Space, Radio, Skeleton } from "antd";
 import { ArrowLeftOutlined, CloseOutlined, SearchOutlined } from "@ant-design/icons";
 import { useNavigate, useParams } from "react-router-dom";
@@ -74,7 +74,7 @@ const AttachClient = () => {
     }
   })
 
-  const inputChangeSearch =  debounce((e: any) => {
+  const inputChangeSearch = debounce((e: any) => {
     searchClients({
       variables: {
         input: {
@@ -84,7 +84,7 @@ const AttachClient = () => {
           }
         }
       }
-    } ).then(r => {
+    }).then(r => {
       console.log(r);
     });
   }, 500);
@@ -99,11 +99,14 @@ const AttachClient = () => {
           }
         }
       }
-    }).then(r => {})
+    }).then(r => { })
   }, [authData?.company?.id, searchClients])
 
   const onSubmitForm = (values: any) => {
-    message.loading({content: "Adding client in progress..", className: 'custom-message'}).then(() =>
+    message.loading({
+      content: "Adding client in progress..",
+      className: 'custom-message'
+    }).then(() =>
       ClientCreate({
         variables: {
           input: {
@@ -124,19 +127,22 @@ const AttachClient = () => {
           return notifyGraphqlError((response.errors))
         } else if (response?.data?.ClientCreate) {
           navigate(routes.employee.path(authData?.company?.code ? authData?.company?.code : ''));
-          message.success({content: `Client updated to new employee successfully!`, className: 'custom-message'});
+          message.success({
+            content: `Client updated to new employee successfully!`,
+            className: 'custom-message'
+          });
         }
       }).catch(notifyGraphqlError))
   }
-  
+
   const cancelAddClient = () => {
     navigate(routes.employee.path(authData?.company?.code ? authData?.company?.code : ''))
   }
-  
+
   const onChangeClient = (event: any) => {
     setClient(event?.target.value)
   }
-  
+
   const addClientToEmployee = () => {
     AssociateClient({
       variables: {
@@ -147,10 +153,10 @@ const AttachClient = () => {
         }
       }
     }).then((response) => {
-      if(response.errors) {
+      if (response.errors) {
         return notifyGraphqlError((response.errors))
       } else if (response?.data?.UserClientAssociate) {
-        message.success(`Client is associated with employee successfully!`).then(r => {});
+        message.success(`Client is associated with employee successfully!`).then(r => { });
         navigate(routes.employee.path(authData?.company?.code ?? ''));
       }
     }).catch(notifyGraphqlError)
@@ -158,25 +164,36 @@ const AttachClient = () => {
 
   return (
     <div className={styles['attach-client-div']}>
-      <Card bordered={false} className={styles['card-div']}>
-        <Row style={{height: '122px'}}>
+      <Card
+        bordered={false}
+        className={styles['card-div']}>
+        <Row style={{ height: '122px' }}>
           <Col span={12} className={styles['employee-col']}>
-            <h1><ArrowLeftOutlined onClick={() => navigate(-1)}/> &nbsp; Add Client</h1>
+            <h1>
+              <ArrowLeftOutlined onClick={() => navigate(-1)} /> &nbsp; Add Client
+            </h1>
           </Col>
           <Col span={12} className={styles['add-existing-col']}>
-            <h1 onClick={() => setVisible(true)}> &nbsp; Add Existing Client</h1>
+            <h1 onClick={() => setVisible(true)}>
+              &nbsp; Add Existing Client
+            </h1>
           </Col>
         </Row>
-        <ClientForm onSubmitForm={onSubmitForm} btnText={'Add Client'} form={form} cancelAddClient={cancelAddClient}/>
+
+        <ClientForm
+          onSubmitForm={onSubmitForm}
+          btnText={'Add Client'} form={form}
+          cancelAddClient={cancelAddClient} />
       </Card>
+
       <Modal
         centered
         visible={visible}
         closeIcon={[
           <div onClick={() => setVisible(false)} key={'1'}>
-              <span className={styles['close-icon-div']}>
-                <CloseOutlined />
-              </span>
+            <span className={styles['close-icon-div']}>
+              <CloseOutlined />
+            </span>
           </div>
         ]}
         footer={[
@@ -192,31 +209,47 @@ const AttachClient = () => {
           <div>
             <span className={styles['add-title']}>Add Existing Client</span>
           </div>
-          <br/><br/>
+          <br /><br />
           <div className={styles['add-body']}>
             <div className={styles['search-client']}>
-              <Form.Item name="username" rules={[{ required: true, message: 'Please input your username!' }]}>
-                <Input prefix={<SearchOutlined className="site-form-item-icon" />}
-                       placeholder="Search for the Existing Client" autoComplete="off" onChange={inputChangeSearch}/>
+              <Form.Item
+                name="username"
+                rules={[{
+                  required: true,
+                  message: 'Please input your username!'
+                }]}>
+                <Input
+                  prefix={<SearchOutlined
+                    className="site-form-item-icon" />}
+                  placeholder="Search for the Existing Client"
+                  autoComplete="off"
+                  onChange={inputChangeSearch} />
               </Form.Item>
             </div>
+
             <div className={styles['list-client-card']}>
-              <Radio.Group defaultValue={clientData?.Client?.data[0]?.id} onChange={onChangeClient}>
-                <Row gutter={16} className={styles['client-row']}>
+              <Radio.Group
+                defaultValue={clientData?.Client?.data[0]?.id}
+                onChange={onChangeClient}>
+                <Row
+                  gutter={16}
+                  className={styles['client-row']}>
                   {loading ? [...Array(6)].map((elementInArray, index) => (
                     <Col xs={24} sm={12} md={8} lg={8} key={index}>
-                      <Skeleton paragraph={{ rows: 3 }}  />
+                      <Skeleton paragraph={{ rows: 3 }} />
                     </Col>)) :
                     searchClientData?.Client?.data?.map((client: any, index: number) =>
-                    <Col xs={24} sm={12} md={8} lg={8} key={index}>
-                      <Radio.Button value={client?.id} className={styles['client-col']}>
-                        <div>
-                          <b>{client?.name}</b><br/>
-                          <span>{client?.address?.streetAddress}</span><br/>
-                          <span>{client?.email}</span>
-                        </div>
-                      </Radio.Button>
-                    </Col>)}
+                      <Col xs={24} sm={12} md={8} lg={8} key={index}>
+                        <Radio.Button
+                          value={client?.id}
+                          className={styles['client-col']}>
+                          <div>
+                            <b>{client?.name}</b><br />
+                            <span>{client?.address?.streetAddress}</span><br />
+                            <span>{client?.email}</span>
+                          </div>
+                        </Radio.Button>
+                      </Col>)}
                 </Row>
               </Radio.Group>
             </div>
