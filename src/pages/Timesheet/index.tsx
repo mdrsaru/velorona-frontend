@@ -34,13 +34,14 @@ import { TimeEntryPagingResult } from "../../interfaces/generated";
 import TimeSheetLoader from "../../components/Skeleton/TimeSheetLoader";
 
 import styles from "./style.module.scss";
+import NoContent from "../../components/NoContent";
 
 export const CREATE_TIME_ENTRY = gql`
     mutation TimeEntryCreate($input: TimeEntryCreateInput!) {
       TimeEntryCreate(input: $input) {
             id
-            start
-            end
+            startTime
+            endTime
             createdAt
             clientLocation
             task {
@@ -50,9 +51,6 @@ export const CREATE_TIME_ENTRY = gql`
             company {
                 id
                 name
-            }
-            approver {
-                firstName
             }
             project {
                 id
@@ -67,7 +65,7 @@ export const UPDATE_TIME_ENTRY = gql`
       TimeEntryUpdate(input: $input) {
             id
             company_id
-            end
+            endTime
         }
     }
 `
@@ -77,8 +75,8 @@ export const TIME_ENTRY = gql`
       TimeEntry(input: $input) {
             data {
                 id
-                start
-                end
+                startTime
+                endTime
                 createdAt
                 duration
                 clientLocation
@@ -89,9 +87,6 @@ export const TIME_ENTRY = gql`
                 company {
                     id
                     name
-                }
-                approver {
-                    firstName
                 }
                 project {
                     id
@@ -110,16 +105,16 @@ const computeDiff = (date: Date) => {
 };
 
 const getTimeFormat = (seconds: any) => {
-  let second = parseInt(seconds, 10); 
+  let second = parseInt(seconds, 10);
   let sec_num = Math.abs(second);
   let hours: any = Math.floor(sec_num / 3600);
   let minutes: any = Math.floor((sec_num - (hours * 3600)) / 60);
   let secs: any = sec_num - (hours * 3600) - (minutes * 60);
 
-  if (hours   < 10) {hours   = "0"+hours;}
-  if (minutes < 10) {minutes = "0"+minutes;}
-  if (secs < 10) {secs = "0"+secs;}
-  return hours+':'+minutes+':'+secs;
+  if (hours < 10) { hours = "0" + hours; }
+  if (minutes < 10) { minutes = "0" + minutes; }
+  if (secs < 10) { secs = "0" + secs; }
+  return hours + ':' + minutes + ':' + secs;
 }
 
 interface TimeEntryResponseArray {
@@ -265,15 +260,15 @@ const Timesheet = () => {
           afterStart: moment().startOf('day')
         },
         paging: {
-          order: ['start:DESC']
+          order: ['startTime:DESC']
         }
       }
     },
     onCompleted: (timeEntry) => {
-      console.log("On Complete Trigger", timeEntry?.TimeEntry?.data[0]?.end)
-      if (timeEntry?.TimeEntry?.data[0]?.end === null) {
+      console.log("On Complete Trigger", timeEntry?.TimeEntry?.data[0]?.endTime)
+      if (timeEntry?.TimeEntry?.data[0]?.endTime === null) {
         setDetailVisible(true)
-        stopwatchOffset.setSeconds(stopwatchOffset.getSeconds() + computeDiff(timeEntry?.TimeEntry?.data[0]?.start))
+        stopwatchOffset.setSeconds(stopwatchOffset.getSeconds() + computeDiff(timeEntry?.TimeEntry?.data[0]?.startTime))
         setTimeEntry({
           id: timeEntry?.TimeEntry?.data[0]?.id,
           name: timeEntry?.TimeEntry?.data[0]?.company?.name,
@@ -317,6 +312,37 @@ const Timesheet = () => {
       }
     }
   })
+
+  const getKeys = () => {
+    var vals: any = [];
+    if (timeEntryData?.TimeEntry?.data) {
+      for (var item of timeEntryData?.TimeEntry?.data) {
+        if (!vals.includes(item?.task?.id)) {
+          vals.push(item.task?.id);
+        }
+      }
+    }
+    return vals
+  }
+  console.log(getKeys())
+  const filterData = () => {
+    let grouped: any = {};
+    timeEntryData?.TimeEntry?.data?.map((entry: any) => {
+      console.log(entry?.task?.id);
+      grouped[entry?.task?.id] = grouped[entry?.task?.id] ?? [];
+      return grouped[entry?.task?.id]?.push({
+        name: entry?.task?.name,
+        project: entry?.project?.name,
+        project_id: entry?.project?.id,
+        startTime: entry?.startTime,
+        endTime: entry?.endTime,
+        duration: entry?.duration
+      })
+    });
+    return grouped
+  }
+
+  filterData()
 
   /* eslint-disable no-template-curly-in-string */
   const validateMessages = {
@@ -372,7 +398,7 @@ const Timesheet = () => {
       CreateTimeEntry({
         variables: {
           input: {
-            start: moment(currentDate, "YYYY-MM-DD HH:mm:ss"),
+            startTime: moment(currentDate, "YYYY-MM-DD HH:mm:ss"),
             task_id: values.task,
             project_id: values.project,
             company_id: authData?.company?.id,
@@ -397,7 +423,7 @@ const Timesheet = () => {
         variables: {
           input: {
             id: newTimeEntry?.id,
-            end: moment(currentDate, "YYYY-MM-DD HH:mm:ss"),
+            endTime: moment(currentDate, "YYYY-MM-DD HH:mm:ss"),
             company_id: authData?.company?.id
           }
         }
@@ -457,7 +483,6 @@ const Timesheet = () => {
                       </Select>
                     </Form.Item>
                   </Col>
-
                   <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
                     <Form.Item
                       name="project"
@@ -484,7 +509,7 @@ const Timesheet = () => {
                     name="task"
                     label="Task"
                     rules={[{
-                      required: !showDetailTimeEntry, 
+                      required: !showDetailTimeEntry,
                       message: 'Choose the task'
                     }]}>
                     {showDetailTimeEntry ?
@@ -537,7 +562,7 @@ const Timesheet = () => {
               <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
                 <span className={styles['date-view']}>
                   April 26, 2022
-                  </span>
+                </span>
               </Col>
             </Row>
             <Row>
@@ -551,51 +576,57 @@ const Timesheet = () => {
                 </div>
               </Col>
             </Row>
+            {timeEntryData?.TimeEntry?.data?.length === 0 && <NoContent title={"Time Entry"} />}
             <Form
               onFinish={onFinish}
               validateMessages={validateMessages}>
-                {timeEntryData && timeEntryData?.TimeEntry?.data.map((entry: any, index: number) => (
-                    <Row className={styles['task-row']} key={index}>
-                      <Col span={24} className={styles['task-div-list']}>
-                        <div className={styles['task-name']}>
-                          <Form.Item
-                            name={`name${index}`}
-                            rules={[{ required: true }]}>
-                            <Input type="text" defaultValue={entry?.task?.name ?? ''} />
-                          </Form.Item>
-                        </div>
-    
-                        <div className={styles['client-name']}>
-                          <Form.Item
-                            name={`client${index}`}
-                            rules={[{ required: true }]}>
-                            <Input type="text" defaultValue={entry?.project?.name ?? ''} />
-                          </Form.Item>
-                        </div>
-    
-                        <div className={styles['start-time']}>
-                          <Form.Item
-                            name={`start${index}`}
-                            rules={[{ required: true }]}>
-                            <Input type="text" defaultValue={moment(entry?.start).format('LT')} />
-                          </Form.Item>
-                        </div>
-    
-                        <div className={styles['end-time']}>
-                        <Form.Item
-                          name={`end${index}`}
-                          rules={[{ required: true }]}>
-                          <Input type="text" defaultValue={moment(entry?.end).format('LT')} />
-                        </Form.Item>
-                        </div>
-    
-                        <div className={styles['total-time']}>
-                        <span>{getTimeFormat(entry?.duration)}</span>
-                        </div>
-    
-                      </Col>
-                  </Row>
-                ))}
+              {getKeys() && getKeys()?.map((entry: any, index: number) => (
+                <Row className={styles['task-row']} key={index}>
+                  <Col span={24} className={styles['task-div-list']}>
+                    <div className={styles['task-name']}>
+                      <div>
+                        <p>
+                          {filterData()[entry].length}
+                        </p>
+                      </div>
+                      <Form.Item
+                        name={`name${index}`}
+                        rules={[{ required: true }]}>
+                        <Input type="text" defaultValue={filterData()[entry][index]?.name ?? ''} />
+                      </Form.Item>
+                    </div>
+
+                    <div className={styles['client-name']}>
+                      <Form.Item
+                        name={`client${index}`}
+                        rules={[{ required: true }]}>
+                        <Input type="text" defaultValue={filterData()[entry][index]?.project ?? ''} />
+                      </Form.Item>
+                    </div>
+
+                    <div className={styles['start-time']}>
+                      <Form.Item
+                        name={`start${index}`}
+                        rules={[{ required: true }]}>
+                        <Input type="text" defaultValue={moment(filterData()[entry][index]?.startTime).format('LT')} />
+                      </Form.Item>
+                    </div>
+
+                    <div className={styles['end-time']}>
+                      <Form.Item
+                        name={`end${index}`}
+                        rules={[{ required: true }]}>
+                        <Input type="text" defaultValue={moment(filterData()[entry][index]?.endTime).format('LT')} />
+                      </Form.Item>
+                    </div>
+
+                    <div className={styles['total-time']}>
+                      <span>{getTimeFormat(filterData()[entry][index]?.duration) ?? 'N/A'}</span>
+                    </div>
+
+                  </Col>
+                </Row>
+              ))}
             </Form>
           </Card>
           <br />

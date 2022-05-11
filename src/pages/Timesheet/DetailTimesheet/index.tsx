@@ -24,9 +24,9 @@ export const TIME_ENTRY_WEEKLY_DETAILS = gql`
 query TimesheetWeeklyDetails($input: TimeEntryWeeklyDetailsInput!) {
   TimeEntryWeeklyDetails(input: $input) {
     id
-    start
+    startTime
     duration
-    end
+    endTime
     project {
       id
     }
@@ -149,7 +149,7 @@ const DetailTimesheet = () => {
                 Last Submitted
               </div>
               <div>
-                {moment(timeEntryData?.TimeEntry?.data[0]?.end).format('L')}
+                {moment(timeEntryData?.TimeEntry?.data[0]?.endTime).format('L')}
               </div>
             </div>
             <div className={styles.timesheetDiv}>

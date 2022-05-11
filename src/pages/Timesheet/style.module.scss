@@ -183,6 +183,27 @@
     }
   }
 
+  div.task-name > div:first-child {
+    width: 10%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 13px;
+    p {
+      padding: 0.2rem;
+      border-radius: 5px;
+      cursor: pointer;
+      background-color: var(--blue-1);
+      &:hover {
+        background-color: var(--blue-2);
+      }
+    }
+  }
+
+  .task-name {
+    display: flex;
+  }
+
   .task-div-header {
     display: flex;
     padding: 0 1.2rem 0.2rem 1.2rem;
