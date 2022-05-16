@@ -59,15 +59,11 @@ const EditEmployee = () => {
     const values = form.getFieldsValue(true, meta => meta.touched);
     let formData: any = { id: params?.eid }
     let address: any = {}
-    let record: any = {}
     for (let data in values) {
-      if (data === 'streetAddress' || data === 'state' || data === 'city' || data === 'zipcode') {
+      if (data === 'streetAddress' || data === 'state' || data === 'city' || data === 'zipcode' || data === 'aptOrSuite') {
         address[data] = values[data]
         formData['address'] = address
-      } else if (data === 'startDate' || data === 'endDate' || data === 'payRate') {
-        record[data] = values[data]
-        formData['record'] = record
-      } else if (data !== 'upload') {
+      }else if (data !== 'upload') {
         formData[data] = values[data]
       }
     }
@@ -107,7 +103,7 @@ const EditEmployee = () => {
       }
     }).catch(notifyGraphqlError)
   }
-
+  
   return (
     <div className={styles['main-div']}>
       <Card bordered={false}>
@@ -137,6 +133,7 @@ const EditEmployee = () => {
               state: userData?.User?.data[0]?.address?.state ?? '',
               city: userData?.User?.data[0]?.address?.city ?? '',
               zipcode: userData?.User?.data[0]?.address?.zipcode ?? '',
+              aptOrSuite: userData?.User?.data[0]?.address?.aptOrSuite ?? '',
               payRate: userData?.User?.data[0]?.record?.payRate ?? ''
             }}>
             <Row>
@@ -241,7 +238,7 @@ const EditEmployee = () => {
               <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
                 <Form.Item
                   label="Apartment/Suite"
-                  name='apartment'>
+                  name='aptOrSuite'>
                   <Input placeholder="Enter your apartment no" autoComplete="off" />
                 </Form.Item>
               </Col>
@@ -259,43 +256,12 @@ const EditEmployee = () => {
               </Col>
             </Row>
             <Row>
-              <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-                <Form.Item
-                  name="startDate"
-                  label="Employee Start Date"
-                  rules={[{
-                    required: true,
-                    message: 'Please select the start date'
-                  }]}>
-                  <DatePicker
-                    format="YYYY-MM-DD HH:mm:ss"
-                    placeholder={"Enter Start Date"}
-                    suffixIcon={""}
-                    showTime={{ defaultValue: moment('00:00:00', 'HH:mm:ss') }} />
-                </Form.Item>
-              </Col>
-              <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-                <Form.Item
-                  name="endDate"
-                  label="Employee End Date"
-                  rules={[{
-                    required: true,
-                    message: 'Please select the end date'
-                  }]}>
-                  <DatePicker
-                    format="YYYY-MM-DD HH:mm:ss"
-                    placeholder={"Enter End Date"} suffixIcon={""}
-                    showTime={{ defaultValue: moment('00:00:00', 'HH:mm:ss') }} />
-                </Form.Item>
-              </Col>
-            </Row>
-            <Row>
+           
               <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
                 <Form.Item
                   name="roles"
                   label="Role"
                   rules={[{
-                    required: true,
                     message: 'Please select the role!'
                   }]}>
                   <Select placeholder="Employee" disabled={true}>
@@ -311,40 +277,19 @@ const EditEmployee = () => {
               </Col>
               <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
                 <Form.Item
-                  label="Pay Rate"
-                  name='payRate'
+                  name="status"
+                  label="Employee Status"
                   rules={[{
-                    required: true,
-                    message: 'Please enter the pay rate'
+                    message: 'Please select the status'
                   }]}>
-                  <InputNumber placeholder="$20" autoComplete="off" />
-                </Form.Item>
-              </Col>
-            </Row>
-            <Row>
-              <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-                <Form.Item
-                  name="reporting"
-                  label="Reporting Manager">
-                  <Select placeholder="Select Reporting Manager">
-                    <Option value="Employee">Employee</Option>
-                    <Option value="TaskManager">Task Manager</Option>
-                    <Option value="Vendor">Vendor</Option>
-                  </Select>
-                </Form.Item>
-              </Col>
-              <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-                <Form.Item
-                  name="reportsTo"
-                  label="Employee Reports to">
-                  <Select placeholder="Select Reporting Officer">
-                    <Option value="Employee">Employee</Option>
-                    <Option value="TaskManager">Task Manager</Option>
-                    <Option value="Vendor">Vendor</Option>
+                  <Select placeholder="Select status">
+                    <Option value="Active">Active</Option>
+                    <Option value="Inactive">InActive</Option>
                   </Select>
                 </Form.Item>
               </Col>
             </Row>
+          
             <Row>
               <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
                 <Form.Item
@@ -357,20 +302,7 @@ const EditEmployee = () => {
                   </Upload>
                 </Form.Item>
               </Col>
-              <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
-                <Form.Item
-                  name="status"
-                  label="Employee Status"
-                  rules={[{
-                    required: true,
-                    message: 'Please select the status'
-                  }]}>
-                  <Select placeholder="Select status">
-                    <Option value="Active">Active</Option>
-                    <Option value="Inactive">In Active</Option>
-                  </Select>
-                </Form.Item>
-              </Col>
+             
             </Row>
             <br /><br />
             <Row justify="end">

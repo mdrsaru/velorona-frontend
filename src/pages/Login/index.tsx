@@ -64,7 +64,7 @@ const Login = () => {
         password: values.password,
         companyCode: values.code
       }
-    message.loading("Please wait, logging in progress..").then(() =>
+    message.loading("Please wait, logging in progress..", 1.5).then(() =>
       Login({
         variables: {
           input: formData
@@ -98,6 +98,7 @@ const Login = () => {
           } else {
             navigate(routes.home.path);
           }
+          message.destroy()
         }
       }).catch(notifyGraphqlError))
   };
