@@ -1,9 +1,8 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import {
   Card,
   Col,
   Row,
-  Table,
   DatePicker,
   Modal,
   Form,
@@ -16,12 +15,9 @@ import {
 import {
   CloseOutlined,
   LeftOutlined,
-  PlusCircleOutlined,
   RightOutlined
 } from '@ant-design/icons';
 
-import routes from "../../config/routes";
-import { useNavigate } from "react-router-dom";
 import { authVar } from "../../App/link";
 import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import { useStopwatch } from 'react-timer-hook';
@@ -37,6 +33,7 @@ import TimeSheetLoader from "../../components/Skeleton/TimeSheetLoader";
 import NoContent from "../../components/NoContent";
 import playBtn from "../../assets/images/play-circle.svg";
 import styles from "./style.module.scss";
+import WeeklyTimeSheet from "./WeeklyTimesheet";
 
 export const STOP_TIMER = gql`
   mutation TimeEntryStop($input: TimeEntryStopInput!) {
@@ -161,7 +158,6 @@ interface TimeEntryResponseArray {
 const Timesheet = () => {
   const { Option } = Select;
   const authData = authVar();
-  let navigate = useNavigate();
   const [form] = Form.useForm();
   const [timeEntryForm] = Form.useForm();
   const stopwatchOffset = new Date();
@@ -175,61 +171,6 @@ const Timesheet = () => {
     project: '',
     task: ''
   });
-
-  const columns = [
-    {
-      title: 'Project Name',
-      key: 'project',
-      render: (record: any) =>
-        <div>
-          {record?.project?.name}
-        </div>
-    },
-    {
-      title: 'Company',
-      key: 'company',
-      render: (record: any) =>
-        <div>
-          {record?.company?.name}
-        </div>
-    },
-    {
-      title: 'Location',
-      key: 'clientLocation',
-      render: (record: any) =>
-        <div>
-          {record?.clientLocation ?? <span className={styles['null-span']}>N/A</span>}
-        </div>
-    },
-    {
-      title: 'Approved by',
-      key: 'approver',
-      render: (record: any) =>
-        <div>
-          {record?.approver ?? <span className={styles['null-span']}>N/A</span>}
-        </div>
-    },
-    {
-      title: 'Created At',
-      key: 'createdAt',
-      render: (record: any) =>
-        <div>
-          {moment(record?.createdAt).format('MMMM Do YYYY, h:mm:ss a')}
-        </div>
-    },
-    {
-      title: 'Actions',
-      key: 'actions',
-      render: (record: any) =>
-        <div
-          className={styles['dropdown-menu']}
-          onClick={(e) => {
-            navigate(routes.detailTimesheet.path(authData?.company?.code ?? '', record?.id))
-          }}>
-          <PlusCircleOutlined /> &nbsp; &nbsp; <span>Edit</span>
-        </div>,
-    },
-  ];
 
   const { data: clientData } = useQuery(CLIENT, {
     fetchPolicy: "network-only",
@@ -643,7 +584,7 @@ const Timesheet = () => {
               <div className={styles['task-row']}>
                 {getKeys() && getKeys()?.map((entry: any, index: number) => (
                   (filterData()[entry].length > 1) ?
-                    <Collapse collapsible="header" ghost className={styles['task-div-list']}>
+                    <Collapse collapsible="header" ghost className={styles['task-div-list']} key={index}>
                       <Panel showArrow={false} header={
                         <Row className={styles['filter-task-list']}>
                           <Col span={4} className={styles['task-name']}>
@@ -832,11 +773,7 @@ const Timesheet = () => {
                 </div>
               </Col>
               <Col span={24} className={styles['card-col-timesheet']}>
-                <Table
-                  dataSource={timeEntryData?.TimeEntry?.data}
-                  columns={columns}
-                  rowKey={record => record?.id}
-                />
+                <WeeklyTimeSheet/>
               </Col>
             </Row>
           </Card>

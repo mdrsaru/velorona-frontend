@@ -125,7 +125,7 @@ const AddTasks = () => {
           <Col span={12} className={styles['project-col']}>
             <h1>
               <ArrowLeftOutlined onClick={() => navigate(-1)} />
-              &nbsp; Add New Tasks
+              &nbsp; Add New Task
             </h1>
           </Col>
         </Row>

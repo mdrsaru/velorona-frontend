@@ -90,7 +90,7 @@ const NewProject = () => {
       <Card bordered={false}>
         <Row>
           <Col span={12} className={styles['project-col']}>
-            <h1><ArrowLeftOutlined onClick={() => navigate(-1)} /> &nbsp; Add New Tasks</h1>
+            <h1><ArrowLeftOutlined onClick={() => navigate(-1)} /> &nbsp; Add New Project</h1>
           </Col>
         </Row>
         
