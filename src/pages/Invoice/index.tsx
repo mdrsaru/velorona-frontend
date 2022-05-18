@@ -9,6 +9,7 @@ import { Link } from 'react-router-dom';
 import routes from '../../config/routes';
 import { notifyGraphqlError } from '../../utils/error';
 import PageHeader from '../../components/PageHeader';
+import constants from '../../config/constants';
 
 import { Invoice as IInvoice, InvoiceQueryInput, InvoiceStatus, InvoiceUpdateInput } from '../../interfaces/generated';
 import { InvoicePagingData } from '../../interfaces/graphql.interface';
@@ -46,7 +47,6 @@ const INVOICE_STATUS_UPDATE = gql`
 `;
 
 const Invoice = () => {
-  const perPage = 2;
   const loggedInUser = authVar();
   const [pagingInput, setPagingInput] = useState<{
     skip: number,
@@ -75,7 +75,7 @@ const Invoice = () => {
   const input: InvoiceQueryInput = {
     paging: {
       skip: pagingInput.skip,
-      take: perPage,
+      take: constants.paging.perPage,
       order: ['date:DESC'],
     },
     query: {
@@ -104,7 +104,7 @@ const Invoice = () => {
   }
 
   const changePage = (page: number) => {
-    const newSkip = (page - 1) * perPage;
+    const newSkip = (page - 1) * constants.paging.perPage;
     setPagingInput({
       ...pagingInput,
       skip: newSkip,
@@ -233,7 +233,7 @@ const Invoice = () => {
                 current: pagingInput.currentPage,
                 onChange: changePage,
                 total: invoiceData?.Invoice?.paging?.total,
-                pageSize: perPage
+                pageSize: constants.paging.perPage
               }}
             />
           </Col>
