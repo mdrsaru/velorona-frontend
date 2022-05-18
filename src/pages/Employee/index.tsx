@@ -45,6 +45,7 @@ export const USER = gql`
                     streetAddress
                     zipcode
                     state
+                    aptOrSuite
                 }
                 company {
                     id
