@@ -25,6 +25,7 @@ export const PROJECT = gql`
                 client {
                     id
                     email
+                    name
                 }
                 company {
                     id
