@@ -70,23 +70,32 @@ const EditProject = () => {
   })
 
   const onSubmitForm = (values: any) => {
-    message.loading({ content: "Editing project in progress..", className: 'custom-message' }).then(() =>
-      ProjectUpdate({
-        variables: {
-          input: {
-            id: params?.pid,
-            name: values.name,
-            company_id: loggedInUser?.company?.id,
-          }
+    let key = 'project'
+    message.loading({
+      content: "Editing project in progress..",
+      key,
+      className: 'custom-message'
+    })
+    ProjectUpdate({
+      variables: {
+        input: {
+          id: params?.pid,
+          name: values.name,
+          company_id: loggedInUser?.company?.id,
         }
-      }).then((response) => {
-        if (response.errors) {
-          return notifyGraphqlError((response.errors))
-        } else if (response?.data?.ProjectUpdate) {
-          navigate(-1)
-          message.success({ content: `Project is updated successfully!`, className: 'custom-message' });
-        }
-      }).catch(notifyGraphqlError))
+      }
+    }).then((response) => {
+      if (response.errors) {
+        return notifyGraphqlError((response.errors))
+      } else if (response?.data?.ProjectUpdate) {
+        navigate(-1)
+        message.success({
+          content: `Project is updated successfully!`,
+          key,
+          className: 'custom-message'
+        });
+      }
+    }).catch(notifyGraphqlError)
   }
 
   return (

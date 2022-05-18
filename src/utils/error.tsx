@@ -1,11 +1,13 @@
 import { message } from 'antd';
 import { CloseCircleOutlined } from "@ant-design/icons";
 
-export function notifyGraphqlError(err: any) {
+export function notifyGraphqlError(err: any, key?: string) {
   let error = err?.graphQLErrors?.[0] ?? err?.networkError?.result?.errors?.[0];
 
   message.error(
-    {content:  <div>
+    {
+      key: key ?? '',
+      content:  <div>
         {error?.message ?? 'Whoops! Something happened. Please try again!'}
         {error?.details?.map((e: string, index: number) => (
           <div style={{ display: 'block' }} key={index}>

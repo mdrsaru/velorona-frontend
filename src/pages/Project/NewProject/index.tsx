@@ -59,29 +59,32 @@ const NewProject = () => {
   })
 
   const onSubmitForm = (values: any) => {
+    let key = 'project'
     message.loading({
       content: "Creating project in progress..",
+      key,
       className: 'custom-message'
-    }).then(() =>
-      ProjectCreate({
-        variables: {
-          input: {
-            name: values.name,
-            company_id: loggedInUser?.company?.id,
-            client_id: values.client,
-          }
+    })
+    ProjectCreate({
+      variables: {
+        input: {
+          name: values.name,
+          company_id: loggedInUser?.company?.id,
+          client_id: values.client,
         }
-      }).then((response) => {
-        if (response.errors) {
-          return notifyGraphqlError((response.errors))
-        } else if (response?.data?.ProjectCreate) {
-          navigate(routes.addTasksProject.path(loggedInUser?.company?.code ?? '', response?.data?.ProjectCreate?.id ?? ''))
-          message.success({
-            content: `New Project is created successfully!`,
-            className: 'custom-message'
-          });
-        }
-      }).catch(notifyGraphqlError))
+      }
+    }).then((response) => {
+      if (response.errors) {
+        return notifyGraphqlError((response.errors))
+      } else if (response?.data?.ProjectCreate) {
+        navigate(routes.addTasksProject.path(loggedInUser?.company?.code ?? '', response?.data?.ProjectCreate?.id ?? ''))
+        message.success({
+          content: `New Project is created successfully!`,
+          key,
+          className: 'custom-message'
+        });
+      }
+    }).catch(notifyGraphqlError)
   }
 
 
@@ -93,7 +96,7 @@ const NewProject = () => {
             <h1><ArrowLeftOutlined onClick={() => navigate(-1)} /> &nbsp; Add New Project</h1>
           </Col>
         </Row>
-        
+
         <Form
           form={form}
           layout="vertical"

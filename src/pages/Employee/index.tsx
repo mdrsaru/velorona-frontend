@@ -149,48 +149,41 @@ const Employee = () => {
   })
 
   const archiveUser = () => {
-    message.loading({
-      content: "Archiving employee in progress..",
-      className: 'custom-message'
-    }).then(() =>
-      EmployeeArchive({
-        variables: {
-          input: {
-            id: employee?.id,
-            archived: !employee?.archived,
-            company_id: loggedInUser?.company?.id
-          }
+    let key = 'archive'
+    message.loading({ content: "Archiving employee in progress..", key, className: 'custom-message' });
+    EmployeeArchive({
+      variables: {
+        input: {
+          id: employee?.id,
+          archived: !employee?.archived,
+          company_id: loggedInUser?.company?.id
         }
-      }).then((response) => {
-        if (response.errors) {
-          return notifyGraphqlError((response.errors))
-        }
-        message.success({
-          content: `Employee is archived successfully!`,
-          className: 'custom-message'
-        });
-        setArchiveVisibility(false)
-      }).catch(notifyGraphqlError))
+      }
+    }).then((response) => {
+      if (response.errors) {
+        return notifyGraphqlError((response.errors))
+      }
+      message.success({ content: `Employee is archived successfully!`, key, className: 'custom-message' });
+      setArchiveVisibility(false)
+    }).catch(notifyGraphqlError)
   }
 
   const changeStatus = (value: string, id: string) => {
-    message.loading({
-      content: "Updating status of employee..",
-      className: 'custom-message'
-    }).then(() =>
-      EmployeeUpdate({
-        variables: {
-          input: {
-            status: value,
-            id: id
-          }
+    let key = 'status'
+    message.loading({ content: "Updating status of employee..", key, className: 'custom-message' });
+    EmployeeUpdate({
+      variables: {
+        input: {
+          status: value,
+          id: id
         }
-      }).then((response) => {
-        if (response.errors) {
-          return notifyGraphqlError((response.errors))
-        }
-        message.success({ content: `Employee is updated successfully!`, className: 'custom-message' });
-      }).catch(notifyGraphqlError))
+      }
+    }).then((response) => {
+      if (response.errors) {
+        return notifyGraphqlError((response.errors))
+      }
+      message.success({ content: `Employee is updated successfully!`, key, className: 'custom-message' });
+    }).catch(notifyGraphqlError)
   }
 
 
@@ -276,7 +269,8 @@ const Employee = () => {
       title: 'Start Date',
       render: (user: any) => {
         return <div>
-          <p>{moment(user?.record?.startDate).format('Do MMMM YYYY') ?? <span className={styles['blankSpan']}> N/A </span>}</p>
+          <p>{moment(user?.record?.startDate).format('Do MMMM YYYY') ??
+            <span className={styles['blankSpan']}> N/A </span>}</p>
         </div>
       }
     },
@@ -284,7 +278,8 @@ const Employee = () => {
       title: 'End Date',
       render: (user: any) => {
         return <div>
-          <p>{moment(user?.record?.endDate).format('Do MMMM YYYY') ?? <span className={styles['blankSpan']}> N/A </span>}</p>
+          <p>{moment(user?.record?.endDate).format('Do MMMM YYYY') ??
+            <span className={styles['blankSpan']}> N/A </span>}</p>
         </div>
       }
     },

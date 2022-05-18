@@ -124,63 +124,58 @@ const NewEmployee = () => {
   }
 
   const onSubmitForm = (values: any) => {
-    message.loading({
-      content: "New employee adding in progress..",
-      className: 'custom-message'
-    }).then(() =>
-      UserCreate({
-        variables: {
-          input: {
-            email: values.email,
-            phone: values.phone,
-            firstName: values.firstName,
-            middleName: values.middleName,
-            lastName: values.lastName,
-            status: values.status,
-            company_id: authData?.company?.id,
-            roles: [values?.roles],
-            address: {
-              streetAddress: values.streetAddress,
-              state: values.state,
-              city: values.city,
-              zipcode: values.zipcode
-            }
+    let key = 'employee'
+    message.loading({ content: "New employee adding in progress..", key, className: 'custom-message' })
+    UserCreate({
+      variables: {
+        input: {
+          email: values.email,
+          phone: values.phone,
+          firstName: values.firstName,
+          middleName: values.middleName,
+          lastName: values.lastName,
+          status: values.status,
+          company_id: authData?.company?.id,
+          roles: [values?.roles],
+          address: {
+            streetAddress: values.streetAddress,
+            state: values.state,
+            city: values.city,
+            zipcode: values.zipcode
           }
         }
-      }).then((response) => {
-        if (response.errors) {
-          return notifyGraphqlError((response.errors))
-        } else if (response?.data) {
-          const user = response?.data?.UserCreate?.id;
-          if (values?.upload) {
-            const formData = new FormData();
-            formData.append('file', values?.upload[0]?.originFileObj)
-            mediaServices.uploadProfileImage(formData).then((res: any) => {
-              const avatar = res?.data?.id;
-              message.loading({
-                content: "Uploading user's profile image..",
-                className: 'custom-message'
-              }).then(() =>
-                ChangeProfilePictureInput({
-                  variables: {
-                    input: {
-                      id: user,
-                      avatar_id: avatar
-                    }
-                  }
-                }).then((imageRes) => {
-                  if (imageRes.errors) {
-                    return notifyGraphqlError((response.errors))
-                  } else {
-                    redirectTo(values?.roles, user);
-                  }
-                }).catch(notifyGraphqlError))
-            })
-          } else {
-            redirectTo(values?.roles, user);
-          }
+      }
+    }).then((response) => {
+      if (response.errors) {
+        return notifyGraphqlError((response.errors), key)
+      } else if (response?.data) {
+        const user = response?.data?.UserCreate?.id;
+        if (values?.upload) {
+          const formData = new FormData();
+          formData.append('file', values?.upload[0]?.originFileObj)
+          mediaServices.uploadProfileImage(formData).then((res: any) => {
+            const avatar = res?.data?.id;
+            message.loading({ content: "Uploading user's profile image..", key, className: 'custom-message' })
+            ChangeProfilePictureInput({
+              variables: {
+                input: {
+                  id: user,
+                  avatar_id: avatar
+                }
+              }
+            }).then((imageRes) => {
+              if (imageRes.errors) {
+                return notifyGraphqlError((response.errors), key)
+              } else {
+                redirectTo(values?.roles, user);
+              }
+            }).catch(notifyGraphqlError)
+          })
+        } else {
+          redirectTo(values?.roles, user);
         }
-      }).catch(notifyGraphqlError))
+      }
+    }).catch(notifyGraphqlError)
   }
 
   return (
