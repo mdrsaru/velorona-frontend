@@ -103,36 +103,31 @@ const AttachClient = () => {
   }, [authData?.company?.id, searchClients])
 
   const onSubmitForm = (values: any) => {
-    message.loading({
-      content: "Adding client in progress..",
-      className: 'custom-message'
-    }).then(() =>
-      ClientCreate({
-        variables: {
-          input: {
-            name: values.name,
-            email: values.email,
-            invoicingEmail: values.invoiceEmail,
-            company_id: authData?.company?.id,
-            address: {
-              streetAddress: values.streetAddress,
-              state: values.state,
-              city: values.city,
-              zipcode: values.zipcode
-            }
+    let key = 'client';
+    message.loading({ content: "Adding client in progress..", key, className: 'custom-message' })
+    ClientCreate({
+      variables: {
+        input: {
+          name: values.name,
+          email: values.email,
+          invoicingEmail: values.invoiceEmail,
+          company_id: authData?.company?.id,
+          address: {
+            streetAddress: values.streetAddress,
+            state: values.state,
+            city: values.city,
+            zipcode: values.zipcode
           }
         }
-      }).then((response) => {
-        if (response.errors) {
-          return notifyGraphqlError((response.errors))
-        } else if (response?.data?.ClientCreate) {
-          navigate(routes.employee.path(authData?.company?.code ? authData?.company?.code : ''));
-          message.success({
-            content: `Client updated to new employee successfully!`,
-            className: 'custom-message'
-          });
-        }
-      }).catch(notifyGraphqlError))
+      }
+    }).then((response) => {
+      if (response.errors) {
+        return notifyGraphqlError((response.errors))
+      } else if (response?.data?.ClientCreate) {
+        navigate(routes.employee.path(authData?.company?.code ? authData?.company?.code : ''));
+        message.success({ content: `Client updated to new employee successfully!`, key, className: 'custom-message' });
+      }
+    }).catch(notifyGraphqlError)
   }
 
   const cancelAddClient = () => {
