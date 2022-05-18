@@ -1,0 +1,21 @@
+.header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 0;
+
+  .header__title {
+    h1 {
+      margin: 0;
+      font-weight: 600;
+      font-size: 24px;
+      line-height: 29px;
+    }
+  }
+
+  .header__extra {
+    display: flex;
+    gap: 10px;
+  }
+}

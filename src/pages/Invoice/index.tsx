@@ -1,117 +1,202 @@
-import React from "react";
-import { Card, Col, Dropdown, Menu, Row, Table } from "antd";
-import { MoreOutlined } from "@ant-design/icons";
+import moment from 'moment';
+import { useState } from 'react';
+import { Card, Col, Dropdown, Menu, Row, Table, message } from 'antd';
+import { MoreOutlined } from '@ant-design/icons';
+import { gql, useQuery, useMutation } from '@apollo/client';
 
-import { authVar } from "../../App/link";
-import { Link } from "react-router-dom";
-import routes from "../../config/routes";
+import { authVar } from '../../App/link';
+import { Link } from 'react-router-dom';
+import routes from '../../config/routes';
+import { notifyGraphqlError } from '../../utils/error';
+import PageHeader from '../../components/PageHeader';
 
-import styles from "./style.module.scss";
+import { Invoice as IInvoice, InvoiceQueryInput, InvoiceStatus, InvoiceUpdateInput } from '../../interfaces/generated';
+import { InvoicePagingData } from '../../interfaces/graphql.interface';
 
+import styles from './style.module.scss';
 
-const { SubMenu } = Menu;
+const INVOICE = gql`
+  query Invoice($input: InvoiceQueryInput!) {
+    Invoice(input: $input) {
+      paging {
+        total
+      }
+      data {
+        id
+        date
+        totalAmount
+        status
+        invoiceNumber
+        client {
+          name
+          invoicingEmail
+        }
+      }
+    }
+  }
+`;
+
+const INVOICE_STATUS_UPDATE = gql`
+  mutation InvoiceUpdate($input: InvoiceUpdateInput!) {
+    InvoiceUpdate(input: $input) {
+      id
+      status
+    }
+  }
+`;
 
 const Invoice = () => {
+  const perPage = 2;
   const loggedInUser = authVar();
+  const [pagingInput, setPagingInput] = useState<{
+    skip: number,
+    currentPage: number,
+  }>({
+    skip: 0,
+    currentPage: 1,
+  });
 
-  const menu = (data: any) => (
-    <Menu>
-      <SubMenu title="Change status" key="mainMenu">
-        <Menu.Item key="active">Active</Menu.Item>
-        <Menu.Divider />
-        <Menu.Item key="inactive">Inactive</Menu.Item>
-      </SubMenu>
-      <Menu.Divider />
-      <Menu.Item key="archive">
-        <div>Archive Invoice</div>
-      </Menu.Item>
-    </Menu>
-  );
+  const [updateStatus, { loading: updateLoading }] = useMutation<
+    { 
+      InvoiceUpdate: IInvoice 
+    }, 
+    { 
+      input: InvoiceUpdateInput 
+    }
+  >(INVOICE_STATUS_UPDATE, {
+    onCompleted(data) {
+      if(data.InvoiceUpdate) {
+        message.success({ content: 'Invoice status updated', key: 'updatable' })
+      }
+    },
+    onError: notifyGraphqlError,
+  });
 
-  const data = [
-    {
-      key: '1',
-      project_name: '02-02-2022',
-      client_name: '02-04-2022',
-      email: '2',
-      date: '02-04-2022',
-      amount: '$250',
-      status: 'Pending'
+  const input: InvoiceQueryInput = {
+    paging: {
+      skip: pagingInput.skip,
+      take: perPage,
+      order: ['date:DESC'],
     },
-    {
-      key: '2',
-      project_name: '02-02-2022',
-      client_name: '02-04-2022',
-      email: '2',
-      date: '02-04-2022',
-      amount: '$250',
-      status: 'Pending'
+    query: {
+      company_id: loggedInUser?.company?.id as string,
     },
-    {
-      key: '3',
-      project_name: '02-02-2022',
-      client_name: '02-04-2022',
-      email: '2',
-      date: '02-04-2022',
-      amount: '$250',
-      status: 'Pending'
-    },
-    {
-      key: '4',
-      project_name: '02-02-2022',
-      client_name: '02-04-2022',
-      email: '2',
-      date: '02-04-2022',
-      amount: '$250',
-      status: 'Pending'
-    },
-  ];
+  };
 
+  const { data: invoiceData, loading } = useQuery<InvoicePagingData>(INVOICE, {
+    fetchPolicy: 'network-only',
+    nextFetchPolicy: 'cache-first',
+    variables: {
+      input,
+    }
+  });
+
+  const changeStatus = (id: string, status: InvoiceStatus) => {
+    updateStatus({
+      variables: {
+        input: {
+          id,
+          company_id: loggedInUser?.company?.id as string,
+          status,
+        }
+      }
+    })
+  }
+
+  const changePage = (page: number) => {
+    const newSkip = (page - 1) * perPage;
+    setPagingInput({
+      ...pagingInput,
+      skip: newSkip,
+      currentPage: page,
+    });
+  };
+
+  const dataSource = invoiceData?.Invoice?.data ?? [];
 
   const columns = [
     {
-      title: 'Project Name',
-      dataIndex: 'project_name',
-      key: 'project_name',
+      title: 'Invoice Number',
+      render: (invoice: IInvoice) => {
+        let invoiceNumber = invoice.invoiceNumber;
+
+        if(invoiceNumber < 10) {
+          return `000${invoiceNumber}`;
+        } else if(invoiceNumber < 100) {
+          return `00${invoiceNumber}`;
+        } else if(invoiceNumber < 1000) {
+          return `0${invoiceNumber}`;
+        } else {
+          return invoiceNumber;
+        }
+      }
     },
     {
       title: 'Client Name',
-      dataIndex: 'client_name',
-      key: 'client_name'
+      render: (invoice: IInvoice) => {
+        return <>{invoice.client.name}</>
+      }
     },
     {
       title: 'Email',
-      dataIndex: 'email',
-      key: 'email'
+      render: (invoice: IInvoice) => {
+        return <>{invoice.client.invoicingEmail}</>
+      }
     },
     {
       title: 'Issued Date',
-      dataIndex: 'date',
-      key: 'date'
+      render: (invoice: IInvoice) => {
+        return <>{moment(invoice.date).format('MM/DD/YYYY')}</>
+      }
     },
     {
       title: 'Amount',
-      dataIndex: 'amount',
-      key: 'amount'
+      dataIndex: 'totalAmount',
     },
     {
       title: 'Status',
       dataIndex: 'status',
-      key: 'status',
-      render: (status: string) =>
-        <span className={status === 'Active' ? styles['active-status'] : styles['inactive-status']}>
-          {status}
-        </span>
     },
     {
       title: 'Actions',
-      key: 'actions',
-      render: (record: any) =>
-        <div className={styles['dropdown-menu']} onClick={(event) => event.stopPropagation()}>
+      render: (invoice: IInvoice) =>
+        <div className={styles['actions']} onClick={(event) => event.stopPropagation()}>
           <Dropdown
-            overlay={menu(record)}
+            overlay={
+              <>
+                <Menu>
+                  <Menu.SubMenu title="Change status" key="mainMenu">
+                    <Menu.Item 
+                      key="Pending"
+                      onClick={() => changeStatus(invoice.id, InvoiceStatus.Pending)}
+                    >
+                      Pending
+                    </Menu.Item>
+
+                    <Menu.Divider />
+
+                    <Menu.Item 
+                      key="Received"
+                      onClick={() => changeStatus(invoice.id, InvoiceStatus.Received)}
+                    >
+                      Received
+                    </Menu.Item>
+
+                    <Menu.Divider />
+
+                    <Menu.Item 
+                      key="Sent"
+                      onClick={() => changeStatus(invoice.id, InvoiceStatus.Sent)}
+                    >
+                      Sent
+                    </Menu.Item>
+                  </Menu.SubMenu>
+                </Menu>
+              </>
+            }
             trigger={['click']}
-            placement="bottomRight">
+            placement="bottomRight"
+          >
             <div
               className="ant-dropdown-link"
               onClick={e => e.preventDefault()}
@@ -124,28 +209,36 @@ const Invoice = () => {
   ];
 
   return (
-    <div className={styles['main-div']}>
+    <div className={styles['container']}>
       <Card bordered={false}>
-        <Row>
-          <Col span={12} className={styles['invoice-col']}>
-            <h1>Invoice History</h1>
-          </Col>
-          <Col span={12} className={styles['invoice-col']}>
-            <div className={styles['add-new-invoice']}>
-              <Link to={routes.addInvoice.path(loggedInUser?.company?.code ? loggedInUser?.company?.code : '')}>
+        <PageHeader 
+          title="Invoice History"
+          extra={[
+            <div className={styles['new-invoice']}>
+              <Link to={routes.addInvoice.path(loggedInUser?.company?.code ?? '')}>
                 Add Invoice
               </Link>
             </div>
-          </Col>
-        </Row>
+          ]}
+        />
+
         <Row>
           <Col span={24}>
             <Table
-              dataSource={data}
+              loading={loading || updateLoading}
+              dataSource={dataSource}
               columns={columns}
-              rowKey={(record => record?.key)} />
+              rowKey={(record => record.id)} 
+              pagination={{
+                current: pagingInput.currentPage,
+                onChange: changePage,
+                total: invoiceData?.Invoice?.paging?.total,
+                pageSize: perPage
+              }}
+            />
           </Col>
         </Row>
+
       </Card>
     </div>
   )

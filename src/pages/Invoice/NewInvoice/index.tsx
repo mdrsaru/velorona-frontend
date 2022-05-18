@@ -1,12 +1,12 @@
-import React, { useState } from "react";
-import { Button, Card, Col, Form, Input, Row, Select, Image } from "antd";
-import { ArrowLeftOutlined, CloseCircleOutlined } from "@ant-design/icons";
-import addIcon from "../../../assets/images/add_icon.svg";
+import React, { useState } from 'react';
+import { Button, Card, Col, Form, Input, Row, Select, Image } from 'antd';
+import { ArrowLeftOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 
-import { useNavigate } from "react-router-dom";
+import PageHeader from '../../../components/PageHeader';
 
-import styles from "../style.module.scss";
-
+import addIcon from '../../../assets/images/add_icon.svg';
+import styles from './style.module.scss';
 
 const NewInvoice = () => {
   const navigate = useNavigate();
@@ -16,15 +16,12 @@ const NewInvoice = () => {
   const { Option } = Select;
 
   return (
-    <div className={styles['main-div']}>
+    <div className={styles['container']}>
       <Card bordered={false}>
-        <Row>
-          <Col span={12} className={styles['invoice-col']}>
-            <h1>
-              <ArrowLeftOutlined onClick={() => navigate(-1)} /> &nbsp; Add Invoice
-            </h1>
-          </Col>
-        </Row>
+        <PageHeader 
+          title={<><ArrowLeftOutlined onClick={() => navigate(-1)} /> &nbsp; Add Invoice</>}
+        />
+
         {!confirm &&
           <Form
             form={companyForm}
