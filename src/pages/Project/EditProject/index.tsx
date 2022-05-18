@@ -116,7 +116,7 @@ const EditProject = () => {
             onFinish={onSubmitForm}
             initialValues={{
               name: projectData?.Project?.data[0]?.name ?? '',
-              client: projectData?.Project?.data[0]?.client?.id ?? '',
+              client: projectData?.Project?.data[0]?.client?.name ?? '',
             }}>
             <Row>
               <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
