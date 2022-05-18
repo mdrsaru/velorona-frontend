@@ -54,35 +54,34 @@ const EditClient = () => {
   })
 
   const onSubmitForm = (values: any) => {
-    message.loading({
-      content: "Client updating in progress..",
-      className: 'custom-message'
-    }).then(() =>
-      ClientUpdate({
-        variables: {
-          input: {
-            id: params?.cid,
-            name: values.name,
-            company_id: authData?.company?.id,
-            address: {
-              streetAddress: values.streetAddress,
-              state: values.state,
-              city: values.city,
-              zipcode: values.zipcode
-            }
+    let key = 'message';
+    message.loading({ content: "Client updating in progress..", key, className: 'custom-message' });
+    ClientUpdate({
+      variables: {
+        input: {
+          id: params?.cid,
+          name: values.name,
+          company_id: authData?.company?.id,
+          address: {
+            streetAddress: values.streetAddress,
+            state: values.state,
+            city: values.city,
+            zipcode: values.zipcode
           }
         }
-      }).then((response) => {
-        if (response.errors) {
-          return notifyGraphqlError((response.errors))
-        } else if (response?.data) {
-          navigate(-1)
-          message.success({
-            content: `Client is updated successfully!`,
-            className: 'custom-message'
-          });
-        }
-      }).catch(notifyGraphqlError))
+      }
+    }).then((response) => {
+      if (response.errors) {
+        return notifyGraphqlError((response.errors))
+      } else if (response?.data) {
+        navigate(-1)
+        message.success({
+          content: `Client is updated successfully!`,
+          key,
+          className: 'custom-message'
+        });
+      }
+    }).catch(notifyGraphqlError)
   }
 
   return (

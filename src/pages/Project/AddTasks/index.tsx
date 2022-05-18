@@ -89,32 +89,34 @@ const AddTasks = () => {
 
 
   const onSubmitForm = (values: any) => {
-    console.log(values);
+    let key = 'task'
     message.loading({
       content: "Adding task in progress..",
+      key,
       className: 'custom-message'
-    }).then(() =>
-      TaskCreate({
-        variables: {
-          input: {
-            name: values?.name,
-            status: values?.status,
-            company_id: loggedInUser?.company?.id,
-            manager_id: values?.taskManager,
-            project_id: params?.pid
-          }
+    })
+    TaskCreate({
+      variables: {
+        input: {
+          name: values?.name,
+          status: values?.status,
+          company_id: loggedInUser?.company?.id,
+          manager_id: values?.taskManager,
+          project_id: params?.pid
         }
-      }).then((response) => {
-        if (response.errors) {
-          return notifyGraphqlError((response.errors))
-        } else if (response?.data?.TaskCreate) {
-          navigate(routes.detailProject.path(loggedInUser?.company?.code ?? '', params?.pid ?? ''));
-          message.success({
-            content: `New task is added successfully!`,
-            className: 'custom-message'
-          });
-        }
-      }).catch(notifyGraphqlError))
+      }
+    }).then((response) => {
+      if (response.errors) {
+        return notifyGraphqlError((response.errors))
+      } else if (response?.data?.TaskCreate) {
+        navigate(routes.detailProject.path(loggedInUser?.company?.code ?? '', params?.pid ?? ''));
+        message.success({
+          content: `New task is added successfully!`,
+          key,
+          className: 'custom-message'
+        });
+      }
+    }).catch(notifyGraphqlError)
   }
 
 
@@ -125,7 +127,7 @@ const AddTasks = () => {
           <Col span={12} className={styles['project-col']}>
             <h1>
               <ArrowLeftOutlined onClick={() => navigate(-1)} />
-              &nbsp; Add New Tasks
+              &nbsp; Add New Task
             </h1>
           </Col>
         </Row>

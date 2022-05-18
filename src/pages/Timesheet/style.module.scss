@@ -161,13 +161,23 @@
     }
   }
 
-  .task-div-list {
-    display: flex;
+  .task-div, .filter-task-list {
     padding: 0.7rem;
-    width: 100%;
+  }
+  
+
+  .task-div-list,
+  .task-div {
     margin-top: 1rem;
     border: 1px solid var(--gray-secondary);
     box-sizing: border-box;
+
+    .play-button {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+    }
 
     div {
       font-weight: 600;
@@ -183,36 +193,37 @@
     }
   }
 
-  div.task-name > div:first-child {
-    width: 10%;
+  .task-name {
     display: flex;
     justify-content: center;
     align-items: center;
+    width: 10%;
+  }
+
+  div.task-name>div:first-child {
     font-size: 13px;
+    padding-right: 1rem;
+
     p {
       padding: 0.2rem;
       border-radius: 5px;
       cursor: pointer;
       background-color: var(--blue-1);
+
       &:hover {
         background-color: var(--blue-2);
       }
     }
   }
 
-  .task-name {
-    display: flex;
-  }
-
   .task-div-header {
-    display: flex;
-    padding: 0 1.2rem 0.2rem 1.2rem;
+    padding: 0 1.4rem 0.2rem 1.2rem;
 
     div {
       color: var(--white);
-      font-weight: 600;
-      font-size: 14px;
-      line-height: 17px;
+      font-weight: 500;
+      font-size: 18px;
+      line-height: 22px;
       padding: 0.8rem 0 0.8rem 1.4rem;
       background: var(--gray-secondary);
     }
@@ -419,6 +430,7 @@
     font-weight: 600;
     font-size: 14px;
     line-height: 17px;
+    color: var(--primary-blue);
   }
 }
 

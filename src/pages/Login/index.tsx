@@ -1,6 +1,7 @@
-import { Layout, Row, Col, Form, Input, Button, message, Modal } from 'antd';
+import { Layout, Row, Col, Form, Input, Button, message, Modal, Spin } from 'antd';
 import { useState } from "react";
 import { useNavigate, useParams } from 'react-router-dom';
+import { LoadingOutlined } from '@ant-design/icons';
 
 import { authVar } from '../../App/link';
 import { gql, useMutation } from "@apollo/client";
@@ -48,12 +49,14 @@ const Login = () => {
   const [form] = Form.useForm();
   const [forgetForm] = Form.useForm();
   const navigate = useNavigate();
-  const [Login] = useMutation<LoginResponseData>(LOGIN);
+  const [Login, { loading }] = useMutation<LoginResponseData>(LOGIN);
   const [ForgotPassword] = useMutation(FORGOT_PASSWORD);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
+  const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
 
 
   const handleSubmit = (values: any) => {
+    let key = 'login'
     let formData = role === 'admin' ?
       {
         email: values.email,
@@ -64,46 +67,46 @@ const Login = () => {
         password: values.password,
         companyCode: values.code
       }
-    message.loading("Please wait, logging in progress..", 1.5).then(() =>
-      Login({
-        variables: {
-          input: formData
-        }
-      }).then((response) => {
-        if (response.errors) {
-          return notifyGraphqlError((response?.errors))
-        }
-        if (response?.data) {
-          message.success({ content: `LoggedIn successfully!`, className: 'custom-message' })
-          const loginData = response?.data?.Login;
-          const roles = loginData?.roles?.map((role: any) => role?.name);
+    Login({
+      variables: {
+        input: formData
+      }
+    }).then((response) => {
+      if (response.errors) {
+        return notifyGraphqlError((response?.errors), key)
+      }
+      if (response?.data) {
+        message.success({ content: `LoggedIn successfully!`, key, className: 'custom-message' })
+        const loginData = response?.data?.Login;
+        const roles = loginData?.roles?.map((role: any) => role?.name);
 
-          authVar({
-            token: loginData?.token,
-            user: {
-              id: loginData?.id,
-              roles,
-            },
-            company: {
-              id: loginData?.company?.id ?? '',
-              code: loginData?.company?.companyCode ?? ''
-            },
-            isLoggedIn: true,
-          });
+        authVar({
+          token: loginData?.token,
+          user: {
+            id: loginData?.id,
+            roles,
+          },
+          company: {
+            id: loginData?.company?.id ?? '',
+            code: loginData?.company?.companyCode ?? ''
+          },
+          isLoggedIn: true,
+        });
 
-          if (roles.includes(constants.roles.SuperAdmin)) {
-            navigate(routes.dashboard.path)
-          } else if (roles.includes(constants.roles.CompanyAdmin)) {
-            navigate(routes.company.path(loginData?.company?.companyCode));
-          } else {
-            navigate(routes.home.path);
-          }
-          message.destroy()
+        if (roles.includes(constants.roles.SuperAdmin)) {
+          navigate(routes.dashboard.path)
+        } else if (roles.includes(constants.roles.CompanyAdmin)) {
+          navigate(routes.company.path(loginData?.company?.companyCode));
+        } else {
+          navigate(routes.home.path);
         }
-      }).catch(notifyGraphqlError))
+        message.destroy()
+      }
+    }).catch(notifyGraphqlError)
   };
 
   const onSubmitForgotPasswordForm = (values: any) => {
+    let key = 'forgotPassword'
     let formData = role === 'admin' ?
       {
         email: values?.email,
@@ -115,21 +118,28 @@ const Login = () => {
         userType: constants?.userType?.Company,
         companyCode: values?.code
       }
-    message.loading("Sending reset link to user's email..").then(() =>
-      ForgotPassword({
-        variables: {
-          input: formData
-        }
-      }).then((response) => {
-        if (response.errors) {
-          console.log('Forget Password Error');
-          return notifyGraphqlError((response?.errors))
-        }
-        setModalVisible(false)
-        forgetForm.resetFields();
-        message.success(`If account ${values?.email} exists,
-       reset password link is successfully sent to the email!`)
-      }).catch(notifyGraphqlError))
+    message.loading({
+      content: `Sending reset link to user's email..`,
+      key,
+      className: 'custom-message'
+    });
+    ForgotPassword({
+      variables: {
+        input: formData
+      }
+    }).then((response) => {
+      if (response.errors) {
+        console.log('Forget Password Error');
+        return notifyGraphqlError((response?.errors), key)
+      }
+      setModalVisible(false)
+      forgetForm.resetFields();
+      message.success({
+        content: `If account ${values?.email} exists, reset password link is successfully sent to the email!`,
+        key,
+        className: 'custom-message'
+      })
+    }).catch(notifyGraphqlError)
   }
 
   return (
@@ -196,9 +206,11 @@ const Login = () => {
                 </Form.Item>
 
                 <Form.Item>
-                  <Button type="primary" htmlType="submit" className={styles['login-form-button']}>Login</Button>
+                  <Button type="primary" htmlType="submit" className={styles['login-form-button']}>
+                    {loading ? 
+                    <span><Spin indicator={antIcon}/>&nbsp; Logging in..</span> : 'Login'}
+                  </Button>
                 </Form.Item>
-
               </Form>
             </div>
           </div>
