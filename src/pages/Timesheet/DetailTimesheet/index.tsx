@@ -1,16 +1,17 @@
-import { Card, Col, Row, Button, Space, Input } from "antd";
-import { ArrowLeftOutlined, CloseCircleOutlined } from "@ant-design/icons";
+import { Card, Col, Row, Button, Space, Input } from 'antd';
+import { ArrowLeftOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import moment from 'moment';
 
 import { gql, useLazyQuery, useQuery } from '@apollo/client';
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from 'react-router-dom';
 import { authVar } from '../../../App/link';
 import _ from 'lodash';
 
-import styles from "../style.module.scss";
-import { useState } from "react";
-import WeeklyTimeSheet from "../WeeklyTimesheet";
-import AppLoader from "../../../components/Skeleton/AppLoader";
+import { useState } from 'react';
+import AppLoader from '../../../components/Skeleton/AppLoader';
+
+import styles from '../style.module.scss';
+import { getTimeFormat } from '..';
 
 export const TIME_SHEET = gql`
 query Timesheet($input: TimesheetQueryInput!) {
@@ -56,6 +57,7 @@ query TimesheetWeeklyDetails($input: TimeEntryWeeklyDetailsInput!) {
     id
     startTime
     endTime
+    duration
     task_id
     task {
       id
@@ -69,15 +71,10 @@ query TimesheetWeeklyDetails($input: TimeEntryWeeklyDetailsInput!) {
 }
 `
 
-
-function getPreviousMonday() {
-  var date = new Date();
-  var day = date.getDay();
-  var prevMonday = new Date();
-  date.getDay() === 0 ? prevMonday.setDate(date.getDate() - 7) :
-    prevMonday.setDate(date.getDate() - (day - 1))
-  return prevMonday;
+function getWeekDays(date: any) {
+  return Array(7).fill(new Date(date)).map((el, idx) => new Date(el.setDate(el.getDate() - el.getDay() + idx + 1)))
 }
+
 
 const DetailTimesheet = () => {
   let params = useParams();
@@ -94,12 +91,10 @@ const DetailTimesheet = () => {
         endTime: ''
       }
     },
-    onCompleted: (weeklyData) => {
+    onCompleted: () => {
       groupByDate()
     }
   });
-
-  console.log(timeSheetWeekly)
 
   const { data: timeSheetDetail } = useQuery(TIME_SHEET, {
     fetchPolicy: "network-only",
@@ -129,10 +124,24 @@ const DetailTimesheet = () => {
     }
   });
 
+  function getTotalTime(entries: any) {
+    let sum = 0
+    console.log(entries);
+    if (entries) {
+      const durations = entries.map((data: any, index: number) => data?.duration)
+      sum = durations.reduce((entry1: any, entry2: any) => {
+        console.log('Duration', entry1);
+        return entry1 + entry2
+      }, 0);
+      console.log('sum', sum);
+    }
+    return getTimeFormat(sum)
+  }
+
+
   function groupByTimeEntry(array: any) {
     const monthDate = (entry: any) => moment(entry?.startTime).format('ddd, MMM D');
-    const result = _.groupBy(array, monthDate);
-    return result
+    return _.groupBy(array, monthDate);
   }
 
   function groupByDate() {
@@ -148,6 +157,7 @@ const DetailTimesheet = () => {
     }
     setTimeSheetWeekly(grouped)
   }
+  console.log(timeSheetWeekly);
 
   return (
     <>
@@ -251,46 +261,31 @@ const DetailTimesheet = () => {
                     <div className={styles['table-header-cell']}>
                       Task
                     </div>
-                    {timeSheetWeekly?.map((date: any, index: number) =>
+                    {getWeekDays(timeSheetDetail?.Timesheet?.data[0]?.weekStartDate).map((day: any, index: number) =>
                       <div className={styles['table-header-cell']} key={index}>
-                        Mon, April 4
+                        {moment(day).format('ddd, MMM D')}
                       </div>)}
                     <div className={styles['table-header-cell']}>
                       Total
                     </div>
                   </div>
-                  <div className={styles["resp-table-body"]}>
-                    <div className={styles["table-body-cell"]}>
-                      Data 1
-                    </div>
-                    <div className={styles["table-body-cell"]}>
-                      Database Design
-                    </div>
-                    <div className={styles["table-body-cell"]}>
-                      <Input value={"20:30:44"} />
-                    </div>
-                    <div className={styles["table-body-cell"]}>
-                      <Input value={"20:30:44"} />
-                    </div>
-                    <div className={styles["table-body-cell"]}>
-                      <Input value={"20:30:44"} />
-                    </div>
-                    <div className={styles["table-body-cell"]}>
-                      <Input value={"20:30:44"} />
-                    </div>
-                    <div className={styles["table-body-cell"]}>
-                      <Input value={"20:30:44"} />
-                    </div>
-                    <div className={styles["table-body-cell"]}>
-                      <Input value={"20:30:44"} />
-                    </div>
-                    <div className={styles["table-body-cell"]}>
-                      <Input value={"20:30:44"} />
-                    </div>
-                    <div className={styles["table-body-cell"]}>
-                      <span>40:00:00 </span> &nbsp; &nbsp; <CloseCircleOutlined />
-                    </div>
-                  </div>
+                  {timeSheetWeekly?.map((timesheet: any, index: number) =>
+                    <div className={styles["resp-table-body"]} key={index}>
+                      <div className={styles["table-body-cell"]}>
+                        {timesheet?.project}
+                      </div>
+                      <div className={styles["table-body-cell"]}>
+                        {timesheet?.name}
+                      </div>
+                      {getWeekDays(timeSheetDetail?.Timesheet?.data[0]?.weekStartDate).map((day: any, timeIndex: number) =>
+                        <div className={styles["table-body-cell"]} key={timeIndex}>
+                          <Input value={getTotalTime(timesheet?.entries[moment(day).format('ddd, MMM D')])} />
+                        </div>
+                      )}
+                      <div className={styles["table-body-cell"]}>
+                        <span>40:00:00 </span> &nbsp; &nbsp; <CloseCircleOutlined />
+                      </div>
+                    </div>)}
                 </div>
               </Col>
             </Row>

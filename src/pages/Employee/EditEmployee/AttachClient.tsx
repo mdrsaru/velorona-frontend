@@ -143,7 +143,7 @@ const AttachClient = () => {
       variables: {
         input: {
           user_id: params?.eid,
-          client_id: client,
+          client_id: client ? client : clientData?.Client?.data[0]?.id,
           company_id: authData?.company?.id
         }
       }

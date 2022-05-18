@@ -137,7 +137,7 @@ const computeDiff = (date: Date) => {
   return diff
 };
 
-const getTimeFormat = (seconds: any) => {
+export const getTimeFormat = (seconds: any) => {
   let second = parseInt(seconds, 10);
   let sec_num = Math.abs(second);
   let hours: any = Math.floor(sec_num / 3600);
