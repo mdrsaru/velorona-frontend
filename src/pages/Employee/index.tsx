@@ -89,7 +89,14 @@ const Employee = () => {
   const loggedInUser = authVar();
   const navigate = useNavigate();
   const [EmployeeUpdate] = useMutation(USER_UPDATE);
-  const [EmployeeArchive] = useMutation(USER_ARCHIVE);
+  
+  const [EmployeeArchive] = useMutation(USER_ARCHIVE,{
+    update(cache) {
+      const normalizedId = cache.identify({ id: employee.id, __typename: "User" });
+      cache.evict({ id: normalizedId });
+      cache.gc();
+    },});
+
   const [employee, setEmployee] = useState<any>('');
   const [visibility, setVisibility] = useState<boolean>(false);
   const [showArchive, setArchiveModal] = useState<boolean>(false);
@@ -125,7 +132,7 @@ const Employee = () => {
         </div> <br />
         <p>
           Are you sure you want to {employee?.archived ? "unarchive" : "archive"}
-          <strong>Insight Workshop Pvt. Ltd?</strong>
+          <strong> { employee.fullName}? </strong>
         </p>
         <p className={styles['archive-text']}>
           Employee will {employee?.archived ? "" : "not"} be able to login to the system.
@@ -233,13 +240,13 @@ const Employee = () => {
           {data?.archived ? "Unarchive Employee" : "Archive Employee"}
         </div>
       </Menu.Item>
-      <Menu.Divider />
+      {/* <Menu.Divider /> */}
 
-      <Menu.Item key="delete">
+      {/* <Menu.Item key="delete">
         <div onClick={() => setModalVisibility(true)}>
           Delete Employee
         </div>
-      </Menu.Item>
+      </Menu.Item> */}
     </Menu>
   );
 

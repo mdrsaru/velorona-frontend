@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Card, Col, Dropdown, Menu, Row, Table } from "antd";
 
 import { Link } from "react-router-dom";
@@ -8,63 +8,73 @@ import { authVar } from "../../App/link";
 import { gql, useQuery } from "@apollo/client";
 import { MoreOutlined } from "@ant-design/icons";
 
-import { User } from "../../interfaces/generated";
+import {  User } from "../../interfaces/generated";
 
 import styles from "./style.module.scss";
+import ClientDetail from "./ClientDetail";
 
 export interface UserData {
   User: {
-    data: User[]
-  }
+    data: User[];
+  };
 }
 
 export const CLIENT = gql`
-    query Client($input: ClientQueryInput!) {
-        Client(input: $input) {
-            data {
-                id
-                name
-                email
-                invoicingEmail
-                address {
-                    streetAddress
-                    state
-                    zipcode
-                    city
-                }
-            }
-            paging {
-                total
-                startIndex
-                endIndex
-                hasNextPage
-            }
+  query Client($input: ClientQueryInput!) {
+    Client(input: $input) {
+      data {
+        id
+        name
+        email
+        invoicingEmail
+        status
+        address {
+          streetAddress
+          state
+          zipcode
+          city
         }
+      }
+      paging {
+        total
+        startIndex
+        endIndex
+        hasNextPage
+      }
     }
-`
+  }
+`;
 
 const Client = () => {
   const loggedInUser = authVar();
+  const [showModal, setShowModal] = useState(false);
+  const [client, setClient] = useState();
+
   const { data: clientData } = useQuery(CLIENT, {
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
     variables: {
       input: {
         query: {
-          company_id: loggedInUser?.company?.id
+          company_id: loggedInUser?.company?.id,
         },
         paging: {
-          order: ['updatedAt:DESC']
-        }
-      }
-    }
-  })
+          order: ["updatedAt:DESC"],
+        },
+      },
+    },
+  });
 
   const menu = (data: any) => (
     <Menu>
       <Menu.Item key="edit">
         <div>
-          <Link to={routes.editClient.path(loggedInUser?.company?.code ?? '1', data?.id ?? '1')}>
+          <Link
+            to={routes.editClient.path(
+              loggedInUser?.company?.code ?? "1",
+              data?.id ?? "1"
+            )}
+          >
             Edit Client
           </Link>
         </div>
@@ -74,51 +84,75 @@ const Client = () => {
 
   const columns = [
     {
-      title: 'Client Name',
-      dataIndex: 'name',
-      key: 'name',
+      title: "Client Name",
+      dataIndex: "name",
+      key: "name",
+      render: (client: any) => {
+        return (
+          <div className={styles["client-name"]}>
+            <p>{client}</p>
+          </div>
+        );
+      },
+      onCell: (data: any) => {
+        return {
+          onClick: () => {
+            setClient(data);
+            setShowModal(!showModal);
+          },
+        };
+      },
     },
     {
-      title: 'Email Address',
-      dataIndex: 'email',
-      key: 'email'
+      title: "Email Address",
+      dataIndex: "email",
+      key: "email",
     },
     {
-      title: 'Invoicing Email',
-      dataIndex: 'invoicingEmail',
-      key: 'invoicingEmail'
+      title: "Invoicing Email",
+      dataIndex: "invoicingEmail",
+      key: "invoicingEmail",
     },
     {
-      title: 'Actions',
-      key: 'actions',
-      render: (record: any) =>
+      title: "Actions",
+      key: "actions",
+      render: (record: any) => (
         <div
-          className={styles['dropdown-menu']}
-          onClick={(event) => event.stopPropagation()}>
+          className={styles["dropdown-menu"]}
+          onClick={(event) => event.stopPropagation()}
+        >
           <Dropdown
             overlay={menu(record)}
-            trigger={['click']} placement="bottomRight">
+            trigger={["click"]}
+            placement="bottomRight"
+          >
             <div
               className="ant-dropdown-link"
-              onClick={e => e.preventDefault()}
-              style={{ paddingLeft: '1rem' }}>
+              onClick={(e) => e.preventDefault()}
+              style={{ paddingLeft: "1rem" }}
+            >
               <MoreOutlined />
             </div>
           </Dropdown>
-        </div>,
+        </div>
+      ),
     },
   ];
 
   return (
-    <div className={styles['main-div']}>
+    <div className={styles["main-div"]}>
       <Card bordered={false}>
         <Row>
-          <Col span={12} className={styles['client-col']}>
+          <Col span={12} className={styles["client-col"]}>
             <h1>Client</h1>
           </Col>
-          <Col span={12} className={styles['client-col']}>
-            <div className={styles['add-new-client']}>
-              <Link to={routes.addClient.path(loggedInUser?.company?.code ? loggedInUser?.company?.code : '')}>
+          <Col span={12} className={styles["client-col"]}>
+            <div className={styles["add-new-client"]}>
+              <Link
+                to={routes.addClient.path(
+                  loggedInUser?.company?.code ? loggedInUser?.company?.code : ""
+                )}
+              >
                 Add New Client
               </Link>
             </div>
@@ -127,13 +161,23 @@ const Client = () => {
         <Row>
           <Col span={24}>
             <Table
-              dataSource={clientData?.Client?.data} columns={columns}
-              rowKey={(record => record?.id)} />
+              dataSource={clientData?.Client?.data}
+              columns={columns}
+              rowKey={(record) => record?.id}
+            />
           </Col>
         </Row>
       </Card>
+
+      {showModal && (
+        <ClientDetail
+          visible={showModal}
+          client={client}
+          setVisible={setShowModal}
+        />
+      )}
     </div>
-  )
-}
+  );
+};
 
 export default Client;

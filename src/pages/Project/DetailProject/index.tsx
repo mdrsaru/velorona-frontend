@@ -1,4 +1,4 @@
-import { Card, Col, Dropdown, Menu, Row, Table, message } from "antd";
+import { Card, Col, Dropdown, Menu, Row, Table, message, Spin } from "antd";
 import { ArrowLeftOutlined, MoreOutlined } from "@ant-design/icons";
 import React, { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -16,6 +16,8 @@ import archiveImg from "../../../assets/images/archive_btn.svg";
 
 import styles from "../style.module.scss";
 import ModalConfirm from "../../../components/Modal";
+import ArchiveBody from "../../../components/Archive";
+import DeleteBody from "../../../components/Delete";
 
 const { SubMenu } = Menu;
 
@@ -41,25 +43,42 @@ export const TASK_DELETE = gql`
   }
 `;
 
-export const TASK_FRAGMENT = gql`
-  fragment Task on Task {
-    id
-  }
-`;
-
 const DetailProject = () => {
   let params = useParams();
   const navigate = useNavigate();
   const loggedInUser = authVar();
 
-  const [TaskUpdate] = useMutation(TASK_UPDATE, {
+  const [taskUpdate, { loading: updateLoading }] = useMutation(TASK_UPDATE, {
+    onCompleted() {
+      message.success({
+        content: `Task is updated successfully!`,
+        className: "custom-message",
+      });
+      setArchiveVisibility(false);
+    },
+    onError(err) {
+      setArchiveVisibility(false);
+      notifyGraphqlError(err);
+    },
     update(cache) {
       const normalizedId = cache.identify({ id: task.id, __typename: "Task" });
       cache.evict({ id: normalizedId });
       cache.gc();
     },
   });
-  const [TaskDelete] = useMutation(TASK_DELETE, {
+  const [taskDelete, { loading }] = useMutation(TASK_DELETE, {
+    onCompleted() {
+      message.success({
+        content: `Task is deleted successfully!`,
+        className: "custom-message",
+      });
+      setVisibility(false);
+    },
+    onError(err) {
+      setVisibility(false);
+      notifyGraphqlError(err);
+    },
+
     update(cache) {
       const normalizedId = cache.identify({ id: task.id, __typename: "Task" });
       cache.evict({ id: normalizedId });
@@ -79,128 +98,38 @@ const DetailProject = () => {
     setArchiveModal(value);
   };
 
-  const deleteBody = () => {
-    return (
-      <div className={styles["modal-message"]}>
-        <div>
-          <img src={deleteImg} alt="confirm" />
-        </div>
-        <br />
-        <p>
-          Are you sure you want to delete
-          <strong> {task.name}?</strong>
-        </p>
-        <p className={styles["warning-text"]}>
-          All the data associated with the task will be deleted permanently.
-        </p>
-      </div>
-    );
-  };
-
-  const archiveBody = () => {
-    return (
-      <div className={styles["modal-message"]}>
-        <div>
-          <img src={archiveImg} alt="archive-confirm" />
-        </div>{" "}
-        <br />
-        <p>
-          Are you sure you want to {task?.archived ? "unarchive" : "archive"}
-          <strong> {task.name}?</strong>
-        </p>
-        <p className={styles["archive-text"]}>
-          Task will {task?.archived ? "" : "not"} be able to assigned to any
-          employee
-        </p>
-      </div>
-    );
-  };
-
   const changeStatus = (value: string, id: string) => {
-    message
-      .loading({
-        content: "Updating status of task..",
-        className: "custom-message",
-      })
-      .then(() =>
-        TaskUpdate({
-          variables: {
-            input: {
-              status: value,
-              id: id,
-              company_id: loggedInUser?.company?.id,
-            },
-          },
-        })
-          .then((response) => {
-            if (response.errors) {
-              return notifyGraphqlError(response.errors);
-            }
-            message.success({
-              content: `Task is updated successfully!`,
-              className: "custom-message",
-            });
-          })
-          .catch(notifyGraphqlError)
-      );
+    taskUpdate({
+      variables: {
+        input: {
+          status: value,
+          id: id,
+          company_id: loggedInUser?.company?.id,
+        },
+      },
+    });
   };
 
   const archiveTask = () => {
-    message
-      .loading({
-        content: "Archiving task in progress..",
-        className: "custom-message",
-      })
-      .then(() =>
-        TaskUpdate({
-          variables: {
-            input: {
-              id: task?.id,
-              archived: !task?.archived,
-              company_id: loggedInUser?.company?.id,
-            },
-          },
-        })
-          .then((response) => {
-            if (response.errors) {
-              return notifyGraphqlError(response.errors);
-            }
-            message.success({
-              content: `Task is archived successfully!`,
-              className: "custom-message",
-            });
-            setArchiveVisibility(false);
-          })
-          .catch(notifyGraphqlError)
-      );
+    taskUpdate({
+      variables: {
+        input: {
+          id: task?.id,
+          archived: !task?.archived,
+          company_id: loggedInUser?.company?.id,
+        },
+      },
+    });
   };
-
   const deleteTask = () => {
-    message
-      .loading({
-        content: "Deleting task in progress..",
-        className: "custom-message",
-      })
-      .then(() =>
-        TaskDelete({
-          variables: {
-            input: {
-              id: task?.id,
-            },
-          },
-        })
-          .then((response) => {
-            if (response.errors) {
-              return notifyGraphqlError(response.errors);
-            }
-            message.success({
-              content: `Task is deleted successfully!`,
-              className: "custom-message",
-            });
-            setVisibility(false);
-          })
-          .catch(notifyGraphqlError)
-      );
+    setVisibility(false);
+    taskDelete({
+      variables: {
+        input: {
+          id: task?.id,
+        },
+      },
+    });
   };
 
   const menu = (data: any) => (
@@ -396,6 +325,7 @@ const DetailProject = () => {
         <Row>
           <Col span={24}>
             <Table
+              loading={loading || updateLoading}
               dataSource={taskData?.Task?.data}
               columns={columns}
               rowKey={(record) => record?.id}
@@ -409,7 +339,24 @@ const DetailProject = () => {
         setModalVisibility={setModalVisibility}
         imgSrc={deleteImg}
         okText={"Delete"}
-        modalBody={deleteBody}
+        closable
+        modalBody={() =>
+          DeleteBody({
+            title: (
+              <>
+                {" "}
+                Are you sure you want to delete
+                <strong> {task?.name}?</strong>
+              </>
+            ),
+            subText: (
+              <>
+                ` All the data associated with the task will be deleted
+                permanently.`
+              </>
+            ),
+          })
+        }
         onOkClick={deleteTask}
       />
 
@@ -418,7 +365,21 @@ const DetailProject = () => {
         setModalVisibility={setArchiveVisibility}
         imgSrc={archiveImg}
         okText={task?.archived ? "Unarchive" : "Archive"}
-        modalBody={archiveBody}
+        closable
+        modalBody={() =>
+          ArchiveBody({
+            title: (
+              <>
+                Are you sure you want to{" "}
+                {task?.archived ? "unarchive" : "archive"}
+                <strong> {task.name}?</strong>
+              </>
+            ),
+            subText: `Task will ${
+              task?.archived ? "" : "not"
+            } be able to assigned to any employee`,
+          })
+        }
         onOkClick={archiveTask}
       />
     </div>

@@ -20,6 +20,15 @@
   }
 }
 
+.client-name {
+  cursor: pointer;
+  text-transform: capitalize;
+}
+
+.client-name:hover {
+  color: var(--primary-blue);
+}
+
 .formCol {
   padding: 0 1rem 0 1rem;
 
