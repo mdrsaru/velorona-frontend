@@ -1,18 +1,18 @@
 import { Layout, Row, Col, Form, Input, Button, message, Modal, Spin } from 'antd';
-import { useState } from "react";
+import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { LoadingOutlined } from '@ant-design/icons';
 
 import { authVar } from '../../App/link';
-import { gql, useMutation } from "@apollo/client";
+import { gql, useMutation } from '@apollo/client';
 
-import { notifyGraphqlError } from "../../utils/error";
+import { notifyGraphqlError } from '../../utils/error';
 import constants from '../../config/constants';
 import routes from '../../config/routes';
 
 import logo from '../../assets/images/main_logo.svg';
 import highFiveImg from '../../assets/images/High_five.svg';
-import { LoginResponse } from "../../interfaces/generated";
+import { LoginResponse } from '../../interfaces/generated';
 
 import styles from './style.module.scss';
 
@@ -57,16 +57,17 @@ const Login = () => {
 
   const handleSubmit = (values: any) => {
     let key = 'login'
-    let formData = role === 'admin' ?
-      {
-        email: values.email,
-        password: values.password
-      } :
-      {
-        email: values.email,
-        password: values.password,
-        companyCode: values.code
-      }
+    let formData: {
+      email: '',
+      password: '',
+      companyCode?: ''
+    } = {
+      email: values.email,
+      password: values.password
+    }
+    if (role === 'admin') {
+      formData['companyCode'] = values.code
+    }
     Login({
       variables: {
         input: formData
@@ -207,8 +208,8 @@ const Login = () => {
 
                 <Form.Item>
                   <Button type="primary" htmlType="submit" className={styles['login-form-button']}>
-                    {loading ? 
-                    <span><Spin indicator={antIcon}/>&nbsp; Logging in..</span> : 'Login'}
+                    {loading ?
+                      <span><Spin indicator={antIcon} />&nbsp; Logging in..</span> : 'Login'}
                   </Button>
                 </Form.Item>
               </Form>

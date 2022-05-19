@@ -160,32 +160,8 @@ interface TimeEntryResponseArray {
 const Timesheet = () => {
   const { Option } = Select;
   const authData = authVar();
-  const [form] = Form.useForm();
-  const [newTimeSheet, setNewTimeSheet] = useState({
-    clientLocation: '',
-    company: {
-      id: '',
-      name: '',
-      __typename: 'Company'
-    },
-    createdAt: '',
-    duration: '',
-    endTime: '',
-    id: '',
-    project: {
-      id: '',
-      name: '',
-      __typename: 'Project'
-    },
-    startTime: '',
-    task: {
-      id: '',
-      name: '',
-      __typename: 'Task'
-    },
-    __typename: 'TimeEntry'
-  });
-  const [timeEntryForm] = Form.useForm();
+  const [form] = Form.useForm()
+  const [timeEntryForm] = Form.useForm()
   const stopwatchOffset = new Date();
   const [UpdateTimeEntry] = useMutation(UPDATE_TIME_ENTRY);
   const [visible, setVisible] = useState(false);
@@ -227,13 +203,67 @@ const Timesheet = () => {
         }
       }
     }
-  })
+  });
+
+  const { loading, data: timeEntryData } = useQuery(TIME_ENTRY, {
+    fetchPolicy: "network-only",
+    nextFetchPolicy: "cache-first",
+    variables: {
+      input: {
+        query: {
+          company_id: authData?.company?.id,
+          afterStart: moment().startOf('day')
+        },
+        paging: {
+          order: ['startTime:DESC']
+        }
+      }
+    },
+    onCompleted: (timeEntry) => {
+      if (timeEntry?.TimeEntry?.activeEntry) {
+        setDetailVisible(true)
+        stopwatchOffset.setSeconds(stopwatchOffset.getSeconds() + computeDiff(timeEntry?.TimeEntry?.activeEntry?.startTime))
+        setTimeEntry({
+          id: timeEntry?.TimeEntry?.activeEntry?.id,
+          name: timeEntry?.TimeEntry?.activeEntry?.company?.name,
+          project: timeEntry?.TimeEntry?.activeEntry?.project?.name,
+          task: timeEntry?.TimeEntry?.activeEntry?.task?.name
+        })
+        reset(stopwatchOffset)
+      }
+    },
+  });
+
+  const [newTimeSheet, setNewTimeSheet] = useState({
+    clientLocation: timeEntryData?.TimeEntry?.activeEntry?.clientLocation,
+    company: {
+      id: timeEntryData?.TimeEntry?.activeEntry?.company?.id,
+      name: timeEntryData?.TimeEntry?.activeEntry?.company?.name,
+      __typename: 'Company'
+    },
+    createdAt: timeEntryData?.TimeEntry?.activeEntry?.createdAt,
+    duration: '',
+    endTime: '',
+    id: timeEntryData?.TimeEntry?.activeEntry?.id,
+    project: {
+      id: timeEntryData?.TimeEntry?.activeEntry?.project?.id,
+      name: timeEntryData?.TimeEntry?.activeEntry?.project?.name,
+      __typename: 'Project'
+    },
+    startTime: timeEntryData?.TimeEntry?.activeEntry?.startTime,
+    task: {
+      id: timeEntryData?.TimeEntry?.activeEntry?.task?.id,
+      name: timeEntryData?.TimeEntry?.activeEntry?.task?.name,
+      __typename: 'Task'
+    },
+    __typename: 'TimeEntry'
+  });
 
   const [stopTimer] = useMutation(STOP_TIMER, {
-    update: (proxy, result: any) => {
+    update: (cache, result: any) => {
       newTimeSheet['endTime'] = result?.data?.TimeEntryStop?.endTime
       newTimeSheet['duration'] = result?.data?.TimeEntryStop?.duration
-      const data: any = proxy.readQuery({
+      const data: any = cache.readQuery({
         query: TIME_ENTRY,
         variables: {
           input: {
@@ -247,8 +277,7 @@ const Timesheet = () => {
           }
         },
       });
-      console.log(data?.TimeEntry?.data, "COMPARING", newTimeSheet);
-      proxy.writeQuery({
+      cache.writeQuery({
         query: TIME_ENTRY,
         variables: {
           input: {
@@ -295,38 +324,7 @@ const Timesheet = () => {
     start,
     reset
   } = useStopwatch({ autoStart: showDetailTimeEntry });
-
-  const { loading, data: timeEntryData } = useQuery(TIME_ENTRY, {
-    fetchPolicy: "network-only",
-    nextFetchPolicy: "cache-first",
-    variables: {
-      input: {
-        query: {
-          company_id: authData?.company?.id,
-          afterStart: moment().startOf('day')
-        },
-        paging: {
-          order: ['startTime:DESC']
-        }
-      }
-    },
-    onCompleted: (timeEntry) => {
-      if (timeEntry?.TimeEntry?.activeEntry) {
-        setDetailVisible(true)
-        stopwatchOffset.setSeconds(stopwatchOffset.getSeconds() + computeDiff(timeEntry?.TimeEntry?.activeEntry?.startTime))
-        setTimeEntry({
-          id: timeEntry?.TimeEntry?.activeEntry?.id,
-          name: timeEntry?.TimeEntry?.activeEntry?.company?.name,
-          project: timeEntry?.TimeEntry?.activeEntry?.project?.name,
-          task: timeEntry?.TimeEntry?.activeEntry?.task?.name
-        })
-        reset(stopwatchOffset)
-      }
-    },
-  });
-
-
-  const [createTimeEntry] = useMutation(CREATE_TIME_ENTRY)
+  const [createTimeEntry] = useMutation(CREATE_TIME_ENTRY);
 
   const getKeys = () => {
     var vals: any = [];
@@ -432,6 +430,7 @@ const Timesheet = () => {
         }
       }).catch(notifyGraphqlError)
     } else {
+      console.log('submit');
       stopTimer({
         variables: {
           input: {
@@ -441,6 +440,7 @@ const Timesheet = () => {
           }
         }
       }).then((response) => {
+        console.log(response)
         if (response.errors) {
           return notifyGraphqlError((response.errors))
         } else if (response?.data) {
@@ -455,29 +455,52 @@ const Timesheet = () => {
 
   const clickPlayButton = (entry: string) => {
     const timesheet = filterData()[entry][0];
-    createTimeEntry({
-      variables: {
-        input: {
-          startTime: moment(currentDate, "YYYY-MM-DD HH:mm:ss"),
-          task_id: entry,
-          project_id: timesheet?.project_id,
-          company_id: authData?.company?.id,
+    if (!isRunning) {
+      createTimeEntry({
+        variables: {
+          input: {
+            startTime: moment(new Date(), "YYYY-MM-DD HH:mm:ss"),
+            task_id: entry,
+            project_id: timesheet?.project_id,
+            company_id: authData?.company?.id,
+          }
         }
-      }
-    }).then((response) => {
-      if (response.errors) {
-        return notifyGraphqlError((response.errors))
-      } else if (response?.data) {
-        start();
-        setTimeEntry({
-          id: response?.data?.TimeEntryCreate?.id,
-          name: response?.data?.TimeEntryCreate?.company?.name,
-          project: response?.data?.TimeEntryCreate?.project?.name,
-          task: response?.data?.TimeEntryCreate?.task?.name
-        });
-        setDetailVisible(true);
-      }
-    }).catch(notifyGraphqlError);
+      }).then((response) => {
+        if (response.errors) {
+          return notifyGraphqlError((response.errors))
+        } else if (response?.data) {
+          start();
+          setTimeEntry({
+            id: response?.data?.TimeEntryCreate?.id,
+            name: response?.data?.TimeEntryCreate?.company?.name,
+            project: response?.data?.TimeEntryCreate?.project?.name,
+            task: response?.data?.TimeEntryCreate?.task?.name
+          });
+          setDetailVisible(true);
+        }
+      }).catch(notifyGraphqlError);
+    } else {
+      console.log('submit');
+      stopTimer({
+        variables: {
+          input: {
+            id: newTimeEntry?.id,
+            endTime: moment(new Date(), "YYYY-MM-DD HH:mm:ss"),
+            company_id: authData?.company?.id
+          }
+        }
+      }).then((response) => {
+        console.log(response)
+        if (response.errors) {
+          return notifyGraphqlError((response.errors))
+        } else if (response?.data) {
+          reset(undefined, false)
+          setDetailVisible(false);
+          form.resetFields();
+          message.success({ content: `Time Entry is updated successfully!`, className: 'custom-message' });
+        }
+      }).catch(notifyGraphqlError)
+    }
   }
 
   return (
@@ -634,7 +657,9 @@ const Timesheet = () => {
                             <Form.Item
                               name={`name${index}`}
                               rules={[{ required: true }]}>
-                              <Input type="text" defaultValue={filterData()[entry][0]?.name ?? ''}
+                              <Input
+                                type="text"
+                                defaultValue={filterData()[entry][0]?.name ?? ''}
                                 value={filterData()[entry][0]?.name ?? ''} />
                             </Form.Item>
                           </Col>
@@ -672,7 +697,7 @@ const Timesheet = () => {
                           <Col span={4} className={styles['total-time']}>
                             <span>{getTimeFormat(filterData()[entry][0]?.duration) ?? 'N/A'}</span>
                           </Col>
-                          <Col span={4} className={styles['play-button']}>
+                          <Col span={4} className={styles['play-button']} onClick={() => clickPlayButton(entry)}>
                             <img src={playBtn} alt="play Button" />
                           </Col>
                         </Row>
@@ -718,7 +743,7 @@ const Timesheet = () => {
                               <Col span={4} className={styles['total-time']}>
                                 <span>{getTimeFormat(timeData?.duration) ?? 'N/A'}</span>
                               </Col>
-                              <Col span={4} className={styles['play-button']}>
+                              <Col span={4} className={styles['play-button']} onClick={() => clickPlayButton(entry)}>
                                 <img src={playBtn} alt="play Button" />
                               </Col>
                             </Row>)

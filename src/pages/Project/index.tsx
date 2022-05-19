@@ -103,9 +103,9 @@ const Project = () => {
           Edit Project
         </Link>
       </Menu.Item>
-      <Menu.Divider />
-
-      <Menu.Item key="archive">
+      
+      {/*<Menu.Divider />
+          <Menu.Item key="archive">
         <div onClick={() => setArchiveVisibility(true)}>
           Archive Project
         </div>
@@ -116,7 +116,7 @@ const Project = () => {
         <div onClick={() => setModalVisibility(true)}>
           Delete Project
         </div>
-      </Menu.Item>
+      </Menu.Item> */}
     </Menu>
   );
 

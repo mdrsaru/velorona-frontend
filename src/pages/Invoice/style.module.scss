@@ -1,32 +1,7 @@
-:global {
-  :local(.formColBtn) {
-    .ant-btn {
-      width: 100%;
-    }
-  }
-
-  :local(.close-icon) {
-    .ant-icon {
-      font: 1.5px solid var(--gray-secondary);
-    }
-  }
-}
-
-
-.main-div {
+.container {
   padding: 2rem 0 2rem 0;
-}
 
-.invoice-col {
-  padding: 1.5rem 0 0.9rem 0;
-
-  h1 {
-    font-weight: 600;
-    font-size: 24px;
-    line-height: 29px;
-  }
-
-  .add-new-invoice {
+  .new-invoice {
     float: right;
     font-weight: 600;
     font-size: 18px;
@@ -35,91 +10,6 @@
   }
 }
 
-.formCol {
-  padding: 0 1rem 0 1rem;
-
-  h1 {
-    font-weight: 600;
-    font-size: 24px;
-    line-height: 29px;
-  }
-}
-
-.formColBtn {
-  padding: 2.2rem 1rem 0 1rem;
-}
-
-.formRow {
-  padding-left: 1rem;
-}
-
-.formHeader {
-  width: 100%;
-  height: 50px;
-  background: var(--gray-secondary);
-  margin: 1.5rem 0 1.5rem;
-  padding: 1rem 0.6rem 0 2rem;
-
-  @media screen and (max-width: 1436px) {
-    margin: 1rem 0 1rem;
-    padding: 1rem 0.3rem 0 1rem;
-  }
-
-  p {
-    font-weight: 600;
-    font-size: 18px;
-    line-height: 22px;
-    color: var(--white);
-  }
-}
-
-.form-items {
-  width: 100%;
-  padding: 0 2rem 0 1.2rem;
-  @media screen and (max-width: 1436px) {
-    padding: 0 1rem 0 0.5rem;
-  }
-}
-
-.form-item-note {
-  width: 100%;
-  padding: 1.9rem 3rem 0 1.2rem;
-}
-
-.add-project {
-  font-weight: 600;
-  font-size: 16px;
-  line-height: 17px;
-  padding-left: 1.2rem;
+.actions {
   cursor: pointer;
-  color: var(--primary-blue);
-}
-
-.client-detail {
-  display: flex;
-  border: 1px solid #BDBDBD;
-  padding: 1rem 1rem 0 1rem;
-  margin-bottom: 2rem;
-  box-sizing: border-box;
-}
-
-.details {
-  width: 85%;
-}
-
-.close-option {
-  width: 15%;
-  display: flex;
-  align-items: center;
-  justify-content: right;
-}
-
-.close-icon {
-  cursor: pointer;
-  font-size: 20px;
-  padding: 0.4rem;
-  color: var(--gray-secondary);
-  &:hover {
-    color: var(--primary-purple);
-  }
 }

@@ -1,18 +1,29 @@
 .no-content-div {
-  padding-top: 5vh;
-  height: 20vh;
+  padding: 12vh;
+  background-color: white;
+  margin-top: 20px;
 
-  div {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+  .wrapper {
+    text-align: center;
     width: 100%;
+  }
+  .title {
+    font-weight: 600;
+    font-size: 24px;
+    color: var(--primary-blue);
+    line-height: 2px;
+    align-items: center;
+    text-align: center;
+  }
 
-    p {
-      font-weight: 600;
-      font-size: 20px;
-      color: var(--primary-blue);
-      line-height: 29px;
-    }
+  .image {
+    width: fit-content;
+    margin-bottom: 20%;
+  }
+
+  .sub-title {
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 17px;
   }
 }
