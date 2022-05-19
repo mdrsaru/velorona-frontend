@@ -1,17 +1,21 @@
-import { Card, Col, Row, Button, Space, Input } from 'antd';
-import { ArrowLeftOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import { Card, Col, Row, Button, Space, Input, message } from 'antd';
+import {
+  ArrowLeftOutlined,
+  // CloseCircleOutlined 
+} from '@ant-design/icons';
 import moment from 'moment';
 
-import { gql, useLazyQuery, useQuery } from '@apollo/client';
+import { gql, useLazyQuery, useQuery, useMutation } from '@apollo/client';
 import { useNavigate, useParams } from 'react-router-dom';
 import { authVar } from '../../../App/link';
 import _ from 'lodash';
 
+import { notifyGraphqlError } from "../../../utils/error";
 import { useState } from 'react';
 import AppLoader from '../../../components/Skeleton/AppLoader';
+import { getTimeFormat } from '..';
 
 import styles from '../style.module.scss';
-import { getTimeFormat } from '..';
 
 export const TIME_SHEET = gql`
 query Timesheet($input: TimesheetQueryInput!) {
@@ -71,6 +75,21 @@ query TimesheetWeeklyDetails($input: TimeEntryWeeklyDetailsInput!) {
 }
 `
 
+export const TIMESHEET_SUBMIT = gql`
+  mutation TimesheetSubmit($input: TimesheetSubmitInput!) {
+    TimesheetSubmit(input: $input) {
+      id
+      isSubmitted
+      lastSubmittedAt
+      approver {
+        id
+        fullName
+        email
+      }
+    }
+  }
+`
+
 function getWeekDays(date: any) {
   return Array(7).fill(new Date(date)).map((el, idx) => new Date(el.setDate(el.getDate() - el.getDay() + idx + 1)))
 }
@@ -78,8 +97,9 @@ function getWeekDays(date: any) {
 
 const DetailTimesheet = () => {
   let params = useParams();
-  const navigate = useNavigate();
   const authData = authVar();
+  const navigate = useNavigate();
+  const [submitTimesheet] = useMutation(TIMESHEET_SUBMIT);
   const [timeSheetWeekly, setTimeSheetWeekly] = useState([]);
   const [getWeeklyTimeEntry, { loading: loadWeekly, data: timeEntryWeeklyDetails }] = useLazyQuery(TIME_ENTRY_WEEKLY_DETAILS, {
     fetchPolicy: "network-only",
@@ -124,17 +144,24 @@ const DetailTimesheet = () => {
     }
   });
 
-  function getTotalTime(entries: any) {
-    let sum = 0
-    console.log(entries);
+  const getTotalTimeForADay = (entries: any) => {
+    let sum = 0;
     if (entries) {
-      const durations = entries.map((data: any, index: number) => data?.duration)
+      const durations = entries.map((data: any) => data?.duration)
       sum = durations.reduce((entry1: any, entry2: any) => {
-        console.log('Duration', entry1);
-        return entry1 + entry2
+        return entry1 + entry2;
       }, 0);
-      console.log('sum', sum);
-    }
+    };
+    return getTimeFormat(sum)
+  }
+
+  const getTotalTimeByTask = (entries: any) => {
+    let durations: any = [];
+    const data = Object.values(entries);
+    data.forEach((tasks: any) => {
+      tasks.forEach((data: any) => { durations.push(data?.duration) })
+    });
+    let sum = durations.reduce((entry1: any, entry2: any) => { return entry1 + entry2 }, 0);
     return getTimeFormat(sum)
   }
 
@@ -156,8 +183,24 @@ const DetailTimesheet = () => {
       })
     }
     setTimeSheetWeekly(grouped)
+  };
+
+  const onSubmitTimesheet = () => {
+    submitTimesheet({
+      variables: {
+        input: {
+          id: timeSheetDetail?.Timesheet?.data[0]?.id,
+          company_id: authData?.company?.id
+        }
+      }
+    }).then((response) => {
+      if (response.errors) {
+        return notifyGraphqlError((response.errors))
+      } else if (response?.data) {
+        message.success({ content: `Timesheet is submitted successfully!`, className: 'custom-message' });
+      }
+    }).catch(notifyGraphqlError)
   }
-  console.log(timeSheetWeekly);
 
   return (
     <>
@@ -165,40 +208,40 @@ const DetailTimesheet = () => {
         <div className={styles['site-card-wrapper']}>
           <Card
             bordered={false}
-            className={styles.timesheetCard}>
-            <Row className={styles.cardHeader}>
-              <Col span={24} className={styles.formColDetail}>
+            className={styles['timesheet-card']}>
+            <Row className={styles['card-header']}>
+              <Col span={24} className={styles['form-col-detail']}>
                 <ArrowLeftOutlined onClick={() => navigate(-1)} />
                 &nbsp; &nbsp;
                 <span> My Timesheet</span>
               </Col>
             </Row>
 
-            <Row className={styles.cardBody}>
+            <Row className={styles['card-body']}>
               <Col xs={24} sm={24} md={24} lg={12} xl={12}>
-                <div className={styles.timesheetDiv}>
+                <div className={styles['timesheet-div']}>
                   <div className={styles.header}>Candidate Name</div>
                   <div>{timeSheetDetail?.Timesheet?.data[0]?.user?.email}</div>
                 </div>
-                <div className={styles.timesheetDiv}>
+                <div className={styles['timesheet-div']}>
                   <div className={styles.header}>Time Period</div>
                   <div>Mon-Sun</div>
                 </div>
-                <div className={styles.timesheetDiv}>
+                <div className={styles['timesheet-div']}>
                   <div className={styles.header}>Total Expense</div>
                   <div>{timeSheetDetail?.Timesheet?.data[0]?.totalExpense ?? 'N/A'}</div>
                 </div>
-                <div className={styles.timesheetDiv}>
+                <div className={styles['timesheet-div']}>
                   <div className={styles.header}>Approver/Manager</div>
                   <div>{timeSheetDetail?.Timesheet?.data[0]?.approver?.fullName ?? 'N/A'}</div>
                 </div>
-                <div className={styles.timesheetDiv}>
+                <div className={styles['timesheet-div']}>
                   <div className={styles.header}>Status</div>
                   <div>{timeSheetDetail?.Timesheet?.data[0]?.status}</div>
                 </div>
               </Col>
               <Col xs={24} sm={24} md={24} lg={12} xl={12}>
-                <div className={styles.timesheetDiv}>
+                <div className={styles['timesheet-div']}>
                   <div className={styles.header}>
                     Project Name
                   </div>
@@ -206,7 +249,7 @@ const DetailTimesheet = () => {
                     {timeSheetDetail?.Timesheet?.data[0]?.project?.name ?? 'N/A'}
                   </div>
                 </div>
-                <div className={styles.timesheetDiv}>
+                <div className={styles['timesheet-div']}>
                   <div className={styles.header}>
                     Client Name
                   </div>
@@ -214,7 +257,7 @@ const DetailTimesheet = () => {
                     Araniko College Pvt Ltd
                   </div>
                 </div>
-                <div className={styles.timesheetDiv}>
+                <div className={styles['timesheet-div']}>
                   <div className={styles.header}>
                     Client Location
                   </div>
@@ -222,7 +265,7 @@ const DetailTimesheet = () => {
                     {timeSheetDetail?.Timesheet?.data[0]?.clientLocation ?? 'N/A'}
                   </div>
                 </div>
-                <div className={styles.timesheetDiv}>
+                <div className={styles['timesheet-div']}>
                   <div className={styles.header}>
                     Last Submitted
                   </div>
@@ -230,7 +273,7 @@ const DetailTimesheet = () => {
                     {moment(timeSheetDetail?.Timesheet?.data[0]?.weekEndDate).format('L')}
                   </div>
                 </div>
-                <div className={styles.timesheetDiv}>
+                <div className={styles['timesheet-div']}>
                   <div className={styles.header}>
                     Last Approved
                   </div>
@@ -243,16 +286,20 @@ const DetailTimesheet = () => {
           </Card>
           <br />
           <Card bordered={false}>
-            <Row className={styles.timeSheetDetail}>
-              <Col span={24} className={styles.formCol1}>
-                <span>Time Entry Details</span>
+            <Row className={styles['timesheet-detail']}>
+              <Col span={12} className={styles['form-col1']}>
+                <span>
+                  Time Entry Details
+                </span>
               </Col>
-              <Col span={24} className={styles.formCol1}>
-                <span></span>
+              <Col span={12} className={styles['form-col1']}>
+                <span className={styles['add-entry']}>
+                  Add New Time Entry
+                </span>
               </Col>
             </Row>
             <Row>
-              <Col span={24} className={styles.formCol}>
+              <Col span={24} className={styles['form-col']}>
                 <div className={styles['resp-table']}>
                   <div className={styles["resp-table-header"]}>
                     <div className={styles['table-header-cell']}>
@@ -279,11 +326,12 @@ const DetailTimesheet = () => {
                       </div>
                       {getWeekDays(timeSheetDetail?.Timesheet?.data[0]?.weekStartDate).map((day: any, timeIndex: number) =>
                         <div className={styles["table-body-cell"]} key={timeIndex}>
-                          <Input value={getTotalTime(timesheet?.entries[moment(day).format('ddd, MMM D')])} />
+                          <Input type="text" value={getTotalTimeForADay(timesheet?.entries[moment(day).format('ddd, MMM D')])} />
                         </div>
                       )}
                       <div className={styles["table-body-cell"]}>
-                        <span>40:00:00 </span> &nbsp; &nbsp; <CloseCircleOutlined />
+                        <span>{getTotalTimeByTask(timesheet?.entries)} </span>
+                        {/* &nbsp; &nbsp; <CloseCircleOutlined /> */}
                       </div>
                     </div>)}
                 </div>
@@ -291,12 +339,12 @@ const DetailTimesheet = () => {
             </Row>
             <br />
             <Row justify={"end"}>
-              <Col className={styles.formCol}>
+              <Col className={styles['form-col']}>
                 <Space>
                   <Button type="primary" htmlType="button">
                     Save and Exit
                   </Button>
-                  <Button type="default" htmlType="button">
+                  <Button type="default" htmlType="button" onClick={onSubmitTimesheet}>
                     Submit
                   </Button>
                 </Space>

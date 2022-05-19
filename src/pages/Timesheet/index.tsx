@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from 'react';
 import {
   Card,
   Col,
@@ -18,22 +18,23 @@ import {
   RightOutlined
 } from '@ant-design/icons';
 
-import { authVar } from "../../App/link";
-import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
+import { authVar } from '../../App/link';
+import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import { useStopwatch } from 'react-timer-hook';
 import { notifyGraphqlError } from "../../utils/error";
-import { PROJECT } from "../Project";
-import { CLIENT } from "../Client";
+import { PROJECT } from '../Project';
+import { CLIENT } from '../Client';
 
-import moment from "moment";
-import { TASK } from "../Tasks";
-import { TimeEntryPagingResult } from "../../interfaces/generated";
-import TimeSheetLoader from "../../components/Skeleton/TimeSheetLoader";
+import moment from 'moment';
+import { TASK } from '../Tasks';
+import { TimeEntryPagingResult } from '../../interfaces/generated';
+import TimeSheetLoader from '../../components/Skeleton/TimeSheetLoader';
 
-import NoContent from "../../components/NoContent";
-import playBtn from "../../assets/images/play-circle.svg";
-import styles from "./style.module.scss";
-import WeeklyTimeSheet from "./WeeklyTimesheet";
+import NoContent from '../../components/NoContent';
+import playBtn from '../../assets/images/play-circle.svg';
+import WeeklyTimeSheet from './WeeklyTimesheet';
+
+import styles from './style.module.scss';
 
 export const STOP_TIMER = gql`
   mutation TimeEntryStop($input: TimeEntryStopInput!) {
@@ -49,23 +50,24 @@ export const STOP_TIMER = gql`
 export const CREATE_TIME_ENTRY = gql`
     mutation TimeEntryCreate($input: TimeEntryCreateInput!) {
       TimeEntryCreate(input: $input) {
+          id
+          startTime
+          endTime
+          createdAt
+          duration
+          clientLocation
+          task {
+            id 
+            name
+          }
+          company {
             id
-            startTime
-            endTime
-            createdAt
-            clientLocation
-            task {
-                id
-                name
-            }
-            company {
-                id
-                name
-            }
-            project {
-                id
-                name
-            }
+            name
+          }
+          project {
+            id
+            name
+          }
         }
     }
 `
@@ -159,6 +161,30 @@ const Timesheet = () => {
   const { Option } = Select;
   const authData = authVar();
   const [form] = Form.useForm();
+  const [newTimeSheet, setNewTimeSheet] = useState({
+    clientLocation: '',
+    company: {
+      id: '',
+      name: '',
+      __typename: 'Company'
+    },
+    createdAt: '',
+    duration: '',
+    endTime: '',
+    id: '',
+    project: {
+      id: '',
+      name: '',
+      __typename: 'Project'
+    },
+    startTime: '',
+    task: {
+      id: '',
+      name: '',
+      __typename: 'Task'
+    },
+    __typename: 'TimeEntry'
+  });
   const [timeEntryForm] = Form.useForm();
   const stopwatchOffset = new Date();
   const [UpdateTimeEntry] = useMutation(UPDATE_TIME_ENTRY);
@@ -203,7 +229,47 @@ const Timesheet = () => {
     }
   })
 
-  const [stopTimer] = useMutation(STOP_TIMER)
+  const [stopTimer] = useMutation(STOP_TIMER, {
+    update: (proxy, result: any) => {
+      newTimeSheet['endTime'] = result?.data?.TimeEntryStop?.endTime
+      newTimeSheet['duration'] = result?.data?.TimeEntryStop?.duration
+      const data: any = proxy.readQuery({
+        query: TIME_ENTRY,
+        variables: {
+          input: {
+            query: {
+              company_id: authData?.company?.id,
+              afterStart: moment().startOf('day')
+            },
+            paging: {
+              order: ['startTime:DESC']
+            }
+          }
+        },
+      });
+      console.log(data?.TimeEntry?.data, "COMPARING", newTimeSheet);
+      proxy.writeQuery({
+        query: TIME_ENTRY,
+        variables: {
+          input: {
+            query: {
+              company_id: authData?.company?.id,
+              afterStart: moment().startOf('day')
+            },
+            paging: {
+              order: ['startTime:DESC']
+            }
+          }
+        },
+        data: {
+          TimeEntry: {
+            activeEntry: null,
+            data: [...data?.TimeEntry?.data, newTimeSheet]
+          }
+        }
+      });
+    }
+  })
 
   const [getTask, { data: taskData }] = useLazyQuery(TASK, {
     fetchPolicy: "network-only",
@@ -247,7 +313,7 @@ const Timesheet = () => {
     onCompleted: (timeEntry) => {
       if (timeEntry?.TimeEntry?.activeEntry) {
         setDetailVisible(true)
-        stopwatchOffset.setSeconds(stopwatchOffset.getSeconds() + computeDiff(timeEntry?.TimeEntry?.data[0]?.startTime))
+        stopwatchOffset.setSeconds(stopwatchOffset.getSeconds() + computeDiff(timeEntry?.TimeEntry?.activeEntry?.startTime))
         setTimeEntry({
           id: timeEntry?.TimeEntry?.activeEntry?.id,
           name: timeEntry?.TimeEntry?.activeEntry?.company?.name,
@@ -260,44 +326,14 @@ const Timesheet = () => {
   });
 
 
-
-  const [createTimeEntry] = useMutation(CREATE_TIME_ENTRY, {
-    update(cache, { data }) {
-      const response = data?.TimeEntryCreate;
-      const timeEntry = cache.readQuery<TimeEntryResponseArray>({
-        query: TIME_ENTRY,
-        variables: {
-          input: {
-            query: {
-              company_id: authData?.company?.id,
-            },
-            paging: {
-              order: ['createdAt:DESC']
-            }
-          }
-        }
-      });
-      if (timeEntry) {
-        let arrayData = timeEntry?.TimeEntry?.data
-        console.log('arrayData', arrayData?.length, [...arrayData, response].length);
-        cache.writeQuery({
-          query: TIME_ENTRY,
-          data: {
-            TimeEntry: {
-              data: [response, ...arrayData]
-            }
-          }
-        })
-      }
-    }
-  })
+  const [createTimeEntry] = useMutation(CREATE_TIME_ENTRY)
 
   const getKeys = () => {
     var vals: any = [];
     if (timeEntryData?.TimeEntry?.data) {
       for (var item of timeEntryData?.TimeEntry?.data) {
         if (!vals.includes(item?.task?.id)) {
-          vals.push(item.task?.id);
+          vals.push(item?.task?.id);
         }
       }
     }
@@ -385,6 +421,7 @@ const Timesheet = () => {
           return notifyGraphqlError((response.errors))
         } else if (response?.data) {
           start();
+          setNewTimeSheet(response?.data?.TimeEntryCreate)
           setTimeEntry({
             id: response?.data?.TimeEntryCreate?.id,
             name: response?.data?.TimeEntryCreate?.company?.name,
@@ -449,7 +486,7 @@ const Timesheet = () => {
         <div className={styles['site-card-wrapper']}>
           <Card
             bordered={false}
-            className={styles.formRow}>
+            className={styles['form-row']}>
             <Form
               form={form}
               layout="vertical"
@@ -457,7 +494,7 @@ const Timesheet = () => {
 
               {showDetailTimeEntry ?
                 <Row>
-                  <Col xs={24} sm={24} md={12} lg={12} className={styles.formColHeader}>
+                  <Col xs={24} sm={24} md={12} lg={12} className={styles['form-col-header']}>
                     <b>
                       <span>{newTimeEntry?.name ?? timeEntryData?.TimeEntry?.activeEntry?.name}</span> :
                       &nbsp;{newTimeEntry?.project ?? timeEntryData?.TimeEntry?.activeEntry?.project?.name}
@@ -465,7 +502,7 @@ const Timesheet = () => {
                   </Col>
                 </Row> :
                 <Row>
-                  <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+                  <Col xs={24} sm={24} md={12} lg={12} className={styles['form-col']}>
                     <Form.Item
                       name="client"
                       label="Client"
@@ -486,7 +523,7 @@ const Timesheet = () => {
                       </Select>
                     </Form.Item>
                   </Col>
-                  <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+                  <Col xs={24} sm={24} md={12} lg={12} className={styles['form-col']}>
                     <Form.Item
                       name="project"
                       label="Project"
@@ -507,7 +544,7 @@ const Timesheet = () => {
                 </Row>}
 
               <Row>
-                <Col xs={24} sm={24} md={12} lg={16} xl={18} className={styles.taskCol}>
+                <Col xs={24} sm={24} md={12} lg={16} xl={18} className={styles['task-col']}>
                   <Form.Item
                     name="task"
                     label="Task"
@@ -516,7 +553,7 @@ const Timesheet = () => {
                       message: 'Choose the task'
                     }]}>
                     {showDetailTimeEntry ?
-                      <div className={styles['timesheetTask']}>
+                      <div className={styles['timesheet-task']}>
                         {newTimeEntry?.task}
                       </div> :
                       <Select placeholder="Select Task">
@@ -529,7 +566,7 @@ const Timesheet = () => {
                   </Form.Item>
                 </Col>
 
-                <Col xs={24} sm={24} md={12} lg={8} xl={6} className={styles.timeStartCol}>
+                <Col xs={24} sm={24} md={12} lg={8} xl={6} className={styles['time-start-col']}>
                   <Form.Item>
                     <div
                       style={{
@@ -562,7 +599,7 @@ const Timesheet = () => {
             bordered={false}
             className={styles['task-card']}>
             <Row>
-              <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+              <Col xs={24} sm={24} md={12} lg={12} className={styles['form-col']}>
                 <span className={styles['date-view']}>
                   {moment(new Date()).format('LL')}
                 </span>
@@ -773,7 +810,7 @@ const Timesheet = () => {
                 </div>
               </Col>
               <Col span={24} className={styles['card-col-timesheet']}>
-                <WeeklyTimeSheet/>
+                <WeeklyTimeSheet />
               </Col>
             </Row>
           </Card>

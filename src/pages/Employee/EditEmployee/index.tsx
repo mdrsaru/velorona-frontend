@@ -1,19 +1,18 @@
-import React from "react";
-import { Button, Card, Col, Form, Input, message, Row, Select, Space, DatePicker, InputNumber, Upload } from "antd";
-import { ArrowLeftOutlined, UploadOutlined } from "@ant-design/icons";
+import { Button, Card, Col, Form, Input, message, Row, Select, Space, Upload } from 'antd';
+import { ArrowLeftOutlined, UploadOutlined } from '@ant-design/icons';
 import moment from 'moment';
 
-import { useNavigate, useParams } from "react-router-dom";
-import { useMutation, useQuery } from "@apollo/client";
-import { notifyGraphqlError } from "../../../utils/error";
+import { useNavigate, useParams } from 'react-router-dom';
+import { useMutation, useQuery } from '@apollo/client';
+import { notifyGraphqlError } from '../../../utils/error';
 
-import { mediaServices } from "../../../services/MediaService";
-import { IRole } from "../../../interfaces/IRole";
-import { USER_UPDATE, USER } from "..";
-import { ROLES } from "../../Role";
-import { CHANGE_PROFILE_IMAGE } from "../NewEmployee";
+import { mediaServices } from '../../../services/MediaService';
+import { IRole } from '../../../interfaces/IRole';
+import { USER_UPDATE, USER } from '..';
+import { ROLES } from '../../Role';
+import { CHANGE_PROFILE_IMAGE } from '../NewEmployee';
 
-import styles from "../style.module.scss";
+import styles from '../style.module.scss';
 
 const dateFormat = 'YYYY-MM-DD HH:mm:ss';
 const profileFile = (e: any) => {
@@ -27,7 +26,7 @@ const profileFile = (e: any) => {
 const EditEmployee = () => {
   let params = useParams();
   const navigate = useNavigate();
-  const [UserUpdate] = useMutation(USER_UPDATE);
+  const [userUpdate] = useMutation(USER_UPDATE);
   const [ChangeProfilePictureInput] = useMutation(CHANGE_PROFILE_IMAGE);
   const { data: roles } = useQuery(ROLES, {
     fetchPolicy: "cache-first"
@@ -50,8 +49,7 @@ const EditEmployee = () => {
   }
 
   const successMessage = () => {
-    message.success(`Employee is updated successfully!`).then(r => {
-    });
+    message.success(`Employee is updated successfully!`).then(r => {});
     navigate(-1)
   }
 
@@ -68,7 +66,7 @@ const EditEmployee = () => {
       }
     }
 
-    UserUpdate({
+    userUpdate({
       variables: {
         input: formData
       }
