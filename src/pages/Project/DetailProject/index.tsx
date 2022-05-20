@@ -1,4 +1,4 @@
-import { Card, Col, Dropdown, Menu, Row, Table, message, Spin } from "antd";
+import { Card, Col, Dropdown, Menu, Row, Table, message } from "antd";
 import { ArrowLeftOutlined, MoreOutlined } from "@ant-design/icons";
 import React, { useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
@@ -18,6 +18,7 @@ import styles from "../style.module.scss";
 import ModalConfirm from "../../../components/Modal";
 import ArchiveBody from "../../../components/Archive";
 import DeleteBody from "../../../components/Delete";
+import TaskDetail from "../../../components/TaskDetail";
 
 const { SubMenu } = Menu;
 
@@ -132,6 +133,7 @@ const DetailProject = () => {
     });
   };
 
+  const [detailVisibility, setDetailVisibility] = useState(false);
   const menu = (data: any) => (
     <Menu>
       <SubMenu title="Change status" key="mainMenu">
@@ -194,15 +196,11 @@ const DetailProject = () => {
           </div>
         );
       },
-      onCell: (record: any) => {
+      onCell: (task: any) => {
         return {
           onClick: () => {
-            navigate(
-              routes.detailProject.path(
-                loggedInUser?.company?.code ?? "",
-                record?.id ?? ""
-              )
-            );
+            setDetailVisibility(!detailVisibility);
+            setTask(task)
           },
         };
       },
@@ -382,6 +380,13 @@ const DetailProject = () => {
         }
         onOkClick={archiveTask}
       />
+      {detailVisibility && (
+        <TaskDetail
+          visibility={detailVisibility}
+          setVisibility={setDetailVisibility}
+          data={task}
+        />
+      )}
     </div>
   );
 };
