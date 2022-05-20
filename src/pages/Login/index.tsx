@@ -65,7 +65,7 @@ const Login = () => {
       email: values.email,
       password: values.password
     }
-    if (role === 'admin') {
+    if (role !== 'admin') {
       formData['companyCode'] = values.code
     }
     Login({

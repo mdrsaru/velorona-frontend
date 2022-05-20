@@ -9,7 +9,6 @@ import {
   Select,
   Button,
   message,
-  Input,
   Collapse
 } from 'antd';
 import {
@@ -31,10 +30,10 @@ import { TimeEntryPagingResult } from '../../interfaces/generated';
 import TimeSheetLoader from '../../components/Skeleton/TimeSheetLoader';
 
 import NoContent from '../../components/NoContent';
-import playBtn from '../../assets/images/play-circle.svg';
 import WeeklyTimeSheet from './WeeklyTimesheet';
 
 import styles from './style.module.scss';
+import TimeEntry from './TimeEntry';
 
 export const STOP_TIMER = gql`
   mutation TimeEntryStop($input: TimeEntryStopInput!) {
@@ -174,6 +173,31 @@ const Timesheet = () => {
     task: ''
   });
 
+  const [newTimeSheet, setNewTimeSheet] = useState({
+    clientLocation: '',
+    company: {
+      id: '',
+      name: '',
+      __typename: 'Company'
+    },
+    createdAt: '',
+    duration: '',
+    endTime: '',
+    id: '',
+    project: {
+      id: '',
+      name: '',
+      __typename: 'Project'
+    },
+    startTime: '',
+    task: {
+      id: '',
+      name: '',
+      __typename: 'Task'
+    },
+    __typename: 'TimeEntry'
+  });
+
   const { data: clientData } = useQuery(CLIENT, {
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
@@ -229,40 +253,41 @@ const Timesheet = () => {
           project: timeEntry?.TimeEntry?.activeEntry?.project?.name,
           task: timeEntry?.TimeEntry?.activeEntry?.task?.name
         })
+        setNewTimeSheet({
+          clientLocation: timeEntry?.TimeEntry?.activeEntry?.clientLocation,
+          company: {
+            id: timeEntry?.TimeEntry?.activeEntry?.company?.id,
+            name: timeEntry?.TimeEntry?.activeEntry?.company?.name,
+            __typename: 'Company'
+          },
+          createdAt: timeEntry?.TimeEntry?.activeEntry?.createdAt,
+          duration: '',
+          endTime: '',
+          id: timeEntry?.TimeEntry?.activeEntry?.id,
+          project: {
+            id: timeEntry?.TimeEntry?.activeEntry?.project?.id,
+            name: timeEntry?.TimeEntry?.activeEntry?.project?.name,
+            __typename: 'Project'
+          },
+          startTime: timeEntry?.TimeEntry?.activeEntry?.startTime,
+          task: {
+            id: timeEntry?.TimeEntry?.activeEntry?.task?.id,
+            name: timeEntry?.TimeEntry?.activeEntry?.task?.name,
+            __typename: 'Task'
+          },
+          __typename: 'TimeEntry'
+        })
         reset(stopwatchOffset)
       }
     },
   });
 
-  const [newTimeSheet, setNewTimeSheet] = useState({
-    clientLocation: timeEntryData?.TimeEntry?.activeEntry?.clientLocation,
-    company: {
-      id: timeEntryData?.TimeEntry?.activeEntry?.company?.id,
-      name: timeEntryData?.TimeEntry?.activeEntry?.company?.name,
-      __typename: 'Company'
-    },
-    createdAt: timeEntryData?.TimeEntry?.activeEntry?.createdAt,
-    duration: '',
-    endTime: '',
-    id: timeEntryData?.TimeEntry?.activeEntry?.id,
-    project: {
-      id: timeEntryData?.TimeEntry?.activeEntry?.project?.id,
-      name: timeEntryData?.TimeEntry?.activeEntry?.project?.name,
-      __typename: 'Project'
-    },
-    startTime: timeEntryData?.TimeEntry?.activeEntry?.startTime,
-    task: {
-      id: timeEntryData?.TimeEntry?.activeEntry?.task?.id,
-      name: timeEntryData?.TimeEntry?.activeEntry?.task?.name,
-      __typename: 'Task'
-    },
-    __typename: 'TimeEntry'
-  });
 
   const [stopTimer] = useMutation(STOP_TIMER, {
     update: (cache, result: any) => {
       newTimeSheet['endTime'] = result?.data?.TimeEntryStop?.endTime
       newTimeSheet['duration'] = result?.data?.TimeEntryStop?.duration
+
       const data: any = cache.readQuery({
         query: TIME_ENTRY,
         variables: {
@@ -277,6 +302,7 @@ const Timesheet = () => {
           }
         },
       });
+
       cache.writeQuery({
         query: TIME_ENTRY,
         variables: {
@@ -364,10 +390,6 @@ const Timesheet = () => {
     number: {
       range: '${label} must be between ${min} and ${max}',
     },
-  };
-
-  const onFinish = (values: any) => {
-    console.log("form values", values);
   };
 
   const onChangeClientSelect = (value: string) => {
@@ -470,6 +492,7 @@ const Timesheet = () => {
           return notifyGraphqlError((response.errors))
         } else if (response?.data) {
           start();
+          setNewTimeSheet(response?.data?.TimeEntryCreate);
           setTimeEntry({
             id: response?.data?.TimeEntryCreate?.id,
             name: response?.data?.TimeEntryCreate?.company?.name,
@@ -490,7 +513,6 @@ const Timesheet = () => {
           }
         }
       }).then((response) => {
-        console.log(response)
         if (response.errors) {
           return notifyGraphqlError((response.errors))
         } else if (response?.data) {
@@ -565,7 +587,6 @@ const Timesheet = () => {
                     </Form.Item>
                   </Col>
                 </Row>}
-
               <Row>
                 <Col xs={24} sm={24} md={12} lg={16} xl={18} className={styles['task-col']}>
                   <Form.Item
@@ -588,25 +609,17 @@ const Timesheet = () => {
                       </Select>}
                   </Form.Item>
                 </Col>
-
                 <Col xs={24} sm={24} md={12} lg={8} xl={6} className={styles['time-start-col']}>
                   <Form.Item>
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}>
-                      <div style={{ width: '50%' }}>
-                        <div style={{ textAlign: 'center' }}>
-                          <span>
-                            {(hours > 9 ? hours : '0' + hours) + ':' +
-                              (minutes > 9 ? minutes : '0' + minutes) + ':'
-                              + (seconds > 9 ? seconds : '0' + seconds)}
-                          </span>
-                        </div>
+                    <div className={styles['timer-div']}>
+                      <div>
+                        <span>
+                          {(hours > 9 ? hours : '0' + hours) + ':' +
+                            (minutes > 9 ? minutes : '0' + minutes) + ':'
+                            + (seconds > 9 ? seconds : '0' + seconds)}
+                        </span>
                       </div> &nbsp; &nbsp; &nbsp; &nbsp;
-                      <div style={{ width: '50%' }}>
+                      <div>
                         {isRunning ?
                           <Button type="primary" htmlType="submit" danger>Stop</Button> :
                           <Button type="primary" htmlType="submit">Start</Button>}
@@ -629,173 +642,53 @@ const Timesheet = () => {
               </Col>
             </Row>
             <Row className={styles['task-div-header']}>
-              <Col span={4} className={styles['task-header']}>Task</Col>
+              <Col span={6} className={styles['task-header']}>Task</Col>
               <Col span={4} className={styles['client-header']}>Client: Project</Col>
-              <Col span={4} className={styles['start-header']}>Start Time</Col>
-              <Col span={4} className={styles['end-header']}>End Time</Col>
+              <Col span={3} className={styles['start-header']}>Start Time</Col>
+              <Col span={3} className={styles['end-header']}>End Time</Col>
               <Col span={4} className={styles['total-header']}>Total</Col>
               <Col span={4}></Col>
             </Row>
+
             {timeEntryData?.TimeEntry?.data?.length === 0 && <NoContent title={"Time Entry"} />}
-            <Form
-              form={timeEntryForm}
-              onFinish={onFinish}
-              validateMessages={validateMessages}>
+
+            <Form form={timeEntryForm} validateMessages={validateMessages}>
               <div className={styles['task-row']}>
                 {getKeys() && getKeys()?.map((entry: any, index: number) => (
+
                   (filterData()[entry].length > 1) ?
-                    <Collapse collapsible="header" ghost className={styles['task-div-list']} key={index}>
+                    <Collapse
+                      collapsible="header"
+                      ghost
+                      className={styles['task-div-list']}
+                      key={index}>
+
                       <Panel showArrow={false} header={
-                        <Row className={styles['filter-task-list']}>
-                          <Col span={4} className={styles['task-name']}>
-                            <div>
-                              {filterData()[entry].length > 1 &&
-                                <p>
-                                  {filterData()[entry].length}
-                                </p>}
-                            </div>
-                            <Form.Item
-                              name={`name${index}`}
-                              rules={[{ required: true }]}>
-                              <Input
-                                type="text"
-                                defaultValue={filterData()[entry][0]?.name ?? ''}
-                                value={filterData()[entry][0]?.name ?? ''} />
-                            </Form.Item>
-                          </Col>
-
-                          <Col span={4} className={styles['client-name']}>
-                            <Form.Item
-                              name={`client${index}`}
-                              rules={[{ required: true }]}>
-                              <Input type="text"
-                                defaultValue={filterData()[entry][0]?.project ?? ''}
-                                value={filterData()[entry][0]?.project ?? ''} />
-                            </Form.Item>
-                          </Col>
-
-                          <Col span={4} className={styles['start-time']}>
-                            <Form.Item
-                              name={`start${index}`}
-                              rules={[{ required: true }]}>
-                              <Input type="text"
-                                defaultValue={moment(filterData()[entry][0]?.startTime).format('LT')}
-                                value={moment(filterData()[entry][0]?.startTime).format('LT')} />
-                            </Form.Item>
-                          </Col>
-
-                          <Col span={4} className={styles['end-time']}>
-                            <Form.Item
-                              name={`end${index}`}
-                              rules={[{ required: true }]}>
-                              <Input type="text"
-                                defaultValue={moment(filterData()[entry][0]?.endTime).format('LT')}
-                                value={moment(filterData()[entry][0]?.endTime).format('LT')} />
-                            </Form.Item>
-                          </Col>
-
-                          <Col span={4} className={styles['total-time']}>
-                            <span>{getTimeFormat(filterData()[entry][0]?.duration) ?? 'N/A'}</span>
-                          </Col>
-                          <Col span={4} className={styles['play-button']} onClick={() => clickPlayButton(entry)}>
-                            <img src={playBtn} alt="play Button" />
-                          </Col>
-                        </Row>
-                      } key={index}>
+                        <TimeEntry
+                          rowClassName={'filter-task-list'}
+                          index={index}
+                          data={filterData()[entry][0]}
+                          length={filterData()[entry]?.length}
+                          clickPlayButton={() => clickPlayButton(entry)} />} key={index}>
                         {filterData()[entry].map((timeData: any, entryIndex: number) => {
                           return (
-                            <Row key={entryIndex} className={styles['filter-task-list']}>
-                              <Col span={4} className={styles['task-name']}>
-                                <Form.Item
-                                  name={`name${index}`}
-                                  rules={[{ required: true }]}>
-                                  <Input type="text" defaultValue={timeData?.name ?? ''} />
-                                </Form.Item>
-                              </Col>
-
-                              <Col span={4} className={styles['client-name']}>
-                                <Form.Item
-                                  name={`client${index}`}
-                                  rules={[{ required: true }]}>
-                                  <Input type="text"
-                                    defaultValue={timeData?.project ?? ''} />
-                                </Form.Item>
-                              </Col>
-
-                              <Col span={4} className={styles['start-time']}>
-                                <Form.Item
-                                  name={`start${index}`}
-                                  rules={[{ required: true }]}>
-                                  <Input type="text"
-                                    defaultValue={moment(timeData?.startTime).format('LT')} />
-                                </Form.Item>
-                              </Col>
-
-                              <Col span={4} className={styles['end-time']}>
-                                <Form.Item
-                                  name={`end${index}`}
-                                  rules={[{ required: true }]}>
-                                  <Input type="text"
-                                    defaultValue={moment(timeData?.endTime).format('LT')} />
-                                </Form.Item>
-                              </Col>
-
-                              <Col span={4} className={styles['total-time']}>
-                                <span>{getTimeFormat(timeData?.duration) ?? 'N/A'}</span>
-                              </Col>
-                              <Col span={4} className={styles['play-button']} onClick={() => clickPlayButton(entry)}>
-                                <img src={playBtn} alt="play Button" />
-                              </Col>
-                            </Row>)
+                            <TimeEntry
+                              key={entryIndex}
+                              rowClassName={'filter-task-list'}
+                              index={index}
+                              data={timeData}
+                              length={timeData?.length}
+                              clickPlayButton={() => clickPlayButton(entry)} />)
                         })}
                       </Panel>
+
                     </Collapse> :
-                    <Row className={styles['task-div']}>
-                      <Col span={4} className={styles['task-name']}>
-                        <div>
-                          {filterData()[entry].length > 1 &&
-                            <p>
-                              {filterData()[entry].length}
-                            </p>}
-                        </div>
-                        <Form.Item
-                          name={`name${index}`}
-                          rules={[{ required: true }]}>
-                          <Input type="text" defaultValue={filterData()[entry][0]?.name ?? ''} />
-                        </Form.Item>
-                      </Col>
-
-                      <Col span={4} className={styles['client-name']}>
-                        <Form.Item
-                          name={`client${index}`}
-                          rules={[{ required: true }]}>
-                          <Input type="text" defaultValue={filterData()[entry][0]?.project ?? ''} />
-                        </Form.Item>
-                      </Col>
-
-                      <Col span={4} className={styles['start-time']}>
-                        <Form.Item
-                          name={`start${index}`}
-                          rules={[{ required: true }]}>
-                          <Input type="text" defaultValue={moment(filterData()[entry][0]?.startTime).format('LT')} />
-                        </Form.Item>
-                      </Col>
-
-                      <Col span={4} className={styles['end-time']}>
-                        <Form.Item
-                          name={`end${index}`}
-                          rules={[{ required: true }]}>
-                          <Input type="text" defaultValue={moment(filterData()[entry][0]?.endTime).format('LT')} />
-                        </Form.Item>
-                      </Col>
-
-                      <Col span={4} className={styles['total-time']}>
-                        <span>{getTimeFormat(filterData()[entry][0]?.duration) ?? 'N/A'}</span>
-                      </Col>
-                      <Col span={4} className={styles['play-button']} onClick={() => clickPlayButton(entry)}>
-                        <img src={playBtn} alt="play Button" />
-                      </Col>
-                    </Row>
+                    <TimeEntry
+                      rowClassName={'task-div'}
+                      index={index}
+                      data={filterData()[entry][0]}
+                      length={filterData()[entry]?.length}
+                      clickPlayButton={() => clickPlayButton(entry)} />
                 ))}
               </div>
             </Form>
@@ -839,6 +732,7 @@ const Timesheet = () => {
               </Col>
             </Row>
           </Card>
+
           <Modal
             title=""
             centered

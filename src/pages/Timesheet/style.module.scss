@@ -189,6 +189,7 @@
       font-weight: 600;
       font-size: 18px;
       line-height: 22px;
+      width: 100%;
       color: var(--primary-blue);
     }
   }
@@ -500,4 +501,14 @@
   font-size: 18px;
   line-height: 22px;
   padding: 1rem;
+}
+
+.timer-div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  div {
+    width: 50%;
+  }
 }
