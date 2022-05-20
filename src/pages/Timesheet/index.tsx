@@ -28,12 +28,11 @@ import moment from 'moment';
 import { TASK } from '../Tasks';
 import { TimeEntryPagingResult } from '../../interfaces/generated';
 import TimeSheetLoader from '../../components/Skeleton/TimeSheetLoader';
-
+import TimeEntry from './TimeEntry';
 import NoContent from '../../components/NoContent';
 import WeeklyTimeSheet from './WeeklyTimesheet';
-
+import _ from 'lodash';
 import styles from './style.module.scss';
-import TimeEntry from './TimeEntry';
 
 export const STOP_TIMER = gql`
   mutation TimeEntryStop($input: TimeEntryStopInput!) {
@@ -54,6 +53,7 @@ export const CREATE_TIME_ENTRY = gql`
           endTime
           createdAt
           duration
+          task_id
           clientLocation
           task {
             id 
@@ -91,6 +91,7 @@ export const TIME_ENTRY = gql`
                 createdAt
                 duration
                 clientLocation
+                task_id
                 task {
                     id 
                     name
@@ -323,6 +324,12 @@ const Timesheet = () => {
           }
         }
       });
+    },
+    onCompleted: () => {
+      reset(undefined, false)
+      setDetailVisible(false);
+      form.resetFields();
+      message.success({ content: `Time Entry is updated successfully!`, className: 'custom-message' });
     }
   })
 
@@ -349,35 +356,34 @@ const Timesheet = () => {
     isRunning,
     start,
     reset
-  } = useStopwatch({ autoStart: showDetailTimeEntry });
-  const [createTimeEntry] = useMutation(CREATE_TIME_ENTRY);
+  } = useStopwatch({ autoStart: showDetailTimeEntry, offsetTimestamp: new Date()});
+  const [createTimeEntry] = useMutation(CREATE_TIME_ENTRY, {
+    onCompleted: (response: any) => {
+      start();
+      setNewTimeSheet(response?.TimeEntryCreate)
+      setTimeEntry({
+        id: response?.TimeEntryCreate?.id,
+        name: response?.TimeEntryCreate?.company?.name,
+        project: response?.TimeEntryCreate?.project?.name,
+        task: response?.TimeEntryCreate?.task?.name
+      });
+      setDetailVisible(true);
+    }
+  });
 
   const getKeys = () => {
-    var vals: any = [];
-    if (timeEntryData?.TimeEntry?.data) {
-      for (var item of timeEntryData?.TimeEntry?.data) {
-        if (!vals.includes(item?.task?.id)) {
-          vals.push(item?.task?.id);
-        }
+    const vals: any = [];
+    for (const item of (timeEntryData?.TimeEntry?.data ?? [])) {
+      if (!vals.includes(item?.task?.id)) {
+        vals.push(item?.task?.id);
       }
-    }
+    };
     return vals
   }
 
   const filterData = () => {
-    let grouped: any = {};
-    timeEntryData?.TimeEntry?.data?.map((entry: any) => {
-      grouped[entry?.task?.id] = grouped[entry?.task?.id] ?? [];
-      return grouped[entry?.task?.id]?.push({
-        name: entry?.task?.name,
-        project: entry?.project?.name,
-        project_id: entry?.project?.id,
-        startTime: entry?.startTime,
-        endTime: entry?.endTime,
-        duration: entry?.duration
-      })
-    });
-    return grouped
+    const tasks = _.groupBy(timeEntryData?.TimeEntry?.data, 'task_id');
+    return tasks;
   }
 
   /* eslint-disable no-template-curly-in-string */
@@ -424,105 +430,48 @@ const Timesheet = () => {
     }).then(r => { })
   }
 
+  const createTimeEntries = (values: any) => {
+    createTimeEntry({
+      variables: {
+        input: {
+          startTime: moment(stopwatchOffset, "YYYY-MM-DD HH:mm:ss"),
+          task_id: values.task,
+          project_id: values.project,
+          company_id: authData?.company?.id,
+        }
+      }
+    }).then((response) => {
+      if (response.errors) {
+        return notifyGraphqlError((response.errors))
+      }
+    }).catch(notifyGraphqlError)
+  }
+
+  const submitStopTimer = () => {
+    stopTimer({
+      variables: {
+        input: {
+          id: newTimeEntry?.id,
+          endTime: moment(stopwatchOffset, "YYYY-MM-DD HH:mm:ss"),
+          company_id: authData?.company?.id
+        }
+      }
+    }).then((response) => {
+      if (response.errors) {
+        return notifyGraphqlError((response.errors))
+      }
+    }).catch(notifyGraphqlError)
+  }
+
   const onSubmitForm = (values: any) => {
     setCurrentDate(new Date())
-    if (!isRunning) {
-      createTimeEntry({
-        variables: {
-          input: {
-            startTime: moment(currentDate, "YYYY-MM-DD HH:mm:ss"),
-            task_id: values.task,
-            project_id: values.project,
-            company_id: authData?.company?.id,
-          }
-        }
-      }).then((response) => {
-        if (response.errors) {
-          return notifyGraphqlError((response.errors))
-        } else if (response?.data) {
-          start();
-          setNewTimeSheet(response?.data?.TimeEntryCreate)
-          setTimeEntry({
-            id: response?.data?.TimeEntryCreate?.id,
-            name: response?.data?.TimeEntryCreate?.company?.name,
-            project: response?.data?.TimeEntryCreate?.project?.name,
-            task: response?.data?.TimeEntryCreate?.task?.name
-          });
-          setDetailVisible(true);
-        }
-      }).catch(notifyGraphqlError)
-    } else {
-      console.log('submit');
-      stopTimer({
-        variables: {
-          input: {
-            id: newTimeEntry?.id,
-            endTime: moment(currentDate, "YYYY-MM-DD HH:mm:ss"),
-            company_id: authData?.company?.id
-          }
-        }
-      }).then((response) => {
-        console.log(response)
-        if (response.errors) {
-          return notifyGraphqlError((response.errors))
-        } else if (response?.data) {
-          reset(undefined, false)
-          setDetailVisible(false);
-          form.resetFields();
-          message.success({ content: `Time Entry is updated successfully!`, className: 'custom-message' });
-        }
-      }).catch(notifyGraphqlError)
-    }
+    !isRunning ? createTimeEntries(values) : submitStopTimer()
   }
 
   const clickPlayButton = (entry: string) => {
+    setCurrentDate(new Date())
     const timesheet = filterData()[entry][0];
-    if (!isRunning) {
-      createTimeEntry({
-        variables: {
-          input: {
-            startTime: moment(new Date(), "YYYY-MM-DD HH:mm:ss"),
-            task_id: entry,
-            project_id: timesheet?.project_id,
-            company_id: authData?.company?.id,
-          }
-        }
-      }).then((response) => {
-        if (response.errors) {
-          return notifyGraphqlError((response.errors))
-        } else if (response?.data) {
-          start();
-          setNewTimeSheet(response?.data?.TimeEntryCreate);
-          setTimeEntry({
-            id: response?.data?.TimeEntryCreate?.id,
-            name: response?.data?.TimeEntryCreate?.company?.name,
-            project: response?.data?.TimeEntryCreate?.project?.name,
-            task: response?.data?.TimeEntryCreate?.task?.name
-          });
-          setDetailVisible(true);
-        }
-      }).catch(notifyGraphqlError);
-    } else {
-      console.log('submit');
-      stopTimer({
-        variables: {
-          input: {
-            id: newTimeEntry?.id,
-            endTime: moment(new Date(), "YYYY-MM-DD HH:mm:ss"),
-            company_id: authData?.company?.id
-          }
-        }
-      }).then((response) => {
-        if (response.errors) {
-          return notifyGraphqlError((response.errors))
-        } else if (response?.data) {
-          reset(undefined, false)
-          setDetailVisible(false);
-          form.resetFields();
-          message.success({ content: `Time Entry is updated successfully!`, className: 'custom-message' });
-        }
-      }).catch(notifyGraphqlError)
-    }
+    !isRunning ? createTimeEntries({ task: entry, project: timesheet?.project?.id }) : submitStopTimer()
   }
 
   return (
@@ -667,7 +616,13 @@ const Timesheet = () => {
                         <TimeEntry
                           rowClassName={'filter-task-list'}
                           index={index}
-                          data={filterData()[entry][0]}
+                          data={{ 
+                            project: filterData()[entry][0]?.project?.name, 
+                            name: filterData()[entry][0]?.task?.name,
+                            startTime: filterData()[entry][0]?.startTime,
+                            endTime: filterData()[entry][0]?.endTime,
+                            duration: filterData()[entry][0]?.duration
+                           }}
                           length={filterData()[entry]?.length}
                           clickPlayButton={() => clickPlayButton(entry)} />} key={index}>
                         {filterData()[entry].map((timeData: any, entryIndex: number) => {
@@ -676,7 +631,13 @@ const Timesheet = () => {
                               key={entryIndex}
                               rowClassName={'filter-task-list'}
                               index={index}
-                              data={timeData}
+                              data={{ 
+                                project: timeData?.project?.name, 
+                                name: timeData?.task?.name,
+                                startTime: timeData?.startTime,
+                                endTime: timeData?.endTime,
+                                duration: timeData?.duration
+                               }}
                               length={timeData?.length}
                               clickPlayButton={() => clickPlayButton(entry)} />)
                         })}
@@ -686,7 +647,13 @@ const Timesheet = () => {
                     <TimeEntry
                       rowClassName={'task-div'}
                       index={index}
-                      data={filterData()[entry][0]}
+                      data={{ 
+                        project: filterData()[entry][0]?.project?.name, 
+                        name: filterData()[entry][0]?.task?.name,
+                        startTime: filterData()[entry][0]?.startTime,
+                        endTime: filterData()[entry][0]?.endTime,
+                        duration: filterData()[entry][0]?.duration
+                       }}
                       length={filterData()[entry]?.length}
                       clickPlayButton={() => clickPlayButton(entry)} />
                 ))}

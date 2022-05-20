@@ -18,6 +18,18 @@
       padding: 0;
     }
 
+    .ant-collapse>.ant-collapse-item>.ant-collapse-header {
+      padding: 0;
+    }
+
+    .ant-collapse-ghost>.ant-collapse-item>.ant-collapse-content>.ant-collapse-content-box {
+      padding: 0;
+    }
+
+    .ant-collapse-content>.ant-collapse-content-box {
+      padding: 0;
+    }
+
     .ant-form-item {
       margin-bottom: 0;
     }
@@ -165,11 +177,23 @@
     padding: 0.7rem;
   }
 
+  .filter-task-list {
+    border-bottom: 1px solid var(--gray-secondary);
+  }
+
+  .task-div-list {
+    border-top: 1px solid var(--gray-secondary);
+    border-right: 1px solid var(--gray-secondary);
+    border-left: 1px solid var(--gray-secondary);
+  }
+
+  .task-div {
+    border: 1px solid var(--gray-secondary);
+  }
 
   .task-div-list,
   .task-div {
     margin-top: 1rem;
-    border: 1px solid var(--gray-secondary);
     box-sizing: border-box;
 
     .play-button {
@@ -196,9 +220,7 @@
 
   .task-name {
     display: flex;
-    justify-content: center;
     align-items: center;
-    width: 10%;
   }
 
   div.task-name>div:first-child {
@@ -379,6 +401,14 @@
   }
 }
 
+.task-name,
+.client-name,
+.start-time,
+.total-time,
+.play-button {
+  padding: 0 1.5% 0 0;
+}
+
 .font24 {
   font-weight: 600;
   font-size: 24px;
@@ -510,5 +540,27 @@
 
   div {
     width: 50%;
+  }
+}
+
+/*** Modal CSS ***/
+
+.modal-message {
+  padding: 3rem 0 0 0;
+  text-align: center;
+
+  img {
+    height: 200px;
+    padding: 1rem;
+  }
+
+  p {
+    font-weight: 400;
+    font-size: 17px;
+    line-height: 17px;
+  }
+
+  .warning-text {
+    color: var(--primary-red);
   }
 }
