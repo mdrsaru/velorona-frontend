@@ -162,7 +162,7 @@ const Timesheet = () => {
   const [form] = Form.useForm()
   const [timeEntryForm] = Form.useForm()
   const stopwatchOffset = new Date();
-  const [UpdateTimeEntry] = useMutation(UPDATE_TIME_ENTRY);
+  // const [UpdateTimeEntry] = useMutation(UPDATE_TIME_ENTRY);
   const [visible, setVisible] = useState(false);
   const [showDetailTimeEntry, setDetailVisible] = useState(false);
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
