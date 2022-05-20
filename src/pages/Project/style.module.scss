@@ -254,3 +254,17 @@
   color: var(--primary-blue);
   font-size: 18px;
 }
+
+.active-status {
+  color: var(--primary-green);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 17px;
+}
+
+.inactive-status {
+  color: var(--gray-secondary);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 17px;
+}
