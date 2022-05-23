@@ -176,6 +176,13 @@ const routes = {
     name: 'New Client',
     key: 'side11'
   },
+  editInvoice: {
+    childPath: ':id',
+    path: (code: string, id: string) => `/${code}/invoices/${id}`,
+    component: lazy(() => import('../pages/Invoice/EditInvoice')),
+    name: 'Edit Invoice',
+    key: 'side20'
+  },
   client: {
     childPath: 'clients',
     path: (id: string) => `/${id}/clients`,
