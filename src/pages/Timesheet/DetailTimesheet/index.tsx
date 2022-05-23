@@ -92,11 +92,10 @@ export const TIMESHEET_SUBMIT = gql`
   }
 `
 
-export const TIME_ENTRY_DELETE = gql`
-  mutation TimeEntryDelete($input: TimeEntryDeleteInput!) {
-    TimeEntryDelete(input: $input) {
+export const TIME_ENTRY_BULK_DELETE = gql`
+  mutation TimeEntryBulkDelete($input: TimeEntryBulkDeleteInput!) {
+    TimeEntryBulkDelete(input: $input) {
       id
-		  company_id
     }
   }
 `
@@ -126,7 +125,7 @@ const DetailTimesheet = () => {
   let params = useParams();
   const authData = authVar();
   const navigate = useNavigate();
-  const [selectedEntry, setCurrentEntry] = useState('');
+  const [selectedEntries, setCurrentEntries] = useState('');
   const [submitTimesheet] = useMutation(TIMESHEET_SUBMIT);
   const [timeSheetWeekly, setTimeSheetWeekly] = useState([]);
   const [visibility, setVisibility] = useState<boolean>(false);
@@ -149,12 +148,10 @@ const DetailTimesheet = () => {
     setVisibility(value)
   }
 
-  const [deleteTimeEntry] = useMutation(TIME_ENTRY_DELETE, {
+  const [deleteBulkTimeEntry] = useMutation(TIME_ENTRY_BULK_DELETE, {
     onCompleted: (response: any) => {
-      const index = timeSheetWeekly.findIndex(function (data: any) {
-        return data?.id === selectedEntry;
-      })
-      if (index !== -1) timeSheetWeekly.splice(index, 1);
+      const newTimeSheets = timeSheetWeekly.filter((entry: any) => { return entry?.id !== selectedEntries });
+      setTimeSheetWeekly(newTimeSheets);
       setModalVisibility(false);
       message.success({ content: `Time entry is deleted successfully!`, className: 'custom-message' });
     }
@@ -246,12 +243,18 @@ const DetailTimesheet = () => {
     }).catch(notifyGraphqlError)
   }
 
-  const onDeleteTimeEntry = () => {
-    if (selectedEntry) {
-      deleteTimeEntry({
+  const onDeleteBulkTimeEntry = () => {
+    if (selectedEntries) {
+      const taskEntries: any = timeSheetWeekly.filter((entry: any) => { return entry?.id === selectedEntries });
+      const arrayEntries = Object.values(taskEntries[0]?.entries).map((timesheet: any) => {
+        return timesheet.map((data:any) => {
+          return data?.id
+        })
+      })
+      deleteBulkTimeEntry({
         variables: {
           input: {
-            id: timeSheetDetail?.Timesheet?.data[0]?.id,
+            ids: arrayEntries.flat(),
             company_id: authData?.company?.id
           }
         }
@@ -394,7 +397,7 @@ const DetailTimesheet = () => {
                         <span>{getTotalTimeByTask(timesheet?.entries)} </span>
                         &nbsp; &nbsp; <CloseCircleOutlined onClick={() => {
                           setModalVisibility(true);
-                          setCurrentEntry(timesheet?.id)
+                          setCurrentEntries(timesheet?.id)
                         }} />
                       </div>
                     </div>)}
@@ -423,7 +426,7 @@ const DetailTimesheet = () => {
         setModalVisibility={setModalVisibility}
         imgSrc={deleteImg}
         okText={'Delete'}
-        onOkClick={() => onDeleteTimeEntry()}
+        onOkClick={() => onDeleteBulkTimeEntry()}
         modalBody={deleteBody} />
     </>
   )
