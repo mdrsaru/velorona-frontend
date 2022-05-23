@@ -25,6 +25,14 @@ const client = new ApolloClient({
     typePolicies: {
       Query: {
         fields: {
+          ClientById: {
+            read(_, { args, toReference }) {
+              return toReference({
+                __typename: 'Client',
+                id: args?.id,
+              });
+            },
+          },
           ...fieldPolicy,
         },
       },
