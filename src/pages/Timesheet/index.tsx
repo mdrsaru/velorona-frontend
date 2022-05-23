@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState } from 'react';
 import {
   Card,
   Col,
@@ -9,7 +9,6 @@ import {
   Select,
   Button,
   message,
-  Input,
   Collapse
 } from 'antd';
 import {
@@ -18,22 +17,22 @@ import {
   RightOutlined
 } from '@ant-design/icons';
 
-import { authVar } from "../../App/link";
-import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
+import { authVar } from '../../App/link';
+import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import { useStopwatch } from 'react-timer-hook';
 import { notifyGraphqlError } from "../../utils/error";
-import { PROJECT } from "../Project";
-import { CLIENT } from "../Client";
+import { PROJECT } from '../Project';
+import { CLIENT } from '../Client';
 
-import moment from "moment";
-import { TASK } from "../Tasks";
-import { TimeEntryPagingResult } from "../../interfaces/generated";
-import TimeSheetLoader from "../../components/Skeleton/TimeSheetLoader";
-
-import NoContent from "../../components/NoContent";
-import playBtn from "../../assets/images/play-circle.svg";
-import styles from "./style.module.scss";
-import WeeklyTimeSheet from "./WeeklyTimesheet";
+import moment from 'moment';
+import { TASK } from '../Tasks';
+import { TimeEntryPagingResult } from '../../interfaces/generated';
+import TimeSheetLoader from '../../components/Skeleton/TimeSheetLoader';
+import TimeEntry from './TimeEntry';
+import NoContent from '../../components/NoContent';
+import WeeklyTimeSheet from './WeeklyTimesheet';
+import _ from 'lodash';
+import styles from './style.module.scss';
 
 export const STOP_TIMER = gql`
   mutation TimeEntryStop($input: TimeEntryStopInput!) {
@@ -49,23 +48,25 @@ export const STOP_TIMER = gql`
 export const CREATE_TIME_ENTRY = gql`
     mutation TimeEntryCreate($input: TimeEntryCreateInput!) {
       TimeEntryCreate(input: $input) {
+          id
+          startTime
+          endTime
+          createdAt
+          duration
+          task_id
+          clientLocation
+          task {
+            id 
+            name
+          }
+          company {
             id
-            startTime
-            endTime
-            createdAt
-            clientLocation
-            task {
-                id
-                name
-            }
-            company {
-                id
-                name
-            }
-            project {
-                id
-                name
-            }
+            name
+          }
+          project {
+            id
+            name
+          }
         }
     }
 `
@@ -90,6 +91,7 @@ export const TIME_ENTRY = gql`
                 createdAt
                 duration
                 clientLocation
+                task_id
                 task {
                     id 
                     name
@@ -137,7 +139,7 @@ const computeDiff = (date: Date) => {
   return diff
 };
 
-const getTimeFormat = (seconds: any) => {
+export const getTimeFormat = (seconds: any) => {
   let second = parseInt(seconds, 10);
   let sec_num = Math.abs(second);
   let hours: any = Math.floor(sec_num / 3600);
@@ -158,10 +160,10 @@ interface TimeEntryResponseArray {
 const Timesheet = () => {
   const { Option } = Select;
   const authData = authVar();
-  const [form] = Form.useForm();
-  const [timeEntryForm] = Form.useForm();
+  const [form] = Form.useForm()
+  const [timeEntryForm] = Form.useForm()
   const stopwatchOffset = new Date();
-  const [UpdateTimeEntry] = useMutation(UPDATE_TIME_ENTRY);
+  // const [UpdateTimeEntry] = useMutation(UPDATE_TIME_ENTRY);
   const [visible, setVisible] = useState(false);
   const [showDetailTimeEntry, setDetailVisible] = useState(false);
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
@@ -170,6 +172,31 @@ const Timesheet = () => {
     name: '',
     project: '',
     task: ''
+  });
+
+  const [newTimeSheet, setNewTimeSheet] = useState({
+    clientLocation: '',
+    company: {
+      id: '',
+      name: '',
+      __typename: 'Company'
+    },
+    createdAt: '',
+    duration: '',
+    endTime: '',
+    id: '',
+    project: {
+      id: '',
+      name: '',
+      __typename: 'Project'
+    },
+    startTime: '',
+    task: {
+      id: '',
+      name: '',
+      __typename: 'Task'
+    },
+    __typename: 'TimeEntry'
   });
 
   const { data: clientData } = useQuery(CLIENT, {
@@ -201,9 +228,110 @@ const Timesheet = () => {
         }
       }
     }
-  })
+  });
 
-  const [stopTimer] = useMutation(STOP_TIMER)
+  const { loading, data: timeEntryData } = useQuery(TIME_ENTRY, {
+    fetchPolicy: "network-only",
+    nextFetchPolicy: "cache-first",
+    variables: {
+      input: {
+        query: {
+          company_id: authData?.company?.id,
+          afterStart: moment().startOf('day')
+        },
+        paging: {
+          order: ['startTime:DESC']
+        }
+      }
+    },
+    onCompleted: (timeEntry) => {
+      if (timeEntry?.TimeEntry?.activeEntry) {
+        setDetailVisible(true)
+        stopwatchOffset.setSeconds(stopwatchOffset.getSeconds() + computeDiff(timeEntry?.TimeEntry?.activeEntry?.startTime))
+        setTimeEntry({
+          id: timeEntry?.TimeEntry?.activeEntry?.id,
+          name: timeEntry?.TimeEntry?.activeEntry?.company?.name,
+          project: timeEntry?.TimeEntry?.activeEntry?.project?.name,
+          task: timeEntry?.TimeEntry?.activeEntry?.task?.name
+        })
+        setNewTimeSheet({
+          clientLocation: timeEntry?.TimeEntry?.activeEntry?.clientLocation,
+          company: {
+            id: timeEntry?.TimeEntry?.activeEntry?.company?.id,
+            name: timeEntry?.TimeEntry?.activeEntry?.company?.name,
+            __typename: 'Company'
+          },
+          createdAt: timeEntry?.TimeEntry?.activeEntry?.createdAt,
+          duration: '',
+          endTime: '',
+          id: timeEntry?.TimeEntry?.activeEntry?.id,
+          project: {
+            id: timeEntry?.TimeEntry?.activeEntry?.project?.id,
+            name: timeEntry?.TimeEntry?.activeEntry?.project?.name,
+            __typename: 'Project'
+          },
+          startTime: timeEntry?.TimeEntry?.activeEntry?.startTime,
+          task: {
+            id: timeEntry?.TimeEntry?.activeEntry?.task?.id,
+            name: timeEntry?.TimeEntry?.activeEntry?.task?.name,
+            __typename: 'Task'
+          },
+          __typename: 'TimeEntry'
+        })
+        reset(stopwatchOffset)
+      }
+    },
+  });
+
+
+  const [stopTimer] = useMutation(STOP_TIMER, {
+    update: (cache, result: any) => {
+      newTimeSheet['endTime'] = result?.data?.TimeEntryStop?.endTime
+      newTimeSheet['duration'] = result?.data?.TimeEntryStop?.duration
+
+      const data: any = cache.readQuery({
+        query: TIME_ENTRY,
+        variables: {
+          input: {
+            query: {
+              company_id: authData?.company?.id,
+              afterStart: moment().startOf('day')
+            },
+            paging: {
+              order: ['startTime:DESC']
+            }
+          }
+        },
+      });
+
+      cache.writeQuery({
+        query: TIME_ENTRY,
+        variables: {
+          input: {
+            query: {
+              company_id: authData?.company?.id,
+              afterStart: moment().startOf('day')
+            },
+            paging: {
+              order: ['startTime:DESC']
+            }
+          }
+        },
+        data: {
+          TimeEntry: {
+            activeEntry: null,
+            data: [...data?.TimeEntry?.data, newTimeSheet]
+          }
+        }
+      });
+    },
+    onCompleted: () => {
+      reset(undefined, false)
+      setDetailVisible(false);
+      form.resetFields();
+      message.success({ content: `Time Entry is updated successfully!`, className: 'custom-message' });
+    }
+  })
 
   const [getTask, { data: taskData }] = useLazyQuery(TASK, {
     fetchPolicy: "network-only",
@@ -228,96 +356,34 @@ const Timesheet = () => {
     isRunning,
     start,
     reset
-  } = useStopwatch({ autoStart: showDetailTimeEntry });
-
-  const { loading, data: timeEntryData } = useQuery(TIME_ENTRY, {
-    fetchPolicy: "network-only",
-    nextFetchPolicy: "cache-first",
-    variables: {
-      input: {
-        query: {
-          company_id: authData?.company?.id,
-          afterStart: moment().startOf('day')
-        },
-        paging: {
-          order: ['startTime:DESC']
-        }
-      }
-    },
-    onCompleted: (timeEntry) => {
-      if (timeEntry?.TimeEntry?.activeEntry) {
-        setDetailVisible(true)
-        stopwatchOffset.setSeconds(stopwatchOffset.getSeconds() + computeDiff(timeEntry?.TimeEntry?.data[0]?.startTime))
-        setTimeEntry({
-          id: timeEntry?.TimeEntry?.activeEntry?.id,
-          name: timeEntry?.TimeEntry?.activeEntry?.company?.name,
-          project: timeEntry?.TimeEntry?.activeEntry?.project?.name,
-          task: timeEntry?.TimeEntry?.activeEntry?.task?.name
-        })
-        reset(stopwatchOffset)
-      }
-    },
+  } = useStopwatch({ autoStart: showDetailTimeEntry, offsetTimestamp: new Date()});
+  const [createTimeEntry] = useMutation(CREATE_TIME_ENTRY, {
+    onCompleted: (response: any) => {
+      start();
+      setNewTimeSheet(response?.TimeEntryCreate)
+      setTimeEntry({
+        id: response?.TimeEntryCreate?.id,
+        name: response?.TimeEntryCreate?.company?.name,
+        project: response?.TimeEntryCreate?.project?.name,
+        task: response?.TimeEntryCreate?.task?.name
+      });
+      setDetailVisible(true);
+    }
   });
 
-
-
-  const [createTimeEntry] = useMutation(CREATE_TIME_ENTRY, {
-    update(cache, { data }) {
-      const response = data?.TimeEntryCreate;
-      const timeEntry = cache.readQuery<TimeEntryResponseArray>({
-        query: TIME_ENTRY,
-        variables: {
-          input: {
-            query: {
-              company_id: authData?.company?.id,
-            },
-            paging: {
-              order: ['createdAt:DESC']
-            }
-          }
-        }
-      });
-      if (timeEntry) {
-        let arrayData = timeEntry?.TimeEntry?.data
-        console.log('arrayData', arrayData?.length, [...arrayData, response].length);
-        cache.writeQuery({
-          query: TIME_ENTRY,
-          data: {
-            TimeEntry: {
-              data: [response, ...arrayData]
-            }
-          }
-        })
-      }
-    }
-  })
-
   const getKeys = () => {
-    var vals: any = [];
-    if (timeEntryData?.TimeEntry?.data) {
-      for (var item of timeEntryData?.TimeEntry?.data) {
-        if (!vals.includes(item?.task?.id)) {
-          vals.push(item.task?.id);
-        }
+    const vals: any = [];
+    for (const item of (timeEntryData?.TimeEntry?.data ?? [])) {
+      if (!vals.includes(item?.task?.id)) {
+        vals.push(item?.task?.id);
       }
-    }
+    };
     return vals
   }
 
   const filterData = () => {
-    let grouped: any = {};
-    timeEntryData?.TimeEntry?.data?.map((entry: any) => {
-      grouped[entry?.task?.id] = grouped[entry?.task?.id] ?? [];
-      return grouped[entry?.task?.id]?.push({
-        name: entry?.task?.name,
-        project: entry?.project?.name,
-        project_id: entry?.project?.id,
-        startTime: entry?.startTime,
-        endTime: entry?.endTime,
-        duration: entry?.duration
-      })
-    });
-    return grouped
+    const tasks = _.groupBy(timeEntryData?.TimeEntry?.data, 'task_id');
+    return tasks;
   }
 
   /* eslint-disable no-template-curly-in-string */
@@ -330,10 +396,6 @@ const Timesheet = () => {
     number: {
       range: '${label} must be between ${min} and ${max}',
     },
-  };
-
-  const onFinish = (values: any) => {
-    console.log("form values", values);
   };
 
   const onChangeClientSelect = (value: string) => {
@@ -368,79 +430,48 @@ const Timesheet = () => {
     }).then(r => { })
   }
 
-  const onSubmitForm = (values: any) => {
-    setCurrentDate(new Date())
-    if (!isRunning) {
-      createTimeEntry({
-        variables: {
-          input: {
-            startTime: moment(currentDate, "YYYY-MM-DD HH:mm:ss"),
-            task_id: values.task,
-            project_id: values.project,
-            company_id: authData?.company?.id,
-          }
-        }
-      }).then((response) => {
-        if (response.errors) {
-          return notifyGraphqlError((response.errors))
-        } else if (response?.data) {
-          start();
-          setTimeEntry({
-            id: response?.data?.TimeEntryCreate?.id,
-            name: response?.data?.TimeEntryCreate?.company?.name,
-            project: response?.data?.TimeEntryCreate?.project?.name,
-            task: response?.data?.TimeEntryCreate?.task?.name
-          });
-          setDetailVisible(true);
-        }
-      }).catch(notifyGraphqlError)
-    } else {
-      stopTimer({
-        variables: {
-          input: {
-            id: newTimeEntry?.id,
-            endTime: moment(currentDate, "YYYY-MM-DD HH:mm:ss"),
-            company_id: authData?.company?.id
-          }
-        }
-      }).then((response) => {
-        if (response.errors) {
-          return notifyGraphqlError((response.errors))
-        } else if (response?.data) {
-          reset(undefined, false)
-          setDetailVisible(false);
-          form.resetFields();
-          message.success({ content: `Time Entry is updated successfully!`, className: 'custom-message' });
-        }
-      }).catch(notifyGraphqlError)
-    }
-  }
-
-  const clickPlayButton = (entry: string) => {
-    const timesheet = filterData()[entry][0];
+  const createTimeEntries = (values: any) => {
     createTimeEntry({
       variables: {
         input: {
-          startTime: moment(currentDate, "YYYY-MM-DD HH:mm:ss"),
-          task_id: entry,
-          project_id: timesheet?.project_id,
+          startTime: moment(stopwatchOffset, "YYYY-MM-DD HH:mm:ss"),
+          task_id: values.task,
+          project_id: values.project,
           company_id: authData?.company?.id,
         }
       }
     }).then((response) => {
       if (response.errors) {
         return notifyGraphqlError((response.errors))
-      } else if (response?.data) {
-        start();
-        setTimeEntry({
-          id: response?.data?.TimeEntryCreate?.id,
-          name: response?.data?.TimeEntryCreate?.company?.name,
-          project: response?.data?.TimeEntryCreate?.project?.name,
-          task: response?.data?.TimeEntryCreate?.task?.name
-        });
-        setDetailVisible(true);
       }
-    }).catch(notifyGraphqlError);
+    }).catch(notifyGraphqlError)
+  }
+
+  const submitStopTimer = () => {
+    stopTimer({
+      variables: {
+        input: {
+          id: newTimeEntry?.id,
+          endTime: moment(stopwatchOffset, "YYYY-MM-DD HH:mm:ss"),
+          company_id: authData?.company?.id
+        }
+      }
+    }).then((response) => {
+      if (response.errors) {
+        return notifyGraphqlError((response.errors))
+      }
+    }).catch(notifyGraphqlError)
+  }
+
+  const onSubmitForm = (values: any) => {
+    setCurrentDate(new Date())
+    !isRunning ? createTimeEntries(values) : submitStopTimer()
+  }
+
+  const clickPlayButton = (entry: string) => {
+    setCurrentDate(new Date())
+    const timesheet = filterData()[entry][0];
+    !isRunning ? createTimeEntries({ task: entry, project: timesheet?.project?.id }) : submitStopTimer()
   }
 
   return (
@@ -449,7 +480,7 @@ const Timesheet = () => {
         <div className={styles['site-card-wrapper']}>
           <Card
             bordered={false}
-            className={styles.formRow}>
+            className={styles['form-row']}>
             <Form
               form={form}
               layout="vertical"
@@ -457,7 +488,7 @@ const Timesheet = () => {
 
               {showDetailTimeEntry ?
                 <Row>
-                  <Col xs={24} sm={24} md={12} lg={12} className={styles.formColHeader}>
+                  <Col xs={24} sm={24} md={12} lg={12} className={styles['form-col-header']}>
                     <b>
                       <span>{newTimeEntry?.name ?? timeEntryData?.TimeEntry?.activeEntry?.name}</span> :
                       &nbsp;{newTimeEntry?.project ?? timeEntryData?.TimeEntry?.activeEntry?.project?.name}
@@ -465,7 +496,7 @@ const Timesheet = () => {
                   </Col>
                 </Row> :
                 <Row>
-                  <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+                  <Col xs={24} sm={24} md={12} lg={12} className={styles['form-col']}>
                     <Form.Item
                       name="client"
                       label="Client"
@@ -486,7 +517,7 @@ const Timesheet = () => {
                       </Select>
                     </Form.Item>
                   </Col>
-                  <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+                  <Col xs={24} sm={24} md={12} lg={12} className={styles['form-col']}>
                     <Form.Item
                       name="project"
                       label="Project"
@@ -505,9 +536,8 @@ const Timesheet = () => {
                     </Form.Item>
                   </Col>
                 </Row>}
-
               <Row>
-                <Col xs={24} sm={24} md={12} lg={16} xl={18} className={styles.taskCol}>
+                <Col xs={24} sm={24} md={12} lg={16} xl={18} className={styles['task-col']}>
                   <Form.Item
                     name="task"
                     label="Task"
@@ -516,7 +546,7 @@ const Timesheet = () => {
                       message: 'Choose the task'
                     }]}>
                     {showDetailTimeEntry ?
-                      <div className={styles['timesheetTask']}>
+                      <div className={styles['timesheet-task']}>
                         {newTimeEntry?.task}
                       </div> :
                       <Select placeholder="Select Task">
@@ -528,25 +558,17 @@ const Timesheet = () => {
                       </Select>}
                   </Form.Item>
                 </Col>
-
-                <Col xs={24} sm={24} md={12} lg={8} xl={6} className={styles.timeStartCol}>
+                <Col xs={24} sm={24} md={12} lg={8} xl={6} className={styles['time-start-col']}>
                   <Form.Item>
-                    <div
-                      style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'center'
-                      }}>
-                      <div style={{ width: '50%' }}>
-                        <div style={{ textAlign: 'center' }}>
-                          <span>
-                            {(hours > 9 ? hours : '0' + hours) + ':' +
-                              (minutes > 9 ? minutes : '0' + minutes) + ':'
-                              + (seconds > 9 ? seconds : '0' + seconds)}
-                          </span>
-                        </div>
+                    <div className={styles['timer-div']}>
+                      <div>
+                        <span>
+                          {(hours > 9 ? hours : '0' + hours) + ':' +
+                            (minutes > 9 ? minutes : '0' + minutes) + ':'
+                            + (seconds > 9 ? seconds : '0' + seconds)}
+                        </span>
                       </div> &nbsp; &nbsp; &nbsp; &nbsp;
-                      <div style={{ width: '50%' }}>
+                      <div>
                         {isRunning ?
                           <Button type="primary" htmlType="submit" danger>Stop</Button> :
                           <Button type="primary" htmlType="submit">Start</Button>}
@@ -562,178 +584,78 @@ const Timesheet = () => {
             bordered={false}
             className={styles['task-card']}>
             <Row>
-              <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+              <Col xs={24} sm={24} md={12} lg={12} className={styles['form-col']}>
                 <span className={styles['date-view']}>
                   {moment(new Date()).format('LL')}
                 </span>
               </Col>
             </Row>
             <Row className={styles['task-div-header']}>
-              <Col span={4} className={styles['task-header']}>Task</Col>
+              <Col span={6} className={styles['task-header']}>Task</Col>
               <Col span={4} className={styles['client-header']}>Client: Project</Col>
-              <Col span={4} className={styles['start-header']}>Start Time</Col>
-              <Col span={4} className={styles['end-header']}>End Time</Col>
+              <Col span={3} className={styles['start-header']}>Start Time</Col>
+              <Col span={3} className={styles['end-header']}>End Time</Col>
               <Col span={4} className={styles['total-header']}>Total</Col>
               <Col span={4}></Col>
             </Row>
+
             {timeEntryData?.TimeEntry?.data?.length === 0 && <NoContent title={"Time Entry"} />}
-            <Form
-              form={timeEntryForm}
-              onFinish={onFinish}
-              validateMessages={validateMessages}>
+
+            <Form form={timeEntryForm} validateMessages={validateMessages}>
               <div className={styles['task-row']}>
                 {getKeys() && getKeys()?.map((entry: any, index: number) => (
+
                   (filterData()[entry].length > 1) ?
-                    <Collapse collapsible="header" ghost className={styles['task-div-list']} key={index}>
+                    <Collapse
+                      collapsible="header"
+                      ghost
+                      className={styles['task-div-list']}
+                      key={index}>
+
                       <Panel showArrow={false} header={
-                        <Row className={styles['filter-task-list']}>
-                          <Col span={4} className={styles['task-name']}>
-                            <div>
-                              {filterData()[entry].length > 1 &&
-                                <p>
-                                  {filterData()[entry].length}
-                                </p>}
-                            </div>
-                            <Form.Item
-                              name={`name${index}`}
-                              rules={[{ required: true }]}>
-                              <Input type="text" defaultValue={filterData()[entry][0]?.name ?? ''}
-                                value={filterData()[entry][0]?.name ?? ''} />
-                            </Form.Item>
-                          </Col>
-
-                          <Col span={4} className={styles['client-name']}>
-                            <Form.Item
-                              name={`client${index}`}
-                              rules={[{ required: true }]}>
-                              <Input type="text"
-                                defaultValue={filterData()[entry][0]?.project ?? ''}
-                                value={filterData()[entry][0]?.project ?? ''} />
-                            </Form.Item>
-                          </Col>
-
-                          <Col span={4} className={styles['start-time']}>
-                            <Form.Item
-                              name={`start${index}`}
-                              rules={[{ required: true }]}>
-                              <Input type="text"
-                                defaultValue={moment(filterData()[entry][0]?.startTime).format('LT')}
-                                value={moment(filterData()[entry][0]?.startTime).format('LT')} />
-                            </Form.Item>
-                          </Col>
-
-                          <Col span={4} className={styles['end-time']}>
-                            <Form.Item
-                              name={`end${index}`}
-                              rules={[{ required: true }]}>
-                              <Input type="text"
-                                defaultValue={moment(filterData()[entry][0]?.endTime).format('LT')}
-                                value={moment(filterData()[entry][0]?.endTime).format('LT')} />
-                            </Form.Item>
-                          </Col>
-
-                          <Col span={4} className={styles['total-time']}>
-                            <span>{getTimeFormat(filterData()[entry][0]?.duration) ?? 'N/A'}</span>
-                          </Col>
-                          <Col span={4} className={styles['play-button']}>
-                            <img src={playBtn} alt="play Button" />
-                          </Col>
-                        </Row>
-                      } key={index}>
+                        <TimeEntry
+                          rowClassName={'filter-task-list'}
+                          index={index}
+                          data={{ 
+                            project: filterData()[entry][0]?.project?.name, 
+                            name: filterData()[entry][0]?.task?.name,
+                            startTime: filterData()[entry][0]?.startTime,
+                            endTime: filterData()[entry][0]?.endTime,
+                            duration: filterData()[entry][0]?.duration
+                           }}
+                          length={filterData()[entry]?.length}
+                          clickPlayButton={() => clickPlayButton(entry)} />} key={index}>
                         {filterData()[entry].map((timeData: any, entryIndex: number) => {
                           return (
-                            <Row key={entryIndex} className={styles['filter-task-list']}>
-                              <Col span={4} className={styles['task-name']}>
-                                <Form.Item
-                                  name={`name${index}`}
-                                  rules={[{ required: true }]}>
-                                  <Input type="text" defaultValue={timeData?.name ?? ''} />
-                                </Form.Item>
-                              </Col>
-
-                              <Col span={4} className={styles['client-name']}>
-                                <Form.Item
-                                  name={`client${index}`}
-                                  rules={[{ required: true }]}>
-                                  <Input type="text"
-                                    defaultValue={timeData?.project ?? ''} />
-                                </Form.Item>
-                              </Col>
-
-                              <Col span={4} className={styles['start-time']}>
-                                <Form.Item
-                                  name={`start${index}`}
-                                  rules={[{ required: true }]}>
-                                  <Input type="text"
-                                    defaultValue={moment(timeData?.startTime).format('LT')} />
-                                </Form.Item>
-                              </Col>
-
-                              <Col span={4} className={styles['end-time']}>
-                                <Form.Item
-                                  name={`end${index}`}
-                                  rules={[{ required: true }]}>
-                                  <Input type="text"
-                                    defaultValue={moment(timeData?.endTime).format('LT')} />
-                                </Form.Item>
-                              </Col>
-
-                              <Col span={4} className={styles['total-time']}>
-                                <span>{getTimeFormat(timeData?.duration) ?? 'N/A'}</span>
-                              </Col>
-                              <Col span={4} className={styles['play-button']}>
-                                <img src={playBtn} alt="play Button" />
-                              </Col>
-                            </Row>)
+                            <TimeEntry
+                              key={entryIndex}
+                              rowClassName={'filter-task-list'}
+                              index={index}
+                              data={{ 
+                                project: timeData?.project?.name, 
+                                name: timeData?.task?.name,
+                                startTime: timeData?.startTime,
+                                endTime: timeData?.endTime,
+                                duration: timeData?.duration
+                               }}
+                              length={timeData?.length}
+                              clickPlayButton={() => clickPlayButton(entry)} />)
                         })}
                       </Panel>
+
                     </Collapse> :
-                    <Row className={styles['task-div']}>
-                      <Col span={4} className={styles['task-name']}>
-                        <div>
-                          {filterData()[entry].length > 1 &&
-                            <p>
-                              {filterData()[entry].length}
-                            </p>}
-                        </div>
-                        <Form.Item
-                          name={`name${index}`}
-                          rules={[{ required: true }]}>
-                          <Input type="text" defaultValue={filterData()[entry][0]?.name ?? ''} />
-                        </Form.Item>
-                      </Col>
-
-                      <Col span={4} className={styles['client-name']}>
-                        <Form.Item
-                          name={`client${index}`}
-                          rules={[{ required: true }]}>
-                          <Input type="text" defaultValue={filterData()[entry][0]?.project ?? ''} />
-                        </Form.Item>
-                      </Col>
-
-                      <Col span={4} className={styles['start-time']}>
-                        <Form.Item
-                          name={`start${index}`}
-                          rules={[{ required: true }]}>
-                          <Input type="text" defaultValue={moment(filterData()[entry][0]?.startTime).format('LT')} />
-                        </Form.Item>
-                      </Col>
-
-                      <Col span={4} className={styles['end-time']}>
-                        <Form.Item
-                          name={`end${index}`}
-                          rules={[{ required: true }]}>
-                          <Input type="text" defaultValue={moment(filterData()[entry][0]?.endTime).format('LT')} />
-                        </Form.Item>
-                      </Col>
-
-                      <Col span={4} className={styles['total-time']}>
-                        <span>{getTimeFormat(filterData()[entry][0]?.duration) ?? 'N/A'}</span>
-                      </Col>
-                      <Col span={4} className={styles['play-button']} onClick={() => clickPlayButton(entry)}>
-                        <img src={playBtn} alt="play Button" />
-                      </Col>
-                    </Row>
+                    <TimeEntry
+                      rowClassName={'task-div'}
+                      index={index}
+                      data={{ 
+                        project: filterData()[entry][0]?.project?.name, 
+                        name: filterData()[entry][0]?.task?.name,
+                        startTime: filterData()[entry][0]?.startTime,
+                        endTime: filterData()[entry][0]?.endTime,
+                        duration: filterData()[entry][0]?.duration
+                       }}
+                      length={filterData()[entry]?.length}
+                      clickPlayButton={() => clickPlayButton(entry)} />
                 ))}
               </div>
             </Form>
@@ -773,10 +695,11 @@ const Timesheet = () => {
                 </div>
               </Col>
               <Col span={24} className={styles['card-col-timesheet']}>
-                <WeeklyTimeSheet/>
+                <WeeklyTimeSheet />
               </Col>
             </Row>
           </Card>
+
           <Modal
             title=""
             centered

@@ -1,5 +1,4 @@
 :global {
-
   .ant-modal-close {
     padding: 1rem;
   }
@@ -16,6 +15,18 @@
 
   :local(.site-card-wrapper) {
     .ant-card-body {
+      padding: 0;
+    }
+
+    .ant-collapse>.ant-collapse-item>.ant-collapse-header {
+      padding: 0;
+    }
+
+    .ant-collapse-ghost>.ant-collapse-item>.ant-collapse-content>.ant-collapse-content-box {
+      padding: 0;
+    }
+
+    .ant-collapse-content>.ant-collapse-content-box {
       padding: 0;
     }
 
@@ -105,7 +116,7 @@
 
 /*** NewTimeSheet CSS ***/
 
-.formCol {
+.form-col {
   padding: 1.5rem;
 
   .date-view {
@@ -115,7 +126,7 @@
   }
 }
 
-.formColDetail {
+.form-col-detail {
   padding: 1.5rem;
 
   span {
@@ -161,15 +172,28 @@
     }
   }
 
-  .task-div, .filter-task-list {
+  .task-div,
+  .filter-task-list {
     padding: 0.7rem;
   }
-  
+
+  .filter-task-list {
+    border-bottom: 1px solid var(--gray-secondary);
+  }
+
+  .task-div-list {
+    border-top: 1px solid var(--gray-secondary);
+    border-right: 1px solid var(--gray-secondary);
+    border-left: 1px solid var(--gray-secondary);
+  }
+
+  .task-div {
+    border: 1px solid var(--gray-secondary);
+  }
 
   .task-div-list,
   .task-div {
     margin-top: 1rem;
-    border: 1px solid var(--gray-secondary);
     box-sizing: border-box;
 
     .play-button {
@@ -189,15 +213,14 @@
       font-weight: 600;
       font-size: 18px;
       line-height: 22px;
+      width: 100%;
       color: var(--primary-blue);
     }
   }
 
   .task-name {
     display: flex;
-    justify-content: center;
     align-items: center;
-    width: 10%;
   }
 
   div.task-name>div:first-child {
@@ -244,7 +267,7 @@
   }
 }
 
-.formColHeader {
+.form-col-header {
   padding: 2rem;
 
   b {
@@ -264,20 +287,20 @@
   color: var(--gray-secondary);
 }
 
-.formRow {
+.form-row {
   border: 1px solid #E0E0E0;
   box-sizing: border-box;
   box-shadow: 0 7px 4px rgba(231, 231, 231, 0.25);
 }
 
-.taskCol {
+.task-col {
   padding: 1.5rem;
   border-top: 1px solid #E0E0E0;
   box-sizing: border-box;
   box-shadow: 0 7px 4px rgba(231, 231, 231, 0.25);
 }
 
-.timeStartCol {
+.time-start-col {
   padding: 1.5rem;
   border-top: 1px solid #E0E0E0;
   border-left: 1px solid #E0E0E0;
@@ -294,7 +317,7 @@
   }
 }
 
-.formCol1 {
+.form-col1 {
   padding-left: 1.5rem;
   padding-top: 1.5rem;
 
@@ -303,9 +326,19 @@
     font-size: 24px;
     line-height: 29px;
   }
+
+  .add-entry {
+    float: right;
+    padding-right: 2.5%;
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 22px;
+    cursor: pointer;
+    color: var(--primary-blue);
+  }
 }
 
-.cardHeaderRow {
+.card-header-row {
   padding-top: 1.9rem;
   padding-bottom: 2.5rem;
 
@@ -316,7 +349,7 @@
   }
 }
 
-.cardBody {
+.card-body {
   padding: 1rem;
 
   span {
@@ -332,7 +365,7 @@
   }
 }
 
-.timesheetDiv {
+.timesheet-div {
   display: flex;
   padding: 0.7rem;
   margin-right: 1.5rem;
@@ -344,11 +377,11 @@
   }
 }
 
-.timesheetDiv:nth-child(odd) {
+.timesheet-div:nth-child(odd) {
   background: var(--gray-2);
 }
 
-.totalTimeDiv {
+.total-time-div {
   background: #FFFFFF;
   padding: 1.4rem;
   border: 1px solid #F2F2F2;
@@ -368,16 +401,24 @@
   }
 }
 
+.task-name,
+.client-name,
+.start-time,
+.total-time,
+.play-button {
+  padding: 0 1.5% 0 0;
+}
+
 .font24 {
   font-weight: 600;
   font-size: 24px;
   line-height: 29px;
 }
 
-.timesheetCard {
+.timesheet-card {
   padding: 1rem .5rem .5rem 0;
 
-  .dateSpan {
+  .date-span {
     font-weight: 600;
     font-size: 18px;
     line-height: 22px;
@@ -386,12 +427,12 @@
 
 }
 
-.timeSheetDetail {
+.timesheet-detail {
   padding-top: 1.5rem;
   padding-right: 0.5rem;
 }
 
-.totalRow {
+.total-row {
   padding-left: 3rem;
   padding-top: 0.6rem;
   padding-right: 1rem;
@@ -402,7 +443,7 @@
     line-height: 22px;
   }
 
-  .totalCount {
+  .total-count {
     float: right;
   }
 }
@@ -484,10 +525,42 @@
   background: var(--gray-2);
 }
 
-.timesheetTask {
+.timesheet-task {
   background-color: var(--gray-2);
   font-weight: 600;
   font-size: 18px;
   line-height: 22px;
   padding: 1rem;
+}
+
+.timer-div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  div {
+    width: 50%;
+  }
+}
+
+/*** Modal CSS ***/
+
+.modal-message {
+  padding: 3rem 0 0 0;
+  text-align: center;
+
+  img {
+    height: 200px;
+    padding: 1rem;
+  }
+
+  p {
+    font-weight: 400;
+    font-size: 17px;
+    line-height: 17px;
+  }
+
+  .warning-text {
+    color: var(--primary-red);
+  }
 }

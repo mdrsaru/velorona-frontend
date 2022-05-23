@@ -1,3 +1,8 @@
+.remove-icon {
+  color: var(--gray-secondary);
+  padding-bottom: 1rem;
+}
+
 .items-table {
   width: 100%;
   text-align: left;
@@ -29,6 +34,10 @@
     font-size: 18px;
     line-height: 22px;
     color: var(--white);
+  }
+
+  .remove-item {
+    padding-bottom: 1rem;
   }
 }
 

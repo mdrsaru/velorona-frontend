@@ -19,8 +19,9 @@ import ModalConfirm from "../../../components/Modal";
 import ArchiveBody from "../../../components/Archive";
 import DeleteBody from "../../../components/Delete";
 import TaskDetail from "../../../components/TaskDetail";
-import AssignedUser from "../../../components/AssignedUser";
 import Status from "../../../components/Status";
+import ExclamationCircleOutlined from "@ant-design/icons/lib/icons/ExclamationCircleOutlined";
+import InfoCircleOutlined from "@ant-design/icons/lib/icons/InfoCircleOutlined";
 
 const { SubMenu } = Menu;
 
@@ -138,9 +139,10 @@ const DetailProject = () => {
   const [detailVisibility, setDetailVisibility] = useState(false);
   const menu = (data: any) => (
     <Menu>
-      <SubMenu title="Change status" key="mainMenu">
+      <SubMenu title="Change status" key="mainMenu" className={styles.list}>
         <Menu.Item
           key="active"
+          className={styles.list}
           onClick={() => {
             if (data?.status === "Inactive") {
               changeStatus("Active", data?.id);
@@ -163,7 +165,7 @@ const DetailProject = () => {
       </SubMenu>
       <Menu.Divider />
 
-      <Menu.Item key="archive">
+      <Menu.Item key="archive" className={styles.list}>
         <div
           onClick={() => {
             setTask(data);
@@ -175,7 +177,7 @@ const DetailProject = () => {
       </Menu.Item>
       <Menu.Divider />
 
-      <Menu.Item key="delete">
+      <Menu.Item key="delete" className={styles.list}>
         <div
           onClick={() => {
             setModalVisibility(true);
@@ -187,6 +189,21 @@ const DetailProject = () => {
       </Menu.Item>
     </Menu>
   );
+
+  const assignedMenu = (record: any) => (
+    <Menu>
+      <p className={styles.employeeTitle}>
+        Employee List ({record.users.length}){" "}
+      </p>
+      {record.users?.map((user: any) => (
+        <>
+          <Menu.Item className={styles.list}>{user.fullName}</Menu.Item>
+          <Menu.Divider />
+        </>
+      ))}
+    </Menu>
+  );
+
   const columns = [
     {
       title: "Task Name",
@@ -205,14 +222,6 @@ const DetailProject = () => {
             setTask(task);
           },
         };
-      },
-    },
-    {
-      title: "Assigned To",
-      key: "assignedTo",
-      width:"35%",
-      render: (task: any) => {
-        return <AssignedUser users={task?.users} />;
       },
     },
     {
@@ -241,6 +250,21 @@ const DetailProject = () => {
           onClick={(event) => event.stopPropagation()}
         >
           <Dropdown
+            overlay={assignedMenu(record)}
+            trigger={["click"]}
+            placement="bottomRight"
+          >
+            <div
+              className="ant-dropdown-link"
+              onClick={(e) => e.preventDefault()}
+              style={{ marginRight: "0.6rem" }}
+              title="Assigned User"
+            >
+              <InfoCircleOutlined className={styles.icons} />
+            </div>
+          </Dropdown>
+
+          <Dropdown
             overlay={menu(record)}
             trigger={["click"]}
             placement="bottomRight"
@@ -250,7 +274,7 @@ const DetailProject = () => {
               onClick={(e) => e.preventDefault()}
               style={{ paddingLeft: "1rem" }}
             >
-              <MoreOutlined />
+              <MoreOutlined className={styles.icons}/>
             </div>
           </Dropdown>
         </div>

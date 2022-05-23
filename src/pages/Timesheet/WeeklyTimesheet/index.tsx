@@ -1,5 +1,4 @@
 import { gql, useQuery } from "@apollo/client";
-import moment from "moment";
 
 import { useNavigate } from "react-router-dom";
 import { authVar } from "../../../App/link";
