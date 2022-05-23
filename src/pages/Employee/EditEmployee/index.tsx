@@ -1,19 +1,18 @@
-import React from "react";
-import { Button, Card, Col, Form, Input, message, Row, Select, Space, Upload } from "antd";
-import { ArrowLeftOutlined, UploadOutlined } from "@ant-design/icons";
+import { Button, Card, Col, Form, Input, message, Row, Select, Space, Upload } from 'antd';
+import { ArrowLeftOutlined, UploadOutlined } from '@ant-design/icons';
 import moment from 'moment';
 
-import { useNavigate, useParams } from "react-router-dom";
-import { useMutation, useQuery } from "@apollo/client";
-import { notifyGraphqlError } from "../../../utils/error";
+import { useNavigate, useParams } from 'react-router-dom';
+import { useMutation, useQuery } from '@apollo/client';
+import { notifyGraphqlError } from '../../../utils/error';
 
-import { mediaServices } from "../../../services/MediaService";
-import { IRole } from "../../../interfaces/IRole";
-import { USER_UPDATE, USER } from "..";
-import { ROLES } from "../../Role";
-import { CHANGE_PROFILE_IMAGE } from "../NewEmployee";
+import { mediaServices } from '../../../services/MediaService';
+import { IRole } from '../../../interfaces/IRole';
+import { USER_UPDATE, USER } from '..';
+import { ROLES } from '../../Role';
+import { CHANGE_PROFILE_IMAGE } from '../NewEmployee';
 
-import styles from "../style.module.scss";
+import styles from '../style.module.scss';
 
 const dateFormat = 'YYYY-MM-DD HH:mm:ss';
 const profileFile = (e: any) => {
@@ -27,7 +26,7 @@ const profileFile = (e: any) => {
 const EditEmployee = () => {
   let params = useParams();
   const navigate = useNavigate();
-  const [UserUpdate] = useMutation(USER_UPDATE);
+  const [userUpdate] = useMutation(USER_UPDATE);
   const [ChangeProfilePictureInput] = useMutation(CHANGE_PROFILE_IMAGE);
   const { data: roles } = useQuery(ROLES, {
     fetchPolicy: "cache-first"
@@ -50,8 +49,7 @@ const EditEmployee = () => {
   }
 
   const successMessage = () => {
-    message.success(`Employee is updated successfully!`).then(r => {
-    });
+    message.success(`Employee is updated successfully!`).then(r => {});
     navigate(-1)
   }
 
@@ -63,12 +61,12 @@ const EditEmployee = () => {
       if (data === 'streetAddress' || data === 'state' || data === 'city' || data === 'zipcode' || data === 'aptOrSuite') {
         address[data] = values[data]
         formData['address'] = address
-      }else if (data !== 'upload') {
+      } else if (data !== 'upload') {
         formData[data] = values[data]
       }
     }
 
-    UserUpdate({
+    userUpdate({
       variables: {
         input: formData
       }
@@ -103,7 +101,7 @@ const EditEmployee = () => {
       }
     }).catch(notifyGraphqlError)
   }
-  
+
   return (
     <div className={styles['main-div']}>
       <Card bordered={false}>
@@ -256,7 +254,7 @@ const EditEmployee = () => {
               </Col>
             </Row>
             <Row>
-           
+
               <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
                 <Form.Item
                   name="roles"
@@ -289,7 +287,7 @@ const EditEmployee = () => {
                 </Form.Item>
               </Col>
             </Row>
-          
+
             <Row>
               <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
                 <Form.Item
@@ -302,7 +300,7 @@ const EditEmployee = () => {
                   </Upload>
                 </Form.Item>
               </Col>
-             
+
             </Row>
             <br /><br />
             <Row justify="end">
