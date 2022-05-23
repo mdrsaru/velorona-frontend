@@ -19,6 +19,8 @@ import ModalConfirm from "../../../components/Modal";
 import ArchiveBody from "../../../components/Archive";
 import DeleteBody from "../../../components/Delete";
 import TaskDetail from "../../../components/TaskDetail";
+import AssignedUser from "../../../components/AssignedUser";
+import Status from "../../../components/Status";
 
 const { SubMenu } = Menu;
 
@@ -200,9 +202,17 @@ const DetailProject = () => {
         return {
           onClick: () => {
             setDetailVisibility(!detailVisibility);
-            setTask(task)
+            setTask(task);
           },
         };
+      },
+    },
+    {
+      title: "Assigned To",
+      key: "assignedTo",
+      width:"35%",
+      render: (task: any) => {
+        return <AssignedUser users={task?.users} />;
       },
     },
     {
@@ -211,7 +221,7 @@ const DetailProject = () => {
       render: (task: any) => {
         return (
           <div>
-            <p>{task?.name}</p>
+            <p>{task?.manager?.fullName}</p>
           </div>
         );
       },
@@ -220,17 +230,7 @@ const DetailProject = () => {
       title: "Status",
       dataIndex: "status",
       key: "status",
-      render: (status: string) => (
-        <span
-          className={
-            status === "Active"
-              ? styles["active-status"]
-              : styles["inactive-status"]
-          }
-        >
-          {status}
-        </span>
-      ),
+      render: (status: string) => <Status status={status} />,
     },
     {
       title: "Actions",
