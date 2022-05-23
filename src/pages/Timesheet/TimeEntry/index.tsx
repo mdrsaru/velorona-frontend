@@ -18,7 +18,6 @@ const TimeEntry = (props: any) => {
       <Col
         span={6}
         className={styles['task-name']}>
-
         <div>
           {length > 1 &&
             <p>
@@ -26,39 +25,24 @@ const TimeEntry = (props: any) => {
             </p>}
         </div>
         <div onClick={event => { event.stopPropagation() }}>
-          <Form.Item
-            name={`name${index}`}
-            rules={[{ required: true }]}>
-            <Input
-              type="text"
-              defaultValue={data?.name ?? ''}
-              value={data?.name ?? ''} />
-          </Form.Item>
+          <Input
+            type="text"
+            value={data?.name ?? ''} />
         </div>
       </Col>
 
       <Col
         span={4}
         className={styles['client-name']} onClick={event => { event.stopPropagation() }}>
-        <Form.Item
-          name={`client${index}`}
-          rules={[{ required: true }]}>
-          <Input type="text"
-            defaultValue={data?.project ?? ''}
-            value={data?.project ?? ''} />
-        </Form.Item>
+        <Input type="text"
+          value={data?.project ?? ''} />
       </Col>
 
       <Col
         span={3}
         className={styles['start-time']} onClick={event => { event.stopPropagation() }}>
-        <Form.Item
-          name={`start${index}`}
-          rules={[{ required: true }]}>
-          <Input type="text"
-            defaultValue={moment(data?.startTime).format('LT')}
-            value={moment(data?.startTime).format('LT')} />
-        </Form.Item>
+        <Input type="text"
+          value={moment(data?.startTime).format('LT')} />
       </Col>
 
       <Col

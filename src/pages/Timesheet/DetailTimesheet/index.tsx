@@ -1,7 +1,7 @@
 import { Card, Col, Row, Button, Space, Input, message } from 'antd';
 import {
   ArrowLeftOutlined,
-  // CloseCircleOutlined 
+  CloseCircleOutlined
 } from '@ant-design/icons';
 import moment from 'moment';
 
@@ -14,6 +14,8 @@ import { notifyGraphqlError } from "../../../utils/error";
 import { useState } from 'react';
 import AppLoader from '../../../components/Skeleton/AppLoader';
 import { getTimeFormat } from '..';
+import deleteImg from "../../../assets/images/delete_btn.svg";
+import ModalConfirm from '../../../components/Modal';
 
 import styles from '../style.module.scss';
 
@@ -90,6 +92,30 @@ export const TIMESHEET_SUBMIT = gql`
   }
 `
 
+export const TIME_ENTRY_BULK_DELETE = gql`
+  mutation TimeEntryBulkDelete($input: TimeEntryBulkDeleteInput!) {
+    TimeEntryBulkDelete(input: $input) {
+      id
+    }
+  }
+`
+
+const deleteBody = () => {
+  return (
+    <div className={styles['modal-message']}>
+      <div>
+        <img src={deleteImg} alt="confirm" />
+      </div><br />
+      <p>
+        <strong> Are you sure you want to delete the current time entry?</strong>
+      </p>
+      <p className={styles['warning-text']}>
+        Your current time tracking will be deleted.
+      </p>
+    </div>
+  )
+}
+
 function getWeekDays(date: any) {
   return Array(7).fill(new Date(date)).map((el, idx) => new Date(el.setDate(el.getDate() - el.getDay() + idx + 1)))
 }
@@ -99,8 +125,10 @@ const DetailTimesheet = () => {
   let params = useParams();
   const authData = authVar();
   const navigate = useNavigate();
+  const [selectedEntries, setCurrentEntries] = useState('');
   const [submitTimesheet] = useMutation(TIMESHEET_SUBMIT);
   const [timeSheetWeekly, setTimeSheetWeekly] = useState([]);
+  const [visibility, setVisibility] = useState<boolean>(false);
   const [getWeeklyTimeEntry, { loading: loadWeekly, data: timeEntryWeeklyDetails }] = useLazyQuery(TIME_ENTRY_WEEKLY_DETAILS, {
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
@@ -113,6 +141,19 @@ const DetailTimesheet = () => {
     },
     onCompleted: () => {
       groupByDate()
+    }
+  });
+
+  const setModalVisibility = (value: boolean) => {
+    setVisibility(value)
+  }
+
+  const [deleteBulkTimeEntry] = useMutation(TIME_ENTRY_BULK_DELETE, {
+    onCompleted: (response: any) => {
+      const newTimeSheets = timeSheetWeekly.filter((entry: any) => { return entry?.id !== selectedEntries });
+      setTimeSheetWeekly(newTimeSheets);
+      setModalVisibility(false);
+      message.success({ content: `Time entry is deleted successfully!`, className: 'custom-message' });
     }
   });
 
@@ -200,6 +241,29 @@ const DetailTimesheet = () => {
         message.success({ content: `Timesheet is submitted successfully!`, className: 'custom-message' });
       }
     }).catch(notifyGraphqlError)
+  }
+
+  const onDeleteBulkTimeEntry = () => {
+    if (selectedEntries) {
+      const taskEntries: any = timeSheetWeekly.filter((entry: any) => { return entry?.id === selectedEntries });
+      const arrayEntries = Object.values(taskEntries[0]?.entries).map((timesheet: any) => {
+        return timesheet.map((data:any) => {
+          return data?.id
+        })
+      })
+      deleteBulkTimeEntry({
+        variables: {
+          input: {
+            ids: arrayEntries.flat(),
+            company_id: authData?.company?.id
+          }
+        }
+      }).then((response) => {
+        if (response.errors) {
+          return notifyGraphqlError((response.errors))
+        }
+      }).catch(notifyGraphqlError)
+    }
   }
 
   return (
@@ -331,7 +395,10 @@ const DetailTimesheet = () => {
                       )}
                       <div className={styles["table-body-cell"]}>
                         <span>{getTotalTimeByTask(timesheet?.entries)} </span>
-                        {/* &nbsp; &nbsp; <CloseCircleOutlined /> */}
+                        &nbsp; &nbsp; <CloseCircleOutlined onClick={() => {
+                          setModalVisibility(true);
+                          setCurrentEntries(timesheet?.id)
+                        }} />
                       </div>
                     </div>)}
                 </div>
@@ -354,6 +421,13 @@ const DetailTimesheet = () => {
           </Card>
         </div>
       }
+      <ModalConfirm
+        visibility={visibility}
+        setModalVisibility={setModalVisibility}
+        imgSrc={deleteImg}
+        okText={'Delete'}
+        onOkClick={() => onDeleteBulkTimeEntry()}
+        modalBody={deleteBody} />
     </>
   )
 }
