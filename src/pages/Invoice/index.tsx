@@ -117,19 +117,7 @@ const Invoice = () => {
   const columns = [
     {
       title: 'Invoice Number',
-      render: (invoice: IInvoice) => {
-        let invoiceNumber = invoice.invoiceNumber;
-
-        if(invoiceNumber < 10) {
-          return `000${invoiceNumber}`;
-        } else if(invoiceNumber < 100) {
-          return `00${invoiceNumber}`;
-        } else if(invoiceNumber < 1000) {
-          return `0${invoiceNumber}`;
-        } else {
-          return invoiceNumber;
-        }
-      }
+      dataIndex: 'invoiceNumber'
     },
     {
       title: 'Client Name',
