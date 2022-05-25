@@ -27,10 +27,10 @@ const INVOICE = gql`
         subtotal
         taxPercent
         totalAmount
-        totalHours
+        totalQuantity
         items {
           id
-          hours
+          quantity
           rate
           amount
           project_id

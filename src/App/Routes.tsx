@@ -87,6 +87,30 @@ const _Routes = () => {
                   </Suspense>
                 </CheckRoles>
               }/>
+
+            <Route
+              path={routes.employeeTimesheet.childPath}
+              element={
+                <CheckRoles allowedRoles={[constants.roles.CompanyAdmin, constants.roles.SuperAdmin]}>
+                  <Suspense fallback={<RouteLoader/>}>
+                    <routes.employeeTimesheet.component/>
+                  </Suspense>
+                </CheckRoles>
+              }
+            />
+
+            <Route
+              path={routes.timesheetInvoice.childPath}
+              element={
+                <CheckRoles allowedRoles={[constants.roles.CompanyAdmin, constants.roles.SuperAdmin]}>
+                  <Suspense fallback={<RouteLoader/>}>
+                    <routes.timesheetInvoice.component/>
+                  </Suspense>
+                </CheckRoles>
+              }
+            />
+
+
             <Route path={routes.timesheet.childPath}>
               <Route
                 index
@@ -113,7 +137,6 @@ const _Routes = () => {
                     <routes.detailTimesheet.component/>
                   </Suspense>
                 }/>
-
             </Route>
 
             <Route

@@ -49,17 +49,23 @@ const NewInvoice = () => {
   const [confirmed, setConfirmed] = useState(false)
   const loggedInUser = authVar();
 
-  const { data: clientData, loading: clientLoading } = useQuery<ClientPagingData, { input: ClientQueryInput }>(CLIENT_LIST, {
-    fetchPolicy: 'network-only',
-    nextFetchPolicy: 'cache-first',
-    variables: {
-      input: {
-        query: {
-          company_id: loggedInUser?.company?.id as string,
+  const { 
+    data: clientData,
+    loading: clientLoading,
+  } = useQuery<ClientPagingData, { input: ClientQueryInput }>(
+    CLIENT_LIST, 
+    {
+      fetchPolicy: 'network-only',
+      nextFetchPolicy: 'cache-first',
+      variables: {
+        input: {
+          query: {
+            company_id: loggedInUser?.company?.id as string,
+          }
         }
       }
     }
-  });
+  );
 
   const [fetchClient] = useLazyQuery<{ ClientById: Client }, { id: string }>(CLIENT, {
     fetchPolicy: 'cache-only',
