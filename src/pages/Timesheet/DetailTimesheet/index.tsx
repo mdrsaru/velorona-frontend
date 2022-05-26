@@ -1,7 +1,8 @@
-import { Card, Col, Row, Button, Space, Input, message } from 'antd';
+import { Card, Col, Row, Button, Space, Input, message, Modal, Form, Select } from 'antd';
 import {
   ArrowLeftOutlined,
-  CloseCircleOutlined
+  CloseCircleOutlined,
+  CloseOutlined
 } from '@ant-design/icons';
 import moment from 'moment';
 
@@ -12,12 +13,15 @@ import _ from 'lodash';
 
 import { notifyGraphqlError } from "../../../utils/error";
 import { useState } from 'react';
-import AppLoader from '../../../components/Skeleton/AppLoader';
 import { getTimeFormat } from '..';
 import deleteImg from "../../../assets/images/delete_btn.svg";
 import ModalConfirm from '../../../components/Modal';
+import EditTimeSheet from '../EditTimesheet';
 
 import styles from '../style.module.scss';
+import { TASK } from '../../Tasks';
+import { PROJECT } from '../../Project';
+import TimeSheetLoader from '../../../components/Skeleton/TimeSheetLoader';
 
 export const TIME_SHEET = gql`
 query Timesheet($input: TimesheetQueryInput!) {
@@ -79,7 +83,7 @@ query TimesheetWeeklyDetails($input: TimeEntryWeeklyDetailsInput!) {
 
 export const TIMESHEET_SUBMIT = gql`
   mutation TimesheetSubmit($input: TimesheetSubmitInput!) {
-    TimesheetSubmit(input: $input) {
+    TimesheetSubmit(input: $input) {Form
       id
       isSubmitted
       lastSubmittedAt
@@ -105,9 +109,12 @@ const deleteBody = () => {
     <div className={styles['modal-message']}>
       <div>
         <img src={deleteImg} alt="confirm" />
-      </div><br />
+      </div>
+      <br />
       <p>
-        <strong> Are you sure you want to delete the current time entry?</strong>
+        <strong>
+          Are you sure you want to delete the current time entry?
+        </strong>
       </p>
       <p className={styles['warning-text']}>
         Your current time tracking will be deleted.
@@ -120,40 +127,156 @@ function getWeekDays(date: any) {
   return Array(7).fill(new Date(date)).map((el, idx) => new Date(el.setDate(el.getDate() - el.getDay() + idx + 1)))
 }
 
+export const getTotalTimeForADay = (entries: any) => {
+  let sum = 0;
+  if (entries) {
+    console.log(entries);
+    const durations = entries.map((data: any) => data?.duration)
+    sum = durations.reduce((entry1: any, entry2: any) => {
+      return entry1 + entry2;
+    }, 0);
+  };
+  return sum
+}
+
+
 
 const DetailTimesheet = () => {
   let params = useParams();
+  const { Option } = Select;
   const authData = authVar();
+  const [form] = Form.useForm();
   const navigate = useNavigate();
-  const [selectedEntries, setCurrentEntries] = useState('');
+  const [filteredTasks, setTasks] = useState([]);
+  const [timesheet, setTimesheet] = useState<any>();
+  const [editTimesheet, setEditTimesheet] = useState('');
   const [submitTimesheet] = useMutation(TIMESHEET_SUBMIT);
-  const [timeSheetWeekly, setTimeSheetWeekly] = useState([]);
+  const [selectedEntries, setCurrentEntries] = useState('');
+  const [timeSheetWeekly, setTimeSheetWeekly] = useState<Array<any>>([]);
+  /** Modal Visibility **/
   const [visibility, setVisibility] = useState<boolean>(false);
-  const [getWeeklyTimeEntry, { loading: loadWeekly, data: timeEntryWeeklyDetails }] = useLazyQuery(TIME_ENTRY_WEEKLY_DETAILS, {
+  const [showEditModal, setEditModal] = useState<boolean>(false);
+  const [showAddNewEntry, setShowAddNewEntry] = useState<boolean>(false);
+
+  const [getTask, { data: taskData }] = useLazyQuery(TASK, {
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
     variables: {
       input: {
-        company_id: authData?.company?.id ?? '',
-        startTime: '',
-        endTime: ''
+        query: {
+          company_id: authData?.company?.id,
+          project_id: ''
+        },
+        paging: {
+          order: ['updatedAt:DESC']
+        }
       }
     },
-    onCompleted: () => {
-      groupByDate()
+    onCompleted: (response: any) => {
+      const taskIds = timeSheetWeekly.map((timesheet: any) => {
+        return timesheet?.id
+      });
+      const filtered = response?.Task?.data?.filter((task: any) => {
+        return !taskIds.includes(task?.id)
+      });
+
+      setTasks(filtered)
+    }
+  })
+
+  const onSubmitNewTimeEntry = (values: any) => {
+    const project = projectData?.Project?.data?.filter((data: any) =>
+      data?.id === values?.project
+    );
+    const task = taskData?.Task?.data?.filter((data: any) =>
+      data?.id === values?.task
+    );
+    const timeEntry = {
+      entries: {},
+      id: task[0]?.id,
+      project: project[0]?.name,
+      project_id: project[0]?.id,
+      name: task[0]?.name
+    }
+    const ids = timeSheetWeekly?.map((timesheet: any) => {
+      return timesheet?.id
+    })
+    if (!ids.includes(task[0]?.id)) {
+      setTimeSheetWeekly([...timeSheetWeekly, timeEntry])
+    }
+    setShowAddNewEntry(false);
+    form.resetFields();
+  }
+
+  const [getProject, { data: projectData }] = useLazyQuery(PROJECT, {
+    fetchPolicy: "network-only",
+    nextFetchPolicy: "cache-first",
+    variables: {
+      input: {
+        query: {
+          company_id: authData?.company?.id,
+          client_id: ''
+        },
+        paging: {
+          order: ['updatedAt:DESC']
+        }
+      }
     }
   });
+
+  const [getWeeklyTimeEntry, {
+    loading: loadWeekly,
+    data: timeEntryWeeklyDetails }] =
+    useLazyQuery(TIME_ENTRY_WEEKLY_DETAILS, {
+      fetchPolicy: "network-only",
+      nextFetchPolicy: "cache-first",
+      variables: {
+        input: {
+          company_id: authData?.company?.id ?? '',
+          startTime: '',
+          endTime: ''
+        }
+      },
+      onCompleted: () => {
+        groupByDate()
+      }
+    });
 
   const setModalVisibility = (value: boolean) => {
     setVisibility(value)
   }
 
+  const onChangeProjectSelect = (value: string) => {
+    getTask({
+      variables: {
+        input: {
+          query: {
+            company_id: authData?.company?.id,
+            project_id: value
+          },
+          paging: {
+            order: ['updatedAt:DESC']
+          }
+        }
+      }
+    }).then(r => { })
+    if (form.getFieldValue(['task'])) {
+      form.resetFields(['task']);
+    }
+  }
+
+
   const [deleteBulkTimeEntry] = useMutation(TIME_ENTRY_BULK_DELETE, {
-    onCompleted: (response: any) => {
-      const newTimeSheets = timeSheetWeekly.filter((entry: any) => { return entry?.id !== selectedEntries });
+    onCompleted: () => {
+      const newTimeSheets = timeSheetWeekly.filter((entry: any) => {
+        return entry?.id !== selectedEntries
+      });
       setTimeSheetWeekly(newTimeSheets);
       setModalVisibility(false);
-      message.success({ content: `Time entry is deleted successfully!`, className: 'custom-message' });
+      message.success({
+        content: `Time entry is deleted successfully!`,
+        className: 'custom-message'
+      });
     }
   });
 
@@ -173,6 +296,19 @@ const DetailTimesheet = () => {
       }
     },
     onCompleted: (timeData) => {
+      getProject({
+        variables: {
+          input: {
+            query: {
+              company_id: authData?.company?.id,
+              client_id: timeData?.Timesheet?.data[0]?.client?.id,
+            },
+            paging: {
+              order: ['updatedAt:DESC']
+            }
+          }
+        }
+      }).then(r => { })
       getWeeklyTimeEntry({
         variables: {
           input: {
@@ -185,24 +321,17 @@ const DetailTimesheet = () => {
     }
   });
 
-  const getTotalTimeForADay = (entries: any) => {
-    let sum = 0;
-    if (entries) {
-      const durations = entries.map((data: any) => data?.duration)
-      sum = durations.reduce((entry1: any, entry2: any) => {
-        return entry1 + entry2;
-      }, 0);
-    };
-    return getTimeFormat(sum)
-  }
-
   const getTotalTimeByTask = (entries: any) => {
     let durations: any = [];
     const data = Object.values(entries);
     data.forEach((tasks: any) => {
-      tasks.forEach((data: any) => { durations.push(data?.duration) })
+      tasks.forEach((data: any) => {
+        durations.push(data?.duration)
+      })
     });
-    let sum = durations.reduce((entry1: any, entry2: any) => { return entry1 + entry2 }, 0);
+    let sum = durations.reduce((entry1: any, entry2: any) => {
+      return entry1 + entry2
+    }, 0);
     return getTimeFormat(sum)
   }
 
@@ -220,6 +349,7 @@ const DetailTimesheet = () => {
         id: key,
         name: value[0]?.task?.name,
         project: value[0]?.project?.name,
+        project_id: value[0]?.project?.id,
         entries: groupByTimeEntry(value)
       })
     }
@@ -238,16 +368,27 @@ const DetailTimesheet = () => {
       if (response.errors) {
         return notifyGraphqlError((response.errors))
       } else if (response?.data) {
-        message.success({ content: `Timesheet is submitted successfully!`, className: 'custom-message' });
+        message.success({
+          content: `Timesheet is submitted successfully!`,
+          className: 'custom-message'
+        });
       }
     }).catch(notifyGraphqlError)
   }
 
+  const showEditTimesheet = (value: any, timesheet: any) => {
+    setEditTimesheet(value);
+    setTimesheet(timesheet);
+    setEditModal(true);
+  }
+
   const onDeleteBulkTimeEntry = () => {
     if (selectedEntries) {
-      const taskEntries: any = timeSheetWeekly.filter((entry: any) => { return entry?.id === selectedEntries });
+      const taskEntries: any = timeSheetWeekly.filter((entry: any) => {
+        return entry?.id === selectedEntries
+      });
       const arrayEntries = Object.values(taskEntries[0]?.entries).map((timesheet: any) => {
-        return timesheet.map((data:any) => {
+        return timesheet.map((data: any) => {
           return data?.id
         })
       })
@@ -266,15 +407,19 @@ const DetailTimesheet = () => {
     }
   }
 
+  console.log(timeEntryWeeklyDetails);
+
   return (
     <>
-      {loadWeekly ? <AppLoader /> :
+      {loadWeekly ? <TimeSheetLoader /> :
         <div className={styles['site-card-wrapper']}>
           <Card
             bordered={false}
             className={styles['timesheet-card']}>
             <Row className={styles['card-header']}>
-              <Col span={24} className={styles['form-col-detail']}>
+              <Col
+                span={24}
+                className={styles['form-col-detail']}>
                 <ArrowLeftOutlined onClick={() => navigate(-1)} />
                 &nbsp; &nbsp;
                 <span> My Timesheet</span>
@@ -282,29 +427,62 @@ const DetailTimesheet = () => {
             </Row>
 
             <Row className={styles['card-body']}>
-              <Col xs={24} sm={24} md={24} lg={12} xl={12}>
+              <Col
+                xs={24}
+                sm={24}
+                md={24}
+                lg={12}
+                xl={12}>
                 <div className={styles['timesheet-div']}>
-                  <div className={styles.header}>Candidate Name</div>
-                  <div>{timeSheetDetail?.Timesheet?.data[0]?.user?.email}</div>
+                  <div className={styles.header}>
+                    Candidate Name
+                  </div>
+                  <div>
+                    {timeSheetDetail?.Timesheet?.data[0]?.user?.email}
+                  </div>
                 </div>
+
                 <div className={styles['timesheet-div']}>
-                  <div className={styles.header}>Time Period</div>
+                  <div className={styles.header}>
+                    Time Period
+                  </div>
                   <div>Mon-Sun</div>
                 </div>
+
                 <div className={styles['timesheet-div']}>
-                  <div className={styles.header}>Total Expense</div>
-                  <div>{timeSheetDetail?.Timesheet?.data[0]?.totalExpense ?? 'N/A'}</div>
+                  <div className={styles.header}>
+                    Total Expense
+                  </div>
+                  <div>
+                    {timeSheetDetail?.Timesheet?.data[0]?.totalExpense ?? 'N/A'}
+                  </div>
                 </div>
+
                 <div className={styles['timesheet-div']}>
-                  <div className={styles.header}>Approver/Manager</div>
-                  <div>{timeSheetDetail?.Timesheet?.data[0]?.approver?.fullName ?? 'N/A'}</div>
+                  <div className={styles.header}>
+                    Approver/Manager
+                  </div>
+                  <div>
+                    {timeSheetDetail?.Timesheet?.data[0]?.approver?.fullName ?? 'N/A'}
+                  </div>
                 </div>
+
                 <div className={styles['timesheet-div']}>
-                  <div className={styles.header}>Status</div>
-                  <div>{timeSheetDetail?.Timesheet?.data[0]?.status}</div>
+                  <div className={styles.header}>
+                    Status
+                  </div>
+                  <div>
+                    {timeSheetDetail?.Timesheet?.data[0]?.status}
+                  </div>
                 </div>
               </Col>
-              <Col xs={24} sm={24} md={24} lg={12} xl={12}>
+
+              <Col
+                xs={24}
+                sm={24}
+                md={24}
+                lg={12}
+                xl={12}>
                 <div className={styles['timesheet-div']}>
                   <div className={styles.header}>
                     Project Name
@@ -351,19 +529,29 @@ const DetailTimesheet = () => {
           <br />
           <Card bordered={false}>
             <Row className={styles['timesheet-detail']}>
-              <Col span={12} className={styles['form-col1']}>
+              <Col
+                span={12}
+                className={styles['form-col1']}>
                 <span>
                   Time Entry Details
                 </span>
               </Col>
-              <Col span={12} className={styles['form-col1']}>
-                <span className={styles['add-entry']}>
+              <Col
+                span={12}
+                className={styles['form-col1']}>
+                <span className={styles['add-entry']} onClick={() => {
+                  setShowAddNewEntry(true)
+                  form.resetFields();
+                }}>
                   Add New Time Entry
                 </span>
               </Col>
             </Row>
+
             <Row>
-              <Col span={24} className={styles['form-col']}>
+              <Col
+                span={24}
+                className={styles['form-col']}>
                 <div className={styles['resp-table']}>
                   <div className={styles["resp-table-header"]}>
                     <div className={styles['table-header-cell']}>
@@ -373,15 +561,20 @@ const DetailTimesheet = () => {
                       Task
                     </div>
                     {getWeekDays(timeSheetDetail?.Timesheet?.data[0]?.weekStartDate).map((day: any, index: number) =>
-                      <div className={styles['table-header-cell']} key={index}>
+                      <div
+                        className={styles['table-header-cell']}
+                        key={index}>
                         {moment(day).format('ddd, MMM D')}
                       </div>)}
                     <div className={styles['table-header-cell']}>
                       Total
                     </div>
                   </div>
+
                   {timeSheetWeekly?.map((timesheet: any, index: number) =>
-                    <div className={styles["resp-table-body"]} key={index}>
+                    <div
+                      className={styles["resp-table-body"]}
+                      key={index}>
                       <div className={styles["table-body-cell"]}>
                         {timesheet?.project}
                       </div>
@@ -389,16 +582,29 @@ const DetailTimesheet = () => {
                         {timesheet?.name}
                       </div>
                       {getWeekDays(timeSheetDetail?.Timesheet?.data[0]?.weekStartDate).map((day: any, timeIndex: number) =>
-                        <div className={styles["table-body-cell"]} key={timeIndex}>
-                          <Input type="text" value={getTotalTimeForADay(timesheet?.entries[moment(day).format('ddd, MMM D')])} />
+                        <div
+                          className={styles["table-body-cell"]}
+                          key={timeIndex}>
+                          <Input
+                            type="text"
+                            onClick={() =>
+                              showEditTimesheet(moment(day).format('YYYY-MM-DD'), timesheet)
+                            }
+                            value={
+                              getTimeFormat(getTotalTimeForADay(timesheet?.entries[moment(day).format('ddd, MMM D')]))
+                            } />
                         </div>
                       )}
                       <div className={styles["table-body-cell"]}>
-                        <span>{getTotalTimeByTask(timesheet?.entries)} </span>
-                        &nbsp; &nbsp; <CloseCircleOutlined onClick={() => {
-                          setModalVisibility(true);
-                          setCurrentEntries(timesheet?.id)
-                        }} />
+                        <span>
+                          {getTotalTimeByTask(timesheet?.entries)}
+                        </span>
+                        &nbsp; &nbsp;
+                        <CloseCircleOutlined
+                          onClick={() => {
+                            setModalVisibility(true);
+                            setCurrentEntries(timesheet?.id)
+                          }} />
                       </div>
                     </div>)}
                 </div>
@@ -408,10 +614,15 @@ const DetailTimesheet = () => {
             <Row justify={"end"}>
               <Col className={styles['form-col']}>
                 <Space>
-                  <Button type="primary" htmlType="button">
+                  <Button
+                    type="primary"
+                    htmlType="button">
                     Save and Exit
                   </Button>
-                  <Button type="default" htmlType="button" onClick={onSubmitTimesheet}>
+                  <Button
+                    type="default"
+                    htmlType="button"
+                    onClick={onSubmitTimesheet}>
                     Submit
                   </Button>
                 </Space>
@@ -421,6 +632,83 @@ const DetailTimesheet = () => {
           </Card>
         </div>
       }
+
+      <EditTimeSheet
+        setVisibility={() => setEditModal(false)}
+        visible={showEditModal}
+        day={editTimesheet}
+        total={getTotalTimeForADay(timesheet?.entries[moment(editTimesheet).format('ddd, MMM D')])}
+        timesheetDetail={timesheet ?? []} />
+
+      <Modal
+        centered
+        visible={showAddNewEntry}
+        footer={null}
+        closeIcon={[
+          <div onClick={() => setShowAddNewEntry(false)} key={1}>
+            <span className={styles['close-icon-div']}>
+              <CloseOutlined />
+            </span>
+          </div>
+        ]}
+        width={1000}>
+        <div className={styles['modal-title']}>Select Project</div>
+        <Form
+          form={form}
+          onFinish={onSubmitNewTimeEntry}
+          layout="vertical">
+          <div className={styles['form-body']}>
+            <Form.Item
+              name="project"
+              label="Project"
+              rules={[{
+                required: true,
+                message: 'Choose the project'
+              }]}>
+              <Select
+                placeholder="Select Project"
+                onChange={onChangeProjectSelect}>
+                {projectData && projectData?.Project?.data.map((project: any, index: number) => (
+                  <Option value={project?.id} key={index}>
+                    {project?.name}
+                  </Option>))}
+              </Select>
+            </Form.Item>
+            <Form.Item
+              name={'task'}
+              label="Task Name"
+              rules={[{
+                required: true,
+                message: 'Choose the task'
+              }]}>
+              <Select placeholder="Select Task">
+                {filteredTasks && filteredTasks?.map((task: any, index: number) => (
+                  <Option value={task?.id} key={index}>
+                    {task?.name}
+                  </Option>)
+                )}
+              </Select>
+            </Form.Item>
+          </div>
+
+          <div className={styles['form-footer']}>
+            <Form.Item>
+              <Button
+                type="default"
+                htmlType="button" onClick={() => setShowAddNewEntry(false)}>
+                Cancel
+              </Button>
+              &nbsp; &nbsp;
+              <Button
+                type="primary"
+                htmlType="submit">
+                Create
+              </Button>
+            </Form.Item>
+          </div>
+        </Form>
+      </Modal>
+
       <ModalConfirm
         visibility={visibility}
         setModalVisibility={setModalVisibility}
