@@ -5,10 +5,11 @@ import { Form, Input } from 'antd';
 import moment, { Moment } from 'moment';
 
 import { gql, useMutation } from '@apollo/client';
-import { CREATE_TIME_ENTRY, getTimeFormat } from '..';
+import { CREATE_TIME_ENTRY, getTimeFormat, TIME_ENTRY } from '..';
 import { notifyGraphqlError } from '../../../utils/error';
 import { authVar } from '../../../App/link';
 import styles from "./style.module.scss";
+import { TIME_ENTRY_WEEKLY_DETAILS } from '../DetailTimesheet';
 
 
 export const UPDATE_TIME_ENTRY = gql`
@@ -107,10 +108,7 @@ const EditTimeSheet = (props: IProps) => {
   const resetForm = () => {
     form.resetFields();
     setTotalDuration(0);
-  }
-
-  console.log(props?.timesheetDetail);
-
+  };
   return (
     <Modal
       centered

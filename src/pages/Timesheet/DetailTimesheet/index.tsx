@@ -204,6 +204,16 @@ const DetailTimesheet = () => {
     if (!ids.includes(task[0]?.id)) {
       setTimeSheetWeekly([...timeSheetWeekly, timeEntry])
     }
+    console.log(timeSheetDetail);
+    getWeeklyTimeEntry({
+      variables: {
+        input: {
+          company_id: authData?.company?.id ?? '',
+          startTime: timeSheetDetail?.Timesheet?.data[0]?.weekStartDate,
+          endTime: timeSheetDetail?.Timesheet?.data[0]?.weekEndDate
+        }
+      }
+    });
     setShowAddNewEntry(false);
     form.resetFields();
   }
@@ -317,7 +327,7 @@ const DetailTimesheet = () => {
             endTime: timeData?.Timesheet?.data[0]?.weekEndDate
           }
         }
-      }).then(r => { })
+      });
     }
   });
 
@@ -382,6 +392,19 @@ const DetailTimesheet = () => {
     setEditModal(true);
   }
 
+  const editModal = () => {
+    getWeeklyTimeEntry({
+      variables: {
+        input: {
+          company_id: authData?.company?.id ?? '',
+          startTime: timeSheetDetail?.Timesheet?.data[0]?.weekStartDate,
+          endTime: timeSheetDetail?.Timesheet?.data[0]?.weekEndDate
+        }
+      }
+    });
+    setEditModal(false);
+  }
+
   const onDeleteBulkTimeEntry = () => {
     if (selectedEntries) {
       const taskEntries: any = timeSheetWeekly.filter((entry: any) => {
@@ -406,8 +429,6 @@ const DetailTimesheet = () => {
       }).catch(notifyGraphqlError)
     }
   }
-
-  console.log(timeEntryWeeklyDetails);
 
   return (
     <>
@@ -634,7 +655,7 @@ const DetailTimesheet = () => {
       }
 
       <EditTimeSheet
-        setVisibility={() => setEditModal(false)}
+        setVisibility={editModal}
         visible={showEditModal}
         day={editTimesheet}
         total={getTotalTimeForADay(timesheet?.entries[moment(editTimesheet).format('ddd, MMM D')])}
