@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Modal, Row, Col, Button, TimePicker } from 'antd';
 import { CloseOutlined } from "@ant-design/icons";
 import { Form, Input } from 'antd';
@@ -50,9 +50,12 @@ const EditTimeSheet = (props: IProps) => {
   const authData = authVar();
   const [updateTimeEntry] = useMutation(UPDATE_TIME_ENTRY);
   const [createTimeEntry] = useMutation(CREATE_TIME_ENTRY);
-  const [totalDuration, setTotalDuration] = useState<number>(props?.total ?? '');
+  const [totalDuration, setTotalDuration] = useState<number>(0);
   const [timeEntryId, setTimeEntry] = useState('');
 
+  useEffect(() => {
+    setTotalDuration(props?.total)
+  }, [props?.total])
   const onChangeTime = (time: Moment, id: string, type: string) => {
     let formData: {
       id: '' | string,
@@ -63,7 +66,7 @@ const EditTimeSheet = (props: IProps) => {
       id: id ?? '',
       company_id: authData?.company?.id ?? ''
     }
-    let newTime = moment(props?.day).format('YYYY-MM-DD') + moment(time, " HH:mm:ss")
+    let newTime = moment(props?.day).format('YYYY-MM-DD') + moment(time).format(' HH:mm:ss')
     type === 'start' ? formData['startTime'] = newTime : formData['endTime'] = newTime;
 
     updateTimeEntry({
@@ -83,7 +86,7 @@ const EditTimeSheet = (props: IProps) => {
       createTimeEntry({
         variables: {
           input: {
-            startTime: moment(props?.day).format('YYYY-MM-DD') + moment(time, "HH:mm:ss"),
+            startTime: moment(props?.day).format('YYYY-MM-DD') + moment(time).format(' HH:mm:ss'),
             task_id: taskId,
             project_id: projectId,
             company_id: authData?.company?.id,
@@ -105,6 +108,8 @@ const EditTimeSheet = (props: IProps) => {
     form.resetFields();
     setTotalDuration(0);
   }
+
+  console.log(props?.timesheetDetail);
 
   return (
     <Modal
@@ -163,8 +168,8 @@ const EditTimeSheet = (props: IProps) => {
               layout="vertical"
               onFinish={resetForm}
               name="timesheet-form">
-              {props?.timesheetDetail?.entries[props?.day] ?
-                props?.timesheetDetail?.entries[props?.day]?.map((entry: any, index: number) => (
+              {props?.timesheetDetail?.entries[moment(props?.day).format('ddd, MMM D')] ?
+                props?.timesheetDetail?.entries[moment(props?.day).format('ddd, MMM D')]?.map((entry: any, index: number) => (
                   <Row
                     key={index}
                     className={styles['form-div']}
