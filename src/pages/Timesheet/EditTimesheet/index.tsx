@@ -51,6 +51,9 @@ const EditTimeSheet = (props: IProps) => {
   const [updateTimeEntry] = useMutation(UPDATE_TIME_ENTRY);
   const [createTimeEntry] = useMutation(CREATE_TIME_ENTRY);
   const [totalDuration, setTotalDuration] = useState(0);
+  function disabledDate(current: Moment) {
+    return current && current.isSame("2022-05-24");
+  }
 
   const onChangeTime = (time: Moment, id: string, type: string) => {
     let formData: {
@@ -109,9 +112,7 @@ const EditTimeSheet = (props: IProps) => {
           </span>
         </div>
       ]}
-      okText={'Exit'}
       footer={null}
-      onOk={() => props?.setVisibility}
       width={869}>
       <div className={styles['modal-body']}>
         <div>
@@ -183,6 +184,7 @@ const EditTimeSheet = (props: IProps) => {
                         ]}>
                         <TimePicker
                           use12Hours
+                          disabledDate={disabledDate}
                           format="h:mm:ss A"
                           onChange={(event: any) => onChangeTime(event, entry?.id, 'start')}
                           defaultValue={moment(entry?.startTime, 'h:mm:ss A')} />
@@ -201,6 +203,7 @@ const EditTimeSheet = (props: IProps) => {
                         ]}>
                         <TimePicker
                           use12Hours
+                          disabledDate={disabledDate}
                           format="h:mm:ss A"
                           onChange={(event: any) => onChangeTime(event, entry?.id, 'end')}
                           defaultValue={moment(entry?.endTime, 'h:mm:ss A')} />
@@ -281,7 +284,7 @@ const EditTimeSheet = (props: IProps) => {
                 </Row>}
               <br /> <br />
               <Form.Item style={{ float: 'right' }}>
-                <Button type="primary" onClick={() => props?.setVisibility}>
+                <Button type="primary" onClick={props?.setVisibility}>
                   Exit
                 </Button>
               </Form.Item>
