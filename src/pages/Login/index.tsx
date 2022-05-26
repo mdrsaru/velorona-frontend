@@ -49,7 +49,7 @@ const Login = () => {
   const [form] = Form.useForm();
   const [forgetForm] = Form.useForm();
   const navigate = useNavigate();
-  const [Login, { loading }] = useMutation<LoginResponseData>(LOGIN);
+  const [Login] = useMutation<LoginResponseData>(LOGIN);
   const [ForgotPassword] = useMutation(FORGOT_PASSWORD);
   const [modalVisible, setModalVisible] = useState<boolean>(false);
   const antIcon = <LoadingOutlined style={{ fontSize: 24 }} spin />;
@@ -208,8 +208,7 @@ const Login = () => {
 
                 <Form.Item>
                   <Button type="primary" htmlType="submit" className={styles['login-form-button']}>
-                    {loading ?
-                      <span><Spin indicator={antIcon} />&nbsp; Logging in..</span> : 'Login'}
+                    Login
                   </Button>
                 </Form.Item>
               </Form>

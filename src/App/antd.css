@@ -26001,7 +26001,9 @@ div.ant-typography-edit-content.ant-typography-rtl {
   border-color: #3A43AF;
 }
 .ant-btn:hover,
-.ant-btn-primary:hover {
+.ant-btn-primary:hover,
+.ant-btn:focus,
+.ant-btn-primary:focus {
   border-color: #3A43AF;
 }
 .ant-btn-primary:hover {
@@ -26034,8 +26036,7 @@ input {
 .ant-select:not(.ant-select-customize-input) .ant-select-selector {
   border: none;
   background-color: var(--gray-2) !important;
-  min-height: 54px;
-  overflow-y: auto;
+  height: 54px;
 }
 .ant-select-single.ant-select-show-arrow .ant-select-selection-placeholder,
 .ant-select-single.ant-select-show-arrow .ant-select-selection-item {

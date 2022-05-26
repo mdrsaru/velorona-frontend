@@ -6,7 +6,6 @@ import moment, { Moment } from 'moment';
 
 import { gql, useMutation } from '@apollo/client';
 import { CREATE_TIME_ENTRY, getTimeFormat } from '..';
-import { getTotalTimeForADay } from '../DetailTimesheet';
 import { notifyGraphqlError } from '../../../utils/error';
 import { authVar } from '../../../App/link';
 import styles from "./style.module.scss";
@@ -42,6 +41,7 @@ interface IProps {
   visible: boolean,
   setVisibility: () => void,
   day: string,
+  total: number;
   timesheetDetail: any
 }
 
@@ -50,22 +50,21 @@ const EditTimeSheet = (props: IProps) => {
   const authData = authVar();
   const [updateTimeEntry] = useMutation(UPDATE_TIME_ENTRY);
   const [createTimeEntry] = useMutation(CREATE_TIME_ENTRY);
-  const [totalDuration, setTotalDuration] = useState(0);
-  function disabledDate(current: Moment) {
-    return current && current.isSame("2022-05-24");
-  }
+  const [totalDuration, setTotalDuration] = useState<number>(props?.total ?? '');
+  const [timeEntryId, setTimeEntry] = useState('');
 
   const onChangeTime = (time: Moment, id: string, type: string) => {
     let formData: {
       id: '' | string,
       company_id: '' | string,
-      startTime?: Moment,
-      endTime?: Moment
+      startTime?: string,
+      endTime?: string
     } = {
       id: id ?? '',
       company_id: authData?.company?.id ?? ''
     }
-    type === 'start' ? formData['startTime'] = time : formData['endTime'] = time;
+    let newTime = moment(props?.day).format('YYYY-MM-DD') + moment(time, " HH:mm:ss")
+    type === 'start' ? formData['startTime'] = newTime : formData['endTime'] = newTime;
 
     updateTimeEntry({
       variables: {
@@ -75,29 +74,37 @@ const EditTimeSheet = (props: IProps) => {
       if (response.errors) {
         return notifyGraphqlError((response.errors))
       }
+      setTotalDuration(response?.data?.TimeEntryUpdate?.duration)
     }).catch(notifyGraphqlError)
   };
 
-  const onCreateTimeEntry = (time: Moment, taskId: string, projectId: string) => {
-    const startTime = form.getFieldValue('start-time');
-    createTimeEntry({
-      variables: {
-        input: {
-          startTime: moment(startTime, "YYYY-MM-DD HH:mm:ss"),
-          endTime: moment(time, "YYYY-MM-DD HH:mm:ss"),
-          task_id: taskId,
-          project_id: projectId,
-          company_id: authData?.company?.id,
+  const onCreateTimeEntry = (time: Moment, taskId: string, projectId: string, type: string) => {
+    if (type === 'start') {
+      createTimeEntry({
+        variables: {
+          input: {
+            startTime: moment(props?.day).format('YYYY-MM-DD') + moment(time, "HH:mm:ss"),
+            task_id: taskId,
+            project_id: projectId,
+            company_id: authData?.company?.id,
+          }
         }
-      }
-    }).then((response) => {
-      if (response.errors) {
-        return notifyGraphqlError((response.errors))
-      }
-      setTotalDuration(response?.data?.TimeEntryCreate?.duration)
-    }).catch(notifyGraphqlError)
+      }).then((response) => {
+        if (response.errors) {
+          return notifyGraphqlError((response.errors))
+        }
+        setTimeEntry(response?.data?.TimeEntryCreate?.id)
+
+      }).catch(notifyGraphqlError)
+    } else {
+      onChangeTime(time, timeEntryId, type)
+    }
   }
 
+  const resetForm = () => {
+    form.resetFields();
+    setTotalDuration(0);
+  }
 
   return (
     <Modal
@@ -112,6 +119,7 @@ const EditTimeSheet = (props: IProps) => {
           </span>
         </div>
       ]}
+      destroyOnClose
       footer={null}
       width={869}>
       <div className={styles['modal-body']}>
@@ -125,7 +133,7 @@ const EditTimeSheet = (props: IProps) => {
           <Col span={18}>
             <div>
               <span>
-                {props?.day}, {new Date().getFullYear()}
+                {moment(props?.day).format('ddd, MMM D')}, {new Date().getFullYear()}
               </span>
             </div>
             <br />
@@ -141,7 +149,7 @@ const EditTimeSheet = (props: IProps) => {
             span={6}
             className={styles['subtitle1']}>
             <div>
-              {getTotalTimeForADay(props?.timesheetDetail?.entries[props?.day])}
+              {getTimeFormat(totalDuration)}
             </div>
           </Col>
         </Row>
@@ -153,6 +161,7 @@ const EditTimeSheet = (props: IProps) => {
             <Form
               form={form}
               layout="vertical"
+              onFinish={resetForm}
               name="timesheet-form">
               {props?.timesheetDetail?.entries[props?.day] ?
                 props?.timesheetDetail?.entries[props?.day]?.map((entry: any, index: number) => (
@@ -184,7 +193,6 @@ const EditTimeSheet = (props: IProps) => {
                         ]}>
                         <TimePicker
                           use12Hours
-                          disabledDate={disabledDate}
                           format="h:mm:ss A"
                           onChange={(event: any) => onChangeTime(event, entry?.id, 'start')}
                           defaultValue={moment(entry?.startTime, 'h:mm:ss A')} />
@@ -203,7 +211,6 @@ const EditTimeSheet = (props: IProps) => {
                         ]}>
                         <TimePicker
                           use12Hours
-                          disabledDate={disabledDate}
                           format="h:mm:ss A"
                           onChange={(event: any) => onChangeTime(event, entry?.id, 'end')}
                           defaultValue={moment(entry?.endTime, 'h:mm:ss A')} />
@@ -246,6 +253,14 @@ const EditTimeSheet = (props: IProps) => {
                       ]}>
                       <TimePicker
                         use12Hours
+                        onChange={(event: any) =>
+                          onCreateTimeEntry(
+                            event,
+                            props?.timesheetDetail?.id,
+                            props?.timesheetDetail?.project_id,
+                            'start'
+                          )
+                        }
                         format='h:mm:ss A'
                       />
                     </Form.Item>
@@ -267,7 +282,8 @@ const EditTimeSheet = (props: IProps) => {
                           onCreateTimeEntry(
                             event,
                             props?.timesheetDetail?.id,
-                            props?.timesheetDetail?.project_id
+                            props?.timesheetDetail?.project_id,
+                            'end'
                           )
                         }
                         format='h:mm:ss A'
@@ -284,7 +300,7 @@ const EditTimeSheet = (props: IProps) => {
                 </Row>}
               <br /> <br />
               <Form.Item style={{ float: 'right' }}>
-                <Button type="primary" onClick={props?.setVisibility}>
+                <Button type="primary" htmlType='submit' onClick={props?.setVisibility}>
                   Exit
                 </Button>
               </Form.Item>

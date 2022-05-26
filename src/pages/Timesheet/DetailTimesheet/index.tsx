@@ -9,11 +9,10 @@ import moment from 'moment';
 import { gql, useLazyQuery, useQuery, useMutation } from '@apollo/client';
 import { useNavigate, useParams } from 'react-router-dom';
 import { authVar } from '../../../App/link';
-import _, { filter } from 'lodash';
+import _ from 'lodash';
 
 import { notifyGraphqlError } from "../../../utils/error";
 import { useState } from 'react';
-import AppLoader from '../../../components/Skeleton/AppLoader';
 import { getTimeFormat } from '..';
 import deleteImg from "../../../assets/images/delete_btn.svg";
 import ModalConfirm from '../../../components/Modal';
@@ -22,6 +21,7 @@ import EditTimeSheet from '../EditTimesheet';
 import styles from '../style.module.scss';
 import { TASK } from '../../Tasks';
 import { PROJECT } from '../../Project';
+import TimeSheetLoader from '../../../components/Skeleton/TimeSheetLoader';
 
 export const TIME_SHEET = gql`
 query Timesheet($input: TimesheetQueryInput!) {
@@ -112,7 +112,9 @@ const deleteBody = () => {
       </div>
       <br />
       <p>
-        <strong> Are you sure you want to delete the current time entry?</strong>
+        <strong>
+          Are you sure you want to delete the current time entry?
+        </strong>
       </p>
       <p className={styles['warning-text']}>
         Your current time tracking will be deleted.
@@ -128,12 +130,13 @@ function getWeekDays(date: any) {
 export const getTotalTimeForADay = (entries: any) => {
   let sum = 0;
   if (entries) {
+    console.log(entries);
     const durations = entries.map((data: any) => data?.duration)
     sum = durations.reduce((entry1: any, entry2: any) => {
       return entry1 + entry2;
     }, 0);
   };
-  return getTimeFormat(sum)
+  return sum
 }
 
 
@@ -144,15 +147,17 @@ const DetailTimesheet = () => {
   const authData = authVar();
   const [form] = Form.useForm();
   const navigate = useNavigate();
-  const [selectedEntries, setCurrentEntries] = useState('');
-  const [submitTimesheet] = useMutation(TIMESHEET_SUBMIT);
-  const [timeSheetWeekly, setTimeSheetWeekly] = useState<Array<any>>([]);
-  const [timesheet, setTimesheet] = useState();
-  const [editTimesheet, setEditTimesheet] = useState('');
   const [filteredTasks, setTasks] = useState([]);
+  const [timesheet, setTimesheet] = useState<any>();
+  const [editTimesheet, setEditTimesheet] = useState('');
+  const [submitTimesheet] = useMutation(TIMESHEET_SUBMIT);
+  const [selectedEntries, setCurrentEntries] = useState('');
+  const [timeSheetWeekly, setTimeSheetWeekly] = useState<Array<any>>([]);
+  /** Modal Visibility **/
   const [visibility, setVisibility] = useState<boolean>(false);
   const [showEditModal, setEditModal] = useState<boolean>(false);
   const [showAddNewEntry, setShowAddNewEntry] = useState<boolean>(false);
+
   const [getTask, { data: taskData }] = useLazyQuery(TASK, {
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
@@ -168,7 +173,9 @@ const DetailTimesheet = () => {
       }
     },
     onCompleted: (response: any) => {
-      const taskIds = timeSheetWeekly.map((timesheet: any) => { return timesheet?.id });
+      const taskIds = timeSheetWeekly.map((timesheet: any) => {
+        return timesheet?.id
+      });
       const filtered = response?.Task?.data?.filter((task: any) => {
         return !taskIds.includes(task?.id)
       });
@@ -178,8 +185,12 @@ const DetailTimesheet = () => {
   })
 
   const onSubmitNewTimeEntry = (values: any) => {
-    const project = projectData?.Project?.data?.filter((data: any) => data?.id === values?.project);
-    const task = taskData?.Task?.data?.filter((data: any) => data?.id === values?.task);
+    const project = projectData?.Project?.data?.filter((data: any) =>
+      data?.id === values?.project
+    );
+    const task = taskData?.Task?.data?.filter((data: any) =>
+      data?.id === values?.task
+    );
     const timeEntry = {
       entries: {},
       id: task[0]?.id,
@@ -187,7 +198,9 @@ const DetailTimesheet = () => {
       project_id: project[0]?.id,
       name: task[0]?.name
     }
-    const ids = timeSheetWeekly?.map((timesheet: any) => { return timesheet?.id })
+    const ids = timeSheetWeekly?.map((timesheet: any) => {
+      return timesheet?.id
+    })
     if (!ids.includes(task[0]?.id)) {
       setTimeSheetWeekly([...timeSheetWeekly, timeEntry])
     }
@@ -255,10 +268,15 @@ const DetailTimesheet = () => {
 
   const [deleteBulkTimeEntry] = useMutation(TIME_ENTRY_BULK_DELETE, {
     onCompleted: () => {
-      const newTimeSheets = timeSheetWeekly.filter((entry: any) => { return entry?.id !== selectedEntries });
+      const newTimeSheets = timeSheetWeekly.filter((entry: any) => {
+        return entry?.id !== selectedEntries
+      });
       setTimeSheetWeekly(newTimeSheets);
       setModalVisibility(false);
-      message.success({ content: `Time entry is deleted successfully!`, className: 'custom-message' });
+      message.success({
+        content: `Time entry is deleted successfully!`,
+        className: 'custom-message'
+      });
     }
   });
 
@@ -307,9 +325,13 @@ const DetailTimesheet = () => {
     let durations: any = [];
     const data = Object.values(entries);
     data.forEach((tasks: any) => {
-      tasks.forEach((data: any) => { durations.push(data?.duration) })
+      tasks.forEach((data: any) => {
+        durations.push(data?.duration)
+      })
     });
-    let sum = durations.reduce((entry1: any, entry2: any) => { return entry1 + entry2 }, 0);
+    let sum = durations.reduce((entry1: any, entry2: any) => {
+      return entry1 + entry2
+    }, 0);
     return getTimeFormat(sum)
   }
 
@@ -354,7 +376,7 @@ const DetailTimesheet = () => {
     }).catch(notifyGraphqlError)
   }
 
-  const showEditTimesheet = (value: string, timesheet: any) => {
+  const showEditTimesheet = (value: any, timesheet: any) => {
     setEditTimesheet(value);
     setTimesheet(timesheet);
     setEditModal(true);
@@ -385,14 +407,15 @@ const DetailTimesheet = () => {
     }
   }
 
+  console.log(timeEntryWeeklyDetails);
+
   return (
     <>
-      {loadWeekly ? <AppLoader /> :
+      {loadWeekly ? <TimeSheetLoader /> :
         <div className={styles['site-card-wrapper']}>
           <Card
             bordered={false}
             className={styles['timesheet-card']}>
-
             <Row className={styles['card-header']}>
               <Col
                 span={24}
@@ -564,8 +587,12 @@ const DetailTimesheet = () => {
                           key={timeIndex}>
                           <Input
                             type="text"
-                            onClick={() => showEditTimesheet(moment(day).format('ddd, MMM D'), timesheet)}
-                            value={getTotalTimeForADay(timesheet?.entries[moment(day).format('ddd, MMM D')])} />
+                            onClick={() =>
+                              showEditTimesheet(moment(day).format('YYYY-MM-DD'), timesheet)
+                            }
+                            value={
+                              getTimeFormat(getTotalTimeForADay(timesheet?.entries[moment(day).format('ddd, MMM D')]))
+                            } />
                         </div>
                       )}
                       <div className={styles["table-body-cell"]}>
@@ -610,6 +637,7 @@ const DetailTimesheet = () => {
         setVisibility={() => setEditModal(false)}
         visible={showEditModal}
         day={editTimesheet}
+        total={getTotalTimeForADay(timesheet?.entries[moment(editTimesheet).format('ddd, MMM D')])}
         timesheetDetail={timesheet ?? []} />
 
       <Modal

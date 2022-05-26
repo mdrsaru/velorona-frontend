@@ -384,6 +384,7 @@ const Timesheet = () => {
   };
 
   const onChangeClientSelect = (value: string) => {
+    form.resetFields(['project', 'task'])
     getProject({
       variables: {
         input: {
