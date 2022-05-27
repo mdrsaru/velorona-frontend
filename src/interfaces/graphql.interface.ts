@@ -21,3 +21,32 @@ export interface ProjectPagingData {
   },
 };
 
+export interface TimesheetPagingData {
+  Timesheet: {
+    data: interfaces.Timesheet[];
+    paging: interfaces.PagingResult;
+  },
+};
+
+export interface IInvoiceItemInput {
+  id?: string;
+  project_id: string;
+  description?: string;
+  quantity: number;
+  rate: number;
+  amount: number;
+};
+
+export interface IInvoiceInput {
+  id?: string;
+  invoiceNumber?: number;
+  issueDate: any;
+  dueDate: any;
+  poNumber: string;
+  totalAmount: number;
+  subtotal: number;
+  taxPercent: number;
+  notes: string;
+  totalQuantity: number;
+  items: IInvoiceItemInput[];
+};

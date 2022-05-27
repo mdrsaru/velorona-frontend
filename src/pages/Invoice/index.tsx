@@ -24,7 +24,7 @@ const INVOICE = gql`
       }
       data {
         id
-        date
+        issueDate 
         totalAmount
         status
         invoiceNumber
@@ -76,7 +76,7 @@ const Invoice = () => {
     paging: {
       skip: pagingInput.skip,
       take: constants.paging.perPage,
-      order: ['date:DESC'],
+      order: ['issueDate:DESC'],
     },
     query: {
       company_id: loggedInUser?.company?.id as string,
@@ -117,19 +117,7 @@ const Invoice = () => {
   const columns = [
     {
       title: 'Invoice Number',
-      render: (invoice: IInvoice) => {
-        let invoiceNumber = invoice.invoiceNumber;
-
-        if(invoiceNumber < 10) {
-          return `000${invoiceNumber}`;
-        } else if(invoiceNumber < 100) {
-          return `00${invoiceNumber}`;
-        } else if(invoiceNumber < 1000) {
-          return `0${invoiceNumber}`;
-        } else {
-          return invoiceNumber;
-        }
-      }
+      dataIndex: 'invoiceNumber'
     },
     {
       title: 'Client Name',
@@ -146,7 +134,7 @@ const Invoice = () => {
     {
       title: 'Issued Date',
       render: (invoice: IInvoice) => {
-        return <>{moment(invoice.date).format('MM/DD/YYYY')}</>
+        return <>{moment(invoice.issueDate).format('MM/DD/YYYY')}</>
       }
     },
     {
@@ -161,10 +149,21 @@ const Invoice = () => {
       title: 'Actions',
       render: (invoice: IInvoice) =>
         <div className={styles['actions']} onClick={(event) => event.stopPropagation()}>
+
           <Dropdown
             overlay={
               <>
                 <Menu>
+                  <Menu.Item key="edit">
+                    <div>
+                      <Link
+                        to={routes.editInvoice.path(loggedInUser?.company?.code as string, invoice.id)}
+                      >
+                        Edit Invoice 
+                      </Link>
+                    </div>
+                  </Menu.Item>
+
                   <Menu.SubMenu title="Change status" key="mainMenu">
                     <Menu.Item 
                       key="Pending"
@@ -214,7 +213,7 @@ const Invoice = () => {
         <PageHeader 
           title="Invoice History"
           extra={[
-            <div className={styles['new-invoice']}>
+            <div className={styles['new-invoice']} key="new-invoice">
               <Link to={routes.addInvoice.path(loggedInUser?.company?.code ?? '')}>
                 Add Invoice
               </Link>

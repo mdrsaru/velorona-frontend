@@ -28,6 +28,7 @@
   }
 }
 
+.ant-input, .ant-input-prefix, .ant-picker-input input, .ant-select-selector, .ant-select-selection-item,
 .ant-input:placeholder-shown, .ant-select-selection-placeholder, .ant-picker:placeholder-shown,
 .ant-input-number-input:placeholder-shown, .ant-form-item-label > label, input  {
   font-weight: 600;
@@ -50,6 +51,7 @@
   height: 54px;
 }
 
+.ant-input-affix-wrapper,
 .ant-select-single.ant-select-show-arrow .ant-select-selection-placeholder,
 .ant-select-single.ant-select-show-arrow .ant-select-selection-item {
   padding-top: 0.7rem;
@@ -69,7 +71,15 @@
   }
 }
 
-.ant-input-number {
+.ant-input-affix-wrapper {
+  border: var(--gray-2);
+
+  input {
+    height: 30px;
+  }
+}
+
+.ant-input-number, .ant-input-affix-wrapper {
   background-color: var(--gray-2) !important;
   padding: 0.7rem;
   width: 100%;
