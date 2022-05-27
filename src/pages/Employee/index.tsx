@@ -36,6 +36,10 @@ export const USER = gql`
                 status
                 archived
                 avatar_id
+                avatar{
+                  id
+                  url
+                }
                 activeClient {
                     id
                     name

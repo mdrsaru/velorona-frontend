@@ -61,7 +61,7 @@ function App() {
             isLoggedIn: true,
             token: response?.data?.accessToken,
             user: {
-              id: response?.data?.id ?? null,
+              id: response?.data?._id ?? null,
               roles: response?.data?.roles?.map((role: any) => role.name),
             },
             company: {
