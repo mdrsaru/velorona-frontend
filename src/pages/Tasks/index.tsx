@@ -11,18 +11,27 @@ import _ from "lodash";
 import TaskCard from "../../components/TaskCard";
 
 export const TASK = gql`
-  query Task($input: TaskQueryInput!) {
-    Task(input: $input) {
-      data {
-        id
-        name
-        status
-        archived
-        company_id
-        project_id
-      }
+    query Task($input: TaskQueryInput!) {
+        Task(input: $input) {
+            data {
+                id
+                name
+                status
+                active
+                description
+                archived
+                company_id
+                project_id
+                manager{
+                  fullName
+                }
+                users{
+                  fullName
+                }
+            }
+        }
     }
-  }
+  
 `;
 
 const Tasks = () => {

@@ -71,9 +71,7 @@ function App() {
           })}
       })
       .finally(() => {
-        setTimeout(() => {
-          setAppLoading(false);
-        }, 3000)
+        setAppLoading(false);
       });
   }, []);
   return (

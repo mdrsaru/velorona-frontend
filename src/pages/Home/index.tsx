@@ -1,12 +1,21 @@
-import React from "react";
-import { Row, Col, Typography, Card, Button, Space, Table, Select } from 'antd';
-import { columns, data } from "../../utils/dummyData";
+// import React from "react";
+import { 
+  Row, 
+  Col, 
+  // Typography, 
+  // Card, 
+  // Button, 
+  Space, 
+  // Table, 
+  // Select 
+} from 'antd';
+// import { columns, data } from "../../utils/dummyData";
 
 import styles from './style.module.scss';
 
 
-const { Title } = Typography;
-const { Option } = Select;
+// const { Title } = Typography;
+// const { Option } = Select;
 
 const Home = () => {
   return (
@@ -18,12 +27,11 @@ const Home = () => {
           <div className={styles['main-title']}>
             Welcome Vellorum User!
           </div>
-          <div className={styles['sub-text']}>
+          {/* <div className={styles['sub-text']}>
             Please checkin to confirm your attendance.
-          </div>
+          </div> */}
         </Col>
-
-        <Col xs={24} sm={8} md={4}>
+{/*     <Col xs={24} sm={8} md={4}>
           <div className={styles['analytics']}>
             Attendance
             <Title level={2}>95%</Title>
@@ -42,9 +50,9 @@ const Home = () => {
             Active Projects
             <Title level={2}>4</Title>
           </div>
-        </Col>
+        </Col> */}
       </Row>
-      <Row className={styles['dashboard-row']}>
+      {/* <Row className={styles['dashboard-row']}>
         <Col xs={24} sm={24} md={12} className={styles['dashboard-col']}>
           <Card>
             <Card.Grid
@@ -120,7 +128,7 @@ const Home = () => {
             </Card.Grid>
           </Card>
         </Col>
-      </Row>
+      </Row> */}
     </Space>
   )
 }
