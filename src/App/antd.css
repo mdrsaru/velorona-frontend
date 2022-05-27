@@ -26006,7 +26006,8 @@ div.ant-typography-edit-content.ant-typography-rtl {
 .ant-btn-primary:focus {
   border-color: #3A43AF;
 }
-.ant-btn-primary:hover {
+.ant-btn-primary:hover,
+.ant-btn-primary:focus {
   background: linear-gradient(to right, #3A43AF, #95239C);
 }
 .ant-input,
