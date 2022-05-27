@@ -1,7 +1,7 @@
 
 import { CloseOutlined , LinkOutlined} from "@ant-design/icons";
 import { Modal } from "antd"
-
+import parse from 'html-react-parser'
 import styles from "./styles.module.scss";
 
 interface IProps{
@@ -42,6 +42,7 @@ const TaskDetail = (props:IProps) =>{
           </div>
           <br /><br />
           <div className={styles['task-body']}>
+          {parse(props?.data?.description)}
             <div className={styles['task-subtitle']}>Design UI for Chat feature.</div>
             <div className={styles['description']}>
               <div>1. Must have options for sending and receiving attachment, image and audio files.</div>

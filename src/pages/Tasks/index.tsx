@@ -20,6 +20,8 @@ export const TASK = gql`
                 archived
                 company_id
                 project_id
+                active
+                description
             }
         }
     }

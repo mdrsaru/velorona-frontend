@@ -19,6 +19,9 @@ import ModalConfirm from "../../../components/Modal";
 import ArchiveBody from "../../../components/Archive";
 import DeleteBody from "../../../components/Delete";
 import TaskDetail from "../../../components/TaskDetail";
+import Status from "../../../components/Status";
+
+
 
 const { SubMenu } = Menu;
 
@@ -29,6 +32,7 @@ export const TASK_UPDATE = gql`
       name
       status
       archived
+      active
     }
   }
 `;
@@ -99,11 +103,11 @@ const DetailProject = () => {
     setArchiveModal(value);
   };
 
-  const changeStatus = (value: string, id: string) => {
+  const changeStatus = (value: boolean, id: string) => {
     taskUpdate({
       variables: {
         input: {
-          status: value,
+          active: value,
           id: id,
           company_id: loggedInUser?.company?.id,
         },
@@ -140,8 +144,8 @@ const DetailProject = () => {
         <Menu.Item
           key="active"
           onClick={() => {
-            if (data?.status === "Inactive") {
-              changeStatus("Active", data?.id);
+            if (data?.active === false) {
+              changeStatus(true, data?.id);
             }
           }}
         >
@@ -151,8 +155,8 @@ const DetailProject = () => {
         <Menu.Item
           key="inactive"
           onClick={() => {
-            if (data?.status === "Active") {
-              changeStatus("Inactive", data?.id);
+            if (data?.active === true) {
+              changeStatus(false, data?.id);
             }
           }}
         >
@@ -218,18 +222,10 @@ const DetailProject = () => {
     },
     {
       title: "Status",
-      dataIndex: "status",
+      dataIndex: "active",
       key: "status",
-      render: (status: string) => (
-        <span
-          className={
-            status === "Active"
-              ? styles["active-status"]
-              : styles["inactive-status"]
-          }
-        >
-          {status}
-        </span>
+      render: (active: boolean) => (
+        <Status status = {active ? 'Active' : 'Inactive'}/>
       ),
     },
     {
