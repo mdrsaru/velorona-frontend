@@ -114,6 +114,7 @@ const InvoiceForm = (props: IProps) => {
     taxPercent: invoice?.taxPercent ?? 0,
     notes: invoice?.notes ?? '',
     totalQuantity: invoice?.totalQuantity ?? 0,
+    taxAmount: (0.01 * (invoice?.taxPercent ?? 0) * (invoice?.subtotal ?? 0)),
     items: invoice?.items?.map((item) => ({
       id: item.id,
       project_id: item.project_id,
@@ -130,7 +131,7 @@ const InvoiceForm = (props: IProps) => {
   }
 
   const onHourRateChange = (index: number) => {
-    let { items, totalAmount, taxPercent = 0 } = form.getFieldsValue();
+    let { items, totalAmount, taxPercent = 0, taxAmount = 0 } = form.getFieldsValue();
 
     const quantity = items?.[index]?.quantity;
     const rate = items?.[index]?.rate;
@@ -147,7 +148,8 @@ const InvoiceForm = (props: IProps) => {
       }, 0) 
 
       if(taxPercent >= 0) {
-        totalAmount = (1 + taxPercent * 0.01) * subtotal;
+        taxAmount = taxPercent * 0.01 * subtotal;
+        totalAmount = subtotal + taxAmount;
       } else {
         totalAmount = subtotal;
       }
@@ -157,6 +159,7 @@ const InvoiceForm = (props: IProps) => {
         totalQuantity,
         subtotal: round(subtotal, 2),
         totalAmount: round(totalAmount, 2),
+        taxAmount: round(taxAmount, 2),
       });
     }
   }
@@ -182,12 +185,15 @@ const InvoiceForm = (props: IProps) => {
 
   const onTaxPercentChange = (e: ChangeEvent<HTMLInputElement>) => {
     const subtotal = form.getFieldValue('subtotal') 
-    const value = parseFloat(e.target.value);
+    const value = parseFloat(e.target.value || '0');
 
     if(value >= 0) {
+      const taxAmount = value * 0.01 * subtotal;
       const totalAmount = (1 + value * 0.01) * subtotal;
+      console.log(taxAmount, value)
       form.setFieldsValue({
         totalAmount: round(totalAmount, 2),
+        taxAmount: round(taxAmount, 2),
       });
     }
   }
@@ -494,9 +500,9 @@ const InvoiceForm = (props: IProps) => {
 
               <td>
                 <Form.Item 
-                  name="totalAmount" 
+                  name="taxAmount" 
                   className={styles['td-input']}
-                  label="Total Amount"
+                  label="Tax Amount"
                 >
                   <Input type="number" prefix="$" disabled />
                 </Form.Item>
@@ -511,7 +517,15 @@ const InvoiceForm = (props: IProps) => {
               <td></td>
               <td></td>
               <td></td>
+              <td> </td>
               <td>
+                <Form.Item 
+                  name="totalAmount" 
+                  className={styles['td-input']}
+                  label="Total Amount"
+                >
+                  <Input type="number" prefix="$" disabled />
+                </Form.Item>
               </td>
             </tr>
           </tfoot>
