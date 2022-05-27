@@ -22,6 +22,12 @@ export const TASK = gql`
                 project_id
                 active
                 description
+                manager{
+                  fullName
+                }
+                users{
+                  fullName
+                }
             }
         }
     }

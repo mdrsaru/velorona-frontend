@@ -4,8 +4,10 @@ import { useNavigate } from "react-router-dom";
 import { authVar } from "../../../App/link";
 
 import { Table } from 'antd';
-
+import constants from '../../../config/constants';
 import routes from "../../../config/routes";
+
+import { useState } from "react";
 import styles from "./../style.module.scss";
 
 export const TIME_WEEKLY = gql`
@@ -44,6 +46,15 @@ query Timesheet($input: TimesheetQueryInput!) {
 const WeeklyTimeSheet = () => {
   const authData = authVar();
   let navigate = useNavigate();
+  const [pagingInput, setPagingInput] = useState<{
+    skip: number,
+    currentPage: number,
+  }>
+    ({
+      skip: 0,
+      currentPage: 1,
+    });
+
 
   const columns = [
     {
@@ -92,7 +103,16 @@ const WeeklyTimeSheet = () => {
     },
   ];
 
-  const { data: timeWeeklyEntryData } = useQuery(TIME_WEEKLY, {
+  const changePage = (page: number) => {
+    const newSkip = (page - 1) * constants.paging.perPage;
+    setPagingInput({
+      ...pagingInput,
+      skip: newSkip,
+      currentPage: page,
+    });
+  };
+
+  const { data: timeWeeklyEntryData, loading: loading } = useQuery(TIME_WEEKLY, {
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
     variables: {
@@ -109,9 +129,17 @@ const WeeklyTimeSheet = () => {
 
   return (
     <Table
+      loading={loading}
       dataSource={timeWeeklyEntryData?.Timesheet?.data}
       columns={columns}
-      rowKey={record => record?.id}/>
+      rowKey={record => record?.id}
+      pagination={{
+        current: pagingInput.currentPage,
+        onChange: changePage,
+        total: timeWeeklyEntryData?.Timesheet?.paging?.total,
+        pageSize: constants.paging.perPage
+      }}
+    />
   )
 }
 

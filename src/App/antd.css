@@ -26001,7 +26001,9 @@ div.ant-typography-edit-content.ant-typography-rtl {
   border-color: #3A43AF;
 }
 .ant-btn:hover,
-.ant-btn-primary:hover {
+.ant-btn-primary:hover,
+.ant-btn:focus,
+.ant-btn-primary:focus {
   border-color: #3A43AF;
 }
 .ant-btn-primary:hover {

@@ -21,7 +21,7 @@ import DeleteBody from "../../../components/Delete";
 import TaskDetail from "../../../components/TaskDetail";
 import Status from "../../../components/Status";
 
-
+import InfoCircleOutlined from "@ant-design/icons/lib/icons/InfoCircleOutlined";
 
 const { SubMenu } = Menu;
 
@@ -33,6 +33,7 @@ export const TASK_UPDATE = gql`
       status
       archived
       active
+      description
     }
   }
 `;
@@ -43,6 +44,8 @@ export const TASK_DELETE = gql`
       id
       name
       status
+      active
+      description
       archived
     }
   }
@@ -140,9 +143,10 @@ const DetailProject = () => {
   const [detailVisibility, setDetailVisibility] = useState(false);
   const menu = (data: any) => (
     <Menu>
-      <SubMenu title="Change status" key="mainMenu">
+      <SubMenu title="Change status" key="mainMenu" className={styles.list}>
         <Menu.Item
           key="active"
+          className={styles.list}
           onClick={() => {
             if (data?.active === false) {
               changeStatus(true, data?.id);
@@ -165,7 +169,7 @@ const DetailProject = () => {
       </SubMenu>
       <Menu.Divider />
 
-      <Menu.Item key="archive">
+      <Menu.Item key="archive" className={styles.list}>
         <div
           onClick={() => {
             setTask(data);
@@ -177,7 +181,7 @@ const DetailProject = () => {
       </Menu.Item>
       <Menu.Divider />
 
-      <Menu.Item key="delete">
+      <Menu.Item key="delete" className={styles.list}>
         <div
           onClick={() => {
             setModalVisibility(true);
@@ -189,6 +193,21 @@ const DetailProject = () => {
       </Menu.Item>
     </Menu>
   );
+
+  const assignedMenu = (record: any) => (
+    <Menu>
+      <p className={styles.employeeTitle}>
+        Employee List ({record.users.length}){" "}
+      </p>
+      {record.users?.map((user: any) => (
+        <>
+          <Menu.Item className={styles.list}>{user.fullName}</Menu.Item>
+          <Menu.Divider />
+        </>
+      ))}
+    </Menu>
+  );
+
   const columns = [
     {
       title: "Task Name",
@@ -204,7 +223,7 @@ const DetailProject = () => {
         return {
           onClick: () => {
             setDetailVisibility(!detailVisibility);
-            setTask(task)
+            setTask(task);
           },
         };
       },
@@ -215,7 +234,7 @@ const DetailProject = () => {
       render: (task: any) => {
         return (
           <div>
-            <p>{task?.name}</p>
+            <p>{task?.manager?.fullName}</p>
           </div>
         );
       },
@@ -237,6 +256,21 @@ const DetailProject = () => {
           onClick={(event) => event.stopPropagation()}
         >
           <Dropdown
+            overlay={assignedMenu(record)}
+            trigger={["click"]}
+            placement="bottomRight"
+          >
+            <div
+              className="ant-dropdown-link"
+              onClick={(e) => e.preventDefault()}
+              style={{ marginRight: "0.6rem" }}
+              title="Assigned User"
+            >
+              <InfoCircleOutlined className={styles.icons} />
+            </div>
+          </Dropdown>
+
+          <Dropdown
             overlay={menu(record)}
             trigger={["click"]}
             placement="bottomRight"
@@ -246,7 +280,7 @@ const DetailProject = () => {
               onClick={(e) => e.preventDefault()}
               style={{ paddingLeft: "1rem" }}
             >
-              <MoreOutlined />
+              <MoreOutlined className={styles.icons}/>
             </div>
           </Dropdown>
         </div>

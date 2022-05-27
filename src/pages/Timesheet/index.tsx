@@ -26,7 +26,6 @@ import { CLIENT } from '../Client';
 
 import moment from 'moment';
 import { TASK } from '../Tasks';
-import { TimeEntryPagingResult } from '../../interfaces/generated';
 import TimeSheetLoader from '../../components/Skeleton/TimeSheetLoader';
 import TimeEntry from './TimeEntry';
 import NoContent from '../../components/NoContent';
@@ -70,17 +69,6 @@ export const CREATE_TIME_ENTRY = gql`
         }
     }
 `
-
-export const UPDATE_TIME_ENTRY = gql`
-    mutation TimeEntryUpdate($input: TimeEntryUpdateInput!) {
-      TimeEntryUpdate(input: $input) {
-            id
-            company_id
-            endTime
-        }
-    }
-`
-
 export const TIME_ENTRY = gql`
     query TimeEntry($input: TimeEntryQueryInput!) {
       TimeEntry(input: $input) {
@@ -150,12 +138,7 @@ export const getTimeFormat = (seconds: any) => {
   if (minutes < 10) { minutes = "0" + minutes; }
   if (secs < 10) { secs = "0" + secs; }
   return hours + ':' + minutes + ':' + secs;
-}
-
-interface TimeEntryResponseArray {
-  TimeEntry: TimeEntryPagingResult
-}
-
+};
 
 const Timesheet = () => {
   const { Option } = Select;
@@ -163,10 +146,8 @@ const Timesheet = () => {
   const [form] = Form.useForm()
   const [timeEntryForm] = Form.useForm()
   const stopwatchOffset = new Date();
-  // const [UpdateTimeEntry] = useMutation(UPDATE_TIME_ENTRY);
   const [visible, setVisible] = useState(false);
-  const [showDetailTimeEntry, setDetailVisible] = useState(false);
-  const [currentDate, setCurrentDate] = useState<Date>(new Date());
+  const [showDetailTimeEntry, setDetailVisible] = useState<boolean>(false);
   const [newTimeEntry, setTimeEntry] = useState({
     id: '',
     name: '',
@@ -356,7 +337,11 @@ const Timesheet = () => {
     isRunning,
     start,
     reset
-  } = useStopwatch({ autoStart: showDetailTimeEntry, offsetTimestamp: new Date()});
+  } = useStopwatch({
+    autoStart: showDetailTimeEntry,
+    offsetTimestamp: new Date()
+  });
+
   const [createTimeEntry] = useMutation(CREATE_TIME_ENTRY, {
     onCompleted: (response: any) => {
       start();
@@ -399,6 +384,7 @@ const Timesheet = () => {
   };
 
   const onChangeClientSelect = (value: string) => {
+    form.resetFields(['project', 'task'])
     getProject({
       variables: {
         input: {
@@ -415,6 +401,7 @@ const Timesheet = () => {
   }
 
   const onChangeProjectSelect = (value: string) => {
+    form.resetFields(['task']);
     getTask({
       variables: {
         input: {
@@ -464,14 +451,12 @@ const Timesheet = () => {
   }
 
   const onSubmitForm = (values: any) => {
-    setCurrentDate(new Date())
-    !isRunning ? createTimeEntries(values) : submitStopTimer()
+    !isRunning ? createTimeEntries(values) : submitStopTimer();
   }
 
   const clickPlayButton = (entry: string) => {
-    setCurrentDate(new Date())
     const timesheet = filterData()[entry][0];
-    !isRunning ? createTimeEntries({ task: entry, project: timesheet?.project?.id }) : submitStopTimer()
+    !isRunning ? createTimeEntries({ task: entry, project: timesheet?.project?.id }) : submitStopTimer();
   }
 
   return (
@@ -616,13 +601,13 @@ const Timesheet = () => {
                         <TimeEntry
                           rowClassName={'filter-task-list'}
                           index={index}
-                          data={{ 
-                            project: filterData()[entry][0]?.project?.name, 
+                          data={{
+                            project: filterData()[entry][0]?.project?.name,
                             name: filterData()[entry][0]?.task?.name,
                             startTime: filterData()[entry][0]?.startTime,
                             endTime: filterData()[entry][0]?.endTime,
                             duration: filterData()[entry][0]?.duration
-                           }}
+                          }}
                           length={filterData()[entry]?.length}
                           clickPlayButton={() => clickPlayButton(entry)} />} key={index}>
                         {filterData()[entry].map((timeData: any, entryIndex: number) => {
@@ -631,13 +616,13 @@ const Timesheet = () => {
                               key={entryIndex}
                               rowClassName={'filter-task-list'}
                               index={index}
-                              data={{ 
-                                project: timeData?.project?.name, 
+                              data={{
+                                project: timeData?.project?.name,
                                 name: timeData?.task?.name,
                                 startTime: timeData?.startTime,
                                 endTime: timeData?.endTime,
                                 duration: timeData?.duration
-                               }}
+                              }}
                               length={timeData?.length}
                               clickPlayButton={() => clickPlayButton(entry)} />)
                         })}
@@ -647,13 +632,13 @@ const Timesheet = () => {
                     <TimeEntry
                       rowClassName={'task-div'}
                       index={index}
-                      data={{ 
-                        project: filterData()[entry][0]?.project?.name, 
+                      data={{
+                        project: filterData()[entry][0]?.project?.name,
                         name: filterData()[entry][0]?.task?.name,
                         startTime: filterData()[entry][0]?.startTime,
                         endTime: filterData()[entry][0]?.endTime,
                         duration: filterData()[entry][0]?.duration
-                       }}
+                      }}
                       length={filterData()[entry]?.length}
                       clickPlayButton={() => clickPlayButton(entry)} />
                 ))}

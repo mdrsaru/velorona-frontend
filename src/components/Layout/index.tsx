@@ -2,7 +2,6 @@ import { useQuery } from '@apollo/client';
 import { Outlet, Navigate } from 'react-router-dom';
 import { Layout } from 'antd';
 
-import { AUTH } from '../../gql/auth.gql';
 import { SIDEBAR } from '../../gql/app.gql';
 import routes from '../../config/routes';
 
@@ -10,16 +9,16 @@ import Sidebar from '../Sidebar';
 import Header from '../Header';
 
 import styles from './style.module.scss';
-import {sidebarVar} from "../../App/link";
+import { sidebarVar, authVar } from "../../App/link";
 
 const { Content } = Layout;
 
 
 const _Layout = () => {
-  const { data: authData } = useQuery(AUTH);
   const { data: sidebarData } = useQuery(SIDEBAR);
+  const authData = authVar(); 
 
-  const isLoggedIn = authData?.AuthUser?.isLoggedIn;
+  const isLoggedIn = authData?.isLoggedIn;
 
   if (!isLoggedIn) {
     return <Navigate to={routes.login.path} />;
