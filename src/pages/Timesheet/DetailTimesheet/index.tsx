@@ -39,11 +39,7 @@ query Timesheet($input: TimesheetQueryInput!) {
       totalExpense
       duration
       durationFormat
-			status
-      approver {
-        createdAt
-        fullName
-      }
+      
       user {
         id
         email
@@ -55,6 +51,19 @@ query Timesheet($input: TimesheetQueryInput!) {
       company {
         id
         name
+      }
+      projectItems {
+        project_id
+        totalDuration
+        totalExpense
+        hourlyRate
+      }
+      durationMap
+      timeEntries {
+        id
+        startTime
+        endTime
+        duration
       }
     }
   }
@@ -130,7 +139,6 @@ function getWeekDays(date: any) {
 export const getTotalTimeForADay = (entries: any) => {
   let sum = 0;
   if (entries) {
-    console.log(entries);
     const durations = entries.map((data: any) => data?.duration)
     sum = durations.reduce((entry1: any, entry2: any) => {
       return entry1 + entry2;
@@ -204,7 +212,6 @@ const DetailTimesheet = () => {
     if (!ids.includes(task[0]?.id)) {
       setTimeSheetWeekly([...timeSheetWeekly, timeEntry])
     }
-    console.log(timeSheetDetail);
     getWeeklyTimeEntry({
       variables: {
         input: {
@@ -297,11 +304,10 @@ const DetailTimesheet = () => {
       input: {
         query: {
           company_id: authData?.company?.id,
-          id: params?.id,
-          user_id: authData?.user?.id
+          id: params?.id
         },
         paging: {
-          order: ['createdAt:DESC']
+          order: ['weekStartDate:DESC']
         }
       }
     },
@@ -323,13 +329,15 @@ const DetailTimesheet = () => {
         variables: {
           input: {
             company_id: authData?.company?.id ?? '',
-            startTime: timeData?.Timesheet?.data[0]?.weekStartDate,
-            endTime: timeData?.Timesheet?.data[0]?.weekEndDate
+            startTime: timeData?.Timesheet?.data[0]?.weekStartDate + ' 00:00:00',
+            endTime: timeData?.Timesheet?.data[0]?.weekEndDate + ' 23:59:59'
           }
         }
       });
     }
   });
+
+  console.log(timeSheetDetail);
 
   const getTotalTimeByTask = (entries: any) => {
     let durations: any = [];
@@ -397,8 +405,8 @@ const DetailTimesheet = () => {
       variables: {
         input: {
           company_id: authData?.company?.id ?? '',
-          startTime: timeSheetDetail?.Timesheet?.data[0]?.weekStartDate,
-          endTime: timeSheetDetail?.Timesheet?.data[0]?.weekEndDate
+          startTime: timeSheetDetail?.Timesheet?.data[0]?.weekStartDate + ' 00:00:00',
+          endTime: timeSheetDetail?.Timesheet?.data[0]?.weekEndDate + ' 23:59:59'
         }
       }
     });
@@ -628,6 +636,30 @@ const DetailTimesheet = () => {
                           }} />
                       </div>
                     </div>)}
+                </div>
+              </Col>
+            </Row>
+            <Row>
+              <Col
+                span={24}
+                className={styles['form-col']}>
+                <div className={styles['resp-table']}>
+                  <div className={styles["resp-table-header"]}>
+                    <div className={styles['table-header-cell']}>
+                      Total
+                    </div>
+                    <div className={styles['table-header-cell']}>
+                    </div>
+                    {getWeekDays(timeSheetDetail?.Timesheet?.data[0]?.weekStartDate).map((day: any, index: number) =>
+                      <div
+                        className={styles['table-header-cell']}
+                        key={index}>
+                        {getTimeFormat(timeSheetDetail?.Timesheet?.data[0]?.durationMap[moment(day).format('YYYY-MM-DD')])}
+                      </div>)}
+                    <div className={styles['table-header-cell']}>
+                      Total
+                    </div>
+                  </div>
                 </div>
               </Col>
             </Row>

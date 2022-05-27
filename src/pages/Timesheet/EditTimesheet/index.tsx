@@ -1,15 +1,14 @@
 import { useEffect, useState } from 'react';
-import { Modal, Row, Col, Button, TimePicker } from 'antd';
+import { Modal, Row, Col, Button, TimePicker, message } from 'antd';
 import { CloseOutlined } from "@ant-design/icons";
 import { Form, Input } from 'antd';
 import moment, { Moment } from 'moment';
 
 import { gql, useMutation } from '@apollo/client';
-import { CREATE_TIME_ENTRY, getTimeFormat, TIME_ENTRY } from '..';
+import { CREATE_TIME_ENTRY, getTimeFormat } from '..';
 import { notifyGraphqlError } from '../../../utils/error';
 import { authVar } from '../../../App/link';
 import styles from "./style.module.scss";
-import { TIME_ENTRY_WEEKLY_DETAILS } from '../DetailTimesheet';
 
 
 export const UPDATE_TIME_ENTRY = gql`
@@ -106,8 +105,15 @@ const EditTimeSheet = (props: IProps) => {
   }
 
   const resetForm = () => {
-    form.resetFields();
-    setTotalDuration(0);
+    let data = form.getFieldsValue(['start-time', 'end-time']);
+    if (data['start-time'] && !data['end-time']) {
+      message.error('Update the end-time before closing.');
+    } else {
+      form.resetFields();
+      setTotalDuration(0);
+      props?.setVisibility()
+    }
+
   };
   return (
     <Modal
@@ -115,7 +121,7 @@ const EditTimeSheet = (props: IProps) => {
       visible={props?.visible}
       closeIcon={[
         <div
-          onClick={props?.setVisibility}
+          onClick={resetForm}
           key={1}>
           <span className={styles['close-icon-div']}>
             <CloseOutlined />
@@ -303,7 +309,7 @@ const EditTimeSheet = (props: IProps) => {
                 </Row>}
               <br /> <br />
               <Form.Item style={{ float: 'right' }}>
-                <Button type="primary" htmlType='submit' onClick={props?.setVisibility}>
+                <Button type="primary" htmlType='submit'>
                   Exit
                 </Button>
               </Form.Item>
