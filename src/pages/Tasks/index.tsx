@@ -30,6 +30,11 @@ export const TASK = gql`
                 users{
                   fullName
                 }
+                attachments{
+                  id
+                  url
+                  name
+                }
             }
         }
     }

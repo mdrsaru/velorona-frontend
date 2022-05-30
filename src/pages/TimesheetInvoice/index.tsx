@@ -42,6 +42,7 @@ const TIMESHEET = gql`
           project_id
           totalExpense
           totalDuration
+          totalHours
           hourlyRate
         }
       }
@@ -76,7 +77,7 @@ const TimesheetInvoice = () => {
           const description = `${timesheet.weekStartDate} - ${timesheet.weekEndDate}`;
 
           const items = (timesheet?.projectItems ?? []).map((item) => {
-            const quantity = item.totalDuration / 3600;
+            const quantity = item.totalHours;
             totalAmount += item.totalExpense;
             totalQuantity += quantity;
 
@@ -99,7 +100,7 @@ const TimesheetInvoice = () => {
             subtotal: totalAmount,
             taxPercent: 0,
             notes: '',
-            totalQuantity: round(totalQuantity, 6),
+            totalQuantity: round(totalQuantity, 2),
             items,
           }
 
