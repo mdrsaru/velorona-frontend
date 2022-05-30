@@ -15,9 +15,10 @@ const { Option } = Select;
 const COMPANY_CREATE = gql`
   mutation CompanyCreate($input: CompanyCreateInput!) {
       CompanyCreate(input: $input) {
-          id
-          name
-          createdAt 
+        id
+        name
+        status
+        createdAt 
       }
   }
 `

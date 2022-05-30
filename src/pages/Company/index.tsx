@@ -1,7 +1,7 @@
-import { useQuery, gql } from '@apollo/client';
+import { useQuery, gql, useMutation } from '@apollo/client';
 import { useState } from "react";
 
-import { Card, Row, Col, Table, Menu, Dropdown } from 'antd';
+import { Card, Row, Col, Table, Menu, Dropdown, message } from 'antd';
 import { MoreOutlined } from '@ant-design/icons';
 
 import { Link } from "react-router-dom";
@@ -12,6 +12,7 @@ import archiveImg from "./../../assets/images/archive_btn.svg";
 import ModalConfirm from "../../components/Modal";
 
 import styles from "./style.module.scss";
+import { notifyGraphqlError } from '../../utils/error';
 
 
 const { SubMenu } = Menu;
@@ -22,7 +23,19 @@ const COMPANY = gql`
         id
         name
         status
+        createdAt 
       }
+    }
+  }
+`
+
+const COMPANY_UPDATE = gql`
+  mutation ClientUpdate($input: CompanyUpdateInput!) {
+    CompanyUpdate(input: $input) {
+      id
+      name
+      status
+      createdAt 
     }
   }
 `
@@ -62,7 +75,8 @@ const archiveBody = () => {
 
 
 const Company = () => {
-  const { data: companyData } = useQuery(COMPANY)
+  const { data: companyData } = useQuery(COMPANY);
+  const [updateCompany] = useMutation(COMPANY_UPDATE);
   const [visibility, setVisibility] = useState(false);
   const [showArchive, setArchiveModal] = useState(false);
   const setModalVisibility = (value: boolean) => {
@@ -72,23 +86,51 @@ const Company = () => {
     setArchiveModal(value)
   }
 
-  const menu = (
+  const changeStatus = (value: string, id: string) => {
+    console.log(value, id);
+    let key = 'status'
+    updateCompany({
+      variables: {
+        input: {
+          status: value,
+          id: id
+        }
+      }
+    }).then((response) => {
+      if (response.errors) {
+        return notifyGraphqlError((response.errors))
+      }
+      message.success({ content: `Company is updated successfully!`, key, className: 'custom-message' });
+    }).catch(notifyGraphqlError)
+  }
+
+  const menu = (data: any) => (
     <Menu>
-      <SubMenu title="Change status" key="4">
-        <Menu.Item key="Active">Active</Menu.Item>
+      <SubMenu title="Change status" key="1">
+        <Menu.Item key="active" onClick={() => {
+          if (data?.status === 'Inactive') {
+            changeStatus('Active', data?.id)
+          }
+        }}>Active</Menu.Item>
         <Menu.Divider />
-        <Menu.Item key="Inactive">Inactive</Menu.Item>
-        <Menu.Divider />
-        <Menu.Item key="Archived">Archived</Menu.Item>
+        <Menu.Item
+          key="inactive"
+          onClick={() => {
+            if (data?.status === 'Active') {
+              changeStatus('Inactive', data?.id)
+            }
+          }}>
+          Inactive
+        </Menu.Item>
       </SubMenu>
-      <Menu.Divider />
+      {/* <Menu.Divider />
       <Menu.Item key="2">
         <div onClick={() => setArchiveVisibility(true)}>Archive Company</div>
       </Menu.Item>
       <Menu.Divider />
       <Menu.Item key="3">
         <div onClick={() => setModalVisibility(true)}>Delete Company</div>
-      </Menu.Item>
+      </Menu.Item> */}
     </Menu>
   );
 
@@ -102,15 +144,18 @@ const Company = () => {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
+      render: (status: string) =>
+        <span className={status === 'Active' ? styles['active-status'] : styles['inactive-status']}>
+          {status}
+        </span>
     },
     {
       title: 'Actions',
-      dataIndex: 'actions',
       key: 'actions',
-      render: () =>
+      render: (record: any) =>
         <div className={styles['dropdown-menu']}>
           <Dropdown
-            overlay={menu}
+            overlay={menu(record)}
             trigger={['click']}
             placement="bottomRight">
             <div
