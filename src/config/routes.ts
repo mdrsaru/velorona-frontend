@@ -71,6 +71,13 @@ const routes = {
     name: 'New Company',
     key: 'side20'
   },
+  editCompany: {
+    childPath: ':id/edit',
+    path: (id: string) => `/company/${id}/edit`,
+    component: lazy(() => import('../pages/Company/EditCompany')),
+    name: 'Edit Company',
+    key: 'side20'
+  },
   employee: {
     childPath: 'employee',
     path: (id: string) => `/${id}/employee`,

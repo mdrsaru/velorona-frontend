@@ -55,7 +55,11 @@ const EditClient = () => {
 
   const onSubmitForm = (values: any) => {
     let key = 'message';
-    message.loading({ content: "Client updating in progress..", key, className: 'custom-message' });
+    message.loading({
+      content: "Client updating in progress..",
+      key,
+      className: 'custom-message'
+    });
     ClientUpdate({
       variables: {
         input: {
@@ -88,9 +92,13 @@ const EditClient = () => {
     <div className={styles['main-div']}>
       <Card bordered={false}>
         <Row>
-          <Col span={12} className={styles['client-col']}>
+          <Col
+            span={12}
+            className={styles['client-col']}>
             <h1>
-              <ArrowLeftOutlined onClick={() => navigate(-1)} /> &nbsp; Edit Client
+              <ArrowLeftOutlined
+                onClick={() => navigate(-1)} />
+              &nbsp; Edit Client
             </h1>
           </Col>
         </Row>
@@ -110,7 +118,12 @@ const EditClient = () => {
                 invoiceEmail: userData?.Client?.data[0]?.invoicingEmail ?? ''
               }}>
               <Row>
-                <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+                <Col
+                  xs={24}
+                  sm={24}
+                  md={12}
+                  lg={12}
+                  className={styles.formCol}>
                   <Form.Item
                     label="Full Name"
                     name='name'
@@ -118,10 +131,17 @@ const EditClient = () => {
                       required: true,
                       message: 'Please enter full name!'
                     }]}>
-                    <Input placeholder="Enter the full name" autoComplete="off" />
+                    <Input
+                      placeholder="Enter the full name"
+                      autoComplete="off" />
                   </Form.Item>
                 </Col>
-                <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+                <Col
+                  xs={24}
+                  sm={24}
+                  md={12}
+                  lg={12}
+                  className={styles.formCol}>
                   <Form.Item
                     label="Email Address"
                     name='email'
@@ -132,12 +152,20 @@ const EditClient = () => {
                       required: true,
                       message: 'Please input your E-mail!'
                     },]}>
-                    <Input placeholder="Enter your email" autoComplete="off" disabled />
+                    <Input
+                      placeholder="Enter your email"
+                      autoComplete="off"
+                      disabled />
                   </Form.Item>
                 </Col>
               </Row>
               <Row>
-                <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+                <Col
+                  xs={24}
+                  sm={24}
+                  md={12}
+                  lg={12}
+                  className={styles.formCol}>
                   <Form.Item
                     label="Invoice Email"
                     name='invoiceEmail'
@@ -148,10 +176,18 @@ const EditClient = () => {
                       required: true,
                       message: 'Please input your invoice E-mail!'
                     }]}>
-                    <Input placeholder="Enter your invoice email" autoComplete="off" disabled />
+                    <Input
+                      placeholder="Enter your invoice email"
+                      autoComplete="off"
+                      disabled />
                   </Form.Item>
                 </Col>
-                <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+                <Col
+                  xs={24}
+                  sm={24}
+                  md={12}
+                  lg={12}
+                  className={styles.formCol}>
                   <Form.Item
                     label="Street Address"
                     name='streetAddress'
@@ -159,12 +195,20 @@ const EditClient = () => {
                       required: true,
                       message: 'Please enter address!'
                     }]}>
-                    <Input placeholder="Enter the address of the client" name='address' autoComplete="off" />
+                    <Input
+                      placeholder="Enter the address of the client"
+                      name='address'
+                      autoComplete="off" />
                   </Form.Item>
                 </Col>
               </Row>
               <Row>
-                <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+                <Col
+                  xs={24}
+                  sm={24}
+                  md={12}
+                  lg={12}
+                  className={styles.formCol}>
                   <Form.Item
                     name="state"
                     label="State"
@@ -173,12 +217,21 @@ const EditClient = () => {
                       message: 'Please enter state!'
                     }]}>
                     <Select placeholder="Select State">
-                      <Option value="Arkansas">Arkansas</Option>
-                      <Option value="NewYork">New york</Option>
+                      <Option value="Arkansas">
+                        Arkansas
+                      </Option>
+                      <Option value="NewYork">
+                        New york
+                      </Option>
                     </Select>
                   </Form.Item>
                 </Col>
-                <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+                <Col
+                  xs={24}
+                  sm={24}
+                  md={12}
+                  lg={12}
+                  className={styles.formCol}>
                   <Form.Item
                     name="city"
                     label="City"
@@ -194,7 +247,12 @@ const EditClient = () => {
                 </Col>
               </Row>
               <Row>
-                <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+                <Col
+                  xs={24}
+                  sm={24}
+                  md={12}
+                  lg={12}
+                  className={styles.formCol}>
                   <Form.Item
                     label="Zip Code"
                     name='zipcode'
@@ -202,16 +260,29 @@ const EditClient = () => {
                       required: true,
                       message: 'Please enter zipcode!'
                     }]}>
-                    <Input placeholder="Enter the zipcode" autoComplete="off" />
+                    <Input
+                      placeholder="Enter the zipcode"
+                      autoComplete="off" />
                   </Form.Item>
                 </Col>
               </Row>
-              <Row justify="end" style={{ padding: '1rem 1rem 2rem 0' }}>
+              <Row
+                justify="end"
+                style={{ padding: '1rem 1rem 2rem 0' }}>
                 <Col>
                   <Form.Item>
                     <Space>
-                      <Button type="default" htmlType="button" onClick={cancelAddClient}>Cancel</Button>
-                      <Button type="primary" htmlType="submit">Update Client</Button>
+                      <Button
+                        type="default"
+                        htmlType="button"
+                        onClick={cancelAddClient}>
+                        Cancel
+                      </Button>
+                      <Button
+                        type="primary"
+                        htmlType="submit">
+                        Update Client
+                      </Button>
                     </Space>
                   </Form.Item>
                 </Col>

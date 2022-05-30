@@ -10,15 +10,19 @@ import routes from "../../config/routes";
 import deleteImg from "./../../assets/images/delete_btn.svg";
 import archiveImg from "./../../assets/images/archive_btn.svg";
 import ModalConfirm from "../../components/Modal";
+import constants from '../../config/constants';
 
-import styles from "./style.module.scss";
 import { notifyGraphqlError } from '../../utils/error';
-
+import moment from 'moment';
+import styles from "./style.module.scss";
 
 const { SubMenu } = Menu;
-const COMPANY = gql`
+export const COMPANY = gql`
   query Company {
     Company {
+      paging {
+        total
+      }
       data {
         id
         name
@@ -29,7 +33,7 @@ const COMPANY = gql`
   }
 `
 
-const COMPANY_UPDATE = gql`
+export const COMPANY_UPDATE = gql`
   mutation ClientUpdate($input: CompanyUpdateInput!) {
     CompanyUpdate(input: $input) {
       id
@@ -75,7 +79,17 @@ const archiveBody = () => {
 
 
 const Company = () => {
-  const { data: companyData } = useQuery(COMPANY);
+  const { data: companyData, loading: dataLoading } = useQuery(COMPANY, {
+    fetchPolicy: 'network-only',
+    nextFetchPolicy: 'cache-only'
+  });
+  const [pagingInput, setPagingInput] = useState<{
+    skip: number,
+    currentPage: number,
+  }>({
+    skip: 0,
+    currentPage: 1,
+  });
   const [updateCompany] = useMutation(COMPANY_UPDATE);
   const [visibility, setVisibility] = useState(false);
   const [showArchive, setArchiveModal] = useState(false);
@@ -84,11 +98,9 @@ const Company = () => {
   }
   const setArchiveVisibility = (value: boolean) => {
     setArchiveModal(value)
-  }
-
+  };
   const changeStatus = (value: string, id: string) => {
-    console.log(value, id);
-    let key = 'status'
+    let key = 'status';
     updateCompany({
       variables: {
         input: {
@@ -100,13 +112,33 @@ const Company = () => {
       if (response.errors) {
         return notifyGraphqlError((response.errors))
       }
-      message.success({ content: `Company is updated successfully!`, key, className: 'custom-message' });
+      message.success({
+        content: `Company is updated successfully!`,
+        key,
+        className: 'custom-message'
+      });
     }).catch(notifyGraphqlError)
-  }
+  };
+
+  const changePage = (page: number) => {
+    const newSkip = (page - 1) * constants.paging.perPage;
+    setPagingInput({
+      ...pagingInput,
+      skip: newSkip,
+      currentPage: page,
+    });
+  };
+
 
   const menu = (data: any) => (
     <Menu>
-      <SubMenu title="Change status" key="1">
+      <Menu.Item key="1">
+        <Link to={routes.editCompany.path(data?.id ?? '1')}>
+          Edit Company
+        </Link>
+      </Menu.Item>
+      <Menu.Divider />
+      <SubMenu title="Change status" key="2">
         <Menu.Item key="active" onClick={() => {
           if (data?.status === 'Inactive') {
             changeStatus('Active', data?.id)
@@ -123,12 +155,12 @@ const Company = () => {
           Inactive
         </Menu.Item>
       </SubMenu>
-      {/* <Menu.Divider />
-      <Menu.Item key="2">
+      {/* {/* <Menu.Divider />
+      <Menu.Item key="3">
         <div onClick={() => setArchiveVisibility(true)}>Archive Company</div>
       </Menu.Item>
       <Menu.Divider />
-      <Menu.Item key="3">
+      <Menu.Item key="4">
         <div onClick={() => setModalVisibility(true)}>Delete Company</div>
       </Menu.Item> */}
     </Menu>
@@ -147,6 +179,15 @@ const Company = () => {
       render: (status: string) =>
         <span className={status === 'Active' ? styles['active-status'] : styles['inactive-status']}>
           {status}
+        </span>
+    },
+    {
+      title: 'Created At',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
+      render: (createdAt: string) =>
+        <span>
+          {moment(createdAt).format('YYYY/MM/DD')}
         </span>
     },
     {
@@ -186,9 +227,16 @@ const Company = () => {
           <Row>
             <Col span={24}>
               <Table
+                loading={dataLoading}
                 dataSource={companyData?.Company?.data}
                 columns={columns}
-                rowKey={(record => record?.id)} />
+                rowKey={(record => record?.id)}
+                pagination={{
+                  current: pagingInput.currentPage,
+                  onChange: changePage,
+                  total: companyData?.Company?.paging?.total,
+                  pageSize: constants.paging.perPage
+                }} />
             </Col>
           </Row>
         </Card>
