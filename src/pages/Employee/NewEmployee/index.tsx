@@ -77,7 +77,7 @@ const NewEmployee = () => {
   const navigate = useNavigate();
   const authData = authVar();
 
-  const [UserCreate] = useMutation<UserResponse>(USER_CREATE, {
+  const [userCreate] = useMutation<UserResponse>(USER_CREATE, {
     update(cache, { data }) {
       const userResponse = data?.UserCreate;
       const existingUser = cache.readQuery<UserResponseArray>({
@@ -105,7 +105,7 @@ const NewEmployee = () => {
       }
     }
   })
-  const [ChangeProfilePictureInput] = useMutation(CHANGE_PROFILE_IMAGE);
+  const [changeProfilePictureInput] = useMutation(CHANGE_PROFILE_IMAGE);
   const [form] = Form.useForm();
   const { Option } = Select;
 
@@ -126,7 +126,7 @@ const NewEmployee = () => {
   const onSubmitForm = (values: any) => {
     let key = 'employee'
     message.loading({ content: "New employee adding in progress..", key, className: 'custom-message' })
-    UserCreate({
+    userCreate({
       variables: {
         input: {
           email: values.email,
@@ -156,7 +156,7 @@ const NewEmployee = () => {
           mediaServices.uploadProfileImage(formData).then((res: any) => {
             const avatar = res?.data?.id;
             message.loading({ content: "Uploading user's profile image..", key, className: 'custom-message' })
-            ChangeProfilePictureInput({
+            changeProfilePictureInput({
               variables: {
                 input: {
                   id: user,

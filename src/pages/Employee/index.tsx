@@ -92,9 +92,9 @@ export const USER_ARCHIVE = gql`
 const Employee = () => {
   const loggedInUser = authVar();
   const navigate = useNavigate();
-  const [EmployeeUpdate] = useMutation(USER_UPDATE);
+  const [employeeUpdate] = useMutation(USER_UPDATE);
   
-  const [EmployeeArchive] = useMutation(USER_ARCHIVE,{
+  const [employeeArchive] = useMutation(USER_ARCHIVE,{
     update(cache) {
       const normalizedId = cache.identify({ id: employee.id, __typename: "User" });
       cache.evict({ id: normalizedId });
@@ -163,7 +163,7 @@ const Employee = () => {
   const archiveUser = () => {
     let key = 'archive'
     message.loading({ content: "Archiving employee in progress..", key, className: 'custom-message' });
-    EmployeeArchive({
+    employeeArchive({
       variables: {
         input: {
           id: employee?.id,
@@ -183,7 +183,7 @@ const Employee = () => {
   const changeStatus = (value: string, id: string) => {
     let key = 'status'
     message.loading({ content: "Updating status of employee..", key, className: 'custom-message' });
-    EmployeeUpdate({
+    employeeUpdate({
       variables: {
         input: {
           status: value,

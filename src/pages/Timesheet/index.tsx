@@ -803,7 +803,7 @@ const Timesheet = () => {
             {timeEntryData?.TimeEntry?.data?.length === 0
               &&
               <NoContent
-                title='TimeEntry Not Added!'
+                title='Time entry Not Added!'
                 subtitle='There are no entries added at the moment' />}
 
             <Form

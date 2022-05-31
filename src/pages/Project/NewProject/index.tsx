@@ -41,7 +41,7 @@ const NewProject = () => {
   const navigate = useNavigate();
   const loggedInUser = authVar();
   const { Option } = Select;
-  const [ProjectCreate] = useMutation(PROJECT_CREATE);
+  const [projectCreate] = useMutation(PROJECT_CREATE);
 
   const { data: clientData } = useQuery(CLIENT, {
     fetchPolicy: "network-only",
@@ -65,7 +65,7 @@ const NewProject = () => {
       key,
       className: 'custom-message'
     })
-    ProjectCreate({
+    projectCreate({
       variables: {
         input: {
           name: values.name,

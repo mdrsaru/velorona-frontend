@@ -23,10 +23,10 @@ const ResetPassword = () => {
   const navigate = useNavigate();
   const [ searchParams ] = useSearchParams();
   const [modalVisible, setModalVisible] = useState<boolean>(false);
-  const [ResetPassword] = useMutation(RESET_PASSWORD);
+  const [resetPassword] = useMutation(RESET_PASSWORD);
 
   const onFinish = (values: any) => {
-    ResetPassword({
+    resetPassword({
       variables: {
         input: {
           password: values?.password,

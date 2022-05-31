@@ -30,7 +30,7 @@ export const CLIENT_CREATE = gql`
 const NewClient = () => {
   const authData = authVar();
   const navigate = useNavigate();
-  const [ClientCreate] = useMutation<ClientResponseData>(CLIENT_CREATE);
+  const [clientCreate] = useMutation<ClientResponseData>(CLIENT_CREATE);
   const [form] = Form.useForm();
 
   const cancelAddClient = () => {
@@ -40,7 +40,7 @@ const NewClient = () => {
   const onSubmitForm = (values: any) => {
     let key = 'message';
     message.loading({ content: "New client adding in progress..", key, className: 'custom-message' })
-    ClientCreate({
+    clientCreate({
       variables: {
         input: {
           name: values.name,

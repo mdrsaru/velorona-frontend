@@ -35,7 +35,7 @@ const EditClient = () => {
   let params = useParams();
   const authData = authVar();
   const navigate = useNavigate();
-  const [ClientUpdate] = useMutation<ClientResponseData>(CLIENT_UPDATE);
+  const [clientUpdate] = useMutation<ClientResponseData>(CLIENT_UPDATE);
   const [form] = Form.useForm();
   const { Option } = Select;
 
@@ -60,7 +60,7 @@ const EditClient = () => {
       key,
       className: 'custom-message'
     });
-    ClientUpdate({
+    clientUpdate({
       variables: {
         input: {
           id: params?.cid,
