@@ -215,12 +215,18 @@ const Company = () => {
       <div className={styles['company-main-div']}>
         <Card bordered={false}>
           <Row>
-            <Col span={12} className={styles['form-col']}>
+            <Col
+              span={12}
+              className={styles['form-col']}>
               <h1>Companies</h1>
             </Col>
-            <Col span={12} className={styles['form-col']}>
+            <Col
+              span={12}
+              className={styles['form-col']}>
               <div className={styles['add-new-company']}>
-                <Link to={routes.addCompany.path}>Add new company</Link>
+                <Link to={routes.addCompany.path}>
+                  Add new company
+                </Link>
               </div>
             </Col>
           </Row>

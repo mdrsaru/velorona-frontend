@@ -252,7 +252,11 @@ const EditEmployee = () => {
                 className={styles.formCol}>
                 <Form.Item
                   label="State"
-                  name='state'>
+                  name='state'
+                  rules={[{
+                    required: true,
+                    message: 'Please enter your state!'
+                  }]}>
                   <Input
                     placeholder="Enter the state name"
                     autoComplete="off" />
@@ -266,10 +270,15 @@ const EditEmployee = () => {
                 className={styles.formCol}>
                 <Form.Item
                   label="City"
-                  name='city'>
+                  name='city'
+                  rules={[{
+                    required: true,
+                    message: 'Please enter your city!'
+                  }]}>
                   <Input
                     placeholder="Enter city name"
-                    autoComplete="off" />
+                    autoComplete="off"
+                    />
                 </Form.Item>
               </Col>
               <Col
