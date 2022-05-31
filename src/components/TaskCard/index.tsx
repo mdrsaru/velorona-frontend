@@ -63,6 +63,7 @@ const TaskCard = (props: IProps) => {
           visibility={visibility}
           setVisibility={setVisibility}
           data={task}
+          employee={true}
         />
       )}
     </div>
