@@ -320,7 +320,6 @@ const DetailTimesheet = () => {
       }).then(r => { })
     }
   });
-
   const getTotalTimeByTask = (entries: any) => {
     let durations: any = [];
     const data = Object.values(entries);
@@ -396,7 +395,9 @@ const DetailTimesheet = () => {
         variables: {
           input: {
             ids: arrayEntries.flat(),
-            company_id: authData?.company?.id
+            company_id: authData?.company?.id,
+            created_by: authData?.user?.id,
+            client_id:timeSheetDetail?.Timesheet?.data[0]?.client?.id
           }
         }
       }).then((response) => {
@@ -407,7 +408,6 @@ const DetailTimesheet = () => {
     }
   }
 
-  console.log(timeEntryWeeklyDetails);
 
   return (
     <>
@@ -496,7 +496,7 @@ const DetailTimesheet = () => {
                     Client Name
                   </div>
                   <div>
-                    Araniko College Pvt Ltd
+                  {timeSheetDetail?.Timesheet?.data[0]?.client?.name ?? 'N/A'}
                   </div>
                 </div>
                 <div className={styles['timesheet-div']}>
