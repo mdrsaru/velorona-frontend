@@ -556,10 +556,12 @@ const DetailTimesheet = () => {
               <Col
                 span={12}
                 className={styles['form-col1']}>
-                <span className={styles['add-entry']} onClick={() => {
-                  setShowAddNewEntry(true)
-                  form.resetFields();
-                }}>
+                <span
+                  className={styles['add-entry']}
+                  onClick={() => {
+                    setShowAddNewEntry(true)
+                    form.resetFields();
+                  }}>
                   Add New Time Entry
                 </span>
               </Col>

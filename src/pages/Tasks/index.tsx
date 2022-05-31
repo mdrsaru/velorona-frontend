@@ -116,7 +116,7 @@ const Tasks = () => {
                 ))}
               </Col>
             </Row> :
-            <NoContent title='Content Not Added!' subtitle='There is no content added in the tasks schedule.'/>
+            <NoContent title='Task Not Added!' subtitle='There is no task added in the schedule.'/>
           }
         </Card>
       </div>

@@ -91,12 +91,11 @@ const EditCompany = () => {
               email: companyData?.Company?.data[0]?.email ?? '',
               status: companyData?.Company?.data[0]?.status ?? ''
             }}>
-            <Row>
+            <Row gutter={[24, 0]}>
               <Col
                 xs={24}
                 sm={24}
-                md={12}
-                className={styles['form-col2']}>
+                md={12}>
                 <Form.Item
                   label="Company Name"
                   name="name"
@@ -115,8 +114,7 @@ const EditCompany = () => {
               <Col
                 xs={24}
                 sm={24}
-                md={12}
-                className={styles['form-col2']}>
+                md={12}>
                 <Form.Item
                   name="status"
                   label="Company Status"
@@ -132,6 +130,68 @@ const EditCompany = () => {
                       In Active
                     </Option>
                   </Select>
+                </Form.Item>
+              </Col>
+              <Col
+                xs={24}
+                sm={24}
+                md={12}>
+                <Form.Item
+                  label="State"
+                  name='state'>
+                  <Input
+                    placeholder="Enter the state name"
+                    autoComplete="off" />
+                </Form.Item>
+              </Col>
+              <Col
+                xs={24}
+                sm={24}
+                md={12}>
+                <Form.Item
+                  label="City"
+                  name='city'>
+                  <Input
+                    placeholder="Enter city name"
+                    autoComplete="off" />
+                </Form.Item>
+              </Col>
+              <Col
+                xs={24}
+                sm={24}
+                md={12}>
+                <Form.Item
+                  label="Street Address"
+                  name='streetAddress'>
+                  <Input
+                    placeholder="Enter street address"
+                    autoComplete="off" />
+                </Form.Item>
+              </Col>
+              <Col
+                xs={24}
+                sm={24}
+                md={12}
+                lg={12}>
+                <Form.Item
+                  label="Apartment/Suite"
+                  name='apartment'>
+                  <Input
+                    placeholder="Enter your apartment no"
+                    autoComplete="off" />
+                </Form.Item>
+              </Col>
+              <Col
+                xs={24}
+                sm={24}
+                md={12}
+                lg={12}>
+                <Form.Item
+                  label="Zip Code"
+                  name='zipcode'>
+                  <Input
+                    placeholder="Enter the zipcode"
+                    autoComplete="off" />
                 </Form.Item>
               </Col>
             </Row>
