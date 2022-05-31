@@ -45,10 +45,13 @@
   line-height: 17px;
 }
 
+.statusDiv{
+  
+}
 .task-title {
   font-weight: 600;
   font-size: 24px;
-  line-height: 29px;
+  line-height: 40px;
 }
 
 .task-body {
@@ -81,4 +84,9 @@
 
 .modal-body {
   padding: 1rem;
+}
+
+.status-div{
+  background: var(--gray-2);
+  padding:1rem;
 }
