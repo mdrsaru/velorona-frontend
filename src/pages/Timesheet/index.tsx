@@ -804,7 +804,7 @@ const Timesheet = () => {
               &&
               <NoContent
                 title='TimeEntry Not Added!'
-                subtitle='There is no entries added at the moment' />}
+                subtitle='There are no entries added at the moment' />}
 
             <Form
               form={timeEntryForm}
