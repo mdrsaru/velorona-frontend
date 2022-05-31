@@ -9,7 +9,7 @@ import moment from 'moment';
 import { gql, useLazyQuery, useQuery, useMutation } from '@apollo/client';
 import { useNavigate, useParams } from 'react-router-dom';
 import { authVar } from '../../../App/link';
-import _, { divide } from 'lodash';
+import _ from 'lodash';
 
 import { notifyGraphqlError } from "../../../utils/error";
 import { useState } from 'react';
@@ -23,6 +23,7 @@ import { TASK } from '../../Tasks';
 import { PROJECT } from '../../Project';
 import TimeSheetLoader from '../../../components/Skeleton/TimeSheetLoader';
 import styles from '../style.module.scss';
+
 export const TIME_SHEET = gql`
 query Timesheet($input: TimesheetQueryInput!) {
   Timesheet(input: $input) {
@@ -412,7 +413,9 @@ const DetailTimesheet = () => {
         variables: {
           input: {
             ids: arrayEntries.flat(),
-            company_id: authData?.company?.id
+            company_id: authData?.company?.id,
+            created_by: authData?.user?.id,
+            client_id: timeSheetDetail?.Timesheet?.data[0]?.client?.id
           }
         }
       }).then((response) => {
@@ -510,7 +513,7 @@ const DetailTimesheet = () => {
                     Client Name
                   </div>
                   <div>
-                    Araniko College Pvt Ltd
+                    {timeSheetDetail?.Timesheet?.data[0]?.client?.name ?? 'N/A'}
                   </div>
                 </div>
                 <div className={styles['timesheet-div']}>

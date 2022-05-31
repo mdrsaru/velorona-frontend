@@ -800,7 +800,11 @@ const Timesheet = () => {
               <Col span={4}></Col>
             </Row>
 
-            {timeEntryData?.TimeEntry?.data?.length === 0 && <NoContent title={"Time Entry"} />}
+            {timeEntryData?.TimeEntry?.data?.length === 0
+              &&
+              <NoContent
+                title='TimeEntry Not Added!'
+                subtitle='There is no entries added at the moment' />}
 
             <Form
               form={timeEntryForm}
