@@ -18,10 +18,11 @@ import deleteImg from "../../../assets/images/delete_btn.svg";
 import ModalConfirm from '../../../components/Modal';
 import EditTimeSheet from '../EditTimesheet';
 
-import styles from '../style.module.scss';
+import constants from "../../../config/constants";
 import { TASK } from '../../Tasks';
 import { PROJECT } from '../../Project';
 import TimeSheetLoader from '../../../components/Skeleton/TimeSheetLoader';
+import styles from '../style.module.scss';
 
 export const TIME_SHEET = gql`
 query Timesheet($input: TimesheetQueryInput!) {
@@ -39,11 +40,7 @@ query Timesheet($input: TimesheetQueryInput!) {
       totalExpense
       duration
       durationFormat
-			status
-      approver {
-        createdAt
-        fullName
-      }
+      
       user {
         id
         email
@@ -55,6 +52,28 @@ query Timesheet($input: TimesheetQueryInput!) {
       company {
         id
         name
+      }
+      projectItems {
+        project_id
+        totalDuration
+        totalExpense
+        hourlyRate
+      }
+      durationMap
+      timeEntries {
+        id
+        startTime
+        endTime
+        duration
+        task {
+          id
+          name
+        }
+        project {
+          id
+          name
+        }
+        task_id
       }
     }
   }
@@ -130,7 +149,6 @@ function getWeekDays(date: any) {
 export const getTotalTimeForADay = (entries: any) => {
   let sum = 0;
   if (entries) {
-    console.log(entries);
     const durations = entries.map((data: any) => data?.duration)
     sum = durations.reduce((entry1: any, entry2: any) => {
       return entry1 + entry2;
@@ -203,7 +221,7 @@ const DetailTimesheet = () => {
     })
     if (!ids.includes(task[0]?.id)) {
       setTimeSheetWeekly([...timeSheetWeekly, timeEntry])
-    }
+    };
     setShowAddNewEntry(false);
     form.resetFields();
   }
@@ -222,25 +240,7 @@ const DetailTimesheet = () => {
         }
       }
     }
-  });
-
-  const [getWeeklyTimeEntry, {
-    loading: loadWeekly,
-    data: timeEntryWeeklyDetails }] =
-    useLazyQuery(TIME_ENTRY_WEEKLY_DETAILS, {
-      fetchPolicy: "network-only",
-      nextFetchPolicy: "cache-first",
-      variables: {
-        input: {
-          company_id: authData?.company?.id ?? '',
-          startTime: '',
-          endTime: ''
-        }
-      },
-      onCompleted: () => {
-        groupByDate()
-      }
-    });
+  })
 
   const setModalVisibility = (value: boolean) => {
     setVisibility(value)
@@ -280,22 +280,22 @@ const DetailTimesheet = () => {
     }
   });
 
-  const { data: timeSheetDetail } = useQuery(TIME_SHEET, {
+  const { data: timeSheetDetail, loading: loadWeekly, refetch: refetchTimeSheet } = useQuery(TIME_SHEET, {
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
     variables: {
       input: {
         query: {
           company_id: authData?.company?.id,
-          id: params?.id,
-          user_id: authData?.user?.id
+          id: params?.id
         },
         paging: {
-          order: ['createdAt:DESC']
+          order: ['weekStartDate:DESC']
         }
       }
     },
     onCompleted: (timeData) => {
+      groupByDate()
       getProject({
         variables: {
           input: {
@@ -309,17 +309,9 @@ const DetailTimesheet = () => {
           }
         }
       }).then(r => { })
-      getWeeklyTimeEntry({
-        variables: {
-          input: {
-            company_id: authData?.company?.id ?? '',
-            startTime: timeData?.Timesheet?.data[0]?.weekStartDate,
-            endTime: timeData?.Timesheet?.data[0]?.weekEndDate
-          }
-        }
-      }).then(r => { })
     }
-  });
+  })
+
   const getTotalTimeByTask = (entries: any) => {
     let durations: any = [];
     const data = Object.values(entries);
@@ -342,7 +334,7 @@ const DetailTimesheet = () => {
 
   function groupByDate() {
     let grouped: any = [];
-    const tasks = _.groupBy(timeEntryWeeklyDetails?.TimeEntryWeeklyDetails, 'task_id');
+    const tasks = _.groupBy(timeSheetDetail?.Timesheet?.data[0]?.timeEntries, 'task_id');
     for (const [key, value] of Object.entries(tasks)) {
       grouped.push({
         id: key,
@@ -378,7 +370,33 @@ const DetailTimesheet = () => {
   const showEditTimesheet = (value: any, timesheet: any) => {
     setEditTimesheet(value);
     setTimesheet(timesheet);
+    refetchTimeSheet({
+      input: {
+        query: {
+          company_id: authData?.company?.id,
+          id: params?.id
+        },
+        paging: {
+          order: ['weekStartDate:DESC']
+        }
+      }
+    })
     setEditModal(true);
+  }
+
+  const editModal = () => {
+    refetchTimeSheet({
+      input: {
+        query: {
+          company_id: authData?.company?.id,
+          id: params?.id
+        },
+        paging: {
+          order: ['weekStartDate:DESC']
+        }
+      }
+    })
+    setEditModal(false)
   }
 
   const onDeleteBulkTimeEntry = () => {
@@ -397,7 +415,7 @@ const DetailTimesheet = () => {
             ids: arrayEntries.flat(),
             company_id: authData?.company?.id,
             created_by: authData?.user?.id,
-            client_id:timeSheetDetail?.Timesheet?.data[0]?.client?.id
+            client_id: timeSheetDetail?.Timesheet?.data[0]?.client?.id
           }
         }
       }).then((response) => {
@@ -407,7 +425,6 @@ const DetailTimesheet = () => {
       }).catch(notifyGraphqlError)
     }
   }
-
 
   return (
     <>
@@ -496,7 +513,7 @@ const DetailTimesheet = () => {
                     Client Name
                   </div>
                   <div>
-                  {timeSheetDetail?.Timesheet?.data[0]?.client?.name ?? 'N/A'}
+                    {timeSheetDetail?.Timesheet?.data[0]?.client?.name ?? 'N/A'}
                   </div>
                 </div>
                 <div className={styles['timesheet-div']}>
@@ -539,10 +556,12 @@ const DetailTimesheet = () => {
               <Col
                 span={12}
                 className={styles['form-col1']}>
-                <span className={styles['add-entry']} onClick={() => {
-                  setShowAddNewEntry(true)
-                  form.resetFields();
-                }}>
+                <span
+                  className={styles['add-entry']}
+                  onClick={() => {
+                    setShowAddNewEntry(true)
+                    form.resetFields();
+                  }}>
                   Add New Time Entry
                 </span>
               </Col>
@@ -571,7 +590,7 @@ const DetailTimesheet = () => {
                     </div>
                   </div>
 
-                  {timeSheetWeekly?.map((timesheet: any, index: number) =>
+                  {timeSheetWeekly && timeSheetWeekly?.map((timesheet: any, index: number) =>
                     <div
                       className={styles["resp-table-body"]}
                       key={index}>
@@ -585,14 +604,19 @@ const DetailTimesheet = () => {
                         <div
                           className={styles["table-body-cell"]}
                           key={timeIndex}>
-                          <Input
-                            type="text"
-                            onClick={() =>
-                              showEditTimesheet(moment(day).format('YYYY-MM-DD'), timesheet)
-                            }
-                            value={
-                              getTimeFormat(getTotalTimeForADay(timesheet?.entries[moment(day).format('ddd, MMM D')]))
-                            } />
+                          {authData?.user?.roles.includes(constants.roles.TaskManager) ?
+                            <div>
+                              {getTimeFormat(getTotalTimeForADay(timesheet?.entries[moment(day).format('ddd, MMM D')]))}
+                            </div> :
+                            <Input
+                              type="text"
+                              onClick={() =>
+                                showEditTimesheet(moment(day).format('YYYY-MM-DD'), timesheet)
+                              }
+                              value={
+                                getTimeFormat(getTotalTimeForADay(timesheet?.entries[moment(day).format('ddd, MMM D')]))
+                              } />
+                          }
                         </div>
                       )}
                       <div className={styles["table-body-cell"]}>
@@ -607,6 +631,30 @@ const DetailTimesheet = () => {
                           }} />
                       </div>
                     </div>)}
+                </div>
+              </Col>
+            </Row>
+            <Row>
+              <Col
+                span={24}
+                className={styles['form-col']}>
+                <div className={styles['resp-table']}>
+                  <div className={styles["resp-table-header"]}>
+                    <div className={styles['table-header-cell']}>
+                      Total
+                    </div>
+                    <div className={styles['table-header-cell']}>
+                    </div>
+                    {getWeekDays(timeSheetDetail?.Timesheet?.data[0]?.weekStartDate).map((day: any, index: number) =>
+                      <div
+                        className={styles['table-header-cell']}
+                        key={index}>
+                        {getTimeFormat(timeSheetDetail?.Timesheet?.data[0]?.durationMap[moment(day).format('YYYY-MM-DD')])}
+                      </div>)}
+                    <div className={styles['table-header-cell']}>
+                      Total
+                    </div>
+                  </div>
                 </div>
               </Col>
             </Row>
@@ -634,7 +682,7 @@ const DetailTimesheet = () => {
       }
 
       <EditTimeSheet
-        setVisibility={() => setEditModal(false)}
+        setVisibility={editModal}
         visible={showEditModal}
         day={editTimesheet}
         total={getTotalTimeForADay(timesheet?.entries[moment(editTimesheet).format('ddd, MMM D')])}

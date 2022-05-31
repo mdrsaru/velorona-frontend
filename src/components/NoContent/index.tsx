@@ -4,7 +4,7 @@ import noContent from '../../assets/images/no_content.svg';
 import styles from "./style.module.scss";
 
 const NoContent = (props: any) => {
-  const {title} = props
+  const {title, subtitle} = props
 
   return (
 
@@ -13,8 +13,8 @@ const NoContent = (props: any) => {
       <Image src={noContent} preview={false}  className={styles['image']}/>
     
     <div >
-      <p className={styles['title']}> Content Not Found !</p>
-      <p className={styles['sub-title']}>The content you are searching for is not found</p>
+      <p className={styles['title']}> {title}</p>
+      <p className={styles['sub-title']}>{subtitle}</p>
 
     </div>
   </div>

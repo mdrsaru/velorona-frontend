@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Modal, Row, Col, Button, TimePicker } from 'antd';
+import { useEffect, useState } from 'react';
+import { Modal, Row, Col, Button, TimePicker, message } from 'antd';
 import { CloseOutlined } from "@ant-design/icons";
 import { Form, Input } from 'antd';
 import moment, { Moment } from 'moment';
@@ -50,9 +50,12 @@ const EditTimeSheet = (props: IProps) => {
   const authData = authVar();
   const [updateTimeEntry] = useMutation(UPDATE_TIME_ENTRY);
   const [createTimeEntry] = useMutation(CREATE_TIME_ENTRY);
-  const [totalDuration, setTotalDuration] = useState<number>(props?.total ?? '');
+  const [totalDuration, setTotalDuration] = useState<number>(0);
   const [timeEntryId, setTimeEntry] = useState('');
 
+  useEffect(() => {
+    setTotalDuration(props?.total)
+  }, [props?.total])
   const onChangeTime = (time: Moment, id: string, type: string) => {
     let formData: {
       id: '' | string,
@@ -63,7 +66,7 @@ const EditTimeSheet = (props: IProps) => {
       id: id ?? '',
       company_id: authData?.company?.id ?? ''
     }
-    let newTime = moment(props?.day).format('YYYY-MM-DD') + moment(time, " HH:mm:ss")
+    let newTime = moment(props?.day).format('YYYY-MM-DD') + moment(time).format(' HH:mm:ss')
     type === 'start' ? formData['startTime'] = newTime : formData['endTime'] = newTime;
 
     updateTimeEntry({
@@ -83,7 +86,7 @@ const EditTimeSheet = (props: IProps) => {
       createTimeEntry({
         variables: {
           input: {
-            startTime: moment(props?.day).format('YYYY-MM-DD') + moment(time, "HH:mm:ss"),
+            startTime: moment(props?.day).format('YYYY-MM-DD') + moment(time).format(' HH:mm:ss'),
             task_id: taskId,
             project_id: projectId,
             company_id: authData?.company?.id,
@@ -102,17 +105,23 @@ const EditTimeSheet = (props: IProps) => {
   }
 
   const resetForm = () => {
-    form.resetFields();
-    setTotalDuration(0);
-  }
+    let data = form.getFieldsValue(['start-time', 'end-time']);
+    if (data['start-time'] && !data['end-time']) {
+      message.error('Update the end-time before closing.');
+    } else {
+      form.resetFields();
+      setTotalDuration(0);
+      props?.setVisibility()
+    }
 
+  };
   return (
     <Modal
       centered
       visible={props?.visible}
       closeIcon={[
         <div
-          onClick={props?.setVisibility}
+          onClick={resetForm}
           key={1}>
           <span className={styles['close-icon-div']}>
             <CloseOutlined />
@@ -163,8 +172,8 @@ const EditTimeSheet = (props: IProps) => {
               layout="vertical"
               onFinish={resetForm}
               name="timesheet-form">
-              {props?.timesheetDetail?.entries[props?.day] ?
-                props?.timesheetDetail?.entries[props?.day]?.map((entry: any, index: number) => (
+              {props?.timesheetDetail?.entries[moment(props?.day).format('ddd, MMM D')] ?
+                props?.timesheetDetail?.entries[moment(props?.day).format('ddd, MMM D')]?.map((entry: any, index: number) => (
                   <Row
                     key={index}
                     className={styles['form-div']}
@@ -300,7 +309,7 @@ const EditTimeSheet = (props: IProps) => {
                 </Row>}
               <br /> <br />
               <Form.Item style={{ float: 'right' }}>
-                <Button type="primary" htmlType='submit' onClick={props?.setVisibility}>
+                <Button type="primary" htmlType='submit'>
                   Exit
                 </Button>
               </Form.Item>

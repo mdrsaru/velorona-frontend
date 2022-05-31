@@ -15,9 +15,10 @@ const { Option } = Select;
 const COMPANY_CREATE = gql`
   mutation CompanyCreate($input: CompanyCreateInput!) {
       CompanyCreate(input: $input) {
-          id
-          name
-          createdAt 
+        id
+        name
+        status
+        createdAt 
       }
   }
 `
@@ -49,15 +50,25 @@ const NewCompany = () => {
     <div className={styles['company-main-div']}>
       <Card bordered={false}>
         <Row>
-          <Col span={24} className={styles['form-col']}>
+          <Col
+            span={24}
+            className={styles['form-col']}>
             <h1>
-              <ArrowLeftOutlined onClick={() => navigate(-1)} /> &nbsp; Add New Company
+              <ArrowLeftOutlined onClick={() => navigate(-1)} />
+              &nbsp;
+              Add New Company
             </h1>
           </Col>
         </Row>
-        <Form form={form} layout="vertical" onFinish={onSubmitForm}>
-          <Row>
-            <Col xs={24} sm={24} md={12} className={styles['form-col2']}>
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={onSubmitForm}>
+          <Row gutter={[24, 24]}>
+            <Col
+              xs={24}
+              sm={24}
+              md={12}>
               <Form.Item
                 label="Company Name"
                 name="name"
@@ -68,10 +79,15 @@ const NewCompany = () => {
                   max: 50,
                   message: "Name should be less than 50 character"
                 }]}>
-                <Input placeholder="Enter Name of the company" autoComplete="off" />
+                <Input
+                  placeholder="Enter Name of the company"
+                  autoComplete="off" />
               </Form.Item>
             </Col>
-            <Col xs={24} sm={24} md={12} className={styles['form-col2']}>
+            <Col
+              xs={24}
+              sm={24}
+              md={12}>
               <Form.Item
                 name="status"
                 label="Company Status"
@@ -80,14 +96,21 @@ const NewCompany = () => {
                   message: 'Select a company status.'
                 }]}>
                 <Select placeholder="Active">
-                  <Option value="Active">Active</Option>
-                  <Option value="Inactive">In Active</Option>
+                  <Option value="Active">
+                    Active
+                  </Option>
+                  <Option value="Inactive">
+                    In Active
+                  </Option>
                 </Select>
               </Form.Item>
             </Col>
           </Row>
-          <Row>
-            <Col span={24} className={styles['form-col2']}>
+          <Row gutter={[24, 24]}>
+            <Col
+              xs={24}
+              sm={24}
+              md={12}>
               <Form.Item
                 label="Email"
                 name='email'
@@ -98,17 +121,90 @@ const NewCompany = () => {
                   required: true,
                   message: 'Please input your E-mail!'
                 },]}>
-                <Input placeholder="Company Admin Email" autoComplete="off" />
+                <Input
+                  placeholder="Company Admin Email"
+                  autoComplete="off" />
+              </Form.Item>
+            </Col>
+            <Col
+              xs={24}
+              sm={24}
+              md={12}>
+              <Form.Item
+                label="State"
+                name='state'>
+                <Input
+                  placeholder="Enter the state name"
+                  autoComplete="off" />
+              </Form.Item>
+            </Col>
+            <Col
+              xs={24}
+              sm={24}
+              md={12}>
+              <Form.Item
+                label="City"
+                name='city'>
+                <Input
+                  placeholder="Enter city name"
+                  autoComplete="off" />
+              </Form.Item>
+            </Col>
+            <Col
+              xs={24}
+              sm={24}
+              md={12}>
+              <Form.Item
+                label="Street Address"
+                name='streetAddress'>
+                <Input
+                  placeholder="Enter street address"
+                  autoComplete="off" />
+              </Form.Item>
+            </Col>
+            <Col
+              xs={24}
+              sm={24}
+              md={12}
+              lg={12}>
+              <Form.Item
+                label="Apartment/Suite"
+                name='apartment'>
+                <Input
+                  placeholder="Enter your apartment no"
+                  autoComplete="off" />
+              </Form.Item>
+            </Col>
+            <Col
+              xs={24}
+              sm={24}
+              md={12}
+              lg={12}>
+              <Form.Item
+                label="Zip Code"
+                name='zipcode'>
+                <Input
+                  placeholder="Enter the zipcode"
+                  autoComplete="off" />
               </Form.Item>
             </Col>
           </Row>
-          <br /><br />
+          <br />
+          <br />
           <Row justify="end">
             <Col>
               <Form.Item>
                 <Space size={'large'}>
-                  <Button type="default" htmlType="button">Cancel</Button>
-                  <Button type="primary" htmlType="submit">Add Company</Button>
+                  <Button
+                    type="default"
+                    htmlType="button">
+                    Cancel
+                  </Button>
+                  <Button
+                    type="primary"
+                    htmlType="submit">
+                    Add Company
+                  </Button>
                 </Space>
               </Form.Item>
             </Col>

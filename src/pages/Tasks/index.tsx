@@ -9,6 +9,7 @@ import styles from "./style.module.scss";
 import { authVar } from "../../App/link";
 import _ from "lodash";
 import TaskCard from "../../components/TaskCard";
+import NoContent from "../../components/NoContent";
 
 export const TASK = gql`
     query Task($input: TaskQueryInput!) {
@@ -71,49 +72,52 @@ const Tasks = () => {
               <h1>My Tasks Schedule</h1>
             </Col>
           </Row>
-          <Row>
-            <Col xs={24} sm={24} md={8} lg={8}>
-              <div className={styles["task-header"]}>
-                <div className={styles["task-status"]}>Scheduled Tasks</div>
-                <div className={styles["count"]}>
-                  {groups?.Scheduled?.length}
+          {tasks?.length > 0 ?
+            <Row>
+              <Col xs={24} sm={24} md={8} lg={8}>
+                <div className={styles["task-header"]}>
+                  <div className={styles["task-status"]}>Scheduled Tasks</div>
+                  <div className={styles["count"]}>
+                    {groups?.Scheduled?.length}
+                  </div>
                 </div>
-              </div>
-              {groups?.Scheduled?.map((task, index) => (
-                <div key={index}>
-                  <TaskCard task={task} />
-                </div>
-              ))}
-            </Col>
+                {groups?.Scheduled?.map((task, index) => (
+                  <div key={index}>
+                    <TaskCard task={task} />
+                  </div>
+                ))}
+              </Col>
 
-            <Col xs={24} sm={24} md={8} lg={8}>
-              <div className={styles["task-header"]}>
-                <div className={styles["task-status"]}>On Going Tasks</div>
-                <div className={styles["count"]}>
-                  {groups?.InProgress?.length}
+              <Col xs={24} sm={24} md={8} lg={8}>
+                <div className={styles["task-header"]}>
+                  <div className={styles["task-status"]}>On Going Tasks</div>
+                  <div className={styles["count"]}>
+                    {groups?.InProgress?.length}
+                  </div>
                 </div>
-              </div>
-              {groups?.InProgress?.map((task, index) => (
-                <div key={index}>
-                  <TaskCard task={task} />
-                </div>
-              ))}
-            </Col>
+                {groups?.InProgress?.map((task, index) => (
+                  <div key={index}>
+                    <TaskCard task={task} />
+                  </div>
+                ))}
+              </Col>
 
-            <Col xs={24} sm={24} md={8} lg={8}>
-              <div className={styles["task-header"]}>
-                <div className={styles["task-status"]}>Completed Tasks</div>
-                <div className={styles["count"]}>
-                  {groups?.Completed?.length}
+              <Col xs={24} sm={24} md={8} lg={8}>
+                <div className={styles["task-header"]}>
+                  <div className={styles["task-status"]}>Completed Tasks</div>
+                  <div className={styles["count"]}>
+                    {groups?.Completed?.length}
+                  </div>
                 </div>
-              </div>
-              {groups?.Completed?.map((task, index) => (
-                <div key={index}>
-                  <TaskCard task={task} />
-                </div>
-              ))}
-            </Col>
-          </Row>
+                {groups?.Completed?.map((task, index) => (
+                  <div key={index}>
+                    <TaskCard task={task} />
+                  </div>
+                ))}
+              </Col>
+            </Row> :
+            <NoContent title='Task Not Added!' subtitle='There is no task added in the schedule.'/>
+          }
         </Card>
       </div>
     </>

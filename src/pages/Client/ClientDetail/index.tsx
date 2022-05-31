@@ -2,7 +2,6 @@ import { Modal } from "antd";
 import { CloseOutlined } from "@ant-design/icons";
 
 import styles from "./style.module.scss";
-import { Client } from "../../../interfaces/generated";
 
 interface IProps {
   visible: boolean;

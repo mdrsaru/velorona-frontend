@@ -95,14 +95,14 @@ const Sidebar = (props: any) => {
       name: routes.timesheet.name,
       icon: <FieldTimeOutlined />,
       route: routes.timesheet.path(loggedInUser?.company?.code ?? ''),
-      accessRoles: [constants.roles.Employee, constants.roles.TaskManager]
+      accessRoles: [constants.roles.Employee]
     },
     {
       key: routes.tasks.key,
       name: routes.tasks.name,
       icon: <OrderedListOutlined />,
       route: routes.tasks.path(loggedInUser?.company?.code ?? ''),
-      accessRoles: [constants.roles.Employee, constants.roles.TaskManager]
+      accessRoles: [constants.roles.Employee]
     },
     {
       key: routes.projects.key,
@@ -123,14 +123,14 @@ const Sidebar = (props: any) => {
       name: routes.employeeTimesheet.name,
       icon: <FieldTimeOutlined />,
       route: routes.employeeTimesheet.path(loggedInUser?.company?.code ?? ''),
-      accessRoles: [constants.roles.CompanyAdmin]
+      accessRoles: [constants.roles.CompanyAdmin, constants.roles.TaskManager]
     },
     {
       key: routes.schedule.key,
       name: routes.schedule.name,
       icon: <ScheduleOutlined />,
       route: routes.schedule.path(loggedInUser?.company?.code ?? ''),
-      accessRoles: [constants.roles.Employee, constants.roles.TaskManager]
+      accessRoles: [constants.roles.Employee]
     }
   ]
   const menuArray = menuItems.filter(menu => {return loggedInUser?.user?.roles?.some(role => menu.accessRoles.includes(role))})

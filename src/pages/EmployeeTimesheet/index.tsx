@@ -50,23 +50,24 @@ const EmployeeTimesheet = () => {
     currentPage: 1,
   });
 
-  const { 
+  const {
     data: timesheetData,
-    loading: timesheetLoading 
+    loading: timesheetLoading
   } = useQuery<TimesheetPagingData, { input: TimesheetQueryInput }>(
     EMPLOYEE_TIMESHEET, {
-      fetchPolicy: 'network-only',
-      nextFetchPolicy: 'cache-first',
-      variables: {
-        input: {
-          query: {
-            company_id,
-          },
+    fetchPolicy: 'network-only',
+    nextFetchPolicy: 'cache-first',
+    variables: {
+      input: {
+        query: {
+          company_id,
         },
       },
-      onError: notifyGraphqlError,
     },
+    onError: notifyGraphqlError,
+  },
   );
+  console.log(authData);
 
   const changePage = (page: number) => {
     const newSkip = (page - 1) * constants.paging.perPage;
@@ -95,6 +96,9 @@ const EmployeeTimesheet = () => {
     {
       title: 'Last Approved',
       dataIndex: 'lastApprovedAt',
+      render: (lastApprovedAt: any) => {
+        return <span>{lastApprovedAt ? lastApprovedAt : 'N/A'}</span>
+      }
     },
     {
       title: 'Expense',
@@ -109,13 +113,21 @@ const EmployeeTimesheet = () => {
     },
     {
       title: 'Action',
-      render: (timesheet: Timesheet) =>
-      <Link 
-        className={styles['invoice-link']} 
-        to={routes.timesheetInvoice.path(authData?.company?.code as string, timesheet.id)}
-      >
-        Invoice
-      </Link>
+      render: (timesheet: Timesheet) => {
+        return <span>
+          {authData?.user?.roles.includes(constants.roles.TaskManager) ?
+            <Link
+              className={styles['invoice-link']}
+              to={routes.detailTimesheet.path(authData?.company?.code as string, timesheet.id)}>
+              Details
+            </Link> :
+            <Link
+              className={styles['invoice-link']}
+              to={routes.timesheetInvoice.path(authData?.company?.code as string, timesheet.id)}>
+              Invoice
+            </Link>}
+        </span>
+      }
     },
   ];
 
@@ -130,7 +142,7 @@ const EmployeeTimesheet = () => {
               loading={timesheetLoading}
               dataSource={dataSource}
               columns={columns}
-              rowKey={(record => record.id)} 
+              rowKey={(record => record.id)}
               pagination={{
                 current: pagingInput.currentPage,
                 onChange: changePage,

@@ -27,7 +27,7 @@ const EditEmployee = () => {
   let params = useParams();
   const navigate = useNavigate();
   const [userUpdate] = useMutation(USER_UPDATE);
-  const [ChangeProfilePictureInput] = useMutation(CHANGE_PROFILE_IMAGE);
+  const [changeProfilePictureInput] = useMutation(CHANGE_PROFILE_IMAGE);
   const { data: roles } = useQuery(ROLES, {
     fetchPolicy: "cache-first"
   });
@@ -49,7 +49,7 @@ const EditEmployee = () => {
   }
 
   const successMessage = () => {
-    message.success(`Employee is updated successfully!`).then(r => {});
+    message.success(`Employee is updated successfully!`).then(r => { });
     navigate(-1)
   }
 
@@ -80,7 +80,7 @@ const EditEmployee = () => {
           mediaServices.uploadProfileImage(formData).then((res: any) => {
             const user = params?.eid;
             const avatar = res?.data?.id;
-            ChangeProfilePictureInput({
+            changeProfilePictureInput({
               variables: {
                 input: {
                   id: user,
@@ -108,7 +108,10 @@ const EditEmployee = () => {
         <Row style={{ height: '122px' }}>
           <Col span={12} className={styles['employee-col']}>
             <h1>
-              <ArrowLeftOutlined onClick={() => navigate(-1)} /> &nbsp; Edit Employee
+              <ArrowLeftOutlined
+                onClick={() => navigate(-1)} />
+              &nbsp;
+              Edit Employee
             </h1>
           </Col>
         </Row>
@@ -140,7 +143,12 @@ const EditEmployee = () => {
               </Col>
             </Row>
             <Row>
-              <Col xs={24} sm={24} md={8} lg={8} className={styles.formCol}>
+              <Col
+                xs={24}
+                sm={24}
+                md={8}
+                lg={8}
+                className={styles.formCol}>
                 <Form.Item
                   label="First Name"
                   name='firstName'
@@ -148,17 +156,31 @@ const EditEmployee = () => {
                     required: true,
                     message: 'Please enter the firstname'
                   }]}>
-                  <Input placeholder="Enter firstname" autoComplete="off" />
+                  <Input
+                    placeholder="Enter firstname"
+                    autoComplete="off" />
                 </Form.Item>
               </Col>
-              <Col xs={24} sm={24} md={8} lg={8} className={styles.formCol}>
+              <Col
+                xs={24}
+                sm={24}
+                md={8}
+                lg={8}
+                className={styles.formCol}>
                 <Form.Item
                   label="Middle Name"
                   name='middleName'>
-                  <Input placeholder="Enter middle name" autoComplete="off" />
+                  <Input
+                    placeholder="Enter middle name"
+                    autoComplete="off" />
                 </Form.Item>
               </Col>
-              <Col xs={24} sm={24} md={8} lg={8} className={styles.formCol}>
+              <Col
+                xs={24}
+                sm={24}
+                md={8}
+                lg={8}
+                className={styles.formCol}>
                 <Form.Item
                   label="Last Name"
                   name='lastName'
@@ -166,12 +188,19 @@ const EditEmployee = () => {
                     required: true,
                     message: 'Please select the lastname'
                   }]}>
-                  <Input placeholder="Enter lastname" autoComplete="off" />
+                  <Input
+                    placeholder="Enter lastname"
+                    autoComplete="off" />
                 </Form.Item>
               </Col>
             </Row>
             <Row>
-              <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+              <Col
+                xs={24}
+                sm={24}
+                md={12}
+                lg={12}
+                className={styles.formCol}>
                 <Form.Item
                   label="Email"
                   name='email'
@@ -182,10 +211,17 @@ const EditEmployee = () => {
                     required: true,
                     message: 'Please input your E-mail!'
                   }]}>
-                  <Input placeholder="Enter your email" autoComplete="off" />
+                  <Input
+                    placeholder="Enter your email"
+                    autoComplete="off" />
                 </Form.Item>
               </Col>
-              <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+              <Col
+                xs={24}
+                sm={24}
+                md={12}
+                lg={12}
+                className={styles.formCol}>
                 <Form.Item
                   label="Phone Number"
                   name='phone'
@@ -196,7 +232,9 @@ const EditEmployee = () => {
                     max: 10,
                     message: "Phone number should be less than 10 digits"
                   }]}>
-                  <Input placeholder="Enter your phone number" autoComplete="off" />
+                  <Input
+                    placeholder="Enter your phone number"
+                    autoComplete="off" />
                 </Form.Item>
               </Col>
             </Row>
@@ -206,21 +244,49 @@ const EditEmployee = () => {
               </Col>
             </Row>
             <Row>
-              <Col xs={24} sm={24} md={8} lg={8} className={styles.formCol}>
+              <Col
+                xs={24}
+                sm={24}
+                md={8}
+                lg={8}
+                className={styles.formCol}>
                 <Form.Item
                   label="State"
-                  name='state'>
-                  <Input placeholder="Enter the state name" autoComplete="off" />
+                  name='state'
+                  rules={[{
+                    required: true,
+                    message: 'Please enter your state!'
+                  }]}>
+                  <Input
+                    placeholder="Enter the state name"
+                    autoComplete="off" />
                 </Form.Item>
               </Col>
-              <Col xs={24} sm={24} md={8} lg={8} className={styles.formCol}>
+              <Col
+                xs={24}
+                sm={24}
+                md={8}
+                lg={8}
+                className={styles.formCol}>
                 <Form.Item
                   label="City"
-                  name='city'>
-                  <Input placeholder="Enter city name" autoComplete="off" />
+                  name='city'
+                  rules={[{
+                    required: true,
+                    message: 'Please enter your city!'
+                  }]}>
+                  <Input
+                    placeholder="Enter city name"
+                    autoComplete="off"
+                    />
                 </Form.Item>
               </Col>
-              <Col xs={24} sm={24} md={8} lg={8} className={styles.formCol}>
+              <Col
+                xs={24}
+                sm={24}
+                md={8}
+                lg={8}
+                className={styles.formCol}>
                 <Form.Item
                   label="Street Address"
                   name='streetAddress'
@@ -228,23 +294,39 @@ const EditEmployee = () => {
                     required: true,
                     message: 'Please select the street address'
                   }]}>
-                  <Input placeholder="Enter street address" autoComplete="off" />
+                  <Input
+                    placeholder="Enter street address"
+                    autoComplete="off" />
                 </Form.Item>
               </Col>
             </Row>
             <Row>
-              <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+              <Col
+                xs={24}
+                sm={24}
+                md={12}
+                lg={12}
+                className={styles.formCol}>
                 <Form.Item
                   label="Apartment/Suite"
                   name='aptOrSuite'>
-                  <Input placeholder="Enter your apartment no" autoComplete="off" />
+                  <Input
+                    placeholder="Enter your apartment no"
+                    autoComplete="off" />
                 </Form.Item>
               </Col>
-              <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+              <Col
+                xs={24}
+                sm={24}
+                md={12}
+                lg={12}
+                className={styles.formCol}>
                 <Form.Item
                   label="Zip Code"
                   name='zipcode'>
-                  <Input placeholder="Enter the zipcode" autoComplete="off" />
+                  <Input
+                    placeholder="Enter the zipcode"
+                    autoComplete="off" />
                 </Form.Item>
               </Col>
             </Row>
@@ -255,7 +337,12 @@ const EditEmployee = () => {
             </Row>
             <Row>
 
-              <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+              <Col
+                xs={24}
+                sm={24}
+                md={12}
+                lg={12}
+                className={styles.formCol}>
                 <Form.Item
                   name="roles"
                   label="Role"
@@ -273,7 +360,12 @@ const EditEmployee = () => {
                   </Select>
                 </Form.Item>
               </Col>
-              <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+              <Col
+                xs={24}
+                sm={24}
+                md={12}
+                lg={12}
+                className={styles.formCol}>
                 <Form.Item
                   name="status"
                   label="Employee Status"
@@ -289,14 +381,21 @@ const EditEmployee = () => {
             </Row>
 
             <Row>
-              <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+              <Col
+                xs={24}
+                sm={24}
+                md={12}
+                lg={12}
+                className={styles.formCol}>
                 <Form.Item
                   name="upload"
                   label="Upload"
                   valuePropName="fileList"
                   getValueFromEvent={profileFile}>
                   <Upload name="profileImg" maxCount={1}>
-                    <Button icon={<UploadOutlined />}>Click to Upload</Button>
+                    <Button icon={<UploadOutlined />}>
+                      Click to Upload
+                    </Button>
                   </Upload>
                 </Form.Item>
               </Col>
@@ -307,8 +406,17 @@ const EditEmployee = () => {
               <Col>
                 <Form.Item>
                   <Space>
-                    <Button type="default" htmlType="button" onClick={cancelEditEmployee}>Cancel</Button>
-                    <Button type="primary" htmlType="submit">Update Employee</Button>
+                    <Button
+                      type="default"
+                      htmlType="button"
+                      onClick={cancelEditEmployee}>
+                      Cancel
+                    </Button>
+                    <Button
+                      type="primary"
+                      htmlType="submit">
+                      Update Employee
+                    </Button>
                   </Space>
                 </Form.Item>
               </Col>

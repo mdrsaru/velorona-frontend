@@ -101,7 +101,6 @@ const Client = () => {
       },
 
       onError(err) {
-        console.log(err);
         setArchiveVisibility(false);
         notifyGraphqlError(err);
       },

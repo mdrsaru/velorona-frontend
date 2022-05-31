@@ -1,6 +1,6 @@
 import { CloseOutlined, LinkOutlined } from "@ant-design/icons";
 import { useMutation } from "@apollo/client";
-import { Col, Form, message, Modal, Row, Select } from "antd";
+import { Col, message, Modal, Row, Select } from "antd";
 import parse from "html-react-parser";
 import { authVar } from "../../App/link";
 import { TaskStatus } from "../../interfaces/generated";
@@ -15,10 +15,10 @@ interface IProps {
   data: any;
   employee?: boolean;
 }
+
 const TaskDetail = (props: IProps) => {
   const task = props?.data;
   const loggedInUser = authVar();
-  console.log(task);
   const [taskUpdate] = useMutation(TASK_UPDATE, {
     onCompleted() {
       message.success({
@@ -49,6 +49,7 @@ const TaskDetail = (props: IProps) => {
       },
     });
   };
+
   return (
     <>
       <Modal
@@ -73,7 +74,7 @@ const TaskDetail = (props: IProps) => {
                     </span>{" "}
                     &nbsp;
                     <span className={styles["file-name"]}>
-                      <a href={attachment.url} target="_blank">
+                      <a href={attachment.url} target="_blank" rel="noreferrer">
                         {attachment.name}
                       </a>
                     </span>{" "}
@@ -86,8 +87,7 @@ const TaskDetail = (props: IProps) => {
             )}
           </div>,
         ]}
-        width={869}
-      >
+        width={869}>
         <div className={styles["modal-body"]}>
           <div>
             <Row>

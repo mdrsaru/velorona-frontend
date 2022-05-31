@@ -45,16 +45,16 @@ const TaskCard = (props: IProps) => {
         </Card.Grid>
 
         <Card.Grid hoverable={false} className={styles.gridStyle30}>
-          <Avatar icon={<img src={avatar} />} />
+          <Avatar icon={<img src={avatar} alt='avatar-img' />} />
         </Card.Grid>
-        {task.attachments.map((attachment:any,index:number)=>(
-        <Card.Grid hoverable={false} className={styles.gridStyle}>
-          <span className={styles["file-attach"]}>
-            <LinkOutlined />
-          </span>{" "}
-          &nbsp;
-          <span className={styles["file-name"]}>{attachment.name}</span>
-        </Card.Grid>
+        {task.attachments.map((attachment: any, index: number) => (
+          <Card.Grid hoverable={false} className={styles.gridStyle} key={index}>
+            <span className={styles["file-attach"]}>
+              <LinkOutlined />
+            </span>{" "}
+            &nbsp;
+            <span className={styles["file-name"]}>{attachment.name}</span>
+          </Card.Grid>
         ))}
       </Card>
 
