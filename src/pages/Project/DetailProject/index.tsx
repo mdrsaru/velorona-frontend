@@ -184,6 +184,36 @@ const DetailProject = () => {
       <Menu.Item key="delete" className={styles.list}>
         <div
           onClick={() => {
+            setDetailVisibility(!detailVisibility);
+            setTask(data);
+          }}
+        >
+          View Details
+        </div>
+      </Menu.Item>
+     
+      <Menu.Item key="delete" className={styles.list}>
+        <div
+          onClick={() => {
+            navigate(
+            routes.editTasksProject.path(
+              loggedInUser?.company?.code
+                ? loggedInUser?.company?.code
+                : "",
+              params?.pid ?? "",
+              data?.id
+            )
+            )
+          }}
+        >
+          Edit Task
+        </div>
+      </Menu.Item>
+
+    
+      <Menu.Item key="delete" className={styles.list}>
+        <div
+          onClick={() => {
             setModalVisibility(true);
             setTask(data);
           }}
@@ -244,7 +274,7 @@ const DetailProject = () => {
       dataIndex: "active",
       key: "status",
       render: (active: boolean) => (
-        <Status status = {active ? 'Active' : 'Inactive'}/>
+        <Status status={active ? "Active" : "Inactive"} />
       ),
     },
     {
@@ -280,7 +310,7 @@ const DetailProject = () => {
               onClick={(e) => e.preventDefault()}
               style={{ paddingLeft: "1rem" }}
             >
-              <MoreOutlined className={styles.icons}/>
+              <MoreOutlined className={styles.icons} />
             </div>
           </Dropdown>
         </div>

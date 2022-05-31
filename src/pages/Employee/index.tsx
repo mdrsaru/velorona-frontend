@@ -4,7 +4,6 @@ import { MoreOutlined } from "@ant-design/icons";
 import { Link, useNavigate } from "react-router-dom";
 import routes from "../../config/routes";
 
-import moment from "moment";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { authVar } from "../../App/link";
 import { useState } from "react";
