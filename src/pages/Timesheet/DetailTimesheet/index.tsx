@@ -412,7 +412,9 @@ const DetailTimesheet = () => {
         variables: {
           input: {
             ids: arrayEntries.flat(),
-            company_id: authData?.company?.id
+            company_id: authData?.company?.id,
+            created_by: authData?.user?.id,
+            client_id:timeSheetDetail?.Timesheet?.data[0]?.client?.id
           }
         }
       }).then((response) => {
@@ -422,7 +424,7 @@ const DetailTimesheet = () => {
       }).catch(notifyGraphqlError)
     }
   }
-
+  
   return (
     <>
       {loadWeekly ? <TimeSheetLoader /> :
@@ -510,7 +512,7 @@ const DetailTimesheet = () => {
                     Client Name
                   </div>
                   <div>
-                    Araniko College Pvt Ltd
+                  {timeSheetDetail?.Timesheet?.data[0]?.client?.name ?? 'N/A'}
                   </div>
                 </div>
                 <div className={styles['timesheet-div']}>

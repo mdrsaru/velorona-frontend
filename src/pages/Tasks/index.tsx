@@ -22,11 +22,18 @@ export const TASK = gql`
                 archived
                 company_id
                 project_id
+                active
+                description
                 manager{
                   fullName
                 }
                 users{
                   fullName
+                }
+                attachments{
+                  id
+                  url
+                  name
                 }
             }
         }

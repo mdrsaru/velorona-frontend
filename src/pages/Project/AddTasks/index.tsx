@@ -119,11 +119,12 @@ const AddTasks = () => {
       variables: {
         input: {
           name: values?.name,
+          description: values?.description,
           status: values?.status,
           company_id: loggedInUser?.company?.id,
           manager_id: values?.taskManager,
           project_id: params?.pid,
-          user_ids:values?.assignee,
+          user_ids: values?.assignee,
         },
       },
     });

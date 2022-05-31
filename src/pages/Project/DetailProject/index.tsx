@@ -20,7 +20,7 @@ import ArchiveBody from "../../../components/Archive";
 import DeleteBody from "../../../components/Delete";
 import TaskDetail from "../../../components/TaskDetail";
 import Status from "../../../components/Status";
-import ExclamationCircleOutlined from "@ant-design/icons/lib/icons/ExclamationCircleOutlined";
+
 import InfoCircleOutlined from "@ant-design/icons/lib/icons/InfoCircleOutlined";
 
 const { SubMenu } = Menu;
@@ -32,6 +32,8 @@ export const TASK_UPDATE = gql`
       name
       status
       archived
+      active
+      description
     }
   }
 `;
@@ -42,6 +44,8 @@ export const TASK_DELETE = gql`
       id
       name
       status
+      active
+      description
       archived
     }
   }
@@ -102,11 +106,11 @@ const DetailProject = () => {
     setArchiveModal(value);
   };
 
-  const changeStatus = (value: string, id: string) => {
+  const changeStatus = (value: boolean, id: string) => {
     taskUpdate({
       variables: {
         input: {
-          status: value,
+          active: value,
           id: id,
           company_id: loggedInUser?.company?.id,
         },
@@ -144,8 +148,8 @@ const DetailProject = () => {
           key="active"
           className={styles.list}
           onClick={() => {
-            if (data?.status === "Inactive") {
-              changeStatus("Active", data?.id);
+            if (data?.active === false) {
+              changeStatus(true, data?.id);
             }
           }}
         >
@@ -155,8 +159,8 @@ const DetailProject = () => {
         <Menu.Item
           key="inactive"
           onClick={() => {
-            if (data?.status === "Active") {
-              changeStatus("Inactive", data?.id);
+            if (data?.active === true) {
+              changeStatus(false, data?.id);
             }
           }}
         >
@@ -237,9 +241,11 @@ const DetailProject = () => {
     },
     {
       title: "Status",
-      dataIndex: "status",
+      dataIndex: "active",
       key: "status",
-      render: (status: string) => <Status status={status} />,
+      render: (active: boolean) => (
+        <Status status = {active ? 'Active' : 'Inactive'}/>
+      ),
     },
     {
       title: "Actions",
