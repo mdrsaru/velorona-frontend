@@ -1,4 +1,4 @@
-import React from "react";
+import { useState } from "react";
 
 import { Button, Card, Col, Form, Input, message, Row, Select, Space, Upload } from "antd";
 import { ArrowLeftOutlined, UploadOutlined } from "@ant-design/icons";
@@ -13,6 +13,7 @@ import { authVar } from "../../../App/link";
 import routes from "../../../config/routes";
 import { User, UserPagingResult } from "../../../interfaces/generated";
 import { USER } from "../index";
+import { STATE_CITIES, USA_STATES } from "../../../utils/cities";
 
 import styles from "../style.module.scss";
 
@@ -76,6 +77,7 @@ interface UserResponseArray {
 const NewEmployee = () => {
   const navigate = useNavigate();
   const authData = authVar();
+  const [cities, setCountryCities] = useState<string[]>([]);
 
   const [userCreate] = useMutation<UserResponse>(USER_CREATE, {
     update(cache, { data }) {
@@ -123,9 +125,17 @@ const NewEmployee = () => {
     });
   }
 
+  const setState = (data: string) => {
+    setCountryCities(STATE_CITIES[data]);
+  }
+
   const onSubmitForm = (values: any) => {
     let key = 'employee'
-    message.loading({ content: "New employee adding in progress..", key, className: 'custom-message' })
+    message.loading({
+      content: "New employee adding in progress..",
+      key,
+      className: 'custom-message'
+    })
     userCreate({
       variables: {
         input: {
@@ -155,7 +165,11 @@ const NewEmployee = () => {
           formData.append('file', values?.upload[0]?.originFileObj)
           mediaServices.uploadProfileImage(formData).then((res: any) => {
             const avatar = res?.data?.id;
-            message.loading({ content: "Uploading user's profile image..", key, className: 'custom-message' })
+            message.loading({
+              content: "Uploading user's profile image..",
+              key,
+              className: 'custom-message'
+            })
             changeProfilePictureInput({
               variables: {
                 input: {
@@ -182,7 +196,9 @@ const NewEmployee = () => {
     <div className={styles['main-div']}>
       <Card bordered={false}>
         <Row>
-          <Col span={12} className={styles['employee-col']}>
+          <Col
+            span={12}
+            className={styles['employee-col']}>
             <h1>
               <ArrowLeftOutlined onClick={() => navigate(-1)} />
               &nbsp; Add New Employee
@@ -199,7 +215,12 @@ const NewEmployee = () => {
             </Col>
           </Row>
           <Row>
-            <Col xs={24} sm={24} md={8} lg={8} className={styles.formCol}>
+            <Col
+              xs={24}
+              sm={24}
+              md={8}
+              lg={8}
+              className={styles.formCol}>
               <Form.Item
                 label="First Name"
                 name='firstName'
@@ -210,14 +231,24 @@ const NewEmployee = () => {
                 <Input placeholder="Enter firstname" autoComplete="off" />
               </Form.Item>
             </Col>
-            <Col xs={24} sm={24} md={8} lg={8} className={styles.formCol}>
+            <Col
+              xs={24}
+              sm={24}
+              md={8}
+              lg={8}
+              className={styles.formCol}>
               <Form.Item
                 label="Middle Name"
                 name='middleName'>
                 <Input placeholder="Enter middle name" autoComplete="off" />
               </Form.Item>
             </Col>
-            <Col xs={24} sm={24} md={8} lg={8} className={styles.formCol}>
+            <Col
+              xs={24}
+              sm={24}
+              md={8}
+              lg={8}
+              className={styles.formCol}>
               <Form.Item
                 label="Last Name"
                 name='lastName'
@@ -230,7 +261,12 @@ const NewEmployee = () => {
             </Col>
           </Row>
           <Row>
-            <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+            <Col
+              xs={24}
+              sm={24}
+              md={12}
+              lg={12}
+              className={styles.formCol}>
               <Form.Item
                 label="Email"
                 name='email'
@@ -244,7 +280,12 @@ const NewEmployee = () => {
                 <Input placeholder="Enter your email" autoComplete="off" />
               </Form.Item>
             </Col>
-            <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+            <Col
+              xs={24}
+              sm={24}
+              md={12}
+              lg={12}
+              className={styles.formCol}>
               <Form.Item
                 label="Phone Number"
                 name='phone'
@@ -265,7 +306,12 @@ const NewEmployee = () => {
             </Col>
           </Row>
           <Row>
-            <Col xs={24} sm={24} md={8} lg={8} className={styles.formCol}>
+            <Col
+              xs={24}
+              sm={24}
+              md={8}
+              lg={8}
+              className={styles.formCol}>
               <Form.Item
                 label="State"
                 name='state'
@@ -273,10 +319,23 @@ const NewEmployee = () => {
                   required: true,
                   message: 'Please enter your state!'
                 }]}>
-                <Input placeholder="Enter the state name" autoComplete="off" />
+                <Select
+                  showSearch
+                  placeholder={'Select the state'} onChange={setState}>
+                  {USA_STATES?.map((state: any, index: number) =>
+                    <Select.Option value={state?.name} key={index}>
+                      {state?.name}
+                    </Select.Option>
+                  )}
+                </Select>
               </Form.Item>
             </Col>
-            <Col xs={24} sm={24} md={8} lg={8} className={styles.formCol}>
+            <Col
+              xs={24}
+              sm={24}
+              md={8}
+              lg={8}
+              className={styles.formCol}>
               <Form.Item
                 label="City"
                 name='city'
@@ -284,10 +343,23 @@ const NewEmployee = () => {
                   required: true,
                   message: 'Please enter your city!'
                 }]}>
-                <Input placeholder="Enter city name" autoComplete="off" />
+                <Select
+                  showSearch
+                  placeholder={'Select the city'}>
+                  {cities?.map((city: string, index: number) =>
+                    <Select.Option value={city} key={index}>
+                      {city}
+                    </Select.Option>
+                  )}
+                </Select>
               </Form.Item>
             </Col>
-            <Col xs={24} sm={24} md={8} lg={8} className={styles.formCol}>
+            <Col
+              xs={24}
+              sm={24}
+              md={8}
+              lg={8}
+              className={styles.formCol}>
               <Form.Item
                 label="Street Address"
                 name='streetAddress'
@@ -295,7 +367,10 @@ const NewEmployee = () => {
                   required: true,
                   message: 'Please enter your street address!'
                 }]}>
-                <Input placeholder="Enter street address" name='street' autoComplete="off" />
+                <Input
+                  placeholder="Enter street address"
+                  name='street'
+                  autoComplete="off" />
               </Form.Item>
             </Col>
           </Row>
@@ -324,7 +399,12 @@ const NewEmployee = () => {
             </Col>
           </Row>
           <Row>
-            <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+            <Col
+              xs={24}
+              sm={24}
+              md={12}
+              lg={12}
+              className={styles.formCol}>
               <Form.Item
                 name="roles"
                 label="Role"
@@ -339,7 +419,12 @@ const NewEmployee = () => {
                 </Select>
               </Form.Item>
             </Col>
-            <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+            <Col
+              xs={24}
+              sm={24}
+              md={12}
+              lg={12}
+              className={styles.formCol}>
               <Form.Item
                 name="status"
                 label="Employee Status"
@@ -355,7 +440,12 @@ const NewEmployee = () => {
             </Col>
           </Row>
           <Row>
-            <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+            <Col
+              xs={24}
+              sm={24}
+              md={12}
+              lg={12}
+              className={styles.formCol}>
               <Form.Item
                 name="upload"
                 label="Upload Profile Image"
@@ -373,8 +463,17 @@ const NewEmployee = () => {
             <Col style={{ padding: '0 1rem 1rem 0' }}>
               <Form.Item>
                 <Space>
-                  <Button type="default" htmlType="button" onClick={cancelAddEmployee}>Cancel</Button>
-                  <Button type="primary" htmlType="submit">Continue</Button>
+                  <Button
+                    type="default"
+                    htmlType="button"
+                    onClick={cancelAddEmployee}>
+                    Cancel
+                  </Button>
+                  <Button
+                    type="primary"
+                    htmlType="submit">
+                    Continue
+                  </Button>
                 </Space>
               </Form.Item>
             </Col>

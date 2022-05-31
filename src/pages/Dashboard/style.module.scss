@@ -1,0 +1,11 @@
+.main-title {
+  font-weight: bold;
+  width: 80%;
+  font-size: 38px;
+  line-height: 44px;
+  color: var(--black);
+  white-space: nowrap;
+  overflow: hidden;
+  padding-top: 1rem;
+  text-overflow: ellipsis;
+}
