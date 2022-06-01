@@ -156,6 +156,32 @@ query Timesheet($input: TimesheetQueryInput!) {
   }
 }`;
 
+const UPDATE_TIME_ENTRY = gql`
+    mutation TimeEntryUpdate($input: TimeEntryUpdateInput!) {
+      TimeEntryUpdate(input: $input) {
+          id
+          startTime
+          endTime
+          createdAt
+          duration
+          clientLocation
+          task_id
+          task {
+            id 
+            name
+          }
+          company {
+            id
+            name
+          }
+          project {
+            id
+            name
+          }
+        }
+    }
+`
+
 const { Panel } = Collapse;
 
 const computeDiff = (date: Date) => {
@@ -220,11 +246,11 @@ const Timesheet = () => {
         </div>
     },
     {
-      title: 'Total Hours',
+      title: 'Total Time',
       key: 'duration',
       render: (record: any) =>
         <div>
-          {getHours(record?.duration)}
+          {getHours(record?.durationFormat)}
         </div>
     },
     {
@@ -393,11 +419,10 @@ const Timesheet = () => {
     },
   });
 
-
-  const [stopTimer] = useMutation(STOP_TIMER, {
+  const [updateTimeEntry] = useMutation(UPDATE_TIME_ENTRY, {
     update: (cache, result: any) => {
-      newTimeSheet['endTime'] = result?.data?.TimeEntryStop?.endTime
-      newTimeSheet['duration'] = result?.data?.TimeEntryStop?.duration
+      newTimeSheet['endTime'] = result?.data?.TimeEntryUpdate?.endTime
+      newTimeSheet['duration'] = result?.data?.TimeEntryUpdate?.duration
 
       const data: any = cache.readQuery({
         query: TIME_ENTRY,
@@ -454,7 +479,7 @@ const Timesheet = () => {
         className: 'custom-message'
       });
     }
-  })
+  });
 
   const [getTask, { data: taskData }] = useLazyQuery(TASK, {
     fetchPolicy: "network-only",
@@ -577,7 +602,7 @@ const Timesheet = () => {
   }
 
   const submitStopTimer = () => {
-    stopTimer({
+    updateTimeEntry({
       variables: {
         input: {
           id: newTimeEntry?.id,
