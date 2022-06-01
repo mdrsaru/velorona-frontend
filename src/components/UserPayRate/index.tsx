@@ -1,4 +1,4 @@
-import { Button, Col, Form, Input, InputNumber, message, Modal, Row, Select, Space } from "antd";
+import { Button, Col, Form, InputNumber, message, Modal, Row, Select, Space } from "antd";
 import { CloseOutlined } from "@ant-design/icons";
 
 import styles from "./styles.module.scss";
@@ -6,7 +6,6 @@ import { gql, useMutation, useQuery } from "@apollo/client";
 import { PROJECT } from "../../pages/Project";
 import { authVar } from "../../App/link";
 import { UserPayRate } from "../../interfaces/generated";
-import constants from "../../config/constants";
 import { notifyGraphqlError } from "../../utils/error";
 
 interface IProps {
