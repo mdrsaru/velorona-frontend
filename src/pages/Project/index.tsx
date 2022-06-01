@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import { gql, useQuery } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 
-import { Card, Col, Dropdown, Menu, Row, Table } from "antd";
+import { Card, Col, Dropdown, Menu, message, Row, Table } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import routes from "../../config/routes";
 import { MoreOutlined, PlusCircleOutlined } from "@ant-design/icons";
@@ -13,73 +13,83 @@ import deleteImg from "../../assets/images/delete_btn.svg";
 import archiveImg from "../../assets/images/archive_btn.svg";
 
 import styles from "./style.module.scss";
-
-
+import ArchiveBody from "../../components/Archive";
+import { notifyGraphqlError } from "../../utils/error";
+import SubMenu from "antd/lib/menu/SubMenu";
 
 export const PROJECT = gql`
-    query Project($input: ProjectQueryInput!) {
-        Project(input: $input) {
-            data {
-                id
-                name
-                client {
-                    id
-                    email
-                    name
-                }
-                company {
-                    id
-                    name
-                }
-            }
+  query Project($input: ProjectQueryInput!) {
+    Project(input: $input) {
+      data {
+        id
+        name
+        client {
+          id
+          email
+          name
         }
+        status
+        archived
+        company {
+          id
+          name
+        }
+      }
     }
-`
+  }
+`;
 
+export const PROJECT_UPDATE = gql`
+  mutation ProjectUpdate($input: ProjectUpdateInput!) {
+    ProjectUpdate(input: $input) {
+      id
+      name
+      client {
+        id
+        email
+        name
+      }
+      status
+      archived
+      company {
+        id
+        name
+      }
+    }
+  }
+`;
 
 const deleteBody = () => {
   return (
-    <div className={styles['modal-message']}>
+    <div className={styles["modal-message"]}>
       <div>
         <img src={deleteImg} alt="confirm" />
-      </div><br />
-      <p>Are you sure you want to delete
+      </div>
+      <br />
+      <p>
+        Are you sure you want to delete
         <strong>Insight Workshop Pvt. Ltd?</strong>
       </p>
-      <p className={styles['warning-text']}>
+      <p className={styles["warning-text"]}>
         All the data associated with the project will be deleted permanently.
       </p>
     </div>
-  )
-}
-
-const archiveBody = () => {
-  return (
-    <div className={styles['modal-message']}>
-      <div>
-        <img src={archiveImg} alt="archive-confirm" />
-      </div> <br />
-      <p>Are you sure you want to archive
-        <strong>Insight Workshop Pvt. Ltd?</strong>
-      </p>
-      <p className={styles['archive-text']}>
-        Project will not be able to login to the system.
-      </p>
-    </div>
-  )
-}
+  );
+};
 
 const Project = () => {
   const loggedInUser = authVar();
   const navigate = useNavigate();
   const [visibility, setVisibility] = useState(false);
   const [showArchive, setArchiveModal] = useState(false);
+  const [project, setProject] = useState<any>();
+
   const setModalVisibility = (value: boolean) => {
-    setVisibility(value)
-  }
+    setVisibility(value);
+  };
   const setArchiveVisibility = (value: boolean) => {
-    setArchiveModal(value)
-  }
+    setArchiveModal(value);
+  };
 
   const { data: projectData } = useQuery(PROJECT, {
     fetchPolicy: "network-only",
@@ -87,32 +97,113 @@ const Project = () => {
     variables: {
       input: {
         query: {
-          company_id: loggedInUser?.company?.id
+          company_id: loggedInUser?.company?.id,
         },
         paging: {
-          order: ['updatedAt:DESC']
-        }
-      }
+          order: ["updatedAt:DESC"],
+        },
+      },
+    },
+  });
+
+  const [projectUpdate, { loading: updateLoading }] = useMutation(
+    PROJECT_UPDATE,
+    {
+      onCompleted() {
+        message.success({
+          content: `Project is updated successfully!`,
+          className: "custom-message",
+        });
+        setArchiveVisibility(false);
+      },
+      onError(err) {
+        setArchiveVisibility(false);
+        notifyGraphqlError(err);
+      },
     }
-  })
+  );
+
+  const archiveProject = () => {
+    projectUpdate({
+      variables: {
+        input: {
+          id: project?.id,
+          archived: !project?.archived,
+          company_id: loggedInUser?.company?.id,
+          name: project?.name,
+        },
+      },
+    });
+  };
+
+  const changeStatus = (value: string, id: string, name: string) => {
+    projectUpdate({
+      variables: {
+        input: {
+          status: value,
+          id: id,
+          name: name,
+          company_id: loggedInUser?.company?.id,
+        },
+      },
+    });
+  };
 
   const menu = (data: any) => (
     <Menu>
+      <SubMenu title="Change status" key="mainMenu">
+        <Menu.Item
+          key="active"
+          onClick={() => {
+            setProject(data);
+            if (data?.status === "Inactive") {
+              changeStatus("Active", data?.id, data?.name);
+            }
+          }}
+        >
+          Active
+        </Menu.Item>
+        <Menu.Divider />
+
+        <Menu.Item
+          key="inactive"
+          onClick={() => {
+            if (data?.status === "Active") {
+              setProject(data);
+              changeStatus("Inactive", data?.id, data?.name);
+            }
+          }}
+        >
+          Inactive
+        </Menu.Item>
+      </SubMenu>
+      <Menu.Divider />
+
       <Menu.Item key="edit">
-        <Link to={routes.editProject.path(loggedInUser?.company?.code ?? '1', data?.id ?? '1')}>
+        <Link
+          to={routes.editProject.path(
+            loggedInUser?.company?.code ?? "1",
+            data?.id ?? "1"
+          )}
+        >
           Edit Project
         </Link>
       </Menu.Item>
-      
-      {/*<Menu.Divider />
-          <Menu.Item key="archive">
-        <div onClick={() => setArchiveVisibility(true)}>
-          Archive Project
+      <Menu.Divider />
+
+      <Menu.Item key="archive" className={styles.list}>
+        <div
+          onClick={() => {
+            setProject(data);
+            setArchiveVisibility(true);
+          }}
+        >
+          {data?.archived ? "Unarchive Project" : "Archive Project"}
         </div>
       </Menu.Item>
       <Menu.Divider />
 
-      <Menu.Item key="delete">
+      {/* <Menu.Item key="delete">
         <div onClick={() => setModalVisibility(true)}>
           Delete Project
         </div>
@@ -122,27 +213,31 @@ const Project = () => {
 
   const columns = [
     {
-      title: 'Project Name',
+      title: "Project Name",
       render: (task: any) => {
-        return <div className={styles['task-name']}>
-          <p>{task?.name}</p>
-        </div>
+        return (
+          <div className={styles["task-name"]}>
+            <p>{task?.name}</p>
+          </div>
+        );
       },
       onCell: (record: any) => {
         return {
           onClick: () => {
-            navigate(routes.detailProject.path(loggedInUser?.company?.code ?? '', record?.id ?? ''));
+            navigate(
+              routes.detailProject.path(
+                loggedInUser?.company?.code ?? "",
+                record?.id ?? ""
+              )
+            );
           },
         };
       },
     },
     {
-      title: 'Client',
-      key: 'client',
-      render: (record: any) =>
-        <div>
-          {record?.client?.email}
-        </div>
+      title: "Client",
+      key: "client",
+      render: (record: any) => <div>{record?.client?.email}</div>,
     },
     // {
     //   title: 'Active Employees',
@@ -162,57 +257,69 @@ const Project = () => {
     //       <Progress percent={record?.progress} size="small" />
     //     </div>
     // },
-    // {
-    //   title: 'Status',
-    //   dataIndex: 'status',
-    //   key: 'status',
-    //   render: (status: string) =>
-    //     <div className={styles[`${status}-text`]}>
-    //       {status}
-    //     </div>,
-    // },
     {
-      title: 'Actions',
-      key: 'actions',
-      render: (record: any) =>
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      render: (status: string) => (
+        <div className={styles[`${status}-text`]}>{status}</div>
+      ),
+    },
+    {
+      title: "Actions",
+      key: "actions",
+      render: (record: any) => (
         <div
-          className={styles['dropdown-menu']}
-          onClick={(event) => event.stopPropagation()}>
-          <Link to={routes.addTasksProject.path(loggedInUser?.company?.code ? loggedInUser?.company?.code : '',
-            record?.id ?? '')}>
-            <span className={styles['plus-circle-outline']}>
+          className={styles["dropdown-menu"]}
+          onClick={(event) => event.stopPropagation()}
+        >
+          <Link
+            to={routes.addTasksProject.path(
+              loggedInUser?.company?.code ? loggedInUser?.company?.code : "",
+              record?.id ?? ""
+            )}
+          >
+            <span className={styles["plus-circle-outline"]}>
               <PlusCircleOutlined />
-            </span> &nbsp;
-            <span className={styles['add-task']}>
-              Add Task
-            </span> &nbsp; &nbsp;
+            </span>{" "}
+            &nbsp;
+            <span className={styles["add-task"]}>Add Task</span> &nbsp; &nbsp;
           </Link>
           <Dropdown
             overlay={menu(record)}
-            trigger={['click']}
-            placement="bottomRight">
+            trigger={["click"]}
+            placement="bottomRight"
+          >
             <div
               className="ant-dropdown-link"
-              onClick={e => e.preventDefault()}
-              style={{ paddingLeft: '1rem' }}>
+              onClick={(e) => e.preventDefault()}
+              style={{ paddingLeft: "1rem" }}
+            >
               <MoreOutlined />
             </div>
           </Dropdown>
-        </div>,
+        </div>
+      ),
     },
   ];
 
   return (
     <>
-      <div className={styles['project-main-div']}>
+      <div className={styles["project-main-div"]}>
         <Card bordered={false}>
           <Row>
-            <Col span={12} className={styles['form-col']}>
+            <Col span={12} className={styles["form-col"]}>
               <h1>Projects</h1>
             </Col>
-            <Col span={12} className={styles['form-col']}>
-              <div className={styles['add-new']}>
-                <Link to={routes.addProject.path(loggedInUser?.company?.code ? loggedInUser?.company?.code : '')}>
+            <Col span={12} className={styles["form-col"]}>
+              <div className={styles["add-new"]}>
+                <Link
+                  to={routes.addProject.path(
+                    loggedInUser?.company?.code
+                      ? loggedInUser?.company?.code
+                      : ""
+                  )}
+                >
                   Add new project
                 </Link>
               </div>
@@ -223,7 +330,9 @@ const Project = () => {
               <Table
                 dataSource={projectData?.Project?.data}
                 columns={columns}
-                rowKey={(record => record?.id)} />
+                rowKey={(record) => record?.id}
+                loading={updateLoading }
+              />
             </Col>
           </Row>
         </Card>
@@ -232,16 +341,34 @@ const Project = () => {
         visibility={visibility}
         setModalVisibility={setModalVisibility}
         imgSrc={deleteImg}
-        okText={'Delete'}
-        modalBody={deleteBody} />
+        okText={"Delete"}
+        modalBody={deleteBody}
+      />
+
       <ModalConfirm
         visibility={showArchive}
         setModalVisibility={setArchiveVisibility}
         imgSrc={archiveImg}
-        okText={'Archive'}
-        modalBody={archiveBody} />
+        okText={project?.archived ? "Unarchive" : "Archive"}
+        closable
+        modalBody={() =>
+          ArchiveBody({
+            title: (
+              <>
+                Are you sure you want to{" "}
+                {project?.archived ? "unarchive" : "archive"}
+                <strong> {project.name}?</strong>
+              </>
+            ),
+            subText: `Project will ${
+              project?.archived ? "" : "not"
+            } be able to assigned to any employee`,
+          })
+        }
+        onOkClick={archiveProject}
+      />
     </>
-  )
-}
+  );
+};
 
 export default Project;

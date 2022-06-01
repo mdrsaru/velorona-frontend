@@ -31,7 +31,6 @@ const UserPayRateModal = (props: IProps) => {
   const loggedInUser = authVar();
   const [form] = Form.useForm();
   const user = props.data;
-  console.log(user);
 
   const { data: projectData } = useQuery(PROJECT, {
     fetchPolicy: "network-only",
@@ -48,7 +47,6 @@ const UserPayRateModal = (props: IProps) => {
     },
   });
 
-  console.log(projectData);
 
   const [UserPayRateCreate] = useMutation<UserPayRateResponse>(USER_PAYRATE_CREATE,{
     onCompleted(){
