@@ -105,7 +105,7 @@ const EditTasks = () => {
       },
     },
   });
-  
+
   const { data: employeeData } = useQuery<UserData>(USER, {
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
@@ -237,10 +237,10 @@ const EditTasks = () => {
                   {...selectProps}
                   allowClear
                   placeholder="Please select"
-                  // dropdownStyle={{
-                  //    maxHeight: 100,
-                  //    overflowY: "hidden",
-                  // }}
+                // dropdownStyle={{
+                //    maxHeight: 100,
+                //    overflowY: "hidden",
+                // }}
                 >
                   {employeeData &&
                     employeeData?.User?.data?.map((employee, index) => (
@@ -263,7 +263,7 @@ const EditTasks = () => {
                   {taskManager &&
                     taskManager?.User?.data?.map((manager, index) => (
                       <Option value={manager?.id} key={index}>
-                        <b>{manager?.fullName}</b> / {manager?.email}
+                        {manager?.fullName} / {manager?.email}
                       </Option>
                     ))}
                 </Select>

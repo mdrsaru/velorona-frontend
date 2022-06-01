@@ -1,13 +1,16 @@
-import React from "react";
-import { Button, Col, Form, Input, Row, Select, Space } from "antd";
+import React, { useState } from 'react';
+import { Button, Col, Form, Input, Row, Select, Space } from 'antd';
 
-import styles from "../style.module.scss";
+import { STATE_CITIES, USA_STATES } from '../../../utils/cities';
+import styles from '../style.module.scss';
 
 
 const ClientForm = (props: any) => {
   const { form, onSubmitForm, btnText, cancelAddClient } = props;
-  const { Option } = Select;
-
+  const [cities, setCountryCities] = useState<string[]>([]);
+  const setState = (data: string) => {
+    setCountryCities(STATE_CITIES[data]);
+  }
   return (
     <div>
       <Form
@@ -15,7 +18,12 @@ const ClientForm = (props: any) => {
         layout="vertical"
         onFinish={onSubmitForm}>
         <Row>
-          <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+          <Col
+            xs={24}
+            sm={24}
+            md={12}
+            lg={12}
+            className={styles.formCol}>
             <Form.Item
               label="Full Name"
               name='name'
@@ -23,10 +31,17 @@ const ClientForm = (props: any) => {
                 required: true,
                 message: 'Please enter full name!'
               }]}>
-              <Input placeholder="Enter the full name" autoComplete="off" />
+              <Input
+                placeholder="Enter the full name"
+                autoComplete="off" />
             </Form.Item>
           </Col>
-          <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+          <Col
+            xs={24}
+            sm={24}
+            md={12}
+            lg={12}
+            className={styles.formCol}>
             <Form.Item
               label="Email Address"
               name='email'
@@ -37,12 +52,19 @@ const ClientForm = (props: any) => {
                 required: true,
                 message: 'Please input your E-mail!'
               }]}>
-              <Input placeholder="Enter your email" autoComplete="off" />
+              <Input
+                placeholder="Enter your email"
+                autoComplete="off" />
             </Form.Item>
           </Col>
         </Row>
         <Row>
-          <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+          <Col
+            xs={24}
+            sm={24}
+            md={12}
+            lg={12}
+            className={styles.formCol}>
             <Form.Item
               label="Invoice Email"
               name='invoiceEmail'
@@ -53,10 +75,17 @@ const ClientForm = (props: any) => {
                 required: true,
                 message: 'Please input your invoice E-mail!'
               }]}>
-              <Input placeholder="Enter your invoice email" autoComplete="off" />
+              <Input
+                placeholder="Enter your invoice email"
+                autoComplete="off" />
             </Form.Item>
           </Col>
-          <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+          <Col
+            xs={24}
+            sm={24}
+            md={12}
+            lg={12}
+            className={styles.formCol}>
             <Form.Item
               label="Street Address"
               name='streetAddress'
@@ -64,12 +93,20 @@ const ClientForm = (props: any) => {
                 required: true,
                 message: 'Please enter address!'
               }]}>
-              <Input placeholder="Enter the address of the client" name='address' autoComplete="off" />
+              <Input
+                placeholder="Enter the address of the client"
+                name='address'
+                autoComplete="off" />
             </Form.Item>
           </Col>
         </Row>
         <Row>
-          <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+          <Col
+            xs={24}
+            sm={24}
+            md={12}
+            lg={12}
+            className={styles.formCol}>
             <Form.Item
               name="state"
               label="State"
@@ -77,13 +114,23 @@ const ClientForm = (props: any) => {
                 required: true,
                 message: 'Please enter state!'
               }]}>
-              <Select placeholder="Select State">
-                <Option value="Arkansas">Arkansas</Option>
-                <Option value="NewYork">New york</Option>
+              <Select
+                showSearch
+                placeholder={'Select the state'} onChange={setState}>
+                {USA_STATES?.map((state: any, index: number) =>
+                  <Select.Option value={state?.name} key={index}>
+                    {state?.name}
+                  </Select.Option>
+                )}
               </Select>
             </Form.Item>
           </Col>
-          <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+          <Col
+            xs={24}
+            sm={24}
+            md={12}
+            lg={12}
+            className={styles.formCol}>
             <Form.Item
               name="city"
               label="City"
@@ -91,15 +138,25 @@ const ClientForm = (props: any) => {
                 required: true,
                 message: 'Please enter city!'
               }]}>
-              <Select placeholder="Select City">
-                <Option value="Pokhara">Pokhara</Option>
-                <Option value="Kathmandu">Kathmandu</Option>
+              <Select
+                showSearch
+                placeholder={'Select the city'}>
+                {cities?.map((city: string, index: number) =>
+                  <Select.Option value={city} key={index}>
+                    {city}
+                  </Select.Option>
+                )}
               </Select>
             </Form.Item>
           </Col>
         </Row>
         <Row>
-          <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+          <Col
+            xs={24}
+            sm={24}
+            md={12}
+            lg={12}
+            className={styles.formCol}>
             <Form.Item
               label="Zip Code"
               name='zipcode'
@@ -107,7 +164,9 @@ const ClientForm = (props: any) => {
                 required: true,
                 message: 'Please enter zipcode!'
               }]}>
-              <Input placeholder="Enter the zipcode" autoComplete="off" />
+              <Input
+                placeholder="Enter the zipcode"
+                autoComplete="off" />
             </Form.Item>
           </Col>
         </Row>
@@ -117,8 +176,17 @@ const ClientForm = (props: any) => {
           <Col>
             <Form.Item>
               <Space>
-                <Button type="default" htmlType="button" onClick={cancelAddClient}>Cancel</Button>
-                <Button type="primary" htmlType="submit">{btnText}</Button>
+                <Button
+                  type="default"
+                  htmlType="button"
+                  onClick={cancelAddClient}>
+                  Cancel
+                </Button>
+                <Button
+                  type="primary"
+                  htmlType="submit">
+                  {btnText}
+                </Button>
               </Space>
             </Form.Item>
           </Col>

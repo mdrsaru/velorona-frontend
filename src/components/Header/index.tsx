@@ -61,7 +61,9 @@ const TopHeader = (props: any) => {
   const menu = (
     <Menu style={{ width: 120 }}>
       <Menu.Item key={'1'}>
-        <div onClick={() => logout()}>Logout</div>
+        <div onClick={() => logout()}>
+          Logout
+        </div>
       </Menu.Item>
     </Menu>
   );
@@ -69,26 +71,44 @@ const TopHeader = (props: any) => {
   return (
     <Header className={styles['header-container']}>
       <div className={styles['logo']} >
-        <MenuOutlined onClick={onCollapse} style={{ fontSize: 20, color: 'var(--black)', marginLeft: 10 }}/>
+        <MenuOutlined
+          onClick={onCollapse}
+          style={{
+            fontSize: 20,
+            color: 'var(--black)',
+            marginLeft: 10
+          }} />
         <div>
-          <img src={logo} alt="logo" className={styles['mini-logo']} />
-          <img src={logoContent} alt="logo-01" className={styles['text-logo']} />
+          <img
+            src={logo}
+            alt="logo"
+            className={styles['mini-logo']} />
+          <img
+            src={logoContent}
+            alt="logo-01"
+            className={styles['text-logo']} />
         </div>
       </div>
 
       <div className={styles['header-right']}>
         <div className={styles['notification']}>
-          <img src={notification} alt="notification" />
+          <img
+            src={notification}
+            alt="notification" />
         </div>
         <div className={styles['avatar']}>
           <Avatar size={38} />
-          <Dropdown overlay={menu} trigger={['click']}>
+          <Dropdown
+            overlay={menu}
+            trigger={['click']}>
             <span className={styles['name-container']}>
               <span className={styles['name']}>
                 John Doe
               </span>
               <span className={styles['drop-arrow']}>
-                <img src={downArrow} alt="down-arrow" />
+                <img
+                  src={downArrow}
+                  alt="down-arrow" />
               </span>
             </span>
           </Dropdown>

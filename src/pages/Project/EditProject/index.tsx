@@ -43,7 +43,7 @@ const EditProject = () => {
   const navigate = useNavigate();
   const loggedInUser = authVar();
   const { Option } = Select;
-  const [ProjectUpdate] = useMutation(PROJECT_UPDATE);
+  const [projectUpdate] = useMutation(PROJECT_UPDATE);
 
   const { data: projectData } = useQuery(PROJECT, {
     variables: {
@@ -76,7 +76,7 @@ const EditProject = () => {
       key,
       className: 'custom-message'
     })
-    ProjectUpdate({
+    projectUpdate({
       variables: {
         input: {
           id: params?.pid,
