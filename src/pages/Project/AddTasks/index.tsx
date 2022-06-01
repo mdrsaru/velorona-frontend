@@ -23,6 +23,7 @@ import { UserData } from "../../Client";
 import constants from "../../../config/constants";
 
 import styles from "../style.module.scss";
+import { TaskStatus } from "../../../interfaces/generated";
 
 const USER = gql`
   query User($input: UserQueryInput!) {
@@ -129,7 +130,7 @@ const AddTasks = () => {
       },
     });
   };
-
+  const status = Object.values(TaskStatus);
   return (
     <div className={styles["main-div"]}>
       <Card bordered={false}>
@@ -264,8 +265,11 @@ const AddTasks = () => {
                 ]}
               >
                 <Select placeholder="Select status">
-                  <Option value={"Active"}>Active</Option>
-                  <Option value={"Inactive"}>Inactive</Option>
+                  {status?.map((status, index) => (
+                    <Option value={status} key={index}>
+                      {status}
+                    </Option>
+                  ))}
                 </Select>
               </Form.Item>
             </Col>
