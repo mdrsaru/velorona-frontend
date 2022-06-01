@@ -17,8 +17,8 @@ import constants from "../../config/constants";
 import { UserData } from "../Client";
 
 import RouteLoader from "../../components/Skeleton/RouteLoader";
-import styles from "./style.module.scss";
 import UserPayRateModal from "../../components/UserPayRate";
+import styles from "./style.module.scss";
 
 const { SubMenu } = Menu;
 
@@ -92,9 +92,8 @@ export const USER_ARCHIVE = gql`
 const Employee = () => {
   const loggedInUser = authVar();
   const navigate = useNavigate();
-  const [EmployeeUpdate] = useMutation(USER_UPDATE);
-
-  const [EmployeeArchive] = useMutation(USER_ARCHIVE, {
+  const [employeeUpdate] = useMutation(USER_UPDATE);
+  const [employeeArchive] = useMutation(USER_ARCHIVE, {
     update(cache) {
       const normalizedId = cache.identify({
         id: employee.id,
@@ -173,13 +172,9 @@ const Employee = () => {
   );
 
   const archiveUser = () => {
-    let key = "archive";
-    message.loading({
-      content: "Archiving employee in progress..",
-      key,
-      className: "custom-message",
-    });
-    EmployeeArchive({
+    let key = 'archive'
+    message.loading({ content: "Archiving employee in progress..", key, className: 'custom-message' });
+    employeeArchive({
       variables: {
         input: {
           id: employee?.id,
@@ -203,13 +198,9 @@ const Employee = () => {
   };
 
   const changeStatus = (value: string, id: string) => {
-    let key = "status";
-    message.loading({
-      content: "Updating status of employee..",
-      key,
-      className: "custom-message",
-    });
-    EmployeeUpdate({
+    let key = 'status'
+    message.loading({ content: "Updating status of employee..", key, className: 'custom-message' });
+    employeeUpdate({
       variables: {
         input: {
           status: value,
@@ -393,29 +384,29 @@ const Employee = () => {
       render: (record: any) => (
         <Row>
           <Col>
-          <p onClick={() => handleUserPayRate(record)} className={styles['addPayRate']}>Add PayRate </p>
+            <p onClick={() => handleUserPayRate(record)} className={styles['addPayRate']}>Add PayRate </p>
           </Col>
           <Col>
-        <div
-          className={styles["dropdown-menu"]}
-          onClick={(event) => event.stopPropagation()}
-        >
-         
-          <Dropdown
-            overlay={menu(record)}
-            trigger={["click"]}
-            placement="bottomRight"
-          >
             <div
-              className="ant-dropdown-link"
-              onClick={(e) => e.preventDefault()}
-              style={{ paddingLeft: "1rem" }}
+              className={styles["dropdown-menu"]}
+              onClick={(event) => event.stopPropagation()}
             >
-              <MoreOutlined />
+
+              <Dropdown
+                overlay={menu(record)}
+                trigger={["click"]}
+                placement="bottomRight"
+              >
+                <div
+                  className="ant-dropdown-link"
+                  onClick={(e) => e.preventDefault()}
+                  style={{ paddingLeft: "1rem" }}
+                >
+                  <MoreOutlined />
+                </div>
+              </Dropdown>
             </div>
-          </Dropdown>
-        </div>
-        </Col>
+          </Col>
         </Row>
       ),
     },

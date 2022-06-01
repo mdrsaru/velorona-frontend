@@ -203,6 +203,7 @@ const EditTimeSheet = (props: IProps) => {
                         <TimePicker
                           use12Hours
                           format="h:mm:ss A"
+                          disabled
                           onChange={(event: any) => onChangeTime(event, entry?.id, 'start')}
                           defaultValue={moment(entry?.startTime, 'h:mm:ss A')} />
                       </Form.Item>
@@ -220,6 +221,7 @@ const EditTimeSheet = (props: IProps) => {
                         ]}>
                         <TimePicker
                           use12Hours
+                          disabled
                           format="h:mm:ss A"
                           onChange={(event: any) => onChangeTime(event, entry?.id, 'end')}
                           defaultValue={moment(entry?.endTime, 'h:mm:ss A')} />

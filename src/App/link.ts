@@ -14,7 +14,7 @@ const auth: IAuth = {
   token: null,
   user: {
     roles: [],
-    id: null,
+    id: null
   },
   isLoggedIn: false,
   company: {

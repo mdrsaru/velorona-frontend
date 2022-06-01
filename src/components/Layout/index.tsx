@@ -7,16 +7,15 @@ import routes from '../../config/routes';
 
 import Sidebar from '../Sidebar';
 import Header from '../Header';
-
-import styles from './style.module.scss';
 import { sidebarVar, authVar } from "../../App/link";
+import styles from './style.module.scss';
 
 const { Content } = Layout;
 
 
 const _Layout = () => {
   const { data: sidebarData } = useQuery(SIDEBAR);
-  const authData = authVar(); 
+  const authData = authVar();
 
   const isLoggedIn = authData?.isLoggedIn;
 
@@ -41,10 +40,12 @@ const _Layout = () => {
             ? styles['site-content-collapsed']
             : styles['site-content']
         }>
-        <Sidebar collapsed={sidebarData?.Sidebar?.collapsed} onCollapse={onCollapse}/>
+        <Sidebar
+          collapsed={sidebarData?.Sidebar?.collapsed}
+          onCollapse={onCollapse} />
         <Layout className={styles['site-layout']}>
           <Content style={{ padding: '1em' }}>
-           <Outlet />
+            <Outlet />
           </Content>
         </Layout>
       </Layout>

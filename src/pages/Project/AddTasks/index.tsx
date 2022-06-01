@@ -23,6 +23,7 @@ import { UserData } from "../../Client";
 import constants from "../../../config/constants";
 
 import styles from "../style.module.scss";
+import { TaskStatus } from "../../../interfaces/generated";
 
 const USER = gql`
   query User($input: UserQueryInput!) {
@@ -70,8 +71,7 @@ const AddTasks = () => {
       );
     },
     onError(err) {
-      console.log(err);
-      notifyGraphqlError(err);
+      notifyGraphqlError(err)
     },
   });
 
@@ -129,30 +129,43 @@ const AddTasks = () => {
       },
     });
   };
-
+  const status = Object.values(TaskStatus);
   return (
     <div className={styles["main-div"]}>
       <Card bordered={false}>
         <Row>
-          <Col span={12} className={styles["project-col"]}>
+          <Col
+            span={12}
+            className={styles["project-col"]}>
             <h1>
               <ArrowLeftOutlined onClick={() => navigate(-1)} />
               &nbsp; Add New Task
             </h1>
           </Col>
         </Row>
-        <Form form={form} layout="vertical" onFinish={onSubmitForm}>
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={onSubmitForm}>
           <Row className={styles["add-task-row"]}>
-            <Col span={24} className={styles["form-col-task"]}>
-              <Form.Item label="Task Name" name="name">
+            <Col
+              span={24}
+              className={styles["form-col-task"]}>
+              <Form.Item
+                label="Task Name"
+                name="name">
                 <Input
                   placeholder="Enter the Name of the Task"
                   autoComplete="off"
                 />
               </Form.Item>
             </Col>
-            <Col span={24} className={styles["form-col-task"]}>
-              <Form.Item label="Description Name" name="description">
+            <Col
+              span={24}
+              className={styles["form-col-task"]}>
+              <Form.Item
+                label="Description Name"
+                name="description">
                 <Input.TextArea />
               </Form.Item>
             </Col>
@@ -161,13 +174,11 @@ const AddTasks = () => {
               sm={24}
               md={12}
               lg={12}
-              className={styles["form-col-task"]}
-            >
+              className={styles["form-col-task"]}>
               <Form.Item
                 name="assignmentFile"
                 label="Assignment Files"
-                style={{ position: "relative" }}
-              >
+                style={{ position: "relative" }}>
                 <div className={styles["upload-file"]}>
                   <div>
                     <span>
@@ -181,8 +192,7 @@ const AddTasks = () => {
                       showUploadList={false}
                       beforeUpload={(file) => {
                         setFileName(file?.name);
-                      }}
-                    >
+                      }}>
                       <span>Browse</span>
                     </Upload>
                   </div>
@@ -194,21 +204,19 @@ const AddTasks = () => {
               sm={24}
               md={12}
               lg={12}
-              className={styles["form-col-task"]}
-            >
+              className={styles["form-col-task"]}>
               <Form.Item
                 name="assignee"
                 label="Tasks Assigned to"
-                style={{ position: "relative" }}
-              >
+                style={{ position: "relative" }}>
                 <Select
                   {...selectProps}
                   allowClear
                   placeholder="Please select"
-                  // dropdownStyle={{
-                  //    maxHeight: 100,
-                  //    overflowY: "hidden",
-                  // }}
+                // dropdownStyle={{
+                //    maxHeight: 100,
+                //    overflowY: "hidden",
+                // }}
                 >
                   {employeeData &&
                     employeeData?.User?.data?.map((employee, index) => (
@@ -224,8 +232,7 @@ const AddTasks = () => {
               sm={24}
               md={12}
               lg={12}
-              className={styles["form-col-task"]}
-            >
+              className={styles["form-col-task"]}>
               <Form.Item
                 name="taskManager"
                 label="Task Manager"
@@ -234,13 +241,14 @@ const AddTasks = () => {
                     required: true,
                     message: "Choose the task manager",
                   },
-                ]}
-              >
-                <Select showArrow placeholder="Select Task Manager">
+                ]}>
+                <Select
+                  showArrow
+                  placeholder="Select Task Manager">
                   {taskManager &&
                     taskManager?.User?.data?.map((manager, index) => (
                       <Option value={manager?.id} key={index}>
-                        <b>{manager?.fullName}</b> / {manager?.email}
+                        {manager?.fullName} / {manager?.email}
                       </Option>
                     ))}
                 </Select>
@@ -251,8 +259,7 @@ const AddTasks = () => {
               sm={24}
               md={12}
               lg={12}
-              className={styles["form-col-task"]}
-            >
+              className={styles["form-col-task"]}>
               <Form.Item
                 name="status"
                 label="Status"
@@ -261,11 +268,13 @@ const AddTasks = () => {
                     required: true,
                     message: "Choose the status",
                   },
-                ]}
-              >
+                ]}>
                 <Select placeholder="Select status">
-                  <Option value={"Active"}>Active</Option>
-                  <Option value={"Inactive"}>Inactive</Option>
+                  {status?.map((status, index) => (
+                    <Option value={status} key={index}>
+                      {status}
+                    </Option>
+                  ))}
                 </Select>
               </Form.Item>
             </Col>

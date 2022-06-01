@@ -41,8 +41,8 @@ const AttachClient = () => {
   const authData = authVar();
   const [form] = Form.useForm();
   const [client, setClient] = useState('');
-  const [AssociateClient] = useMutation(ASSOCIATE_USER_WITH_CLIENT);
-  const [ClientCreate] = useMutation(CLIENT_CREATE);
+  const [associateClient] = useMutation(ASSOCIATE_USER_WITH_CLIENT);
+  const [clientCreate] = useMutation(CLIENT_CREATE);
   const [visible, setVisible] = useState(false);
   const [searchClients, { loading, data: searchClientData }] = useLazyQuery(
     CLIENT,
@@ -105,7 +105,7 @@ const AttachClient = () => {
   const onSubmitForm = (values: any) => {
     let key = 'client';
     message.loading({ content: "Adding client in progress..", key, className: 'custom-message' })
-    ClientCreate({
+    clientCreate({
       variables: {
         input: {
           name: values.name,
@@ -139,7 +139,7 @@ const AttachClient = () => {
   }
 
   const addClientToEmployee = () => {
-    AssociateClient({
+    associateClient({
       variables: {
         input: {
           user_id: params?.eid,

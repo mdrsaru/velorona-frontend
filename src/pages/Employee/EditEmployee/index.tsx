@@ -13,6 +13,8 @@ import { ROLES } from '../../Role';
 import { CHANGE_PROFILE_IMAGE } from '../NewEmployee';
 
 import styles from '../style.module.scss';
+import { STATE_CITIES, USA_STATES } from '../../../utils/cities';
+import { useState } from 'react';
 
 const dateFormat = 'YYYY-MM-DD HH:mm:ss';
 const profileFile = (e: any) => {
@@ -100,6 +102,11 @@ const EditEmployee = () => {
         }
       }
     }).catch(notifyGraphqlError)
+  };
+
+  const [cities, setCountryCities] = useState<string[]>([]);
+  const setState = (data: string) => {
+    setCountryCities(STATE_CITIES[data]);
   }
 
   return (
@@ -252,14 +259,20 @@ const EditEmployee = () => {
                 className={styles.formCol}>
                 <Form.Item
                   label="State"
-                  name='state'
+                  name="state"
                   rules={[{
                     required: true,
                     message: 'Please enter your state!'
                   }]}>
-                  <Input
-                    placeholder="Enter the state name"
-                    autoComplete="off" />
+                  <Select
+                    showSearch
+                    placeholder={'Select the state'} onChange={setState}>
+                    {USA_STATES?.map((state: any, index: number) =>
+                      <Select.Option value={state?.name} key={index}>
+                        {state?.name}
+                      </Select.Option>
+                    )}
+                  </Select>
                 </Form.Item>
               </Col>
               <Col
@@ -270,15 +283,20 @@ const EditEmployee = () => {
                 className={styles.formCol}>
                 <Form.Item
                   label="City"
-                  name='city'
+                  name="city"
                   rules={[{
                     required: true,
                     message: 'Please enter your city!'
                   }]}>
-                  <Input
-                    placeholder="Enter city name"
-                    autoComplete="off"
-                    />
+                  <Select
+                    showSearch
+                    placeholder={'Select the city'}>
+                    {cities?.map((city: string, index: number) =>
+                      <Select.Option value={city} key={index}>
+                        {city}
+                      </Select.Option>
+                    )}
+                  </Select>
                 </Form.Item>
               </Col>
               <Col

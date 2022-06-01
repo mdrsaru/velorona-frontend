@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Button, Card, Col, Form, Input, message, Row, Select, Space } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import { useNavigate, useParams } from "react-router-dom";
@@ -10,6 +10,7 @@ import { Client } from "../../../interfaces/generated";
 import { CLIENT } from "../index";
 
 import styles from "../style.module.scss";
+import { STATE_CITIES, USA_STATES } from "../../../utils/cities";
 
 interface ClientResponseData {
   ClientCreate: Client
@@ -35,9 +36,9 @@ const EditClient = () => {
   let params = useParams();
   const authData = authVar();
   const navigate = useNavigate();
-  const [ClientUpdate] = useMutation<ClientResponseData>(CLIENT_UPDATE);
+  const [cities, setCountryCities] = useState<string[]>([]);
+  const [clientUpdate] = useMutation<ClientResponseData>(CLIENT_UPDATE);
   const [form] = Form.useForm();
-  const { Option } = Select;
 
   const cancelAddClient = () => {
     navigate(-1);
@@ -60,7 +61,7 @@ const EditClient = () => {
       key,
       className: 'custom-message'
     });
-    ClientUpdate({
+    clientUpdate({
       variables: {
         input: {
           id: params?.cid,
@@ -87,6 +88,11 @@ const EditClient = () => {
       }
     }).catch(notifyGraphqlError)
   }
+
+  const setState = (data: string) => {
+    setCountryCities(STATE_CITIES[data]);
+  }
+
 
   return (
     <div className={styles['main-div']}>
@@ -216,13 +222,14 @@ const EditClient = () => {
                       required: true,
                       message: 'Please enter state!'
                     }]}>
-                    <Select placeholder="Select State">
-                      <Option value="Arkansas">
-                        Arkansas
-                      </Option>
-                      <Option value="NewYork">
-                        New york
-                      </Option>
+                    <Select
+                      showSearch
+                      placeholder={'Select the state'} onChange={setState}>
+                      {USA_STATES?.map((state: any, index: number) =>
+                        <Select.Option value={state?.name} key={index}>
+                          {state?.name}
+                        </Select.Option>
+                      )}
                     </Select>
                   </Form.Item>
                 </Col>
@@ -239,9 +246,14 @@ const EditClient = () => {
                       required: true,
                       message: 'Please enter city!'
                     }]}>
-                    <Select placeholder="Select City">
-                      <Option value="Pokhara">Pokhara</Option>
-                      <Option value="Kathmandu">Kathmandu</Option>
+                    <Select
+                      showSearch
+                      placeholder={'Select the city'}>
+                      {cities?.map((city: string, index: number) =>
+                        <Select.Option value={city} key={index}>
+                          {city}
+                        </Select.Option>
+                      )}
                     </Select>
                   </Form.Item>
                 </Col>
