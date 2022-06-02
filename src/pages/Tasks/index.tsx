@@ -79,7 +79,6 @@ const Tasks = () => {
 
   const tasks = taskData?.Task?.data;
   const taskGroups = _.groupBy(tasks, "status");
-  console.log(taskGroups, "groups");
 
   const columns = [
     {
@@ -123,8 +122,8 @@ const Tasks = () => {
       title: "Prority",
       dataIndex: "priority",
       key: "status",
-      render: (priority: any) => (
-        <img src={priority ? Priority : NotPriority} width="15px" />
+      render: (task: any) => (
+        <img src={task?.priority ? Priority : NotPriority} alt="task-priority" />
       ),
     },
   ];
