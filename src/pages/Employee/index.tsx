@@ -39,6 +39,7 @@ export const USER = gql`
         avatar {
           id
           url
+          name
         }
         activeClient {
           id
@@ -216,15 +217,15 @@ const Employee = () => {
         },
       },
     }).then((response) => {
-        if (response.errors) {
-          return notifyGraphqlError(response.errors);
-        }
-        message.success({
-          content: `Employee is updated successfully!`,
-          key,
-          className: "custom-message",
-        });
-      })
+      if (response.errors) {
+        return notifyGraphqlError(response.errors);
+      }
+      message.success({
+        content: `Employee is updated successfully!`,
+        key,
+        className: "custom-message",
+      });
+    })
       .catch(notifyGraphqlError);
   };
 
@@ -394,7 +395,7 @@ const Employee = () => {
           <Col>
             <p
               onClick={() => handleUserPayRate(record)}
-              className={styles['addPayRate']}>
+              className={styles['add-pay-rate']}>
               Add PayRate
             </p>
           </Col>

@@ -1,10 +1,10 @@
 import { useState } from "react";
 
 import { Button, Card, Col, Form, Input, message, Row, Select, Space, Upload } from "antd";
-import { ArrowLeftOutlined, UploadOutlined } from "@ant-design/icons";
-import { mediaServices } from '../../../services/MediaService';
+import { ArrowLeftOutlined } from "@ant-design/icons";
 import constants, { roles_user } from "../../../config/constants";
 
+import type { UploadProps } from 'antd';
 import { useNavigate } from "react-router-dom";
 import { gql, useMutation } from "@apollo/client";
 import { notifyGraphqlError } from "../../../utils/error";
@@ -37,32 +37,40 @@ export const CHANGE_PROFILE_IMAGE = gql`
 export const USER_CREATE = gql`
   mutation UserCreate($input: UserCreateInput!) {
       UserCreate(input: $input) {
+        id
+        email
+        phone
+        firstName
+        middleName
+        lastName
+        fullName
+        status
+        archived
+        avatar_id
+        avatar {
           id
-          email
-          phone
-          firstName
-          middleName
-          lastName
-          fullName
-          status
-          activeClient {
-              id
-              name
-          }
-          address {
-              city
-              streetAddress
-              zipcode
-              state
-          }
-          company {
-              id
-              name
-          }
-          roles {
-              id
-              name
-          }
+          url
+          name
+        }
+        activeClient {
+          id
+          name
+        }
+        address {
+          city
+          streetAddress
+          zipcode
+          state
+          aptOrSuite
+        }
+        company {
+          id
+          name
+        }
+        roles {
+          id
+          name
+        }
       }
   }
 `
@@ -75,11 +83,77 @@ interface UserResponseArray {
 }
 
 const NewEmployee = () => {
+  let key = 'employee'
   const navigate = useNavigate();
   const authData = authVar();
   const [cities, setCountryCities] = useState<string[]>([]);
+  const [fileData, setFile] = useState({
+    id: '',
+    name: ''
+  })
+  const [changeProfilePictureInput] = useMutation(CHANGE_PROFILE_IMAGE);
+  const [form] = Form.useForm();
+  const { Option } = Select;
+
+  const cancelAddEmployee = () => {
+    navigate(-1);
+  }
+
+  const redirectTo = (role: string, user: string) => {
+    role === constants?.roles?.Employee ?
+      navigate(routes.attachClient.path(authData?.company?.code ?? "", user ?? "")) :
+      navigate(routes.employee.path(authData?.company?.code ?? ''));
+    message.success({
+      content: `New Employee is created successfully!`,
+      className: 'custom-message'
+    });
+  }
+
+  const props: UploadProps = {
+    name: 'file',
+    action: `${constants.apiUrl}/v1/media/upload`,
+    maxCount: 1,
+    headers: {
+      'authorization': authData?.token ? `Bearer ${authData?.token}` : '',
+    },
+    onChange(info) {
+      if (info.file.status === 'done') {
+        setFile({
+          name: info?.file?.name,
+          id: info?.file?.response?.data?.id
+        })
+      } else if (info.file.status === 'error') {
+        message.error(`${info.file.name} file upload failed.`);
+      }
+    }
+  };
+
+  const setState = (data: string) => {
+    setCountryCities(STATE_CITIES[data]);
+  }
 
   const [userCreate] = useMutation<UserResponse>(USER_CREATE, {
+    onCompleted: (response) => {
+      const user = response?.UserCreate;
+      if (fileData?.id) {
+        message.loading({
+          content: "Uploading user's profile image..",
+          key,
+          className: 'custom-message'
+        })
+        changeProfilePictureInput({
+          variables: {
+            input: {
+              id: user?.id,
+              avatar_id: fileData?.id
+            }
+          }
+        }).catch(notifyGraphqlError)
+        navigate(-1);
+      } else {
+        redirectTo(user?.roles[0]?.name, user?.id);
+      }
+    },
     update(cache, { data }) {
       const userResponse = data?.UserCreate;
       const existingUser = cache.readQuery<UserResponseArray>({
@@ -107,30 +181,7 @@ const NewEmployee = () => {
       }
     }
   })
-  const [changeProfilePictureInput] = useMutation(CHANGE_PROFILE_IMAGE);
-  const [form] = Form.useForm();
-  const { Option } = Select;
-
-  const cancelAddEmployee = () => {
-    navigate(-1);
-  }
-
-  const redirectTo = (role: string, user: string) => {
-    role === constants?.roles?.Employee ?
-      navigate(routes.attachClient.path(authData?.company?.code ?? "", user ?? "")) :
-      navigate(routes.employee.path(authData?.company?.code ?? ''));
-    message.success({
-      content: `New Employee is created successfully!`,
-      className: 'custom-message'
-    });
-  }
-
-  const setState = (data: string) => {
-    setCountryCities(STATE_CITIES[data]);
-  }
-
   const onSubmitForm = (values: any) => {
-    let key = 'employee'
     message.loading({
       content: "New employee adding in progress..",
       key,
@@ -158,37 +209,7 @@ const NewEmployee = () => {
     }).then((response) => {
       if (response.errors) {
         return notifyGraphqlError((response.errors), key)
-      } else if (response?.data) {
-        const user = response?.data?.UserCreate?.id;
-        if (values?.upload) {
-          const formData = new FormData();
-          formData.append('file', values?.upload[0]?.originFileObj)
-          mediaServices.uploadProfileImage(formData).then((res: any) => {
-            const avatar = res?.data?.id;
-            message.loading({
-              content: "Uploading user's profile image..",
-              key,
-              className: 'custom-message'
-            })
-            changeProfilePictureInput({
-              variables: {
-                input: {
-                  id: user,
-                  avatar_id: avatar
-                }
-              }
-            }).then((imageRes) => {
-              if (imageRes.errors) {
-                return notifyGraphqlError((response.errors), key)
-              } else {
-                redirectTo(values?.roles, user);
-              }
-            }).catch(notifyGraphqlError)
-          })
-        } else {
-          redirectTo(values?.roles, user);
-        }
-      }
+      };
     }).catch(notifyGraphqlError)
   }
 
@@ -209,18 +230,15 @@ const NewEmployee = () => {
           form={form}
           layout="vertical"
           onFinish={onSubmitForm}>
-          <Row>
-            <Col className={`${styles.formHeader}`}>
+          <Row gutter={[32, 0]}>
+            <Col className={styles['form-header']}>
               <p>Employee Information</p>
             </Col>
-          </Row>
-          <Row>
             <Col
               xs={24}
               sm={24}
               md={8}
-              lg={8}
-              className={styles.formCol}>
+              lg={8}>
               <Form.Item
                 label="First Name"
                 name='firstName'
@@ -235,8 +253,7 @@ const NewEmployee = () => {
               xs={24}
               sm={24}
               md={8}
-              lg={8}
-              className={styles.formCol}>
+              lg={8}>
               <Form.Item
                 label="Middle Name"
                 name='middleName'>
@@ -259,14 +276,11 @@ const NewEmployee = () => {
                 <Input placeholder="Enter lastname" autoComplete="off" />
               </Form.Item>
             </Col>
-          </Row>
-          <Row>
             <Col
               xs={24}
               sm={24}
               md={12}
-              lg={12}
-              className={styles.formCol}>
+              lg={12}>
               <Form.Item
                 label="Email"
                 name='email'
@@ -284,8 +298,7 @@ const NewEmployee = () => {
               xs={24}
               sm={24}
               md={12}
-              lg={12}
-              className={styles.formCol}>
+              lg={12}>
               <Form.Item
                 label="Phone Number"
                 name='phone'
@@ -293,25 +306,20 @@ const NewEmployee = () => {
                   required: true,
                   message: 'Please input your phone number!'
                 }, {
-                  max: 10,
-                  message: "Phone number should be less than 10 digits"
+                  max: 11,
+                  message: "Phone number should be less than 11 digits"
                 }]}>
                 <Input placeholder="Enter your phone number" autoComplete="off" />
               </Form.Item>
             </Col>
-          </Row>
-          <Row>
-            <Col className={`${styles.formHeader}`}>
+            <Col className={styles['form-header']}>
               <p>Address</p>
             </Col>
-          </Row>
-          <Row>
             <Col
               xs={24}
               sm={24}
               md={8}
-              lg={8}
-              className={styles.formCol}>
+              lg={8}>
               <Form.Item
                 label="State"
                 name='state'
@@ -334,8 +342,7 @@ const NewEmployee = () => {
               xs={24}
               sm={24}
               md={8}
-              lg={8}
-              className={styles.formCol}>
+              lg={8}>
               <Form.Item
                 label="City"
                 name='city'
@@ -358,8 +365,7 @@ const NewEmployee = () => {
               xs={24}
               sm={24}
               md={8}
-              lg={8}
-              className={styles.formCol}>
+              lg={8}>
               <Form.Item
                 label="Street Address"
                 name='streetAddress'
@@ -373,9 +379,7 @@ const NewEmployee = () => {
                   autoComplete="off" />
               </Form.Item>
             </Col>
-          </Row>
-          <Row>
-            <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+            <Col xs={24} sm={24} md={12} lg={12}>
               <Form.Item
                 label="Apartment/Suite"
                 name='apartment'>
@@ -385,26 +389,25 @@ const NewEmployee = () => {
                   autoComplete="off" />
               </Form.Item>
             </Col>
-            <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+            <Col xs={24} sm={24} md={12} lg={12}>
               <Form.Item
                 label="Zip Code"
-                name='zipcode'>
+                name='zipcode'
+                rules={[{
+                  required: true,
+                  message: 'Please select the zipcode'
+                }]}>
                 <Input placeholder="Enter the zipcode" autoComplete="off" />
               </Form.Item>
             </Col>
-          </Row>
-          <Row>
-            <Col className={`${styles.formHeader}`}>
+            <Col className={styles['form-header']}>
               <p>Employee Roles</p>
             </Col>
-          </Row>
-          <Row>
             <Col
               xs={24}
               sm={24}
               md={12}
-              lg={12}
-              className={styles.formCol}>
+              lg={12}>
               <Form.Item
                 name="roles"
                 label="Role"
@@ -414,7 +417,9 @@ const NewEmployee = () => {
                 }]}>
                 <Select placeholder="Employee">
                   {roles_user?.map((role: string, index: number) => (
-                    <Option value={role} key={index}>{role}</Option>
+                    <Option value={role} key={index}>
+                      {role}
+                    </Option>
                   ))}
                 </Select>
               </Form.Item>
@@ -423,8 +428,7 @@ const NewEmployee = () => {
               xs={24}
               sm={24}
               md={12}
-              lg={12}
-              className={styles.formCol}>
+              lg={12}>
               <Form.Item
                 name="status"
                 label="Employee Status"
@@ -438,24 +442,29 @@ const NewEmployee = () => {
                 </Select>
               </Form.Item>
             </Col>
-          </Row>
-          <Row>
             <Col
               xs={24}
               sm={24}
               md={12}
-              lg={12}
-              className={styles.formCol}>
+              lg={12}>
               <Form.Item
                 name="upload"
                 label="Upload Profile Image"
-                valuePropName="fileList"
-                getValueFromEvent={normFile}>
-                <Upload
-                  name="profileImg"
-                  maxCount={1}>
-                  <Button icon={<UploadOutlined />}>Click to Upload</Button>
-                </Upload>
+                valuePropName="filelist"
+                getValueFromEvent={normFile}
+                style={{ position: "relative" }}>
+                <div className={styles["upload-file"]}>
+                  <div>
+                    <span>
+                      {fileData?.name ? fileData?.name : " Attach your files here"}
+                    </span>
+                  </div>
+                  <div className={styles["browse-file"]}>
+                    <Upload {...props}>
+                      Click to Upload
+                    </Upload>
+                  </div>
+                </div>
               </Form.Item>
             </Col>
           </Row>
@@ -480,7 +489,7 @@ const NewEmployee = () => {
           </Row>
         </Form>
       </Card>
-    </div>
+    </div >
   )
 }
 export default NewEmployee

@@ -47,7 +47,12 @@ const EditCompany = () => {
     }
   })
   const [form] = Form.useForm()
-  const [updateCompany] = useMutation(COMPANY_UPDATE)
+  const [updateCompany] = useMutation(COMPANY_UPDATE, {
+    onCompleted: () => {
+      message.success(`Company is updated successfully!`)
+      navigate(-1)
+    },
+  })
 
   const onSubmitForm = (values: any) => {
     updateCompany({
@@ -61,14 +66,9 @@ const EditCompany = () => {
     }).then((response) => {
       if (response.errors) {
         return notifyGraphqlError((response.errors))
-      } else if (response?.data?.CompanyUpdate) {
-        message.success(`Company is updated successfully!`).then(r => { });
-        navigate(-1)
-      }
+      };
     }).catch(notifyGraphqlError)
-  }
-
-  console.log(companyData);
+  };
 
   return (
     <div className={styles['company-main-div']}>

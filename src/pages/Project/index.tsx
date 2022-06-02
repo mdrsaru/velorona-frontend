@@ -302,39 +302,39 @@ const Project = () => {
   ];
 
   return (
-    <>
-      <div className={styles["project-main-div"]}>
-        <Card bordered={false}>
-          <Row>
-            <Col span={12} className={styles["form-col"]}>
-              <h1>Projects</h1>
-            </Col>
-            <Col span={12} className={styles["form-col"]}>
-              <div className={styles["add-new"]}>
-                <Link
-                  to={routes.addProject.path(
-                    loggedInUser?.company?.code
-                      ? loggedInUser?.company?.code
-                      : ""
-                  )}
-                >
-                  Add new project
-                </Link>
-              </div>
-            </Col>
-          </Row>
-          <Row>
-            <Col span={24}>
-              <Table
-                dataSource={projectData?.Project?.data}
-                columns={columns}
-                rowKey={(record) => record?.id}
-                loading={updateLoading }
-              />
-            </Col>
-          </Row>
-        </Card>
-      </div>
+
+    <div className={styles["project-main-div"]}>
+      <Card bordered={false}>
+        <Row>
+          <Col span={12} className={styles["form-col"]}>
+            <h1>Projects</h1>
+          </Col>
+          <Col span={12} className={styles["form-col"]}>
+            <div className={styles["add-new"]}>
+              <Link
+                to={routes.addProject.path(
+                  loggedInUser?.company?.code
+                    ? loggedInUser?.company?.code
+                    : ""
+                )}
+              >
+                Add new project
+              </Link>
+            </div>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={24}>
+            <Table
+              dataSource={projectData?.Project?.data}
+              columns={columns}
+              rowKey={(record) => record?.id}
+              loading={updateLoading}
+            />
+          </Col>
+        </Row>
+      </Card>
+      
       <ModalConfirm
         visibility={visibility}
         setModalVisibility={setModalVisibility}
@@ -358,14 +358,13 @@ const Project = () => {
                 <strong> {project.name}?</strong>
               </>
             ),
-            subText: `Project will ${
-              project?.archived ? "" : "not"
-            } be able to assigned to any employee`,
+            subText: `Project will ${project?.archived ? "" : "not"
+              } be able to assigned to any employee`,
           })
         }
         onOkClick={archiveProject}
       />
-    </>
+    </div>
   );
 };
 

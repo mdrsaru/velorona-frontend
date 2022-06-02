@@ -1,22 +1,24 @@
-import { Button, Card, Col, Form, Input, message, Row, Select, Space, Upload } from 'antd';
-import { ArrowLeftOutlined, UploadOutlined } from '@ant-design/icons';
-import moment from 'moment';
+import { Button, Card, Col, Form, Input, message, Row, Select, Space, Upload } from 'antd'
+import { ArrowLeftOutlined } from '@ant-design/icons'
+import moment from 'moment'
+import type { UploadProps } from 'antd'
 
-import { useNavigate, useParams } from 'react-router-dom';
-import { useMutation, useQuery } from '@apollo/client';
-import { notifyGraphqlError } from '../../../utils/error';
+import constants from '../../../config/constants'
+import { useNavigate, useParams } from 'react-router-dom'
+import { useMutation, useQuery } from '@apollo/client'
+import { notifyGraphqlError } from '../../../utils/error'
+import { IRole } from '../../../interfaces/IRole'
+import { USER_UPDATE, USER } from '..'
+import { ROLES } from '../../Role'
+import { CHANGE_PROFILE_IMAGE } from '../NewEmployee'
 
-import { mediaServices } from '../../../services/MediaService';
-import { IRole } from '../../../interfaces/IRole';
-import { USER_UPDATE, USER } from '..';
-import { ROLES } from '../../Role';
-import { CHANGE_PROFILE_IMAGE } from '../NewEmployee';
+import { STATE_CITIES, USA_STATES } from '../../../utils/cities'
+import { useState } from 'react'
+import styles from '../style.module.scss'
+import { authVar } from '../../../App/link'
+import RouteLoader from '../../../components/Skeleton/RouteLoader'
 
-import styles from '../style.module.scss';
-import { STATE_CITIES, USA_STATES } from '../../../utils/cities';
-import { useState } from 'react';
-
-const dateFormat = 'YYYY-MM-DD HH:mm:ss';
+const dateFormat = 'YYYY-MM-DD HH:mm:ss'
 const profileFile = (e: any) => {
   if (Array.isArray(e)) {
     return e;
@@ -27,19 +29,51 @@ const profileFile = (e: any) => {
 
 const EditEmployee = () => {
   let params = useParams();
+  const authData = authVar();
   const navigate = useNavigate();
-  const [userUpdate] = useMutation(USER_UPDATE);
+  const [fileData, setFile] = useState({
+    id: '',
+    name: ''
+  })
+  const [userUpdate] = useMutation(USER_UPDATE, {
+    onCompleted: () => {
+      if (fileData?.id) {
+        changeProfilePictureInput({
+          variables: {
+            input: {
+              id: params?.eid,
+              avatar_id: fileData?.id
+            }
+          }
+        }).then((response) => {
+          if (response.errors) {
+            return notifyGraphqlError((response.errors))
+          } else if (response?.data) {
+            successMessage()
+          }
+        }).catch(notifyGraphqlError)
+      } else {
+        successMessage()
+      }
+    }
+  });
   const [changeProfilePictureInput] = useMutation(CHANGE_PROFILE_IMAGE);
   const { data: roles } = useQuery(ROLES, {
     fetchPolicy: "cache-first"
   });
-  const { data: userData } = useQuery(USER, {
+  const { data: userData, loading: userLoading } = useQuery(USER, {
     variables: {
       input: {
         query: {
           id: params?.eid
         }
       }
+    },
+    onCompleted: (response) => {
+      setFile({
+        id: '',
+        name: response?.User?.data[0]?.avatar?.name
+      })
     }
   })
 
@@ -55,53 +89,51 @@ const EditEmployee = () => {
     navigate(-1)
   }
 
-  const onSubmitForm = () => {
-    const values = form.getFieldsValue(true, meta => meta.touched);
-    let formData: any = { id: params?.eid }
-    let address: any = {}
-    for (let data in values) {
-      if (data === 'streetAddress' || data === 'state' || data === 'city' || data === 'zipcode' || data === 'aptOrSuite') {
-        address[data] = values[data]
-        formData['address'] = address
-      } else if (data !== 'upload') {
-        formData[data] = values[data]
+  const props: UploadProps = {
+    name: 'file',
+    action: `${constants.apiUrl}/v1/media/upload`,
+    maxCount: 1,
+    headers: {
+      'authorization': authData?.token ? `Bearer ${authData?.token}` : '',
+    },
+    onChange(info) {
+      if (info.file.status === 'done') {
+        setFile({
+          name: info?.file?.name,
+          id: info?.file?.response?.data?.idu
+        })
+      } else if (info.file.status === 'error') {
+        message.error(`${info.file.name} file upload failed.`);
       }
     }
+  };
 
-    userUpdate({
-      variables: {
-        input: formData
-      }
-    }).then((response) => {
-      if (response.errors) {
-        return notifyGraphqlError((response.errors))
-      } else if (response?.data?.UserUpdate) {
-        if (values?.upload) {
-          const formData = new FormData();
-          formData.append('file', values?.upload[0]?.originFileObj)
-          mediaServices.uploadProfileImage(formData).then((res: any) => {
-            const user = params?.eid;
-            const avatar = res?.data?.id;
-            changeProfilePictureInput({
-              variables: {
-                input: {
-                  id: user,
-                  avatar_id: avatar
-                }
-              }
-            }).then((response) => {
-              if (response.errors) {
-                return notifyGraphqlError((response.errors))
-              } else if (response?.data) {
-                successMessage()
-              }
-            }).catch(notifyGraphqlError)
-          })
-        } else {
-          successMessage()
+  const onSubmitForm = () => {
+    const values = form.getFieldsValue(true, meta => meta.touched);
+    if (Object.keys(values).length !== 0) {
+      let formData: any = { id: params?.eid }
+      let address: any = {}
+      for (let data in values) {
+        if (data === 'streetAddress' || data === 'state' || data === 'city' || data === 'zipcode' || data === 'aptOrSuite') {
+          address[data] = values[data]
+          formData['address'] = address
+        } else if (data !== 'upload') {
+          formData[data] = values[data]
         }
       }
-    }).catch(notifyGraphqlError)
+  
+      userUpdate({
+        variables: {
+          input: formData
+        }
+      }).then((response) => {
+        if (response.errors) {
+          return notifyGraphqlError((response.errors))
+        };
+      }).catch(notifyGraphqlError)
+    } else {
+      navigate(-1)
+    }
   };
 
   const [cities, setCountryCities] = useState<string[]>([]);
@@ -111,20 +143,20 @@ const EditEmployee = () => {
 
   return (
     <div className={styles['main-div']}>
-      <Card bordered={false}>
-        <Row style={{ height: '122px' }}>
-          <Col span={12} className={styles['employee-col']}>
-            <h1>
-              <ArrowLeftOutlined
-                onClick={() => navigate(-1)} />
-              &nbsp;
-              Edit Employee
-            </h1>
-          </Col>
-        </Row>
-        {userData &&
-          <Form
-            form={form}
+      {userLoading ?
+        <RouteLoader /> :
+        <Card bordered={false}>
+          <Row>
+            <Col span={12} className={styles['employee-col']}>
+              <h1>
+                <ArrowLeftOutlined
+                  onClick={() => navigate(-1)} />
+                &nbsp;
+                Edit Employee
+              </h1>
+            </Col>
+          </Row>
+          <Form form={form}
             layout="vertical"
             onFinish={onSubmitForm}
             initialValues={{
@@ -140,22 +172,19 @@ const EditEmployee = () => {
               endDate: moment(userData?.User?.data[0]?.record?.startDate ?? '2022-01-02T00:00:00.410Z', dateFormat),
               state: userData?.User?.data[0]?.address?.state ?? '',
               city: userData?.User?.data[0]?.address?.city ?? '',
+              file: userData?.User?.data[0]?.avatar?.url,
               zipcode: userData?.User?.data[0]?.address?.zipcode ?? '',
               aptOrSuite: userData?.User?.data[0]?.address?.aptOrSuite ?? '',
               payRate: userData?.User?.data[0]?.record?.payRate ?? ''
             }}>
-            <Row>
-              <Col className={`${styles.formHeader}`}>
+            <Row gutter={[24, 0]}>
+              <Col className={styles['form-header']}>
                 <p>Employee Information</p>
               </Col>
-            </Row>
-            <Row>
-              <Col
-                xs={24}
+              <Col xs={24}
                 sm={24}
                 md={8}
-                lg={8}
-                className={styles.formCol}>
+                lg={8}>
                 <Form.Item
                   label="First Name"
                   name='firstName'
@@ -172,8 +201,7 @@ const EditEmployee = () => {
                 xs={24}
                 sm={24}
                 md={8}
-                lg={8}
-                className={styles.formCol}>
+                lg={8}>
                 <Form.Item
                   label="Middle Name"
                   name='middleName'>
@@ -186,8 +214,7 @@ const EditEmployee = () => {
                 xs={24}
                 sm={24}
                 md={8}
-                lg={8}
-                className={styles.formCol}>
+                lg={8}>
                 <Form.Item
                   label="Last Name"
                   name='lastName'
@@ -200,14 +227,10 @@ const EditEmployee = () => {
                     autoComplete="off" />
                 </Form.Item>
               </Col>
-            </Row>
-            <Row>
-              <Col
-                xs={24}
+              <Col xs={24}
                 sm={24}
                 md={12}
-                lg={12}
-                className={styles.formCol}>
+                lg={12}>
                 <Form.Item
                   label="Email"
                   name='email'
@@ -227,8 +250,7 @@ const EditEmployee = () => {
                 xs={24}
                 sm={24}
                 md={12}
-                lg={12}
-                className={styles.formCol}>
+                lg={12}>
                 <Form.Item
                   label="Phone Number"
                   name='phone'
@@ -244,19 +266,13 @@ const EditEmployee = () => {
                     autoComplete="off" />
                 </Form.Item>
               </Col>
-            </Row>
-            <Row>
-              <Col className={`${styles.formHeader}`}>
+              <Col className={styles['form-header']}>
                 <p>Address</p>
               </Col>
-            </Row>
-            <Row>
-              <Col
-                xs={24}
+              <Col xs={24}
                 sm={24}
                 md={8}
-                lg={8}
-                className={styles.formCol}>
+                lg={8}>
                 <Form.Item
                   label="State"
                   name="state"
@@ -279,8 +295,7 @@ const EditEmployee = () => {
                 xs={24}
                 sm={24}
                 md={8}
-                lg={8}
-                className={styles.formCol}>
+                lg={8}>
                 <Form.Item
                   label="City"
                   name="city"
@@ -303,8 +318,7 @@ const EditEmployee = () => {
                 xs={24}
                 sm={24}
                 md={8}
-                lg={8}
-                className={styles.formCol}>
+                lg={8}>
                 <Form.Item
                   label="Street Address"
                   name='streetAddress'
@@ -317,14 +331,10 @@ const EditEmployee = () => {
                     autoComplete="off" />
                 </Form.Item>
               </Col>
-            </Row>
-            <Row>
-              <Col
-                xs={24}
+              <Col xs={24}
                 sm={24}
                 md={12}
-                lg={12}
-                className={styles.formCol}>
+                lg={12}>
                 <Form.Item
                   label="Apartment/Suite"
                   name='aptOrSuite'>
@@ -337,8 +347,7 @@ const EditEmployee = () => {
                 xs={24}
                 sm={24}
                 md={12}
-                lg={12}
-                className={styles.formCol}>
+                lg={12}>
                 <Form.Item
                   label="Zip Code"
                   name='zipcode'>
@@ -347,20 +356,13 @@ const EditEmployee = () => {
                     autoComplete="off" />
                 </Form.Item>
               </Col>
-            </Row>
-            <Row>
-              <Col className={styles.formHeader}>
+              <Col className={styles['form-header']}>
                 <p>Employee Roles</p>
               </Col>
-            </Row>
-            <Row>
-
-              <Col
-                xs={24}
+              <Col xs={24}
                 sm={24}
                 md={12}
-                lg={12}
-                className={styles.formCol}>
+                lg={12}>
                 <Form.Item
                   name="roles"
                   label="Role"
@@ -378,12 +380,10 @@ const EditEmployee = () => {
                   </Select>
                 </Form.Item>
               </Col>
-              <Col
-                xs={24}
+              <Col xs={24}
                 sm={24}
                 md={12}
-                lg={12}
-                className={styles.formCol}>
+                lg={12}>
                 <Form.Item
                   name="status"
                   label="Employee Status"
@@ -396,30 +396,31 @@ const EditEmployee = () => {
                   </Select>
                 </Form.Item>
               </Col>
-            </Row>
-
-            <Row>
-              <Col
-                xs={24}
+              <Col xs={24}
                 sm={24}
                 md={12}
-                lg={12}
-                className={styles.formCol}>
+                lg={12}>
                 <Form.Item
-                  name="upload"
-                  label="Upload"
-                  valuePropName="fileList"
-                  getValueFromEvent={profileFile}>
-                  <Upload name="profileImg" maxCount={1}>
-                    <Button icon={<UploadOutlined />}>
-                      Click to Upload
-                    </Button>
-                  </Upload>
+                  name="file"
+                  label="Upload Profile Image"
+                  valuePropName="filelist"
+                  getValueFromEvent={profileFile}
+                  style={{ position: "relative" }}>
+                  <div className={styles["upload-file"]}>
+                    <div>
+                      <span>
+                        {fileData?.name ? fileData?.name : " Attach your file here"}
+                      </span>
+                    </div>
+                    <div className={styles["browse-file"]}>
+                      <Upload {...props}>
+                        Click to Upload
+                      </Upload>
+                    </div>
+                  </div>
                 </Form.Item>
               </Col>
-
-            </Row>
-            <br /><br />
+            </Row><br /><br />
             <Row justify="end">
               <Col>
                 <Form.Item>
@@ -439,8 +440,9 @@ const EditEmployee = () => {
                 </Form.Item>
               </Col>
             </Row>
-          </Form>}
-      </Card>
+          </Form>
+        </Card>}
+
     </div>
   )
 }

@@ -29,7 +29,7 @@ const ModalConfirm = (props: {
       onOk={() => props.onOkClick()}
       onCancel={() => props.setModalVisibility(false)}
       width={1000}
-      className={styles["confirmModal"]}
+      className={styles["confirm-modal"]}
     >
       {<props.modalBody />}
     </Modal>
