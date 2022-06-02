@@ -1,11 +1,23 @@
+
+import moment from "moment";
 import { CloseOutlined, LinkOutlined } from "@ant-design/icons";
-import { useMutation } from "@apollo/client";
-import { Col, message, Modal, Row, Select } from "antd";
+import { useMutation, useQuery } from "@apollo/client";
+import { Col, DatePicker, message, Modal, Row, Select } from "antd";
 import parse from "html-react-parser";
+
 import { authVar } from "../../App/link";
-import { TaskStatus } from "../../interfaces/generated";
+import { UserData } from "../../pages/Client";
+import { USER } from "../../pages/Employee";
 import { TASK_UPDATE } from "../../pages/Project/DetailProject";
+import AssignedUserAvatar from "../AssignedUserAvatar";
+
 import { notifyGraphqlError } from "../../utils/error";
+
+import { TaskStatus } from "../../interfaces/generated";
+
+import NotPriority from "../../assets/images/not-priority.svg";
+import Priority from "../../assets/images/priority.svg";
+
 import Status from "../Status";
 import styles from "./styles.module.scss";
 
@@ -14,11 +26,27 @@ interface IProps {
   setVisibility: any;
   data: any;
   employee?: boolean;
+  userId?: any;
 }
 
 const TaskDetail = (props: IProps) => {
-  const task = props?.data;
+  const { visibility, setVisibility, data, employee, userId  } = props;
   const loggedInUser = authVar();
+  const { data: userData } = useQuery<UserData>(USER, {
+    fetchPolicy: "network-only",
+    nextFetchPolicy: "cache-first",
+    variables: {
+      input: {
+        query: {
+          id: props?.userId,
+        },
+        paging: {
+          order: ["updatedAt:DESC"],
+        },
+      },
+    },
+  });
+
   const [taskUpdate] = useMutation(TASK_UPDATE, {
     onCompleted() {
       message.success({
@@ -30,7 +58,7 @@ const TaskDetail = (props: IProps) => {
       notifyGraphqlError(err);
     },
     update(cache) {
-      const normalizedId = cache.identify({ id: task.id, __typename: "Task" });
+      const normalizedId = cache.identify({ id: data?.id, __typename: "Task" });
       cache.evict({ id: normalizedId });
       cache.gc();
     },
@@ -42,7 +70,7 @@ const TaskDetail = (props: IProps) => {
     taskUpdate({
       variables: {
         input: {
-          id: task?.id,
+          id: data?.id,
           company_id: loggedInUser?.company?.id,
           status: value,
         },
@@ -50,78 +78,205 @@ const TaskDetail = (props: IProps) => {
     });
   };
 
+  const handleDatePickerChange = (date: any, dateString: any) => {
+    let deadline = moment(new Date(date)).format("YYYY-MM-DD");
+    taskUpdate({
+      variables: {
+        input: {
+          id: data?.id,
+          company_id: loggedInUser?.company?.id,
+          deadline: deadline,
+        },
+      },
+    });
+  };
+
+  const handlePriorityChange = () => {
+    taskUpdate({
+      variables: {
+        input: {
+          id: data?.id,
+          company_id: loggedInUser?.company?.id,
+          priority: !data?.priority,
+        },
+      },
+    });
+  };
+  const createdAt = data?.createdAt?.split("T")?.[0];
   return (
-    <>
-      <Modal
-        centered
-        visible={props?.visibility}
-        closeIcon={[
-          <div onClick={() => props?.setVisibility(false)}>
-            <span className={styles["close-icon-div"]}>
-              <CloseOutlined />
-            </span>
-          </div>,
-        ]}
-        footer={[
-          <div className={styles["modal-footer"]}>
-            {task?.attachments?.length ? (
-              <>
-                <span>Attachments</span> &nbsp; &nbsp;
-                {task?.attachments?.map((attachment: any, index: number) => (
-                  <div key={index}>
-                    <span className={styles["file-attach"]}>
-                      <LinkOutlined />
-                    </span>{" "}
-                    &nbsp;
-                    <span className={styles["file-name"]}>
-                      <a href={attachment.url} target="_blank" rel="noreferrer">
-                        {attachment.name}
-                      </a>
-                    </span>{" "}
-                    &nbsp; &nbsp;
-                  </div>
-                ))}
-              </>
-            ) : (
-              ""
-            )}
-          </div>,
-        ]}
-        width={869}>
-        <div className={styles["modal-body"]}>
-          <div>
-            <Row>
-              <Col lg={8}>
-                <span className={styles["task-title"]}>{task?.name}</span>
+    <Modal
+      centered
+      visible={props.visibility}
+      closeIcon={[
+        <div onClick={() => props.setVisibility(false)}>
+          <span className={styles["close-icon-div"]}>
+            <CloseOutlined />
+          </span>
+        </div>,
+      ]}
+      footer={[
+        <div className={styles["modal-footer"]}>
+          {data?.attachments?.length ? (
+            <>
+              <span>Attachments</span> &nbsp; &nbsp;
+              {data?.attachments?.map((attachment: any, index: number) => (
+                <div key={index}>
+                  <span className={styles["file-attach"]}>
+                    <LinkOutlined />
+                  </span>{" "}
+                  &nbsp;
+                  <span className={styles["file-name"]}>
+                    <a href={attachment.url} target="_blank" rel="noreferrer">
+                      {attachment?.name}
+                    </a>
+                  </span>{" "}
+                  &nbsp; &nbsp;
+                </div>
+              ))}
+            </>
+          ) : (
+            ""
+          )}
+        </div>,
+      ]}
+      width={869}
+    >
+      <div className={styles["modal-body"]}>
+        <div>
+          <Row>
+            <Col lg={6}>
+              <span className={styles["task-title"]}>Task Detail</span>
+            </Col>
+            {props?.employee ? (
+              <Col lg={6}>
+                <Select
+                  placeholder="Select State"
+                  onChange={onStatusChange}
+                  defaultValue={data?.status}
+                >
+                  {status?.map((status, index) => (
+                    <Select.Option value={status} key={index}>
+                      {status}
+                    </Select.Option>
+                  ))}
+                </Select>
               </Col>
-              {props?.employee ? (
-                <Col lg={6}>
-                  <Select
-                    placeholder="Select State"
-                    onChange={onStatusChange}
-                    defaultValue={task?.status}
-                  >
-                    {status?.map((status, index) => (
-                      <Select.Option value={status} key={index}>
-                        {status}
-                      </Select.Option>
-                    ))}
-                  </Select>
-                </Col>
-              )
-            :
-            <div className={styles["status-div"]}>
-                <Status status = {task?.active ? 'Active' : 'Inactive'}/>
+            ) : (
+              <div className={styles["status-div"]}>
+                <Status status={data?.active ? "Active" : "Inactive"} />
               </div>
-            }
-            </Row>
-          </div>
-          <br />
-          <br />
-          <div className={styles["task-body"]}>{parse(task?.description)}</div>
+            )}
+          </Row>
         </div>
-      </Modal>
-    </>
+        <br />
+        <br />
+        <div style={{ marginBottom: "1rem" }}>
+          <Row style={{ marginTop: "1rem" }}>
+            {props?.employee && (
+              <Col lg={6} md={5} sm={24}>
+                <p className={styles["user-name"]}>
+                  {userData?.User?.data?.[0]?.fullName}
+                </p>
+              </Col>
+            )}
+            <Col lg={5} md={3} sm={12} className={styles["headings"]}>
+              <p>Assigned To</p>
+              <AssignedUserAvatar users={data?.users} />
+            </Col>
+            <Col lg={4} md={5} sm={12}>
+              <p>Priority</p>
+              {props.employee ? (
+                <img
+                  src={data?.priority ? Priority : NotPriority}
+                  width="15px"
+                  alt="Priority Flag"
+                />
+              ) : (
+                <img
+                  src={data?.priority ? Priority : NotPriority}
+                  width="15px"
+                  alt="Priority Flag"
+                  onClick={handlePriorityChange}
+                />
+              )}
+            </Col>
+
+            <Col lg={6} md={3} sm={12}>
+              <p>CreatedAt</p>
+              <p className={styles["createdAt"]}>{createdAt}</p>
+            </Col>
+
+            <Col lg={3} md={3} sm={12}>
+              <p>Deadline</p>
+
+              {props.employee ? (
+                <span>
+                  {" "}
+                  {data?.deadline ? (
+                    <p className={styles.deadline}>
+                      {" "}
+                      {data?.deadline?.split("T")?.[0]}
+                    </p>
+                  ) : (
+                    "-"
+                  )}{" "}
+                </span>
+              ) : data?.deadline ? (
+                <Row>
+                  <Col>
+                    <DatePicker
+                      bordered={false}
+                      format="MMM Do, YYYY"
+                      allowClear={false}
+                      className={styles["custom-picker"]}
+                      // defaultValue={task?.deadline}
+                      suffixIcon={
+                        <span style={{ color: "beige;" }}>
+                          {" "}
+                          {`${data?.deadline?.split("T")?.[0]}`}{" "}
+                        </span>
+                      }
+                      onChange={(date, dateString) =>
+                        handleDatePickerChange(date, dateString)
+                      }
+                      style={{
+                        width: 20,
+                        boxSizing: "revert",
+                        background: "#fff",
+                      }}
+                    />
+                  </Col>
+                </Row>
+              ) : (
+                <DatePicker
+                  bordered={false}
+                  format="MMM Do, YYYY"
+                  allowClear={false}
+                  className={styles["custom-picker"]}
+                  onChange={(date, dateString) =>
+                    handleDatePickerChange(date, dateString)
+                  }
+                  style={{
+                    width: 20,
+                    boxSizing: "revert",
+                    background: "#fff",
+                  }}
+                />
+              )}
+            </Col>
+          </Row>
+        </div>
+        <div style={{ marginTop: "3rem" }}>
+          <span className={styles["task-title"]}>{data?.name} </span>
+          <span className={styles.clientProjectName}>
+            {data?.project?.client?.name}:{data?.project?.name}
+          </span>
+          <div className={styles["task-body"]}>
+            {data ? parse(data?.description) : ""}
+          </div>
+        </div>
+      </div>
+    </Modal>
   );
 };
 
