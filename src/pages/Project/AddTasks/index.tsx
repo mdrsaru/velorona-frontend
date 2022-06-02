@@ -115,6 +115,7 @@ const AddTasks = () => {
   };
 
   const onSubmitForm = (values: any) => {
+    console.log(values);
     createTask({
       variables: {
         input: {
@@ -130,6 +131,7 @@ const AddTasks = () => {
     });
   };
   const status = Object.values(TaskStatus);
+
   return (
     <div className={styles["main-div"]}>
       <Card bordered={false}>
