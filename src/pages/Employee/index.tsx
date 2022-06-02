@@ -173,7 +173,11 @@ const Employee = () => {
 
   const archiveUser = () => {
     let key = 'archive'
-    message.loading({ content: "Archiving employee in progress..", key, className: 'custom-message' });
+    message.loading({
+      content: "Archiving employee in progress..",
+      key,
+      className: 'custom-message'
+    });
     employeeArchive({
       variables: {
         input: {
@@ -199,7 +203,11 @@ const Employee = () => {
 
   const changeStatus = (value: string, id: string) => {
     let key = 'status'
-    message.loading({ content: "Updating status of employee..", key, className: 'custom-message' });
+    message.loading({
+      content: "Updating status of employee..",
+      key,
+      className: 'custom-message'
+    });
     employeeUpdate({
       variables: {
         input: {
@@ -207,8 +215,7 @@ const Employee = () => {
           id: id,
         },
       },
-    })
-      .then((response) => {
+    }).then((response) => {
         if (response.errors) {
           return notifyGraphqlError(response.errors);
         }
@@ -222,13 +229,14 @@ const Employee = () => {
   };
 
   const handleUserPayRate = (record: any) => {
-    console.log(record);
     setEmployee(record);
     setUserPayRateVisibility(!showUserPayRate);
   };
   const menu = (data: any) => (
     <Menu>
-      <SubMenu title="Change status" key="mainMenu">
+      <SubMenu
+        title="Change status"
+        key="mainMenu">
         <Menu.Item
           key="active"
           onClick={() => {
@@ -384,13 +392,16 @@ const Employee = () => {
       render: (record: any) => (
         <Row>
           <Col>
-            <p onClick={() => handleUserPayRate(record)} className={styles['addPayRate']}>Add PayRate </p>
+            <p
+              onClick={() => handleUserPayRate(record)}
+              className={styles['addPayRate']}>
+              Add PayRate
+            </p>
           </Col>
           <Col>
             <div
               className={styles["dropdown-menu"]}
-              onClick={(event) => event.stopPropagation()}
-            >
+              onClick={(event) => event.stopPropagation()}>
 
               <Dropdown
                 overlay={menu(record)}

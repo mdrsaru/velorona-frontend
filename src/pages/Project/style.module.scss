@@ -134,8 +134,7 @@
 }
 
 .project-col {
-  padding: 1.5rem 0 0.9rem 0;
-
+  padding: 1rem 0 1rem 0;
   h1 {
     font-weight: 600;
     font-size: 24px;
@@ -186,7 +185,6 @@
 .add-task-row {
   margin-left: 1rem;
   margin-right: 1rem;
-  padding: 1rem 1.5rem 1rem 1.5rem;
 }
 
 .upload-file {
@@ -217,15 +215,6 @@
     font-size: 18px;
     line-height: 22px;
     color: var(--gray-secondary);
-  }
-}
-
-.form-col-task {
-  padding: 0 1rem 0 0;
-  :global {
-    .ant-upload-list {
-      display: none;
-    }
   }
 }
 

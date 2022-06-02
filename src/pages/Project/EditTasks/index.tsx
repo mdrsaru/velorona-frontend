@@ -10,8 +10,8 @@ import {
   Upload,
   message,
 } from "antd";
-import { ArrowLeftOutlined } from "@ant-design/icons";
-import React, { useState } from "react";
+import { ArrowLeftOutlined, UploadOutlined } from "@ant-design/icons";
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { authVar } from "../../../App/link";
@@ -21,10 +21,12 @@ import { notifyGraphqlError } from "../../../utils/error";
 import routes from "../../../config/routes";
 import { UserData } from "../../Client";
 import constants from "../../../config/constants";
-
-import styles from "../style.module.scss";
+import type { UploadProps } from 'antd';
 import { TaskStatus } from "../../../interfaces/generated";
 import { TASK } from "../../Tasks";
+
+import styles from "../style.module.scss";
+import { ITasks, ITaskUsers } from "../../../interfaces/ITasks";
 
 const USER = gql`
   query User($input: UserQueryInput!) {
@@ -54,13 +56,16 @@ const TASK_UPDATE = gql`
 const EditTasks = () => {
   let params = useParams();
   const loggedInUser = authVar();
-  const [fileName, setFileName] = useState("");
+  const [fileData, setFile] = useState<ITasks>({
+    ids: [],
+    name: ""
+  })
 
   const [form] = Form.useForm();
   const navigate = useNavigate();
 
   const [updateTask] = useMutation(TASK_UPDATE, {
-    onCompleted(response) {
+    onCompleted() {
       message.success({
         content: `New task is added successfully!`,
         className: "custom-message",
@@ -128,10 +133,31 @@ const EditTasks = () => {
   const selectProps = {
     placeholder: "Select Employees",
     mode: "multiple" as const,
-    style: { width: "100%" },
-    // maxTagCount: 'responsive' as const
+    style: { width: "100%" }
   };
   let task = taskData?.Task?.data[0];
+
+  const props: UploadProps = {
+    name: 'file',
+    action: `${constants.apiUrl}/v1/media/upload`,
+    headers: {
+      'authorization': loggedInUser?.token ? `Bearer ${loggedInUser?.token}` : '',
+    },
+    onChange(info) {
+      if (info.file.status === 'done') {
+        let newID = info?.file?.response?.data?.id
+        let array = [...fileData?.ids, newID]
+        setFile({
+          name: info?.file?.name,
+          ids: array
+        })
+      } else if (info.file.status === 'error') {
+        message.error(`${info.file.name} file upload failed.`);
+      }
+    },
+    defaultFileList: [...task?.attachments],
+    listType: "picture"
+  };
 
   const onSubmitForm = (values: any) => {
     updateTask({
@@ -144,6 +170,7 @@ const EditTasks = () => {
           company_id: loggedInUser?.company?.id,
           manager_id: values?.taskManager,
           project_id: params?.pid,
+          // attachment_ids: fileData?.ids,
           user_ids: values?.assignee,
         },
       },
@@ -169,22 +196,28 @@ const EditTasks = () => {
           initialValues={{
             name: task?.name ?? "",
             description: task?.description ?? "",
-            assignee: task?.users ?? "",
+            assignee: task?.users?.map((user: ITaskUsers) => { return user?.id }) ?? "",
             taskManager: task?.manager?.fullName ?? "",
             status: task?.status ?? "",
-          }}
-        >
-          <Row className={styles["add-task-row"]}>
-            <Col span={24} className={styles["form-col-task"]}>
-              <Form.Item label="Task Name" name="name">
+            file: task?.attachments
+          }}>
+          <Row
+            className={styles["add-task-row"]}
+            gutter={[24, 8]}>
+            <Col span={24}>
+              <Form.Item
+                label="Task Name"
+                name="name">
                 <Input
                   placeholder="Enter the Name of the Task"
                   autoComplete="off"
                 />
               </Form.Item>
             </Col>
-            <Col span={24} className={styles["form-col-task"]}>
-              <Form.Item label="Description Name" name="description">
+            <Col span={24}>
+              <Form.Item
+                label="Description Name"
+                name="description">
                 <Input.TextArea />
               </Form.Item>
             </Col>
@@ -192,56 +225,15 @@ const EditTasks = () => {
               xs={24}
               sm={24}
               md={12}
-              lg={12}
-              className={styles["form-col-task"]}
-            >
-              <Form.Item
-                name="assignmentFile"
-                label="Assignment Files"
-                style={{ position: "relative" }}
-              >
-                <div className={styles["upload-file"]}>
-                  <div>
-                    <span>
-                      {fileName ? fileName : " Attach your files here"}
-                    </span>
-                  </div>
-                  <div className={styles["browse-file"]}>
-                    <Upload
-                      name="assignmentFile"
-                      maxCount={1}
-                      showUploadList={false}
-                      beforeUpload={(file) => {
-                        setFileName(file?.name);
-                      }}
-                    >
-                      <span>Browse</span>
-                    </Upload>
-                  </div>
-                </div>
-              </Form.Item>
-            </Col>
-            <Col
-              xs={24}
-              sm={24}
-              md={12}
-              lg={12}
-              className={styles["form-col-task"]}
-            >
+              lg={12}>
               <Form.Item
                 name="assignee"
                 label="Tasks Assigned to"
-                style={{ position: "relative" }}
-              >
+                style={{ position: "relative" }}>
                 <Select
                   {...selectProps}
                   allowClear
-                  placeholder="Please select"
-                // dropdownStyle={{
-                //    maxHeight: 100,
-                //    overflowY: "hidden",
-                // }}
-                >
+                  placeholder="Please select">
                   {employeeData &&
                     employeeData?.User?.data?.map((employee, index) => (
                       <Option value={employee?.id} key={index}>
@@ -255,11 +247,13 @@ const EditTasks = () => {
               xs={24}
               sm={24}
               md={12}
-              lg={12}
-              className={styles["form-col-task"]}
-            >
-              <Form.Item name="taskManager" label="Task Manager">
-                <Select showArrow placeholder="Select Task Manager">
+              lg={12}>
+              <Form.Item
+                name="taskManager"
+                label="Task Manager">
+                <Select
+                  showArrow
+                  placeholder="Select Task Manager">
                   {taskManager &&
                     taskManager?.User?.data?.map((manager, index) => (
                       <Option value={manager?.id} key={index}>
@@ -273,13 +267,31 @@ const EditTasks = () => {
               xs={24}
               sm={24}
               md={12}
-              lg={12}
-              className={styles["form-col-task"]}
-            >
-              <Form.Item name="status" label="Status">
-                <Select placeholder="Select status" defaultValue={task?.status}>
+              lg={12}>
+              <Form.Item
+                name='file'
+                label="Assignment Files"
+                style={{ position: "relative" }}>
+                <Upload {...props}>
+                  <Button icon={<UploadOutlined />}>
+                    Browse
+                  </Button>
+                </Upload>
+              </Form.Item>
+            </Col>
+            <Col
+              xs={24}
+              sm={24}
+              md={12}
+              lg={12}>
+              <Form.Item
+                name="status"
+                label="Status">
+                <Select placeholder="Select status">
                   {status?.map((status, index) => (
-                    <Option value={status}>{status}</Option>
+                    <Option value={status} key={index}>
+                      {status}
+                    </Option>
                   ))}
                 </Select>
               </Form.Item>
@@ -291,11 +303,11 @@ const EditTasks = () => {
             <Col className={styles["form-submit"]}>
               <Form.Item>
                 <Space>
-                  <Button type="default" htmlType="button">
+                  <Button type="default" htmlType="button" onClick={() => navigate(-1)}>
                     Cancel
                   </Button>
                   <Button type="primary" htmlType="submit">
-                    Create Task
+                    Edit Task
                   </Button>
                 </Space>
               </Form.Item>
