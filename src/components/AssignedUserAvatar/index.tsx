@@ -21,7 +21,7 @@ const AssignedUserAvatar = (props: IProps) => {
               <Avatar src={user.avatar?.url}></Avatar>
             ) : (
               <Avatar style={{ backgroundColor: "#f56a00" }}>
-                {user?.fullName.charAt(0)}
+                {user?.fullName?.charAt(0) ?? ""}
               </Avatar>
             )}
           </Tooltip>

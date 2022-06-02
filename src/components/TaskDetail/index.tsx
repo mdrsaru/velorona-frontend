@@ -20,6 +20,8 @@ import Priority from "../../assets/images/priority.svg";
 
 import Status from "../Status";
 import styles from "./styles.module.scss";
+import { useState } from "react";
+import { TASK } from "../../pages/Tasks";
 
 interface IProps {
   visibility: boolean;
@@ -30,7 +32,8 @@ interface IProps {
 }
 
 const TaskDetail = (props: IProps) => {
-  const { visibility, setVisibility, data, employee, userId  } = props;
+  const { visibility, setVisibility, data,  userId  } = props;
+  const [refresh,setRefresh] = useState(false)
   const loggedInUser = authVar();
   const { data: userData } = useQuery<UserData>(USER, {
     fetchPolicy: "network-only",
@@ -38,7 +41,7 @@ const TaskDetail = (props: IProps) => {
     variables: {
       input: {
         query: {
-          id: props?.userId,
+          id:userId,
         },
         paging: {
           order: ["updatedAt:DESC"],
@@ -48,11 +51,28 @@ const TaskDetail = (props: IProps) => {
   });
 
   const [taskUpdate] = useMutation(TASK_UPDATE, {
+    
+      refetchQueries: [
+        {query: TASK,
+          variables: {
+          input: {
+            query: {
+              company_id: loggedInUser?.company?.id,
+              user_id: loggedInUser?.user?.id,
+            },
+            paging: {
+              order: ["updatedAt:DESC"],
+            },
+          },}, },
+        
+        'Task'
+      ],
     onCompleted() {
       message.success({
-        content: `Status is updated successfully!`,
+        content: `Task is updated successfully!`,
         className: "custom-message",
       });
+      setRefresh(!refresh)
     },
     onError(err) {
       notifyGraphqlError(err);
@@ -62,6 +82,7 @@ const TaskDetail = (props: IProps) => {
       cache.evict({ id: normalizedId });
       cache.gc();
     },
+   
   });
 
   const status = Object.values(TaskStatus);
@@ -106,9 +127,9 @@ const TaskDetail = (props: IProps) => {
   return (
     <Modal
       centered
-      visible={props.visibility}
+      visible={visibility}
       closeIcon={[
-        <div onClick={() => props.setVisibility(false)}>
+        <div onClick={() => setVisibility(false)}>
           <span className={styles["close-icon-div"]}>
             <CloseOutlined />
           </span>
@@ -231,7 +252,7 @@ const TaskDetail = (props: IProps) => {
                       className={styles["custom-picker"]}
                       // defaultValue={task?.deadline}
                       suffixIcon={
-                        <span style={{ color: "beige;" }}>
+                        <span>
                           {" "}
                           {`${data?.deadline?.split("T")?.[0]}`}{" "}
                         </span>
@@ -240,7 +261,7 @@ const TaskDetail = (props: IProps) => {
                         handleDatePickerChange(date, dateString)
                       }
                       style={{
-                        width: 20,
+                        width: 50,
                         boxSizing: "revert",
                         background: "#fff",
                       }}
