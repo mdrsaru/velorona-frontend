@@ -28,6 +28,12 @@ export interface TimesheetPagingData {
   },
 };
 
+export interface UserPayRatePagingData {
+  UserPayRate: {
+    data: interfaces.UserPayRate[];
+    paging: interfaces.PagingResult;
+  },
+};
 export interface IInvoiceItemInput {
   id?: string;
   project_id: string;

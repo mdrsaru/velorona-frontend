@@ -19,6 +19,7 @@ import { UserData } from "../Client";
 import RouteLoader from "../../components/Skeleton/RouteLoader";
 import UserPayRateModal from "../../components/UserPayRate";
 import styles from "./style.module.scss";
+import ViewUserPayRate from "../../components/ViewUserPayRate";
 
 const { SubMenu } = Menu;
 
@@ -109,8 +110,8 @@ const Employee = () => {
   });
 
   const [pagingInput, setPagingInput] = useState<{
-    skip: number,
-    currentPage: number,
+    skip: number;
+    currentPage: number;
   }>({
     skip: 0,
     currentPage: 1,
@@ -128,6 +129,8 @@ const Employee = () => {
   const [visibility, setVisibility] = useState<boolean>(false);
   const [showArchive, setArchiveModal] = useState<boolean>(false);
   const [showUserPayRate, setUserPayRateVisibility] = useState<boolean>(false);
+  const [showViewUserPayRate, setViewUserPayRateVisibility] =
+    useState<boolean>(false);
   const setModalVisibility = (value: boolean) => {
     setVisibility(value);
   };
@@ -173,28 +176,30 @@ const Employee = () => {
     );
   };
 
-  const { loading: employeeLoading, data: employeeData } = useQuery<UserData>(USER, {
-    fetchPolicy: "network-only",
-    nextFetchPolicy: "cache-first",
-    variables: {
-      input: {
-        query: {
-          role: constants.roles.Employee,
-        },
-        paging: {
-          order: ["updatedAt:DESC"],
+  const { loading: employeeLoading, data: employeeData } = useQuery<UserData>(
+    USER,
+    {
+      fetchPolicy: "network-only",
+      nextFetchPolicy: "cache-first",
+      variables: {
+        input: {
+          query: {
+            role: constants.roles.Employee,
+          },
+          paging: {
+            order: ["updatedAt:DESC"],
+          },
         },
       },
-    },
-  }
+    }
   );
 
   const archiveUser = () => {
-    let key = 'archive'
+    let key = "archive";
     message.loading({
       content: "Archiving employee in progress..",
       key,
-      className: 'custom-message'
+      className: "custom-message",
     });
     employeeArchive({
       variables: {
@@ -220,11 +225,11 @@ const Employee = () => {
   };
 
   const changeStatus = (value: string, id: string) => {
-    let key = 'status'
+    let key = "status";
     message.loading({
       content: "Updating status of employee..",
       key,
-      className: 'custom-message'
+      className: "custom-message",
     });
     employeeUpdate({
       variables: {
@@ -233,16 +238,17 @@ const Employee = () => {
           id: id,
         },
       },
-    }).then((response) => {
-      if (response.errors) {
-        return notifyGraphqlError(response.errors);
-      }
-      message.success({
-        content: `Employee is updated successfully!`,
-        key,
-        className: "custom-message",
-      });
     })
+      .then((response) => {
+        if (response.errors) {
+          return notifyGraphqlError(response.errors);
+        }
+        message.success({
+          content: `Employee is updated successfully!`,
+          key,
+          className: "custom-message",
+        });
+      })
       .catch(notifyGraphqlError);
   };
 
@@ -250,11 +256,14 @@ const Employee = () => {
     setEmployee(record);
     setUserPayRateVisibility(!showUserPayRate);
   };
+
+  const handleViewPayRate = (user:any) =>{
+    setEmployee(user)
+    setViewUserPayRateVisibility(!showViewUserPayRate)
+  }
   const menu = (data: any) => (
     <Menu>
-      <SubMenu
-        title="Change status"
-        key="mainMenu">
+      <SubMenu title="Change status" key="mainMenu">
         <Menu.Item
           key="active"
           onClick={() => {
@@ -338,12 +347,12 @@ const Employee = () => {
         };
       },
     },
-    {
-      title: "Role",
-      dataIndex: "roles",
-      key: "roles",
-      render: (roles: { name: string; id: string }[]) => `${roles[0]?.name}`,
-    },
+    // {
+    //   title: "Role",
+    //   dataIndex: "roles",
+    //   key: "roles",
+    //   render: (roles: { name: string; id: string }[]) => `${roles[0]?.name}`,
+    // },
     // {
     //   title: 'Start Date',
     //   render: (user: any) => {
@@ -363,31 +372,23 @@ const Employee = () => {
     //     </div>
     //   }
     // },
-    // {
-    //   title: "Pay Rate",
-    //   render: (user: any) => {
-    //     return (
-    //       <div>
-    //         <p>
-    //           {user?.record?.payRate ?? (
-    //             <span className={styles["blankSpan"]}> N/A </span>
-    //           )}
-    //         </p>
-    //       </div>
-    //     );
-    //   },
-    // },
     {
-      title: "Client",
-      key: "client",
-      render: (client: any) => (
-        <span>
-          {client?.activeClient?.name ?? (
-            <span className={styles["blankSpan"]}> N/A </span>
-          )}
-        </span>
-      ),
+      title: "Pay Rate",
+      render: (user: any) => {
+        return <div onClick={()=>handleViewPayRate(user)}  className={styles["add-pay-rate"]}>View PayRate</div>;
+      },
     },
+    // {
+    //   title: "Client",
+    //   key: "client",
+    //   render: (client: any) => (
+    //     <span>
+    //       {client?.activeClient?.name ?? (
+    //         <span className={styles["blankSpan"]}> N/A </span>
+    //       )}
+    //     </span>
+    //   ),
+    // },
     {
       title: "Status",
       dataIndex: "status",
@@ -412,15 +413,16 @@ const Employee = () => {
           <Col>
             <p
               onClick={() => handleUserPayRate(record)}
-              className={styles['add-pay-rate']}>
+              className={styles["add-pay-rate"]}
+            >
               Add PayRate
             </p>
           </Col>
           <Col>
             <div
               className={styles["dropdown-menu"]}
-              onClick={(event) => event.stopPropagation()}>
-
+              onClick={(event) => event.stopPropagation()}
+            >
               <Dropdown
                 overlay={menu(record)}
                 trigger={["click"]}
@@ -440,8 +442,6 @@ const Employee = () => {
       ),
     },
   ];
-
-  console.log(employeeData?.User?.paging?.total);
 
   return (
     <>
@@ -479,7 +479,7 @@ const Employee = () => {
                     current: pagingInput.currentPage,
                     onChange: changePage,
                     // total: employeeData?.User?.paging?.total,
-                    pageSize: constants.paging.perPage
+                    pageSize: constants.paging.perPage,
                   }}
                 />
               </Col>
@@ -505,6 +505,11 @@ const Employee = () => {
           <UserPayRateModal
             visibility={showUserPayRate}
             setVisibility={setUserPayRateVisibility}
+            data={employee}
+          />
+          <ViewUserPayRate
+            visibility={showViewUserPayRate}
+            setVisibility={setViewUserPayRateVisibility}
             data={employee}
           />
         </div>
