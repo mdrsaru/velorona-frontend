@@ -380,7 +380,7 @@ const Project = () => {
               <>
                 Are you sure you want to{" "}
                 {project?.archived ? "unarchive" : "archive"}
-                <strong> {project.name}?</strong>
+                <strong> {project?.name}</strong>
               </>
             }
             subText={`Project will ${project?.archived ? "" : "not" } be able to assigned to any employee`}

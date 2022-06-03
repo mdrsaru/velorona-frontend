@@ -1,4 +1,10 @@
-
+.site-card-wrapper {
+  :global {
+    .ant-card-body { 
+      padding: 0
+    }
+  }
+}
 .card-col-timesheet {
   overflow-x: auto;
   overflow-y: auto;
