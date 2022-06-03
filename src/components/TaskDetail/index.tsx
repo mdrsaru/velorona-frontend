@@ -261,7 +261,7 @@ const TaskDetail = (props: IProps) => {
                         handleDatePickerChange(date, dateString)
                       }
                       style={{
-                        width: 50,
+                        width: 200,
                         boxSizing: "revert",
                         background: "#fff",
                       }}
@@ -278,7 +278,7 @@ const TaskDetail = (props: IProps) => {
                     handleDatePickerChange(date, dateString)
                   }
                   style={{
-                    width: 20,
+                    width: 90,
                     boxSizing: "revert",
                     background: "#fff",
                   }}

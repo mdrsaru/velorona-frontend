@@ -67,6 +67,11 @@ function App() {
             company: {
               id: response?.data?.company?.id ?? null,
               code: response?.data?.company?.companyCode ?? null,
+            },
+            fullName:response?.data?.fullName,
+            avatar:{
+              id: response?.data?.avatar?.id ?? null,
+              url: response?.data?.avatar?.url ?? null,
             }
           })}
       })

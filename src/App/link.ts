@@ -20,7 +20,12 @@ const auth: IAuth = {
   company: {
     code: '',
     id: null
-  }
+  },
+  avatar: {
+    id: '',
+    url: null
+  },
+  fullName:null
 };
 
 const sidebar = {
