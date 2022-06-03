@@ -146,7 +146,7 @@ const _Routes = () => {
               <Route
                 path={routes.detailTimesheet.childPath}
                 element={
-                  <CheckRoles allowedRoles={[constants.roles.Employee, constants.roles.TaskManager]}>
+                  <CheckRoles allowedRoles={[constants.roles.Employee, constants.roles.TaskManager, constants.roles.CompanyAdmin]}>
                   <Suspense fallback={<TimeSheetLoader />}>
                   <routes.detailTimesheet.component />
                   </Suspense>

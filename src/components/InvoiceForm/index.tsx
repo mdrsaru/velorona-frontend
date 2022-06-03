@@ -16,6 +16,7 @@ import addIcon from '../../assets/images/add_icon.svg';
 import styles from './style.module.scss';
 
 interface IProps {
+  timesheet_id?: string;
   client_id: string;
 
   /**
@@ -243,6 +244,10 @@ const InvoiceForm = (props: IProps) => {
           amount: item.amount,
         })),
       }; 
+
+      if(props.timesheet_id) {
+        input['timesheet_id'] = props.timesheet_id;
+      }
 
       createInvoice({
         variables: {

@@ -138,7 +138,7 @@ const Employee = () => {
     setArchiveModal(value);
   };
 
-  const deleteBody = () => {
+  const DeleteBody = () => {
     return (
       <div className={styles["modal-message"]}>
         <div>
@@ -156,7 +156,7 @@ const Employee = () => {
     );
   };
 
-  const archiveBody = () => {
+  const ArchiveBody = () => {
     return (
       <div className={styles["modal-message"]}>
         <div>
@@ -490,7 +490,7 @@ const Employee = () => {
             setModalVisibility={setModalVisibility}
             imgSrc={deleteImg}
             okText={"Delete"}
-            modalBody={deleteBody}
+            modalBody={<DeleteBody />}
           />
 
           <ModalConfirm
@@ -498,7 +498,7 @@ const Employee = () => {
             setModalVisibility={setArchiveVisibility}
             imgSrc={archiveImg}
             okText={employee?.archived ? "Unarchive" : "Archive"}
-            modalBody={archiveBody}
+            modalBody={<ArchiveBody />}
             onOkClick={archiveUser}
           />
 

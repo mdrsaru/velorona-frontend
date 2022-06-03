@@ -1,0 +1,116 @@
+.card-col-timesheet {
+  overflow-x: auto;
+  overflow-y: auto;
+}
+
+.site-card-wrapper {
+  padding-top: 2rem;
+  font-style: normal;
+
+  .time-entries {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+
+  .add-entry {
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 22px;
+    cursor: pointer;
+    color: var(--primary-blue);
+  }
+  }
+
+  .timesheet {
+    padding: 1rem;
+    font-weight: 600;
+    font-size: 28px;
+    line-height: 29px;
+
+    @media screen and (max-width: 1282px) {
+      font-size: 20px;
+    }
+  }
+
+  .add-time-stamp {
+    font-weight: 600;
+    padding: 1rem;
+    font-size: 20px;
+    float: right;
+
+    @media screen and (max-width: 1281px) {
+      font-size: 14px;
+    }
+
+    line-height: 22px;
+    cursor: pointer;
+    color: var(--primary-blue);
+  }
+}
+
+.resp-table-header,
+.resp-table-body {
+  display: flex;
+}
+
+.resp-table-header {
+  background: var(--gray-secondary);
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 17px;
+  color: var(--white)
+}
+
+.resp-table-body {
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 17px;
+}
+
+.table-header-cell,
+.table-body-cell {
+  width: 15%;
+  padding: 1rem;
+
+  &:last-child {
+    width: 10%;
+  }
+}
+
+.table-body-cell {
+  display: flex;
+  align-items: center;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 17px;
+}
+
+.modal-title {
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 29px;
+  padding: 1rem;
+}
+
+.total-duration {
+  .resp-table-header {
+    background: var(--gray-2);
+    color: var(--black);
+  }
+}
+
+.delete-entry,
+.reject-entry,
+.approve-entry {
+  font-size: 23px;
+}
+
+.reject-entry{
+  color: var(--primary-red);
+  &:hover {
+    color: var(--primary-red);
+  }
+}
+.approve-entry {
+  color: var(--primary-green);
+}
+

@@ -1,0 +1,55 @@
+.timesheet-information {
+  padding: 2rem 1rem 1rem 1rem;
+
+  .date-span {
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 22px;
+    float: right;
+  }
+
+}
+
+.form-col-detail {
+  padding: 1.5rem;
+
+  span {
+    font-weight: 600;
+    font-size: 24px;
+    line-height: 29px;
+  }
+}
+
+.card-body {
+  padding: 1rem;
+
+  span {
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 17px;
+  }
+
+  .header {
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 17px;
+  }
+}
+
+.detail-row {
+  display: flex;
+  padding: 0.7rem;
+  margin-right: 1.5rem;
+  justify-content: center;
+  align-items: center;
+
+  div {
+    width: 50%;
+  }
+}
+
+.detail-row:nth-child(odd) {
+  background: var(--gray-2);
+}
+
+
