@@ -67,7 +67,6 @@ const EmployeeTimesheet = () => {
     onError: notifyGraphqlError,
   },
   );
-  console.log(authData);
 
   const changePage = (page: number) => {
     const newSkip = (page - 1) * constants.paging.perPage;
