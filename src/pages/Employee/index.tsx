@@ -25,6 +25,9 @@ const { SubMenu } = Menu;
 export const USER = gql`
   query User($input: UserQueryInput!) {
     User(input: $input) {
+      paging {
+        total
+      }
       data {
         id
         email
@@ -39,6 +42,7 @@ export const USER = gql`
         avatar {
           id
           url
+          name
         }
         activeClient {
           id
@@ -104,6 +108,22 @@ const Employee = () => {
     },
   });
 
+  const [pagingInput, setPagingInput] = useState<{
+    skip: number,
+    currentPage: number,
+  }>({
+    skip: 0,
+    currentPage: 1,
+  });
+
+  const changePage = (page: number) => {
+    const newSkip = (page - 1) * constants.paging.perPage;
+    setPagingInput({
+      ...pagingInput,
+      skip: newSkip,
+      currentPage: page,
+    });
+  };
   const [employee, setEmployee] = useState<any>("");
   const [visibility, setVisibility] = useState<boolean>(false);
   const [showArchive, setArchiveModal] = useState<boolean>(false);
@@ -153,27 +173,29 @@ const Employee = () => {
     );
   };
 
-  const { loading: employeeLoading, data: employeeData } = useQuery<UserData>(
-    USER,
-    {
-      fetchPolicy: "network-only",
-      nextFetchPolicy: "cache-first",
-      variables: {
-        input: {
-          query: {
-            role: constants.roles.Employee,
-          },
-          paging: {
-            order: ["updatedAt:DESC"],
-          },
+  const { loading: employeeLoading, data: employeeData } = useQuery<UserData>(USER, {
+    fetchPolicy: "network-only",
+    nextFetchPolicy: "cache-first",
+    variables: {
+      input: {
+        query: {
+          role: constants.roles.Employee,
+        },
+        paging: {
+          order: ["updatedAt:DESC"],
         },
       },
-    }
+    },
+  }
   );
 
   const archiveUser = () => {
     let key = 'archive'
-    message.loading({ content: "Archiving employee in progress..", key, className: 'custom-message' });
+    message.loading({
+      content: "Archiving employee in progress..",
+      key,
+      className: 'custom-message'
+    });
     employeeArchive({
       variables: {
         input: {
@@ -199,7 +221,11 @@ const Employee = () => {
 
   const changeStatus = (value: string, id: string) => {
     let key = 'status'
-    message.loading({ content: "Updating status of employee..", key, className: 'custom-message' });
+    message.loading({
+      content: "Updating status of employee..",
+      key,
+      className: 'custom-message'
+    });
     employeeUpdate({
       variables: {
         input: {
@@ -207,28 +233,28 @@ const Employee = () => {
           id: id,
         },
       },
+    }).then((response) => {
+      if (response.errors) {
+        return notifyGraphqlError(response.errors);
+      }
+      message.success({
+        content: `Employee is updated successfully!`,
+        key,
+        className: "custom-message",
+      });
     })
-      .then((response) => {
-        if (response.errors) {
-          return notifyGraphqlError(response.errors);
-        }
-        message.success({
-          content: `Employee is updated successfully!`,
-          key,
-          className: "custom-message",
-        });
-      })
       .catch(notifyGraphqlError);
   };
 
   const handleUserPayRate = (record: any) => {
-    console.log(record);
     setEmployee(record);
     setUserPayRateVisibility(!showUserPayRate);
   };
   const menu = (data: any) => (
     <Menu>
-      <SubMenu title="Change status" key="mainMenu">
+      <SubMenu
+        title="Change status"
+        key="mainMenu">
         <Menu.Item
           key="active"
           onClick={() => {
@@ -384,13 +410,16 @@ const Employee = () => {
       render: (record: any) => (
         <Row>
           <Col>
-            <p onClick={() => handleUserPayRate(record)} className={styles['addPayRate']}>Add PayRate </p>
+            <p
+              onClick={() => handleUserPayRate(record)}
+              className={styles['add-pay-rate']}>
+              Add PayRate
+            </p>
           </Col>
           <Col>
             <div
               className={styles["dropdown-menu"]}
-              onClick={(event) => event.stopPropagation()}
-            >
+              onClick={(event) => event.stopPropagation()}>
 
               <Dropdown
                 overlay={menu(record)}
@@ -411,6 +440,8 @@ const Employee = () => {
       ),
     },
   ];
+
+  console.log(employeeData?.User?.paging?.total);
 
   return (
     <>
@@ -440,9 +471,16 @@ const Employee = () => {
             <Row>
               <Col span={24}>
                 <Table
+                  loading={employeeLoading}
                   dataSource={employeeData?.User?.data}
                   columns={columns}
                   rowKey={(record) => record?.id}
+                  pagination={{
+                    current: pagingInput.currentPage,
+                    onChange: changePage,
+                    // total: employeeData?.User?.paging?.total,
+                    pageSize: constants.paging.perPage
+                  }}
                 />
               </Col>
             </Row>

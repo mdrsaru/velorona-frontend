@@ -10,6 +10,7 @@ import { notifyGraphqlError } from "../../../utils/error";
 import { PROJECT } from "../index";
 import { TASK } from "../../Tasks";
 import routes from "../../../config/routes";
+import constants from '../../../config/constants';
 
 import deleteImg from "../../../assets/images/delete_btn.svg";
 import archiveImg from "../../../assets/images/archive_btn.svg";
@@ -93,6 +94,23 @@ const DetailProject = () => {
       cache.gc();
     },
   });
+
+  const [pagingInput, setPagingInput] = useState<{
+    skip: number,
+    currentPage: number,
+  }>({
+    skip: 0,
+    currentPage: 1,
+  });
+
+  const changePage = (page: number) => {
+    const newSkip = (page - 1) * constants.paging.perPage;
+    setPagingInput({
+      ...pagingInput,
+      skip: newSkip,
+      currentPage: page,
+    });
+  };
 
   const [task, setTask] = useState<any>("");
   const [visibility, setVisibility] = useState<boolean>(false);
@@ -383,6 +401,12 @@ const DetailProject = () => {
               dataSource={taskData?.Task?.data}
               columns={columns}
               rowKey={(record) => record?.id}
+              pagination={{
+                current: pagingInput.currentPage,
+                onChange: changePage,
+                total: taskData?.Task?.paging?.total,
+                pageSize: constants.paging.perPage
+              }}
             />
           </Col>
         </Row>

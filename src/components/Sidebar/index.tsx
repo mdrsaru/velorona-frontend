@@ -12,7 +12,6 @@ import {
   ScheduleOutlined,
   UsergroupAddOutlined,
   SolutionOutlined,
-  OrderedListOutlined,
   FundProjectionScreenOutlined,
   ProfileOutlined
 } from '@ant-design/icons';

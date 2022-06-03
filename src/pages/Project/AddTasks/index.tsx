@@ -10,8 +10,9 @@ import {
   Upload,
   message,
 } from "antd";
-import { ArrowLeftOutlined } from "@ant-design/icons";
-import React, { useState } from "react";
+import type { UploadProps } from 'antd';
+import { ArrowLeftOutlined, UploadOutlined } from "@ant-design/icons";
+import { useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 
 import { authVar } from "../../../App/link";
@@ -21,9 +22,10 @@ import { notifyGraphqlError } from "../../../utils/error";
 import routes from "../../../config/routes";
 import { UserData } from "../../Client";
 import constants from "../../../config/constants";
+import { TaskStatus } from "../../../interfaces/generated";
+import { ITasks } from "../../../interfaces/ITasks";
 
 import styles from "../style.module.scss";
-import { TaskStatus } from "../../../interfaces/generated";
 
 const USER = gql`
   query User($input: UserQueryInput!) {
@@ -53,12 +55,36 @@ const TASK_CREATE = gql`
 const AddTasks = () => {
   let params = useParams();
   const loggedInUser = authVar();
-  const [fileName, setFileName] = useState("");
+  const [fileData, setFile] = useState<ITasks>({
+    ids: [],
+    name: ""
+  })
+
+  const props: UploadProps = {
+    name: 'file',
+    action: `${constants.apiUrl}/v1/media/upload`,
+    headers: {
+      'authorization': loggedInUser?.token ? `Bearer ${loggedInUser?.token}` : '',
+    },
+    onChange(info) {
+      if (info.file.status === 'done') {
+        let newID = info?.file?.response?.data?.id
+        let array = [...fileData?.ids, newID]
+        setFile({
+          name: info?.file?.name,
+          ids: array
+        })
+      } else if (info.file.status === 'error') {
+        message.error(`${info.file.name} file upload failed.`);
+      }
+    },
+    listType: "picture"
+  };
 
   const [form] = Form.useForm();
   const navigate = useNavigate();
   const [createTask] = useMutation(TASK_CREATE, {
-    onCompleted(response) {
+    onCompleted() {
       message.success({
         content: `New task is added successfully!`,
         className: "custom-message",
@@ -110,18 +136,17 @@ const AddTasks = () => {
   const selectProps = {
     placeholder: "Select Employees",
     mode: "multiple" as const,
-    style: { width: "100%" },
-    // maxTagCount: 'responsive' as const
+    style: { width: "100%" }
   };
 
   const onSubmitForm = (values: any) => {
-    console.log(values);
     createTask({
       variables: {
         input: {
           name: values?.name,
           description: values?.description,
           status: values?.status,
+          attachment_ids: fileData?.ids,
           company_id: loggedInUser?.company?.id,
           manager_id: values?.taskManager,
           project_id: params?.pid,
@@ -149,10 +174,8 @@ const AddTasks = () => {
           form={form}
           layout="vertical"
           onFinish={onSubmitForm}>
-          <Row className={styles["add-task-row"]}>
-            <Col
-              span={24}
-              className={styles["form-col-task"]}>
+          <Row className={styles["add-task-row"]} gutter={[24, 8]}>
+            <Col span={24}>
               <Form.Item
                 label="Task Name"
                 name="name">
@@ -162,9 +185,7 @@ const AddTasks = () => {
                 />
               </Form.Item>
             </Col>
-            <Col
-              span={24}
-              className={styles["form-col-task"]}>
+            <Col span={24}>
               <Form.Item
                 label="Description Name"
                 name="description">
@@ -175,38 +196,8 @@ const AddTasks = () => {
               xs={24}
               sm={24}
               md={12}
-              lg={12}
-              className={styles["form-col-task"]}>
-              <Form.Item
-                name="assignmentFile"
-                label="Assignment Files"
-                style={{ position: "relative" }}>
-                <div className={styles["upload-file"]}>
-                  <div>
-                    <span>
-                      {fileName ? fileName : " Attach your files here"}
-                    </span>
-                  </div>
-                  <div className={styles["browse-file"]}>
-                    <Upload
-                      name="assignmentFile"
-                      maxCount={1}
-                      showUploadList={false}
-                      beforeUpload={(file) => {
-                        setFileName(file?.name);
-                      }}>
-                      <span>Browse</span>
-                    </Upload>
-                  </div>
-                </div>
-              </Form.Item>
-            </Col>
-            <Col
-              xs={24}
-              sm={24}
-              md={12}
-              lg={12}
-              className={styles["form-col-task"]}>
+              lg={12}>
+
               <Form.Item
                 name="assignee"
                 label="Tasks Assigned to"
@@ -214,15 +205,12 @@ const AddTasks = () => {
                 <Select
                   {...selectProps}
                   allowClear
-                  placeholder="Please select"
-                // dropdownStyle={{
-                //    maxHeight: 100,
-                //    overflowY: "hidden",
-                // }}
-                >
+                  placeholder="Please select">
                   {employeeData &&
                     employeeData?.User?.data?.map((employee, index) => (
-                      <Option value={employee?.id} key={index}>
+                      <Option
+                        value={employee?.id}
+                        key={index}>
                         {employee?.fullName}
                       </Option>
                     ))}
@@ -233,8 +221,7 @@ const AddTasks = () => {
               xs={24}
               sm={24}
               md={12}
-              lg={12}
-              className={styles["form-col-task"]}>
+              lg={12}>
               <Form.Item
                 name="taskManager"
                 label="Task Manager"
@@ -249,7 +236,9 @@ const AddTasks = () => {
                   placeholder="Select Task Manager">
                   {taskManager &&
                     taskManager?.User?.data?.map((manager, index) => (
-                      <Option value={manager?.id} key={index}>
+                      <Option
+                        value={manager?.id}
+                        key={index}>
                         {manager?.fullName} / {manager?.email}
                       </Option>
                     ))}
@@ -260,8 +249,22 @@ const AddTasks = () => {
               xs={24}
               sm={24}
               md={12}
-              lg={12}
-              className={styles["form-col-task"]}>
+              lg={12}>
+              <Form.Item
+                label="Assignment Files"
+                style={{ position: "relative" }}>
+                <Upload {...props}>
+                  <Button icon={<UploadOutlined />}>
+                    Browse
+                  </Button>
+                </Upload>
+              </Form.Item>
+            </Col>
+            <Col
+              xs={24}
+              sm={24}
+              md={12}
+              lg={12}>
               <Form.Item
                 name="status"
                 label="Status"
@@ -273,7 +276,9 @@ const AddTasks = () => {
                 ]}>
                 <Select placeholder="Select status">
                   {status?.map((status, index) => (
-                    <Option value={status} key={index}>
+                    <Option
+                      value={status}
+                      key={index}>
                       {status}
                     </Option>
                   ))}
@@ -287,10 +292,14 @@ const AddTasks = () => {
             <Col className={styles["form-submit"]}>
               <Form.Item>
                 <Space>
-                  <Button type="default" htmlType="button">
+                  <Button
+                    type="default"
+                    htmlType="button">
                     Cancel
                   </Button>
-                  <Button type="primary" htmlType="submit">
+                  <Button
+                    type="primary"
+                    htmlType="submit">
                     Create Task
                   </Button>
                 </Space>

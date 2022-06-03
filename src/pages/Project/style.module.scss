@@ -1,53 +1,59 @@
-:global {
-  .ant-modal-footer {
-    border: none;
-    text-align: center;
-    padding-bottom: 5rem;
-  }
+.project-main-div {
 
-  :local(.dropdown-menu) {
-    .ant-dropdown-menu {
-      margin: 0 7rem;
-    }
-    .ant-dropdown-menu-item {
-      padding: 12px 0 12px 15px;
-    }
-  }
-
-  :local(.project-main-div) {
-    .ant-progress-inner {
-      border-radius: 0;
+  :global {
+    .ant-modal-footer {
+      border: none;
+      text-align: center;
+      padding-bottom: 5rem;
     }
 
-    .ant-progress-outer {
-      width: 85%;
+    :local(.dropdown-menu) {
+      .ant-dropdown-menu {
+        margin: 0 7rem;
+      }
+
+      .ant-dropdown-menu-item {
+        padding: 12px 0 12px 15px;
+      }
     }
 
-    .ant-progress-text {
-      font-weight: 400;
-      font-size: 14px;
-      line-height: 17px;
-    }
+    :local(.project-main-div) {
+      .ant-progress-inner {
+        border-radius: 0;
+      }
 
-    .ant-progress-status-success {
+      .ant-progress-outer {
+        width: 85%;
+      }
+
       .ant-progress-text {
-        color: var(--black);
-        .anticon {
-          display: none;
+        font-weight: 400;
+        font-size: 14px;
+        line-height: 17px;
+      }
+
+      .ant-progress-status-success {
+        .ant-progress-text {
+          color: var(--black);
+
+          .anticon {
+            display: none;
+          }
+        }
+
+        .ant-progress-text::before {
+          content: "100%";
         }
       }
 
-      .ant-progress-text::before {
-        content: "100%";
+      .ant-progress-bg {
+        border-radius: 0;
+        background-color: var(--primary-orange);
       }
-    }
 
-    .ant-progress-bg {
-      border-radius: 0;
-      background-color: var(--primary-orange);
-    }
-    .ant-progress-status-success .ant-progress-bg {
-      background-color: var(--primary-green);
+      .ant-progress-status-success .ant-progress-bg {
+        background-color: var(--primary-green);
+      }
     }
   }
 }
@@ -134,12 +140,13 @@
 }
 
 .project-col {
-  padding: 1.5rem 0 0.9rem 0;
+  padding: 1rem 0 1rem 0;
 
   h1 {
     font-weight: 600;
     font-size: 24px;
     line-height: 29px;
+
     span {
       color: var(--primary-blue);
     }
@@ -156,6 +163,7 @@
 
 .formCol {
   padding: 0 1rem 0 1rem;
+
   @media screen and (max-width: 767px) {
     padding: 0 1rem 0 0;
   }
@@ -186,7 +194,6 @@
 .add-task-row {
   margin-left: 1rem;
   margin-right: 1rem;
-  padding: 1rem 1.5rem 1rem 1.5rem;
 }
 
 .upload-file {
@@ -204,6 +211,7 @@
   .browse-file {
     text-align: end;
     cursor: pointer;
+
     span {
       color: var(--primary-blue);
       font-weight: 400;
@@ -217,15 +225,6 @@
     font-size: 18px;
     line-height: 22px;
     color: var(--gray-secondary);
-  }
-}
-
-.form-col-task {
-  padding: 0 1rem 0 0;
-  :global {
-    .ant-upload-list {
-      display: none;
-    }
   }
 }
 
@@ -272,7 +271,7 @@
 }
 
 .employeeTitle {
-  font-weight: 600;  
+  font-weight: 600;
   font-size: 14px;
   line-height: 17px;
   padding: 1rem 0.5rem 0 1rem;

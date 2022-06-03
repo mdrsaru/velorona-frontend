@@ -1,16 +1,18 @@
-:global {
-  .ant-modal-footer {
-    border: none;
-    text-align: center;
-    padding-bottom: 5rem;
-  }
-
-  :local(.dropdown-menu) {
-    .ant-dropdown-menu {
-      margin: 0 7rem;
+.company-main-div {
+  :global {
+    .ant-modal-footer {
+      border: none;
+      text-align: center;
+      padding-bottom: 5rem;
     }
-    .ant-dropdown-menu-item {
-      padding: 12px 0 12px 15px;
+  
+    :local(.dropdown-menu) {
+      .ant-dropdown-menu {
+        margin: 0 7rem;
+      }
+      .ant-dropdown-menu-item {
+        padding: 12px 0 12px 15px;
+      }
     }
   }
 }
