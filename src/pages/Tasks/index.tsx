@@ -1,5 +1,5 @@
 import { gql, useQuery } from "@apollo/client";
-import {  Table, Collapse, Space } from "antd";
+import { Table, Collapse, Space } from "antd";
 import _ from "lodash";
 
 import NotPriority from "../../assets/images/not-priority.svg";
@@ -60,7 +60,7 @@ const Tasks = () => {
   const { Panel } = Collapse;
   const [visibility, setVisibility] = useState(false);
   const [task, setTask] = useState<any>();
-  const { data: taskData } = useQuery(TASK, {
+  const { data: taskData, loading: taskLoading } = useQuery(TASK, {
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
     variables: {
@@ -139,6 +139,7 @@ const Tasks = () => {
           <Collapse accordion>
             <Panel header="UnScheduled" key="1">
               <Table
+                loading={taskLoading}
                 dataSource={taskGroups?.UnScheduled}
                 columns={columns}
                 rowKey={(task) => task?.id}
@@ -158,6 +159,7 @@ const Tasks = () => {
           <Collapse accordion>
             <Panel header="Scheduled" key="2">
               <Table
+                loading={taskLoading}
                 dataSource={taskGroups?.Scheduled}
                 columns={columns}
                 rowKey={(task) => task?.id}
@@ -177,6 +179,7 @@ const Tasks = () => {
           <Collapse accordion>
             <Panel header="InProgress" key="3">
               <Table
+                loading={taskLoading}
                 dataSource={taskGroups?.InProgress}
                 columns={columns}
                 rowKey={(task) => task?.id}
@@ -196,6 +199,7 @@ const Tasks = () => {
           <Collapse accordion>
             <Panel header="Completed" key="4">
               <Table
+                loading={taskLoading}
                 dataSource={taskGroups?.Completed}
                 columns={columns}
                 rowKey={(task) => task?.id}

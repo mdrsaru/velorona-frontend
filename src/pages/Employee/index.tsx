@@ -25,6 +25,9 @@ const { SubMenu } = Menu;
 export const USER = gql`
   query User($input: UserQueryInput!) {
     User(input: $input) {
+      paging {
+        total
+      }
       data {
         id
         email
@@ -105,6 +108,22 @@ const Employee = () => {
     },
   });
 
+  const [pagingInput, setPagingInput] = useState<{
+    skip: number,
+    currentPage: number,
+  }>({
+    skip: 0,
+    currentPage: 1,
+  });
+
+  const changePage = (page: number) => {
+    const newSkip = (page - 1) * constants.paging.perPage;
+    setPagingInput({
+      ...pagingInput,
+      skip: newSkip,
+      currentPage: page,
+    });
+  };
   const [employee, setEmployee] = useState<any>("");
   const [visibility, setVisibility] = useState<boolean>(false);
   const [showArchive, setArchiveModal] = useState<boolean>(false);
@@ -154,22 +173,20 @@ const Employee = () => {
     );
   };
 
-  const { loading: employeeLoading, data: employeeData } = useQuery<UserData>(
-    USER,
-    {
-      fetchPolicy: "network-only",
-      nextFetchPolicy: "cache-first",
-      variables: {
-        input: {
-          query: {
-            role: constants.roles.Employee,
-          },
-          paging: {
-            order: ["updatedAt:DESC"],
-          },
+  const { loading: employeeLoading, data: employeeData } = useQuery<UserData>(USER, {
+    fetchPolicy: "network-only",
+    nextFetchPolicy: "cache-first",
+    variables: {
+      input: {
+        query: {
+          role: constants.roles.Employee,
+        },
+        paging: {
+          order: ["updatedAt:DESC"],
         },
       },
-    }
+    },
+  }
   );
 
   const archiveUser = () => {
@@ -424,6 +441,8 @@ const Employee = () => {
     },
   ];
 
+  console.log(employeeData?.User?.paging?.total);
+
   return (
     <>
       {employeeLoading ? (
@@ -452,9 +471,16 @@ const Employee = () => {
             <Row>
               <Col span={24}>
                 <Table
+                  loading={employeeLoading}
                   dataSource={employeeData?.User?.data}
                   columns={columns}
                   rowKey={(record) => record?.id}
+                  pagination={{
+                    current: pagingInput.currentPage,
+                    onChange: changePage,
+                    // total: employeeData?.User?.paging?.total,
+                    pageSize: constants.paging.perPage
+                  }}
                 />
               </Col>
             </Row>

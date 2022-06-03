@@ -11,6 +11,7 @@ import ClientDetail from "./ClientDetail";
 
 import Status from "../../components/Status";
 import ModalConfirm from "../../components/Modal";
+import constants from '../../config/constants';
 
 import archiveImg from "../../assets/images/archive_btn.svg";
 
@@ -24,6 +25,9 @@ import ArchiveBody from "../../components/Archive";
 export interface UserData {
   User: {
     data: User[];
+    paging: {
+      total: number;
+    } 
   };
 }
 
@@ -69,6 +73,22 @@ const Client = () => {
   const [showModal, setShowModal] = useState(false);
   const [client, setClient] = useState<any>();
   const [showArchive, setArchiveModal] = useState<boolean>(false);
+  const [pagingInput, setPagingInput] = useState<{
+    skip: number,
+    currentPage: number,
+  }>({
+    skip: 0,
+    currentPage: 1,
+  });
+
+  const changePage = (page: number) => {
+    const newSkip = (page - 1) * constants.paging.perPage;
+    setPagingInput({
+      ...pagingInput,
+      skip: newSkip,
+      currentPage: page,
+    });
+  };
 
   const setArchiveVisibility = (value: boolean) => {
     setArchiveModal(value);
@@ -287,6 +307,12 @@ const Client = () => {
               loading={updateLoading}
               columns={columns}
               rowKey={(record) => record?.id}
+              pagination={{
+                current: pagingInput.currentPage,
+                onChange: changePage,
+                total: clientData?.Client?.paging?.total,
+                pageSize: constants.paging.perPage
+              }}
             />
           </Col>
         </Row>
@@ -305,7 +331,7 @@ const Client = () => {
         setModalVisibility={setArchiveVisibility}
         imgSrc={archiveImg}
         okText={client?.archived ? "Unarchive" : "Archive"}
-          modalBody={() =>
+        modalBody={() =>
           ArchiveBody({
             title: (
               <>
@@ -314,9 +340,8 @@ const Client = () => {
                 <strong> {client.name}?</strong>
               </>
             ),
-            subText: `Client will ${
-              client?.archived ? "" : "not"
-            } be able to login to the system`,
+            subText: `Client will ${client?.archived ? "" : "not"
+              } be able to login to the system`,
           })
         }
         onOkClick={archiveClient}
