@@ -16,6 +16,9 @@ import archiveImg from "../../assets/images/archive_btn.svg";
 import ArchiveBody from "../../components/Archive";
 import { notifyGraphqlError } from "../../utils/error";
 import SubMenu from "antd/lib/menu/SubMenu";
+
+import { Project, ProjectQueryInput, ProjectStatus, ProjectUpdateInput } from "../../interfaces/generated";
+import { ProjectPagingData } from "../../interfaces/graphql.interface";
 import styles from "./style.module.scss";
 
 export const PROJECT = gql`
@@ -78,12 +81,12 @@ const deleteBody = () => {
   );
 };
 
-const Project = () => {
+const ProjectPage = () => {
   const loggedInUser = authVar();
   const navigate = useNavigate();
-  const [visibility, setVisibility] = useState(false);
-  const [showArchive, setArchiveModal] = useState(false);
-  const [project, setProject] = useState<any>();
+  const [visibility, setVisibility] = useState<boolean>(false);
+  const [showArchive, setArchiveModal] = useState<boolean>(false);
+  const [project, setProject] = useState<Project>();
   const [pagingInput, setPagingInput] = useState<{
     skip: number,
     currentPage: number,
@@ -108,13 +111,13 @@ const Project = () => {
     setArchiveModal(value);
   };
 
-  const { data: projectData } = useQuery(PROJECT, {
+  const { data: projectData } = useQuery<ProjectPagingData, { input: ProjectQueryInput }>(PROJECT, {
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
     variables: {
       input: {
         query: {
-          company_id: loggedInUser?.company?.id,
+          company_id: loggedInUser?.company?.id ?? '',
         },
         paging: {
           order: ["updatedAt:DESC"],
@@ -123,50 +126,49 @@ const Project = () => {
     },
   });
 
-  const [projectUpdate, { loading: updateLoading }] = useMutation(
-    PROJECT_UPDATE,
-    {
-      onCompleted() {
-        message.success({
-          content: `Project is updated successfully!`,
-          className: "custom-message",
-        });
-        setArchiveVisibility(false);
-      },
-      onError(err) {
-        setArchiveVisibility(false);
-        notifyGraphqlError(err);
-      },
-    }
+  const [projectUpdate, { loading: updateLoading }] = useMutation<{ ProjectUpdate: Project }, { input: ProjectUpdateInput }>(
+    PROJECT_UPDATE, {
+    onCompleted() {
+      message.success({
+        content: `Project is updated successfully!`,
+        className: "custom-message",
+      });
+      setArchiveVisibility(false);
+    },
+    onError(err) {
+      setArchiveVisibility(false);
+      notifyGraphqlError(err);
+    },
+  }
   );
 
   const archiveProject = () => {
     projectUpdate({
       variables: {
         input: {
-          id: project?.id,
+          id: project?.id ?? '',
           archived: !project?.archived,
-          company_id: loggedInUser?.company?.id,
-          name: project?.name,
+          company_id: loggedInUser?.company?.id ?? '',
+          name: project?.name ?? '',
         },
       },
     });
   };
 
-  const changeStatus = (value: string, id: string, name: string) => {
+  const changeStatus = (value: ProjectStatus, id: string, name: string) => {
     projectUpdate({
       variables: {
         input: {
-          status: value,
+          status: value ?? '',
           id: id,
           name: name,
-          company_id: loggedInUser?.company?.id,
+          company_id: loggedInUser?.company?.id ?? '',
         },
       },
     });
   };
 
-  const menu = (data: any) => (
+  const menu = (data: Project) => (
     <Menu>
       <SubMenu title="Change status" key="mainMenu">
         <Menu.Item
@@ -174,7 +176,7 @@ const Project = () => {
           onClick={() => {
             setProject(data);
             if (data?.status === "Inactive") {
-              changeStatus("Active", data?.id, data?.name);
+              changeStatus(ProjectStatus?.Active, data?.id, data?.name);
             }
           }}
         >
@@ -187,7 +189,7 @@ const Project = () => {
           onClick={() => {
             if (data?.status === "Active") {
               setProject(data);
-              changeStatus("Inactive", data?.id, data?.name);
+              changeStatus(ProjectStatus?.Inactive, data?.id, data?.name);
             }
           }}
         >
@@ -231,14 +233,14 @@ const Project = () => {
   const columns = [
     {
       title: "Project Name",
-      render: (task: any) => {
+      render: (task: Project) => {
         return (
           <div className={styles["task-name"]}>
             <p>{task?.name}</p>
           </div>
         );
       },
-      onCell: (record: any) => {
+      onCell: (record: Project) => {
         return {
           onClick: () => {
             navigate(
@@ -254,7 +256,7 @@ const Project = () => {
     {
       title: "Client",
       key: "client",
-      render: (record: any) => <div>{record?.client?.email}</div>,
+      render: (record: Project) => <div>{record?.client?.email}</div>,
     },
     // {
     //   title: 'Active Employees',
@@ -285,7 +287,7 @@ const Project = () => {
     {
       title: "Actions",
       key: "actions",
-      render: (record: any) => (
+      render: (record: Project) => (
         <div
           className={styles["dropdown-menu"]}
           onClick={(event) => event.stopPropagation()}
@@ -359,7 +361,7 @@ const Project = () => {
           </Col>
         </Row>
       </Card>
-      
+
       <ModalConfirm
         visibility={visibility}
         setModalVisibility={setModalVisibility}
@@ -380,7 +382,7 @@ const Project = () => {
               <>
                 Are you sure you want to{" "}
                 {project?.archived ? "unarchive" : "archive"}
-                <strong> {project.name}?</strong>
+                <strong> {project?.name}?</strong>
               </>
             ),
             subText: `Project will ${project?.archived ? "" : "not"
@@ -393,4 +395,4 @@ const Project = () => {
   );
 };
 
-export default Project;
+export default ProjectPage;

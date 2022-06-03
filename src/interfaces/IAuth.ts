@@ -33,10 +33,16 @@ export interface ICompanyUser {
   code: string;
 }
 
+export interface IAvatarUser {
+  id: string | null;
+  url: string | null;
+}
 export interface IAuth {
   token: string | null;
   user: IAuthUser;
   isLoggedIn: boolean;
   company?: ICompanyUser;
+  fullName?:string | null;
+  avatar?:IAvatarUser;
 }
 
