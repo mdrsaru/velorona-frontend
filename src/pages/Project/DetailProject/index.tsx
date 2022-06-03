@@ -15,7 +15,6 @@ import constants from '../../../config/constants';
 import deleteImg from "../../../assets/images/delete_btn.svg";
 import archiveImg from "../../../assets/images/archive_btn.svg";
 
-import styles from "../style.module.scss";
 import ModalConfirm from "../../../components/Modal";
 import ArchiveBody from "../../../components/Archive";
 import DeleteBody from "../../../components/Delete";
@@ -23,6 +22,8 @@ import TaskDetail from "../../../components/TaskDetail";
 import Status from "../../../components/Status";
 
 import InfoCircleOutlined from "@ant-design/icons/lib/icons/InfoCircleOutlined";
+import { ProjectPagingData } from "../../../interfaces/graphql.interface";
+import styles from "../style.module.scss";
 
 const { SubMenu } = Menu;
 
@@ -332,7 +333,7 @@ const DetailProject = () => {
     },
   ];
 
-  const { data: projectData } = useQuery(PROJECT, {
+  const { data: projectData } = useQuery<ProjectPagingData>(PROJECT, {
     variables: {
       input: {
         query: {

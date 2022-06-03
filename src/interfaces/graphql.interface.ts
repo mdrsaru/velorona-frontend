@@ -28,6 +28,13 @@ export interface TimesheetPagingData {
   },
 };
 
+export interface TaskPagingData {
+  Task: {
+    data: interfaces.Task[];
+    paging: interfaces.PagingResult;
+  },
+};
+
 export interface IInvoiceItemInput {
   id?: string;
   project_id: string;
