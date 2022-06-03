@@ -27,7 +27,7 @@ const TopHeader = (props: any) => {
   const { onCollapse } = props;
   const client = useApolloClient();
   const navigate = useNavigate();
-
+  const loggedInUser = authVar();
   /* Uncomment it to make sidebar toggle
   const { data: sidebarData } = useQuery(SIDEBAR);
   const onClick = () => {
@@ -51,6 +51,11 @@ const TopHeader = (props: any) => {
         company: {
           id: null,
           code: '',
+        },
+        fullName:null,
+        avatar: {
+          id: null,
+          url: '',
         }
       });
       client.clearStore();
@@ -91,19 +96,19 @@ const TopHeader = (props: any) => {
       </div>
 
       <div className={styles['header-right']}>
-        <div className={styles['notification']}>
+        {/* <div className={styles['notification']}>
           <img
             src={notification}
             alt="notification" />
-        </div>
+        </div> */}
         <div className={styles['avatar']}>
-          <Avatar size={38} />
+          <Avatar size={38} src = {loggedInUser?.avatar?.url} />
           <Dropdown
             overlay={menu}
             trigger={['click']}>
             <span className={styles['name-container']}>
               <span className={styles['name']}>
-                John Doe
+                {loggedInUser?.fullName ?? ''}
               </span>
               <span className={styles['drop-arrow']}>
                 <img

@@ -29,6 +29,11 @@ const LOGIN = gql`
           id
           name
         }
+        fullName
+        avatar{
+          id
+          url
+        }
     }
   }
 `
@@ -63,6 +68,11 @@ const Login = () => {
         company: {
           id: loginData?.company?.id ?? '',
           code: loginData?.company?.companyCode ?? ''
+        },
+        fullName:loginData?.fullName,
+        avatar: {
+          id: loginData?.avatar?.id ?? '',
+          url: loginData?.avatar?.url ?? ''
         },
         isLoggedIn: true,
       });
