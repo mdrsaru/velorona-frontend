@@ -32,6 +32,8 @@ export const PROJECT = gql`
           id
           name
         }
+        status
+        archived
       }
     }
   }
@@ -255,14 +257,14 @@ const Project = () => {
     //       <Progress percent={record?.progress} size="small" />
     //     </div>
     // },
-    // {
-    //   title: "Status",
-    //   dataIndex: "status",
-    //   key: "status",
-    //   render: (status: string) => (
-    //     <div className={styles[`${status}-text`]}>{status}</div>
-    //   ),
-    // },
+    {
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
+      render: (status: string) => (
+        <div className={styles[`${status}-text`]}>{status}</div>
+      ),
+    },
     {
       title: "Actions",
       key: "actions",

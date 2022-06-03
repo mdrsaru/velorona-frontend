@@ -1,16 +1,17 @@
 import { gql, useQuery } from "@apollo/client";
-import { Avatar, Table, Tooltip, Collapse, Space } from "antd";
+import {  Table, Collapse, Space } from "antd";
 import _ from "lodash";
-import { Column } from "rc-table";
 
 import NotPriority from "../../assets/images/not-priority.svg";
 import Priority from "../../assets/images/priority.svg";
 
 import { authVar } from "../../App/link";
-import { TaskStatus, User } from "../../interfaces/generated";
 
 import styles from "./style.module.scss";
 import EmployeeCard from "../../components/EmployeeCard";
+import { useState } from "react";
+import TaskDetail from "../../components/TaskDetail";
+import AssignedUserAvatar from "../../components/AssignedUserAvatar";
 
 export const TASK = gql`
   query Task($input: TaskQueryInput!) {
@@ -50,6 +51,7 @@ export const TASK = gql`
         }
         deadline
         priority
+        createdAt
       }
     }
   }
@@ -57,6 +59,8 @@ export const TASK = gql`
 const Tasks = () => {
   const authData = authVar();
   const { Panel } = Collapse;
+  const [visibility, setVisibility] = useState(false);
+  const [task, setTask] = useState<any>();
   const { data: taskData } = useQuery(TASK, {
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
@@ -75,13 +79,11 @@ const Tasks = () => {
 
   const tasks = taskData?.Task?.data;
   const taskGroups = _.groupBy(tasks, "status");
-  console.log(taskGroups, "groups");
 
   const columns = [
     {
       title: "",
       render: (task: any) => {
-        console.log(task, "task");
         return (
           <>
             <span className={styles.taskName}>{task.name}</span>
@@ -91,39 +93,28 @@ const Tasks = () => {
           </>
         );
       },
+      onCell: (task: any) => {
+        return {
+          onClick: () => {
+            setVisibility(!visibility);
+            setTask(task);
+          },
+        };
+      },
     },
     {
       title: "Assigned To",
-      key: "client",
-      render: (task: any) => (
-        <Avatar.Group
-          maxCount={2}
-          size="large"
-          maxStyle={{ color: "#f56a00", backgroundColor: "#fde3cf" }}
-        >
-          {task.users.map((user: User, index: any) => (
-            <>
-              <Tooltip title={user?.fullName} placement="top">
-                {user?.avatar?.url ? (
-                  <Avatar src={user.avatar?.url}></Avatar>
-                ) : (
-                  <Avatar style={{ backgroundColor: "#f56a00" }}>
-                    {user?.fullName.charAt(0)}
-                  </Avatar>
-                )}
-              </Tooltip>
-            </>
-          ))}
-        </Avatar.Group>
-      ),
+      key: "users",
+      render: (task: any) => {
+        return <AssignedUserAvatar users={task?.users} />;
+      },
     },
     {
       title: "Deadline",
-      dataIndex: "active_employees",
-      render: (task: any) => {
-        const deadlineDate = task?.deadline.split("T");
-        const deadline = deadlineDate?.[0];
-        return <p className={styles["table-data"]}>{deadline}</p>;
+      dataIndex: "deadline",
+      render: (deadline: any) => {
+        const deadlineDate = deadline?.split("T")?.[0];
+        return <p className={styles["table-data"]}>{deadlineDate ?? "-"}</p>;
       },
     },
 
@@ -132,7 +123,7 @@ const Tasks = () => {
       dataIndex: "priority",
       key: "status",
       render: (task: any) => (
-        <img src={task?.priority ? Priority : NotPriority} />
+        <img src={task?.priority ? Priority : NotPriority} alt="task-priority" />
       ),
     },
   ];
@@ -146,9 +137,7 @@ const Tasks = () => {
         style={{ display: "flex", marginTop: "1.5rem" }}
       >
         {taskGroups?.UnScheduled?.length && (
-          <Collapse
-            accordion
-          >
+          <Collapse accordion>
             <Panel header="UnScheduled" key="1">
               <Table
                 dataSource={taskGroups?.UnScheduled}
@@ -164,12 +153,13 @@ const Tasks = () => {
       <Space
         direction="vertical"
         size="middle"
+        style={{ display: "flex", marginTop: "1.5rem" }}
       >
-        {taskGroups?.Schedule?.length && (
+        {taskGroups?.Scheduled?.length && (
           <Collapse accordion>
-            <Panel header="Schedule" key="2">
+            <Panel header="Scheduled" key="2">
               <Table
-                dataSource={taskGroups?.Schedule}
+                dataSource={taskGroups?.Scheduled}
                 columns={columns}
                 rowKey={(task) => task?.id}
                 pagination={false}
@@ -216,6 +206,14 @@ const Tasks = () => {
           </Collapse>
         )}
       </Space>
+
+      <TaskDetail
+        visibility={visibility}
+        setVisibility={setVisibility}
+        data={task}
+        employee={true}
+        userId={authData?.user?.id}
+      />
     </>
   );
 };

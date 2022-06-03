@@ -191,26 +191,23 @@ const DetailProject = () => {
           View Details
         </div>
       </Menu.Item>
-     
+
       <Menu.Item key="delete" className={styles.list}>
         <div
           onClick={() => {
             navigate(
-            routes.editTasksProject.path(
-              loggedInUser?.company?.code
-                ? loggedInUser?.company?.code
-                : "",
-              params?.pid ?? "",
-              data?.id
-            )
-            )
+              routes.editTasksProject.path(
+                loggedInUser?.company?.code ? loggedInUser?.company?.code : "",
+                params?.pid ?? "",
+                data?.id
+              )
+            );
           }}
         >
           Edit Task
         </div>
       </Menu.Item>
 
-    
       <Menu.Item key="delete" className={styles.list}>
         <div
           onClick={() => {
@@ -237,7 +234,6 @@ const DetailProject = () => {
       ))}
     </Menu>
   );
-
   const columns = [
     {
       title: "Task Name",
@@ -440,13 +436,11 @@ const DetailProject = () => {
         }
         onOkClick={archiveTask}
       />
-      {detailVisibility && (
-        <TaskDetail
-          visibility={detailVisibility}
-          setVisibility={setDetailVisibility}
-          data={task}
-        />
-      )}
+      <TaskDetail
+        visibility={detailVisibility}
+        setVisibility={setDetailVisibility}
+        data={task}
+      />
     </div>
   );
 };

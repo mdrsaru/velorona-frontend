@@ -100,7 +100,7 @@ const Sidebar = (props: any) => {
     {
       key: routes.tasks.key,
       name: routes.tasks.name,
-      icon: <OrderedListOutlined />,
+      icon: <ScheduleOutlined />,
       route: routes.tasks.path(loggedInUser?.company?.code ?? ''),
       accessRoles: [constants.roles.Employee]
     },
@@ -125,13 +125,13 @@ const Sidebar = (props: any) => {
       route: routes.employeeTimesheet.path(loggedInUser?.company?.code ?? ''),
       accessRoles: [constants.roles.CompanyAdmin, constants.roles.TaskManager]
     },
-    {
-      key: routes.schedule.key,
-      name: routes.schedule.name,
-      icon: <ScheduleOutlined />,
-      route: routes.schedule.path(loggedInUser?.company?.code ?? ''),
-      accessRoles: [constants.roles.Employee]
-    }
+    // {
+    //   key: routes.schedule.key,
+    //   name: routes.schedule.name,
+    //   icon: <ScheduleOutlined />,
+    //   route: routes.schedule.path(loggedInUser?.company?.code ?? ''),
+    //   accessRoles: [constants.roles.Employee]
+    // }
   ]
   const menuArray = menuItems.filter(menu => {return loggedInUser?.user?.roles?.some(role => menu.accessRoles.includes(role))})
   // const selectedMenuKey = menuKeys.find(key => key.split('/')?.[1] === location.pathname?.split('/')?.[1]) ?? '';
