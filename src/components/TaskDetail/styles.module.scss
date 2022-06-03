@@ -15,10 +15,21 @@
   .ant-modal-close-x {
     padding-top: 0.3rem;
   }
+  .ant-picker,
+  .ant-picker.ant-picker-borderless,
+  .ant-input {
+    background-color: #fff !important;
+    color: black;
+    padding: 0;
+  }
+
+  .ant-picker-suffix {
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 17px;
+    color: var(--black);
+  }
 }
-
-
-
 
 .modal-footer {
   justify-items: left;
@@ -45,9 +56,6 @@
   line-height: 17px;
 }
 
-.statusDiv{
-  
-}
 .task-title {
   font-weight: 600;
   font-size: 24px;
@@ -71,7 +79,7 @@
   font-size: 14px;
   line-height: 17px;
 
-  div  {
+  div {
     margin-bottom: 0.3rem;
   }
 }
@@ -86,7 +94,44 @@
   padding: 1rem;
 }
 
-.status-div{
+.status-div {
   background: var(--gray-2);
-  padding:1rem;
+  padding: 1rem;
+}
+
+.custom-picker input {
+  visibility: hidden;
+}
+
+.user-name {
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 22px;
+}
+
+.heading {
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 17px;
+}
+
+.createdAt {
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 17px;
+}
+
+.clientProjectName {
+  background-color: rgba(149, 35, 156, 0.2);
+  color: var(--primary-purple);
+  padding: 0.5rem;
+  margin-left: 1.5rem;
+  margin-right: 10rem;
+}
+
+.deadline {
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 17px;
+  color: var(--black);
 }
