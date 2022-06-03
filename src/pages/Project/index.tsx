@@ -1,25 +1,25 @@
-import React, { useState } from "react";
-import { gql, useMutation, useQuery } from "@apollo/client";
+import React, { useState } from 'react'
+import { gql, useMutation, useQuery } from '@apollo/client'
 
-import { Card, Col, Dropdown, Menu, message, Row, Table } from "antd";
-import { Link, useNavigate } from "react-router-dom";
-import routes from "../../config/routes";
-import { MoreOutlined, PlusCircleOutlined } from "@ant-design/icons";
+import { Card, Col, Dropdown, Menu, message, Row, Table } from 'antd'
+import { Link, useNavigate } from 'react-router-dom'
+import routes from '../../config/routes'
+import { MoreOutlined, PlusCircleOutlined } from '@ant-design/icons'
 
-import { authVar } from "../../App/link";
-import ModalConfirm from "../../components/Modal";
+import { authVar } from '../../App/link';
+import ModalConfirm from '../../components/Modal';
 
 import constants from '../../config/constants';
-import deleteImg from "../../assets/images/delete_btn.svg";
-import archiveImg from "../../assets/images/archive_btn.svg";
+import deleteImg from '../../assets/images/delete_btn.svg';
+import archiveImg from '../../assets/images/archive_btn.svg';
 
-import ArchiveBody from "../../components/Archive";
-import { notifyGraphqlError } from "../../utils/error";
-import SubMenu from "antd/lib/menu/SubMenu";
+import ArchiveBody from '../../components/Archive';
+import { notifyGraphqlError } from '../../utils/error';
+import SubMenu from 'antd/lib/menu/SubMenu';
 
-import { Project, ProjectQueryInput, ProjectStatus, ProjectUpdateInput } from "../../interfaces/generated";
-import { ProjectPagingData } from "../../interfaces/graphql.interface";
-import styles from "./style.module.scss";
+import { Project, ProjectQueryInput, ProjectStatus, ProjectUpdateInput } from '../../interfaces/generated';
+import { ProjectPagingData } from '../../interfaces/graphql.interface';
+import styles from './style.module.scss';
 
 export const PROJECT = gql`
   query Project($input: ProjectQueryInput!) {

@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { gql, useQuery } from '@apollo/client';
-import { Card, Table, Row, Col } from 'antd';
+import { Card, Table, Row, Col, Button } from 'antd';
 
 import { authVar } from '../../App/link';
 import constants from '../../config/constants';
@@ -77,6 +77,10 @@ const EmployeeTimesheet = () => {
     });
   };
 
+  const downloadReport = () => {
+    
+  }
+
   const dataSource = timesheetData?.Timesheet?.data ?? [];
 
   const columns = [
@@ -150,8 +154,10 @@ const EmployeeTimesheet = () => {
               }}
             />
           </Col>
+          <Col>
+            <Button type="primary" onClick={downloadReport}>Download Report</Button>
+          </Col>
         </Row>
-
       </Card>
     </div>
 
