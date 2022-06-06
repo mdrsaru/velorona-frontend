@@ -80,6 +80,15 @@ const _Routes = () => {
             }
           />
 
+          <Route
+            path={routes.editProfile.childPath}
+            element={
+              <Suspense fallback={<RouteLoader />}>
+                <routes.editProfile.component />
+              </Suspense>
+            }
+          />
+
           <Route path={routes.company.childPath}>
             <Route
               index
@@ -99,15 +108,6 @@ const _Routes = () => {
                     )}
                   </Suspense>
                 </CheckRoles>
-              }
-            />
-
-            <Route
-              path={routes.profile.childPath}
-              element={
-                <Suspense fallback={<RouteLoader />}>
-                  <routes.profile.component />
-                </Suspense>
               }
             />
             <Route
@@ -355,6 +355,15 @@ const _Routes = () => {
               />
             </Route>
           </Route>
+
+          <Route
+            path={routes.profile.childPath}
+            element={
+              <Suspense fallback={<RouteLoader />}>
+                <routes.profile.component />
+              </Suspense>
+            }
+          />
 
           <Route
             path={routes.dashboard.path}

@@ -92,6 +92,13 @@ const routes = {
     name: 'Edit Employee',
     key: 'employee'
   },
+  editProfile: {
+    childPath: '/profile-edit/:eid',
+    path: (eid: string) => `/profile-edit/${eid}`,
+    component: lazy(() => import('../pages/Employee/EditEmployee')),
+    name: 'Edit Employee',
+    key: 'profile-edit'
+  },
   detailEmployee: {
     childPath: ':eid/detail',
     path: (id: string, eid: string) => `/${id}/employee/${eid}/detail`,
@@ -101,7 +108,7 @@ const routes = {
   },
   profile: {
     childPath: 'profile/:eid',
-    path: (id: string, eid: string) => `/${id}/profile/${eid}`,
+    path: (eid: string) => `/profile/${eid}`,
     component: lazy(() => import('../pages/Employee/DetailEmployee')),
     name: 'Profile',
     key: 'profile'

@@ -58,19 +58,19 @@ const DetailEmployee = () => {
                     xl: 130,
                     xxl: 130,
                   }}
-                  // icon={<AntDesignOutlined />}
+                // icon={<AntDesignOutlined />}
                 />
-             
-              {profile ? (
-                 <div>
-                <span></span>
-                </div>
-              ) : (
-                <div className={styles["name-tag"]}>
-                  <span>Employee</span>
-                </div>
-              )}
-               </div>
+
+                {profile ? (
+                  <div>
+                    <span></span>
+                  </div>
+                ) : (
+                  <div className={styles["name-tag"]}>
+                    <span>Employee</span>
+                  </div>
+                )}
+              </div>
             </Col>
           </Row>
           <br />
@@ -142,14 +142,14 @@ const DetailEmployee = () => {
           <Row justify="end" className={styles["footer-btn"]}>
             <Col>
               <Button type="primary">
-                <Link
-                  to={routes.editEmployee.path(
+                {profile ?
+                  <Link to={routes.editProfile.path(params?.eid ?? "1")}>
+                    Edit Profile
+                  </Link> :
+                  <Link to={routes.editEmployee.path(
                     loggedInUser?.company?.code ?? "1",
                     params?.eid ?? "1"
-                  )}
-                >
-                {profile ? 'Edit Profile ': " Edit Employee"}
-                </Link>
+                  )}> </Link>}
               </Button>
             </Col>
           </Row>

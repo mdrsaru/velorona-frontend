@@ -4,7 +4,7 @@ import moment from 'moment'
 import type { UploadProps } from 'antd'
 
 import constants from '../../../config/constants'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery } from '@apollo/client'
 import { notifyGraphqlError } from '../../../utils/error'
 import { IRole } from '../../../interfaces/IRole'
@@ -17,6 +17,7 @@ import { useState } from 'react'
 import styles from '../style.module.scss'
 import { authVar } from '../../../App/link'
 import RouteLoader from '../../../components/Skeleton/RouteLoader'
+import routes from '../../../config/routes'
 
 const dateFormat = 'YYYY-MM-DD HH:mm:ss'
 const profileFile = (e: any) => {
@@ -30,6 +31,7 @@ const profileFile = (e: any) => {
 const EditEmployee = () => {
   let params = useParams();
   const authData = authVar();
+  const location = useLocation();
   const navigate = useNavigate();
   const [fileData, setFile] = useState({
     id: '',
@@ -158,7 +160,7 @@ const EditEmployee = () => {
                 <ArrowLeftOutlined
                   onClick={() => navigate(-1)} />
                 &nbsp;
-                Edit Employee
+                Edit {location.pathname.includes(routes.editProfile?.key) ? "Profile" : " Employee"}
               </h1>
             </Col>
           </Row>
@@ -421,7 +423,7 @@ const EditEmployee = () => {
                     <Button
                       type="primary"
                       htmlType="submit">
-                      Update Employee
+                      Update {location.pathname.includes(routes.editProfile?.key) ? "Profile" : " Employee"}
                     </Button>
                   </Space>
                 </Form.Item>
