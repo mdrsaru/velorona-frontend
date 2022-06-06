@@ -34,6 +34,7 @@ const INVOICE = gql`
           rate
           amount
           project_id
+          description
         }
       }
     }

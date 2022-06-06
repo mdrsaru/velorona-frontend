@@ -206,7 +206,8 @@ const InvoiceForm = (props: IProps) => {
       issueDate: values.issueDate?.toISOString(),
       dueDate: values.dueDate?.toISOString(),
       notes: values.notes,
-      taxPercent: values.taxPercent,
+      taxPercent: parseFloat(values.taxPercent),
+      taxAmount: parseFloat(values.taxAmount),
       totalAmount: parseFloat(values.totalAmount),
       subtotal: parseFloat(values.subtotal),
       totalQuantity: values.totalQuantity,
@@ -220,9 +221,9 @@ const InvoiceForm = (props: IProps) => {
           id: item.id,
           project_id: item.project_id,
           description: item.description,
-          quantity: item.quantity,
-          rate: item.rate,
-          amount: item.amount,
+          quantity: parseFloat(item.quantity),
+          rate: parseFloat(item.rate),
+          amount: parseFloat(item.amount),
         })),
       };
 
@@ -239,9 +240,9 @@ const InvoiceForm = (props: IProps) => {
         items: values.items.map((item: any) => ({
           project_id: item.project_id,
           description: item.description,
-          quantity: item.quantity,
-          rate: item.rate,
-          amount: item.amount,
+          quantity: parseFloat(item.quantity),
+          rate: parseFloat(item.rate),
+          amount: parseFloat(item.amount),
         })),
       }; 
 
