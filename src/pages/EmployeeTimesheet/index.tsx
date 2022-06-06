@@ -54,18 +54,19 @@ const EmployeeTimesheet = () => {
     data: timesheetData,
     loading: timesheetLoading
   } = useQuery<TimesheetPagingData, { input: TimesheetQueryInput }>(
-    EMPLOYEE_TIMESHEET, {
-    fetchPolicy: 'network-only',
-    nextFetchPolicy: 'cache-first',
-    variables: {
-      input: {
-        query: {
-          company_id,
+    EMPLOYEE_TIMESHEET, 
+    {
+      fetchPolicy: 'network-only',
+      nextFetchPolicy: 'cache-first',
+      variables: {
+        input: {
+          query: {
+            company_id,
+          },
         },
       },
+      onError: notifyGraphqlError,
     },
-    onError: notifyGraphqlError,
-  },
   );
 
   const changePage = (page: number) => {
@@ -113,19 +114,13 @@ const EmployeeTimesheet = () => {
     {
       title: 'Action',
       render: (timesheet: Timesheet) => {
-        return <span>
-          {authData?.user?.roles.includes(constants.roles.TaskManager) ?
-            <Link
-              className={styles['invoice-link']}
-              to={routes.detailTimesheet.path(authData?.company?.code as string, timesheet.id)}>
-              Details
-            </Link> :
-            <Link
-              className={styles['invoice-link']}
-              to={routes.timesheetInvoice.path(authData?.company?.code as string, timesheet.id)}>
-              Invoice
-            </Link>}
-        </span>
+        return (
+          <Link
+            className={styles['invoice-link']}
+            to={routes.detailTimesheet.path(authData?.company?.code as string, timesheet.id)}>
+            Details
+          </Link> 
+        )
       }
     },
   ];
@@ -159,3 +154,4 @@ const EmployeeTimesheet = () => {
 }
 
 export default EmployeeTimesheet;
+

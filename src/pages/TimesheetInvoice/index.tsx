@@ -130,7 +130,7 @@ const TimesheetInvoice = () => {
           !!timesheet?.client && (
             <>
               <InvoiceClientDetail client={timesheet.client} />
-              { invoiceInput && <InvoiceForm client_id={timesheet.client.id} invoice={invoiceInput} /> }
+              { invoiceInput && <InvoiceForm timesheet_id={timesheet.id} client_id={timesheet.client.id} invoice={invoiceInput} /> }
             </>
           )
         }

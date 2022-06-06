@@ -332,17 +332,16 @@ const Client = () => {
         imgSrc={archiveImg}
         okText={client?.archived ? "Unarchive" : "Archive"}
         modalBody={() =>
-          ArchiveBody({
-            title: (
+          <ArchiveBody 
+            title={
               <>
                 Are you sure you want to{" "}
                 {client?.archived ? "unarchive" : "archive"}
                 <strong> {client.name}?</strong>
               </>
-            ),
-            subText: `Client will ${client?.archived ? "" : "not"
-              } be able to login to the system`,
-          })
+            }
+            subText={`Client will ${client?.archived ? "" : "not" } be able to login to the system` }
+          />
         }
         onOkClick={archiveClient}
       />
