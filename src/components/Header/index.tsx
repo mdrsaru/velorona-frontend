@@ -65,7 +65,7 @@ const TopHeader = (props: any) => {
   });
 
   const profile = ()=>{
-    navigate(routes.profile.path(loggedInUser?.company?.code as string,loggedInUser?.user?.id as string))
+    navigate(routes.profile.path(loggedInUser?.user?.id as string))
   }
   const menu = (
     <Menu style={{ width: 120 }}>

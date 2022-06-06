@@ -26,15 +26,6 @@ import { useEffect, useState } from "react";
 
 const { Sider } = Layout;
 
-// const menuKeys = [
-//   routes.dashboard.path,
-//   routes.home.path,
-//   routes.timesheet.path,
-//   routes.tasks.path,
-//   routes.schedule.path,
-// ];
-
-
 const Sidebar = (props: any) => {
   const { collapsed, onCollapse } = props
   const [selectedMenuKey, setMenuKey] = useState('')
@@ -43,27 +34,17 @@ const Sidebar = (props: any) => {
   const loggedInUser = authVar();
 
   useEffect(() => {
-    if (location?.pathname.includes('employee-timesheet')) {
-      setMenuKey(routes.employeeTimesheet.key)
-    } else if (location?.pathname.includes('client')) {
-      setMenuKey(routes.client.key)
-    } else if (location?.pathname.includes('project')) {
-      setMenuKey(routes.projects.key)
-    } else if (location?.pathname.includes('invoice')) {
-      setMenuKey(routes.invoice.key)
-    } else if (location?.pathname.includes('employee')) {
-      setMenuKey(routes.employee.key)
-    } else if (location?.pathname === '/' + params?.id) {
-      setMenuKey(routes.companyDashboard.key)
-    } else if (location?.pathname.includes('timesheet')) {
-      setMenuKey(routes.timesheet.key)
-    } else if (location?.pathname.includes('schedule')) {
-      setMenuKey(routes.schedule.key)
-    } else if (location?.pathname.includes('role')) {
-      setMenuKey(routes.role.key)
+    let path = ''
+    if (location?.pathname === '/' + params?.id) {
+      path = routes.companyDashboard.key
+    } else if (params?.id && location?.pathname !== '/' + params?.id) {
+      path = location?.pathname?.split('/').slice(2, 3).toString()
+    } else if (!params.id && location?.pathname !== routes.home.path) {
+      path = location?.pathname?.split('/').slice(1, 2).toString()
     } else {
-      setMenuKey(routes.home.key)
+      path = routes.home.key
     }
+    setMenuKey(path)
   }, [location, params?.id])
 
   const menuItems = [
@@ -82,7 +63,7 @@ const Sidebar = (props: any) => {
       accessRoles: [constants.roles.CompanyAdmin]
     },
     {
-      key: routes.role.name,
+      key: routes.role.key,
       name: routes.role.name,
       icon: <UserSwitchOutlined />,
       route: routes.role.path,

@@ -14,20 +14,21 @@ import { ArrowLeftOutlined } from "@ant-design/icons";
 import moment from "moment";
 import type { UploadProps } from "antd";
 
-import constants from "../../../config/constants";
-import { useNavigate, useParams } from "react-router-dom";
-import { useMutation, useQuery } from "@apollo/client";
-import { notifyGraphqlError } from "../../../utils/error";
-import { IRole } from "../../../interfaces/IRole";
-import { USER_UPDATE, USER } from "..";
-import { ROLES } from "../../Role";
-import { CHANGE_PROFILE_IMAGE } from "../NewEmployee";
+import constants from '../../../config/constants'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { useMutation, useQuery } from '@apollo/client'
+import { notifyGraphqlError } from '../../../utils/error'
+import { IRole } from '../../../interfaces/IRole'
+import { USER_UPDATE, USER } from '..'
+import { ROLES } from '../../Role'
+import { CHANGE_PROFILE_IMAGE } from '../NewEmployee'
 
-import { STATE_CITIES, USA_STATES } from "../../../utils/cities";
-import { useState } from "react";
-import styles from "../style.module.scss";
-import { authVar } from "../../../App/link";
-import RouteLoader from "../../../components/Skeleton/RouteLoader";
+import { STATE_CITIES, USA_STATES } from '../../../utils/cities'
+import { useState } from 'react'
+import styles from '../style.module.scss'
+import { authVar } from '../../../App/link'
+import RouteLoader from '../../../components/Skeleton/RouteLoader'
+import routes from '../../../config/routes'
 
 const dateFormat = "YYYY-MM-DD HH:mm:ss";
 const profileFile = (e: any) => {
@@ -40,13 +41,14 @@ const profileFile = (e: any) => {
 const EditEmployee = () => {
   let params = useParams();
   const authData = authVar();
+  const location = useLocation();
   const navigate = useNavigate();
   const [fileData, setFile] = useState({
     id: "",
     name: "",
   });
   const [userUpdate] = useMutation(USER_UPDATE, {
-    
+
     onCompleted: () => {
       if (fileData?.id) {
         changeProfilePictureInput({
@@ -98,7 +100,7 @@ const EditEmployee = () => {
   };
 
   const successMessage = () => {
-    message.success(`Employee is updated successfully!`).then((r) => {});
+    message.success(`Employee is updated successfully!`).then((r) => { });
     navigate(-1);
   };
 
@@ -170,8 +172,10 @@ const EditEmployee = () => {
           <Row>
             <Col span={12} className={styles["employee-col"]}>
               <h1>
-                <ArrowLeftOutlined onClick={() => navigate(-1)} />
-                &nbsp; Edit Employee
+                <ArrowLeftOutlined
+                  onClick={() => navigate(-1)} />
+                &nbsp;
+                Edit {location.pathname.includes(routes.editProfile?.key) ? "Profile" : " Employee"}
               </h1>
             </Col>
           </Row>
@@ -191,12 +195,12 @@ const EditEmployee = () => {
                 userData?.User?.data[0]?.address?.streetAddress ?? "",
               startDate: moment(
                 userData?.User?.data[0]?.record?.endDate ??
-                  "2022-01-01T00:00:00.410Z",
+                "2022-01-01T00:00:00.410Z",
                 dateFormat
               ),
               endDate: moment(
                 userData?.User?.data[0]?.record?.startDate ??
-                  "2022-01-02T00:00:00.410Z",
+                "2022-01-02T00:00:00.410Z",
                 dateFormat
               ),
               state: userData?.User?.data[0]?.address?.state ?? "",
@@ -421,17 +425,19 @@ const EditEmployee = () => {
                     >
                       Cancel
                     </Button>
-                    <Button type="primary" htmlType="submit">
-                      Update Employee
+                    <Button
+                      type="primary"
+                      htmlType="submit">
+                      Update {location.pathname.includes(routes.editProfile?.key) ? "Profile" : " Employee"}
                     </Button>
                   </Space>
-                </Form.Item>
-              </Col>
-            </Row>
-          </Form>
-        </Card>
+                </Form.Item >
+              </Col >
+            </Row >
+          </Form >
+        </Card >
       )}
-    </div>
+    </div >
   );
 };
 export default EditEmployee;

@@ -124,7 +124,7 @@ const DetailEmployee = () => {
                     xl: 130,
                     xxl: 130,
                   }}
-                  // icon={<AntDesignOutlined />}
+                // icon={<AntDesignOutlined />}
                 />
 
                 {profile ? (
@@ -220,14 +220,16 @@ const DetailEmployee = () => {
           <Row justify="end" className={styles["footer-btn"]}>
             <Col>
               <Button type="primary">
-                <Link
-                  to={routes.editEmployee.path(
+                {profile ?
+                  <Link to={routes.editProfile.path(params?.eid ?? "1")}>
+                    Edit Profile
+                  </Link> :
+                  <Link to={routes.editEmployee.path(
                     loggedInUser?.company?.code ?? "1",
                     params?.eid ?? "1"
-                  )}
-                >
-                  {profile ? "Edit Profile " : " Edit Employee"}
-                </Link>
+                  )}>
+                    Edit Employee
+                  </Link>}
               </Button>
             </Col>
           </Row>
