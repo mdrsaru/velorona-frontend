@@ -8,6 +8,7 @@ import { useNavigate } from 'react-router-dom';
 //import { SIDEBAR } from '../../gql/app.gql';
 import { /*sidebarVar, */authVar } from '../../App/link';
 import logo from '../../assets/images/logo.svg';
+import pp from '../../assets/images/default_pp.png';
 import logoContent from '../../assets/images/logo-01.svg';
 import downArrow from '../../assets/images/down-arrow.svg';
 // import notification from '../../assets/images/notification.svg';
@@ -106,13 +107,13 @@ const TopHeader = (props: any) => {
             alt="notification" />
         </div> */}
         <div className={styles['avatar']}>
-          <Avatar size={38} src = {loggedInUser?.avatar?.url} />
+          <Avatar size={38} src = {loggedInUser?.avatar?.url ?? pp } />
           <Dropdown
             overlay={menu}
             trigger={['click']}>
             <span className={styles['name-container']}>
               <span className={styles['name']}>
-                {loggedInUser?.fullName ?? ''}
+                {loggedInUser?.fullName}
               </span>
               <span className={styles['drop-arrow']}>
                 <img

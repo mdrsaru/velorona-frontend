@@ -1,26 +1,63 @@
-import { Avatar, Card, Col, Row, Button } from "antd";
+import React, { useState } from "react";
+import {
+  Avatar,
+  Card,
+  Col,
+  Row,
+  Button,
+  UploadProps,
+  message,
+  Upload,
+  Spin,
+} from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 
-import { useQuery } from "@apollo/client";
+import { useMutation, useQuery } from "@apollo/client";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import routes from "../../../config/routes";
 import { authVar } from "../../../App/link";
 
-import image from "../../../assets/images/High_five.svg";
+import image from "../../../assets/images/default_pp.png";
+import camera from "../../../assets/images/camera.svg";
 import { USER } from "../index";
 
 import styles from "../style.module.scss";
+import ViewUserPayRate from "../../../components/ViewUserPayRate";
+import constants from "../../../config/constants";
+import { CHANGE_PROFILE_IMAGE } from "../NewEmployee";
+import { notifyGraphqlError } from "../../../utils/error";
 
 const DetailEmployee = () => {
-  console.log("profile");
   const navigate = useNavigate();
   const loggedInUser = authVar();
+
   let params = useParams();
   let location = useLocation();
-  console.log(location.pathname.includes("profile"));
+  const [showViewUserPayRate, setViewUserPayRateVisibility] =
+    useState<boolean>(false);
 
   const profile = location.pathname.includes("profile");
-  console.log(profile, "profule");
+
+  const [isImageLoading, setIsImageLoading] = useState<boolean>(false);
+
+  const [changeProfilePictureInput] = useMutation(CHANGE_PROFILE_IMAGE, {
+    onCompleted(response) {
+      const userAuth = authVar();
+      authVar({
+        ...userAuth,
+        avatar: {
+          id: response.ChangeProfilePicture?.avatar?.id,
+          url: response.ChangeProfilePicture?.avatar?.url,
+        },
+      });
+      setIsImageLoading(false);
+      message.success({
+        content: `Profile picture changed successfully!`,
+        className: "custom-message",
+      });
+    },
+  });
+
   const { data: userData } = useQuery(USER, {
     fetchPolicy: "network-only",
     variables: {
@@ -31,6 +68,34 @@ const DetailEmployee = () => {
       },
     },
   });
+
+  const props: UploadProps = {
+    name: "file",
+    action: `${constants.apiUrl}/v1/media/upload`,
+    maxCount: 1,
+    headers: {
+      authorization: loggedInUser?.token ? `Bearer ${loggedInUser?.token}` : "",
+    },
+    onChange(info) {
+      if (info.file.status === "done") {
+        setIsImageLoading(true);
+        changeProfilePictureInput({
+          variables: {
+            input: {
+              id: userData?.User?.data[0]?.id,
+              avatar_id: info?.file?.response?.data?.id,
+            },
+          },
+        }).catch(notifyGraphqlError);
+      } else if (info.file.status === "error") {
+        message.error(`${info.file.name} file upload failed.`);
+      }
+    },
+  };
+
+  const handleViewPayRate = () => {
+    setViewUserPayRateVisibility(!showViewUserPayRate);
+  };
 
   return (
     <div className={styles["main-div"]}>
@@ -48,6 +113,7 @@ const DetailEmployee = () => {
           <Row justify="center">
             <Col className={styles["avatar-col"]}>
               <div className={styles["avatar-image"]}>
+                {isImageLoading ? <Spin className="circular-loading" /> : null}
                 <Avatar
                   src={userData?.User?.data[0]?.avatar?.url ?? image}
                   size={{
@@ -60,17 +126,21 @@ const DetailEmployee = () => {
                   }}
                   // icon={<AntDesignOutlined />}
                 />
-             
-              {profile ? (
-                 <div>
-                <span></span>
-                </div>
-              ) : (
-                <div className={styles["name-tag"]}>
-                  <span>Employee</span>
-                </div>
-              )}
-               </div>
+
+                {profile ? (
+                  <div className={styles["camera-div"]}>
+                    <div className={styles["browse-file"]}>
+                      <Upload {...props}>
+                        <img src={camera} />
+                      </Upload>
+                    </div>
+                  </div>
+                ) : (
+                  <div className={styles["name-tag"]}>
+                    <span>Employee</span>
+                  </div>
+                )}
+              </div>
             </Col>
           </Row>
           <br />
@@ -137,6 +207,14 @@ const DetailEmployee = () => {
                 </span>
               </div> */}
             </Col>
+            <Col xs={24} sm={24} md={12} lg={12}>
+              <p
+                className={styles["view-pay-rate"]}
+                onClick={handleViewPayRate}
+              >
+                View Payrate
+              </p>
+            </Col>
           </Row>
 
           <Row justify="end" className={styles["footer-btn"]}>
@@ -148,13 +226,18 @@ const DetailEmployee = () => {
                     params?.eid ?? "1"
                   )}
                 >
-                {profile ? 'Edit Profile ': " Edit Employee"}
+                  {profile ? "Edit Profile " : " Edit Employee"}
                 </Link>
               </Button>
             </Col>
           </Row>
         </Card>
       )}
+      <ViewUserPayRate
+        visibility={showViewUserPayRate}
+        setVisibility={setViewUserPayRateVisibility}
+        data={userData?.User?.data[0]}
+      />
     </div>
   );
 };

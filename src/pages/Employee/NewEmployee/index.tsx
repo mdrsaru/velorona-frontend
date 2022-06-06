@@ -30,6 +30,11 @@ export const CHANGE_PROFILE_IMAGE = gql`
       id
       firstName
       lastName
+      avatar{
+        id
+        url
+        name
+      }
     }
   }
 `
