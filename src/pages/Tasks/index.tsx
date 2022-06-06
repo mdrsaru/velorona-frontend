@@ -1,16 +1,18 @@
-import { gql, useQuery } from "@apollo/client";
-import { Table, Collapse, Space } from "antd";
-import _ from "lodash";
+import { gql, useQuery } from '@apollo/client'
+import { Table, Collapse, Space } from 'antd'
+import _ from 'lodash'
 
-import NotPriority from "../../assets/images/not-priority.svg";
-import Priority from "../../assets/images/priority.svg";
+import NotPriority from '../../assets/images/not-priority.svg'
+import Priority from '../../assets/images/priority.svg'
 
-import { authVar } from "../../App/link";
-import styles from "./style.module.scss";
-import EmployeeCard from "../../components/EmployeeCard";
-import { useState } from "react";
-import TaskDetail from "../../components/TaskDetail";
-import AssignedUserAvatar from "../../components/AssignedUserAvatar";
+import { authVar } from '../../App/link'
+import EmployeeCard from '../../components/EmployeeCard'
+import { useState } from 'react'
+import TaskDetail from '../../components/TaskDetail'
+import AssignedUserAvatar from '../../components/AssignedUserAvatar'
+import { TaskPagingData } from '../../interfaces/graphql.interface'
+import { Task } from '../../interfaces/generated'
+import styles from './style.module.scss'
 
 export const TASK = gql`
   query Task($input: TaskQueryInput!) {
@@ -55,12 +57,13 @@ export const TASK = gql`
     }
   }
 `;
+
 const Tasks = () => {
   const authData = authVar();
   const { Panel } = Collapse;
-  const [visibility, setVisibility] = useState(false);
-  const [task, setTask] = useState<any>();
-  const { data: taskData, loading: taskLoading } = useQuery(TASK, {
+  const [visibility, setVisibility] = useState<boolean>(false);
+  const [task, setTask] = useState<Task>();
+  const { data: taskData, loading: taskLoading } = useQuery<TaskPagingData>(TASK, {
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
     variables: {
@@ -82,17 +85,17 @@ const Tasks = () => {
   const columns = [
     {
       title: "",
-      render: (task: any) => {
+      render: (task: Task) => {
         return (
           <>
-            <span className={styles.taskName}>{task.name}</span>
+            <span className={styles['task-name']}>{task?.name}</span>
             <span className={styles.clientProjectName}>
-              {task.project.client.name}:{task.project.name}
+              {task?.project?.client?.name}:{task?.project?.name}
             </span>
           </>
         );
       },
-      onCell: (task: any) => {
+      onCell: (task: Task) => {
         return {
           onClick: () => {
             setVisibility(!visibility);
@@ -100,28 +103,25 @@ const Tasks = () => {
           },
         };
       },
-    },
-    {
+    }, {
       title: "Assigned To",
       key: "users",
-      render: (task: any) => {
+      render: (task: Task) => {
         return <AssignedUserAvatar users={task?.users} />;
       },
     },
     {
       title: "Deadline",
       dataIndex: "deadline",
-      render: (deadline: any) => {
+      render: (deadline: string) => {
         const deadlineDate = deadline?.split("T")?.[0];
         return <p className={styles["table-data"]}>{deadlineDate ?? "-"}</p>;
       },
-    },
-
-    {
+    }, {
       title: "Prority",
       dataIndex: "priority",
       key: "status",
-      render: (task: any) => (
+      render: (task: Task) => (
         <img src={task?.priority ? Priority : NotPriority} alt="task-priority" />
       ),
     },

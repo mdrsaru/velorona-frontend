@@ -1,32 +1,31 @@
-import { Suspense } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { Suspense } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
-import NotFound from '../components/NotFound';
+import NotFound from "../components/NotFound";
 import Layout from "../components/Layout";
 import CheckRoles from "../components/CheckRoles";
 
-import routes from '../config/routes';
+import routes from "../config/routes";
 import constants from "../config/constants";
 
 import LoginLoader from "../components/Skeleton/LoginLoader";
 import RouteLoader from "../components/Skeleton/RouteLoader";
 import PublicRoutes from "../components/PublicRoutes";
 import { authVar } from "./link";
-import TimeSheetLoader from '../components/Skeleton/TimeSheetLoader';
-
+import TimeSheetLoader from "../components/Skeleton/TimeSheetLoader";
 
 const _Routes = () => {
   const loginData = authVar();
   const roles = loginData?.user?.roles;
   const getRoute = () => {
     if (roles.includes(constants.roles.SuperAdmin)) {
-      return routes.dashboard.path
+      return routes.dashboard.path;
     } else if (roles.includes(constants.roles.CompanyAdmin)) {
-      return routes.company.path(loginData?.company?.code)
+      return routes.company.path(loginData?.company?.code);
     } else {
-      return routes.home.path
+      return routes.home.path;
     }
-  }
+  };
 
   return (
     <Router>
@@ -41,7 +40,8 @@ const _Routes = () => {
                   <routes.login.component />
                 </Suspense>
               </PublicRoutes>
-            } />
+            }
+          />
           <Route
             path={routes.loginAdmin.childPath}
             element={
@@ -50,7 +50,8 @@ const _Routes = () => {
                   <routes.login.component />
                 </Suspense>
               </PublicRoutes>
-            } />
+            }
+          />
         </Route>
 
         <Route path={routes.resetPassword.path}>
@@ -62,7 +63,8 @@ const _Routes = () => {
                   <routes.resetPassword.component />
                 </Suspense>
               </PublicRoutes>
-            } />
+            }
+          />
         </Route>
 
         {/* protected routes */}
@@ -75,33 +77,49 @@ const _Routes = () => {
                   <routes.role.component />
                 </Suspense>
               </CheckRoles>
-            } />
+            }
+          />
 
           <Route path={routes.company.childPath}>
             <Route
               index
               element={
-                <CheckRoles allowedRoles={[
-                  constants.roles.CompanyAdmin,
-                  constants.roles.Employee,
-                  constants.roles.TaskManager
-                ]}>
+                <CheckRoles
+                  allowedRoles={[
+                    constants.roles.CompanyAdmin,
+                    constants.roles.Employee,
+                    constants.roles.TaskManager,
+                  ]}
+                >
                   <Suspense fallback={<RouteLoader />}>
-                    {roles.includes(constants.roles.CompanyAdmin) ?
+                    {roles.includes(constants.roles.CompanyAdmin) ? (
                       <routes.dashboard.component />
-                      : <routes.home.component />}
+                    ) : (
+                      <routes.home.component />
+                    )}
                   </Suspense>
                 </CheckRoles>
-              } />
+              }
+            />
 
+            <Route
+              path={routes.profile.childPath}
+              element={
+                <Suspense fallback={<RouteLoader />}>
+                  <routes.profile.component />
+                </Suspense>
+              }
+            />
             <Route
               path={routes.employeeTimesheet.childPath}
               element={
-                <CheckRoles allowedRoles={[
-                  constants.roles.CompanyAdmin,
-                  constants.roles.SuperAdmin,
-                  constants.roles.TaskManager
-                ]}>
+                <CheckRoles
+                  allowedRoles={[
+                    constants.roles.CompanyAdmin,
+                    constants.roles.SuperAdmin,
+                    constants.roles.TaskManager,
+                  ]}
+                >
                   <Suspense fallback={<RouteLoader />}>
                     <routes.employeeTimesheet.component />
                   </Suspense>
@@ -112,17 +130,18 @@ const _Routes = () => {
             <Route
               path={routes.timesheetInvoice.childPath}
               element={
-                <CheckRoles allowedRoles={[
-                  constants.roles.CompanyAdmin,
-                  constants.roles.SuperAdmin
-                ]}>
+                <CheckRoles
+                  allowedRoles={[
+                    constants.roles.CompanyAdmin,
+                    constants.roles.SuperAdmin,
+                  ]}
+                >
                   <Suspense fallback={<RouteLoader />}>
                     <routes.timesheetInvoice.component />
                   </Suspense>
                 </CheckRoles>
               }
             />
-
 
             <Route path={routes.timesheet.childPath}>
               <Route
@@ -133,7 +152,8 @@ const _Routes = () => {
                       <routes.timesheet.component />
                     </Suspense>
                   </CheckRoles>
-                } />
+                }
+              />
 
               <Route
                 path={routes.newTimesheet.childPath}
@@ -141,95 +161,104 @@ const _Routes = () => {
                   <Suspense fallback={<TimeSheetLoader />}>
                     <routes.newTimesheet.component />
                   </Suspense>
-                } />
+                }
+              />
 
               <Route
                 path={routes.detailTimesheet.childPath}
                 element={
-                  <CheckRoles allowedRoles={[constants.roles.Employee, constants.roles.TaskManager, constants.roles.CompanyAdmin]}>
-                  <Suspense fallback={<TimeSheetLoader />}>
-                  <routes.detailTimesheet.component />
-                  </Suspense>
-                </CheckRoles>
+                  <CheckRoles allowedRoles={[
+                    constants.roles.Employee,
+                    constants.roles.TaskManager,
+                    constants.roles.CompanyAdmin
+                  ]}>
+                    <Suspense fallback={<TimeSheetLoader />}>
+                      <routes.detailTimesheet.component />
+                    </Suspense>
+                  </CheckRoles>
                 } />
             </Route>
 
             <Route
-              path={routes.tasks.childPath}
-              element={
-                <CheckRoles allowedRoles={[
-                  constants.roles.Employee,
-                  constants.roles.TaskManager
-                ]}>
-                  <Suspense fallback={<RouteLoader />}>
-                    <routes.tasks.component />
-                  </Suspense>
-                </CheckRoles>
-              } />
-
-            <Route
               path={routes.schedule.childPath}
               element={
-                <CheckRoles allowedRoles={[constants.roles.Employee]}>
+                <CheckRoles
+                  allowedRoles={[
+                    constants.roles.Employee,
+                    constants.roles.TaskManager,
+                  ]}
+                >
                   <Suspense fallback={<RouteLoader />}>
                     <routes.schedule.component />
                   </Suspense>
                 </CheckRoles>
-              } />
+              }
+            />
 
             <Route path={routes.projects.childPath}>
-              <Route index element={
-                <CheckRoles allowedRoles={[constants.roles.CompanyAdmin]}>
-                  <Suspense fallback={<RouteLoader />}>
-                    <routes.projects.component />
-                  </Suspense>
-                </CheckRoles>
-              } />
+              <Route
+                index
+                element={
+                  <CheckRoles allowedRoles={[constants.roles.CompanyAdmin]}>
+                    <Suspense fallback={<RouteLoader />}>
+                      <routes.projects.component />
+                    </Suspense>
+                  </CheckRoles>
+                }
+              />
               <Route
                 path={routes.addProject.childPath}
                 element={
                   <Suspense fallback={<RouteLoader />}>
                     <routes.addProject.component />
                   </Suspense>
-                } />
+                }
+              />
               <Route
                 path={routes.addTasksProject.childPath}
                 element={
                   <Suspense fallback={<RouteLoader />}>
                     <routes.addTasksProject.component />
                   </Suspense>
-                } />
-                 <Route
+                }
+              />
+              <Route
                 path={routes.editTasksProject.childPath}
                 element={
                   <Suspense fallback={<RouteLoader />}>
                     <routes.editTasksProject.component />
                   </Suspense>
-                } />
+                }
+              />
               <Route
                 path={routes.editProject.childPath}
                 element={
                   <Suspense fallback={<RouteLoader />}>
                     <routes.editProject.component />
                   </Suspense>
-                } />
+                }
+              />
               <Route
                 path={routes.detailProject.childPath}
                 element={
                   <Suspense fallback={<RouteLoader />}>
                     <routes.detailProject.component />
                   </Suspense>
-                } />
+                }
+              />
             </Route>
 
             <Route path={routes.invoice.childPath}>
-              <Route index element={
-                <CheckRoles allowedRoles={[constants.roles.CompanyAdmin]}>
-                  <Suspense fallback={<RouteLoader />}>
-                    <routes.invoice.component />
-                  </Suspense>
-                </CheckRoles>
-              } />
+              <Route
+                index
+                element={
+                  <CheckRoles allowedRoles={[constants.roles.CompanyAdmin]}>
+                    <Suspense fallback={<RouteLoader />}>
+                      <routes.invoice.component />
+                    </Suspense>
+                  </CheckRoles>
+                }
+              />
 
               <Route
                 path={routes.editInvoice.childPath}
@@ -246,31 +275,37 @@ const _Routes = () => {
                   <Suspense fallback={<RouteLoader />}>
                     <routes.addInvoice.component />
                   </Suspense>
-                } />
+                }
+              />
             </Route>
 
             <Route path={routes.client.childPath}>
-              <Route index element={
-                <CheckRoles allowedRoles={[constants.roles.CompanyAdmin]}>
-                  <Suspense fallback={<RouteLoader />}>
-                    <routes.client.component />
-                  </Suspense>
-                </CheckRoles>
-              } />
+              <Route
+                index
+                element={
+                  <CheckRoles allowedRoles={[constants.roles.CompanyAdmin]}>
+                    <Suspense fallback={<RouteLoader />}>
+                      <routes.client.component />
+                    </Suspense>
+                  </CheckRoles>
+                }
+              />
               <Route
                 path={routes.addClient.childPath}
                 element={
                   <Suspense fallback={<RouteLoader />}>
                     <routes.addClient.component />
                   </Suspense>
-                } />
+                }
+              />
               <Route
                 path={routes.editClient.childPath}
                 element={
                   <Suspense fallback={<RouteLoader />}>
                     <routes.editClient.component />
                   </Suspense>
-                } />
+                }
+              />
             </Route>
 
             <Route path={routes.employee.childPath}>
@@ -280,7 +315,8 @@ const _Routes = () => {
                   <Suspense fallback={<RouteLoader />}>
                     <routes.employee.component />
                   </Suspense>
-                } />
+                }
+              />
 
               <Route
                 path={routes.addEmployee.childPath}
@@ -288,7 +324,8 @@ const _Routes = () => {
                   <Suspense fallback={<RouteLoader />}>
                     <routes.addEmployee.component />
                   </Suspense>
-                } />
+                }
+              />
 
               <Route
                 path={routes.attachClient.childPath}
@@ -296,7 +333,8 @@ const _Routes = () => {
                   <Suspense fallback={<RouteLoader />}>
                     <routes.attachClient.component />
                   </Suspense>
-                } />
+                }
+              />
 
               <Route
                 path={routes.editEmployee.childPath}
@@ -304,7 +342,8 @@ const _Routes = () => {
                   <Suspense fallback={<RouteLoader />}>
                     <routes.editEmployee.component />
                   </Suspense>
-                } />
+                }
+              />
 
               <Route
                 path={routes.detailEmployee.childPath}
@@ -312,8 +351,8 @@ const _Routes = () => {
                   <Suspense fallback={<RouteLoader />}>
                     <routes.detailEmployee.component />
                   </Suspense>
-                } />
-
+                }
+              />
             </Route>
           </Route>
 
@@ -325,7 +364,8 @@ const _Routes = () => {
                   <routes.dashboard.component />
                 </Suspense>
               </CheckRoles>
-            } />
+            }
+          />
 
           <Route path={routes.companyAdmin.path}>
             <Route
@@ -336,7 +376,8 @@ const _Routes = () => {
                     <routes.company.component />
                   </Suspense>
                 </CheckRoles>
-              } />
+              }
+            />
 
             <Route
               path={routes.addCompany.childPath}
@@ -344,7 +385,8 @@ const _Routes = () => {
                 <Suspense fallback={<RouteLoader />}>
                   <routes.addCompany.component />
                 </Suspense>
-              } />
+              }
+            />
 
             <Route
               path={routes.editCompany.childPath}
@@ -352,27 +394,28 @@ const _Routes = () => {
                 <Suspense fallback={<RouteLoader />}>
                   <routes.editCompany.component />
                 </Suspense>
-              } />
-
+              }
+            />
           </Route>
 
           <Route
             index
             element={
-              <CheckRoles allowedRoles={[
-                constants.roles.Employee,
-                constants.roles.TaskManager
-              ]} redirect_to={getRoute()}>
+              <CheckRoles
+                allowedRoles={[
+                  constants.roles.Employee,
+                  constants.roles.TaskManager,
+                ]}
+                redirect_to={getRoute()}
+              >
                 <Suspense fallback={<RouteLoader />}>
                   <routes.home.component />
                 </Suspense>
               </CheckRoles>
-            } />
+            }
+          />
 
-          <Route
-            path="*"
-            element={<NotFound />} />
-
+          <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
     </Router>
@@ -380,5 +423,3 @@ const _Routes = () => {
 };
 
 export default _Routes;
-
-

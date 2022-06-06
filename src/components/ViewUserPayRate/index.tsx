@@ -2,7 +2,7 @@ import CloseOutlined from "@ant-design/icons/lib/icons/CloseOutlined";
 import { gql, useQuery } from "@apollo/client";
 import { Modal } from "antd";
 import { Table } from "antd";
-import { UserPayRate } from "../../interfaces/generated";
+// import { UserPayRate } from "../../interfaces/generated";
 import { UserPayRatePagingData } from "../../interfaces/graphql.interface";
 
 import styles from "./styles.module.scss";
@@ -13,7 +13,7 @@ interface IProps {
   data: any;
 }
 
-const USER_PAY_RATE = gql`
+export const USER_PAY_RATE = gql`
   query UserPayRate($input: UserPayRateQueryInput!) {
     UserPayRate(input: $input) {
       data {

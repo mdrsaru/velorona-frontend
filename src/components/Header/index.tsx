@@ -10,7 +10,7 @@ import { /*sidebarVar, */authVar } from '../../App/link';
 import logo from '../../assets/images/logo.svg';
 import logoContent from '../../assets/images/logo-01.svg';
 import downArrow from '../../assets/images/down-arrow.svg';
-import notification from '../../assets/images/notification.svg';
+// import notification from '../../assets/images/notification.svg';
 import routes from '../../config/routes';
 
 import styles from './style.module.scss';
@@ -63,13 +63,17 @@ const TopHeader = (props: any) => {
     },
   });
 
+  const profile = ()=>{
+    navigate(routes.profile.path(loggedInUser?.company?.code as string,loggedInUser?.user?.id as string))
+  }
   const menu = (
     <Menu style={{ width: 120 }}>
-      <Menu.Item key={'1'}>
-        <div onClick={() => logout()}>
-          Logout
-        </div>
-      </Menu.Item>
+     <Menu.Item key={"1"}>
+       <div onClick={() => profile()}>Profile</div>
+     </Menu.Item>
+     <Menu.Item key={"2"}>
+       <div onClick={() => logout()}>Logout</div>
+     </Menu.Item>
     </Menu>
   );
 

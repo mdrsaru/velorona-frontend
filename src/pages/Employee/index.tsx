@@ -76,8 +76,13 @@ export const USER_UPDATE = gql`
       firstName
       lastName
       email
+      phone
       status
       archived
+      avatar{
+        url
+        id
+      }
     }
   }
 `;

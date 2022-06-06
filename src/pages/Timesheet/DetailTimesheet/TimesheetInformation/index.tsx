@@ -1,11 +1,9 @@
 import moment from 'moment';
-import { Card, Col, Row, Button, Space, Input, message, Modal, Form } from 'antd';
+import { Card, Col, Row } from 'antd';
 import {
-  ArrowLeftOutlined,
-  CloseCircleOutlined,
-  CloseOutlined
+  ArrowLeftOutlined
 } from '@ant-design/icons';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import routes from '../../../../config/routes';
 import { authVar } from '../../../../App/link';
@@ -20,7 +18,7 @@ interface IProps {
 }
 
 const TimesheetInformation = (props: IProps) => {
-  const navigate = useNavigate();
+
   const authData = authVar();
   const companyCode = authData?.company?.code as string;
   const timesheet = props.timesheet;
@@ -30,11 +28,11 @@ const TimesheetInformation = (props: IProps) => {
       bordered={false}
       className={styles['timesheet-information']}
     >
-      <PageHeader 
+      <PageHeader
         title={
           <>
             <Link to={routes.timesheet.path(companyCode)}>
-              <ArrowLeftOutlined /> 
+              <ArrowLeftOutlined />
             </Link>
             &nbsp; My Timesheet
           </>
