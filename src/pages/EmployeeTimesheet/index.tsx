@@ -9,7 +9,6 @@ import routes from '../../config/routes';
 import { notifyGraphqlError } from '../../utils/error';
 import { TimesheetPagingData } from '../../interfaces/graphql.interface';
 import { TimesheetQueryInput, Timesheet } from '../../interfaces/generated';
-
 import PageHeader from '../../components/PageHeader';
 import Status from '../../components/Status';
 
@@ -39,9 +38,9 @@ const EMPLOYEE_TIMESHEET = gql`
 `;
 
 const EmployeeTimesheet = () => {
+  let csv: any;
   const authData = authVar();
-  const company_id = authData.company?.id as string;
-
+  const company_id = authData.company?.id as string
   const [pagingInput, setPagingInput] = useState<{
     skip: number,
     currentPage: number,
@@ -78,7 +77,14 @@ const EmployeeTimesheet = () => {
   };
 
   const downloadReport = () => {
-    
+    const items = timesheetData?.Timesheet?.data ?? []
+    const replacer = (key: string, value: string) => value === null ? '' : value
+    const header = Object.keys(items[0])
+    csv = [
+      header.join(','),
+      ...items.map((row: any) => header.map(fieldName => JSON.stringify(row[fieldName], replacer)).join(','))
+    ].join('\r\n')
+    console.log(csv);
   }
 
   const dataSource = timesheetData?.Timesheet?.data ?? [];
@@ -155,7 +161,9 @@ const EmployeeTimesheet = () => {
             />
           </Col>
           <Col>
-            <Button type="primary" onClick={downloadReport}>Download Report</Button>
+            <Button type="primary" onClick={downloadReport}>
+              Download Report
+            </Button>
           </Col>
         </Row>
       </Card>
