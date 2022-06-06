@@ -167,16 +167,20 @@ const _Routes = () => {
               <Route
                 path={routes.detailTimesheet.childPath}
                 element={
-                  <CheckRoles allowedRoles={[constants.roles.Employee, constants.roles.TaskManager, constants.roles.CompanyAdmin]}>
-                  <Suspense fallback={<TimeSheetLoader />}>
-                  <routes.detailTimesheet.component />
-                  </Suspense>
-                </CheckRoles>
+                  <CheckRoles allowedRoles={[
+                    constants.roles.Employee,
+                    constants.roles.TaskManager,
+                    constants.roles.CompanyAdmin
+                  ]}>
+                    <Suspense fallback={<TimeSheetLoader />}>
+                      <routes.detailTimesheet.component />
+                    </Suspense>
+                  </CheckRoles>
                 } />
             </Route>
 
             <Route
-              path={routes.tasks.childPath}
+              path={routes.schedule.childPath}
               element={
                 <CheckRoles
                   allowedRoles={[
@@ -184,17 +188,6 @@ const _Routes = () => {
                     constants.roles.TaskManager,
                   ]}
                 >
-                  <Suspense fallback={<RouteLoader />}>
-                    <routes.tasks.component />
-                  </Suspense>
-                </CheckRoles>
-              }
-            />
-
-            <Route
-              path={routes.schedule.childPath}
-              element={
-                <CheckRoles allowedRoles={[constants.roles.Employee]}>
                   <Suspense fallback={<RouteLoader />}>
                     <routes.schedule.component />
                   </Suspense>

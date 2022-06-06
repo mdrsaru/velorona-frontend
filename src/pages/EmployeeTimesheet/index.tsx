@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { gql, useQuery } from '@apollo/client';
-import { Card, Table, Row, Col } from 'antd';
+import { Card, Table, Row, Col, Button } from 'antd';
 
 import { authVar } from '../../App/link';
 import constants from '../../config/constants';
@@ -9,7 +9,6 @@ import routes from '../../config/routes';
 import { notifyGraphqlError } from '../../utils/error';
 import { TimesheetPagingData } from '../../interfaces/graphql.interface';
 import { TimesheetQueryInput, Timesheet } from '../../interfaces/generated';
-
 import PageHeader from '../../components/PageHeader';
 import Status from '../../components/Status';
 
@@ -38,10 +37,17 @@ const EMPLOYEE_TIMESHEET = gql`
   }
 `;
 
+const csvHeader: Array<{ label: string, key: string, subKey?: string }> = [
+  { label: "Employee Name", key: "client", subKey: "name" },
+  { label: "Total Time", key: "durationFormat" },
+  { label: "Status", key: "status" },
+  { label: "Total Expense", key: "totalExpense" },
+  { label: "Last Approved", key: "lastApprovedAt" }
+]
+
 const EmployeeTimesheet = () => {
   const authData = authVar();
-  const company_id = authData.company?.id as string;
-
+  const company_id = authData.company?.id as string
   const [pagingInput, setPagingInput] = useState<{
     skip: number,
     currentPage: number,
@@ -76,6 +82,36 @@ const EmployeeTimesheet = () => {
       skip: newSkip,
       currentPage: page,
     });
+  };
+
+  const arrayToCsv = () => {
+    let csvRows = [];
+    let data = timesheetData?.Timesheet?.data ?? []
+
+    const headerValues = csvHeader.map(header => header.label);
+    csvRows.push(headerValues.join(','));
+    data.forEach((row: any) => {
+      const rowValues = csvHeader.map((header: { key: string, label: string, subKey?: string }) => {
+        const escaped = header?.subKey ? ('' + row[header.key][header?.subKey] ?? '').replace(/"/g, '\\"') :
+          ('' + row[header.key] ?? '').replace(/"/g, '\\"')
+        return `"${escaped}"`;
+      });
+      csvRows.push(rowValues.join(','));
+    })
+    return csvRows.join('\n');
+  }
+
+  const downloadReport = () => {
+    const csvData = arrayToCsv()
+    const blob = new Blob([csvData], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.setAttribute('hidden', '');
+    a.setAttribute('href', url);
+    a.setAttribute('download', 'Employee_timesheet.csv');
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
   };
 
   const dataSource = timesheetData?.Timesheet?.data ?? [];
@@ -145,8 +181,12 @@ const EmployeeTimesheet = () => {
               }}
             />
           </Col>
+          <Col>
+            <Button type="primary" onClick={downloadReport}>
+              Download Report
+            </Button>
+          </Col>
         </Row>
-
       </Card>
     </div>
 

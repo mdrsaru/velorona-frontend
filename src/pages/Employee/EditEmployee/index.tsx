@@ -46,6 +46,7 @@ const EditEmployee = () => {
     name: "",
   });
   const [userUpdate] = useMutation(USER_UPDATE, {
+    
     onCompleted: () => {
       if (fileData?.id) {
         changeProfilePictureInput({
@@ -109,7 +110,6 @@ const EditEmployee = () => {
       authorization: authData?.token ? `Bearer ${authData?.token}` : "",
     },
     onChange(info) {
-      console.log(info);
       if (info.file.status === "done") {
         setFile({
           name: info?.file?.name,
@@ -244,7 +244,11 @@ const EditEmployee = () => {
                   <Input placeholder="Enter lastname" autoComplete="off" />
                 </Form.Item>
               </Col>
-              <Col xs={24} sm={24} md={12} lg={12}>
+              <Col
+                xs={24}
+                sm={24}
+                md={12}
+                lg={12}>
                 <Form.Item
                   label="Phone Number"
                   name="phone"

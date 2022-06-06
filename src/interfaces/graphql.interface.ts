@@ -32,6 +32,13 @@ export interface TimesheetPagingData {
   },
 };
 
+export interface TaskPagingData {
+  Task: {
+    data: interfaces.Task[];
+    paging: interfaces.PagingResult;
+  },
+};
+
 export interface UserPayRatePagingData {
   UserPayRate: {
     data: interfaces.UserPayRate[];
