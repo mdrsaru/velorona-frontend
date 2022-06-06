@@ -144,16 +144,9 @@ const routes = {
   schedule: {
     childPath: 'schedule',
     path: (id: string) => `/${id}/schedule`,
-    component: lazy(() => import('../pages/Schedule')),
-    name: 'Schedule',
-    key: 'side5'
-  },
-  tasks: {
-    childPath: 'tasks',
-    path: (id: string) => `/${id}/tasks`,
     component: lazy(() => import('../pages/Tasks')),
     name: 'Schedule',
-    key: 'side6'
+    key: 'side5'
   },
   projects: {
     childPath: 'projects',

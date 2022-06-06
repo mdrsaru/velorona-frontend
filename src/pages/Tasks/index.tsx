@@ -88,9 +88,9 @@ const Tasks = () => {
       render: (task: Task) => {
         return (
           <>
-            <span className={styles.taskName}>{task.name}</span>
+            <span className={styles['task-name']}>{task?.name}</span>
             <span className={styles.clientProjectName}>
-              {task.project.client.name}:{task.project.name}
+              {task?.project?.client?.name}:{task?.project?.name}
             </span>
           </>
         );

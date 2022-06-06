@@ -1,6 +1,7 @@
 import {
   Link,
-  // useLocation
+  useLocation,
+  useParams
 } from 'react-router-dom';
 import { Menu, Layout } from 'antd';
 import {
@@ -21,7 +22,7 @@ import routes from '../../config/routes';
 import { authVar } from '../../App/link';
 
 import styles from './style.module.scss';
-import {useState} from "react";
+import { useEffect, useState } from "react";
 
 const { Sider } = Layout;
 
@@ -37,8 +38,34 @@ const { Sider } = Layout;
 const Sidebar = (props: any) => {
   const { collapsed, onCollapse } = props
   const [selectedMenuKey, setMenuKey] = useState('')
-  // const location = useLocation();
+  const location = useLocation();
+  const params = useParams();
   const loggedInUser = authVar();
+
+  useEffect(() => {
+    if (location?.pathname.includes('employee-timesheet')) {
+      setMenuKey(routes.employeeTimesheet.key)
+    } else if (location?.pathname.includes('client')) {
+      setMenuKey(routes.client.key)
+    } else if (location?.pathname.includes('project')) {
+      setMenuKey(routes.projects.key)
+    } else if (location?.pathname.includes('invoice')) {
+      setMenuKey(routes.invoice.key)
+    } else if (location?.pathname.includes('employee')) {
+      setMenuKey(routes.employee.key)
+    } else if (location?.pathname === '/' + params?.id) {
+      setMenuKey(routes.companyDashboard.key)
+    } else if (location?.pathname.includes('timesheet')) {
+      setMenuKey(routes.timesheet.key)
+    } else if (location?.pathname.includes('schedule')) {
+      setMenuKey(routes.schedule.key)
+    } else if (location?.pathname.includes('role')) {
+      setMenuKey(routes.role.key)
+    } else {
+      setMenuKey(routes.home.key)
+    }
+  }, [location, params?.id])
+
   const menuItems = [
     {
       key: routes.dashboard.key,
@@ -97,10 +124,10 @@ const Sidebar = (props: any) => {
       accessRoles: [constants.roles.Employee]
     },
     {
-      key: routes.tasks.key,
-      name: routes.tasks.name,
+      key: routes.schedule.key,
+      name: routes.schedule.name,
       icon: <ScheduleOutlined />,
-      route: routes.tasks.path(loggedInUser?.company?.code ?? ''),
+      route: routes.schedule.path(loggedInUser?.company?.code ?? ''),
       accessRoles: [constants.roles.Employee]
     },
     {
@@ -132,7 +159,7 @@ const Sidebar = (props: any) => {
     //   accessRoles: [constants.roles.Employee]
     // }
   ]
-  const menuArray = menuItems.filter(menu => {return loggedInUser?.user?.roles?.some(role => menu.accessRoles.includes(role))})
+  const menuArray = menuItems.filter(menu => { return loggedInUser?.user?.roles?.some(role => menu.accessRoles.includes(role)) })
   // const selectedMenuKey = menuKeys.find(key => key.split('/')?.[1] === location.pathname?.split('/')?.[1]) ?? '';
 
   return (
@@ -152,7 +179,7 @@ const Sidebar = (props: any) => {
         style={{ height: '100%', borderRight: 0 }}
         selectedKeys={[selectedMenuKey]}>
         {menuArray && menuArray.map((menu) => (
-          <Menu.Item key={menu?.key} icon={menu?.icon} onClick={(e: any) =>{setMenuKey(e.key)}}>
+          <Menu.Item key={menu?.key} icon={menu?.icon} onClick={(e: any) => { setMenuKey(e.key) }}>
             <Link to={menu.route}>{menu.name}</Link>
           </Menu.Item>
         ))}
