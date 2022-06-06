@@ -6,6 +6,11 @@
       padding-bottom: 5rem;
     }
   
+    .ant-upload-span {
+      .ant-btn {
+        border: none;
+      }
+    }
     :local(.dropdown-menu) {
       .ant-dropdown-menu {
         margin: 0 7rem;
@@ -79,4 +84,45 @@
   font-weight: 400;
   font-size: 14px;
   line-height: 17px;
+}
+
+.company-main-div {
+  padding: 2rem 0 2rem 0;
+
+  :global {
+    .ant-upload-list {
+      display: none;
+    }
+  }
+}
+
+.upload-file {
+  padding: 1rem;
+  display: flex;
+  background: var(--gray-2);
+
+  div {
+    width: 50%;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .browse-file {
+    text-align: end;
+    cursor: pointer;
+
+    span {
+      color: var(--primary-blue);
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 17px;
+    }
+  }
+
+  span {
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 22px;
+    color: var(--gray-secondary);
+  }
 }

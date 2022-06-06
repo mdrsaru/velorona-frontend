@@ -1,4 +1,16 @@
-import { Card, Col, Row, Form, Input, Space, Button, Select, message } from "antd";
+import {
+  Card,
+  Col,
+  Row,
+  Form,
+  Input,
+  Space,
+  Button,
+  Select,
+  message,
+  UploadProps,
+  Upload,
+} from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 
 import { gql, useMutation, useQuery } from "@apollo/client";
@@ -8,8 +20,19 @@ import { notifyGraphqlError } from "../../../utils/error";
 import { COMPANY_UPDATE } from "..";
 
 import styles from "../style.module.scss";
+import { useState } from "react";
+import constants from "../../../config/constants";
+import { authVar } from "../../../App/link";
 
 const { Option } = Select;
+
+const normFile = (e: any) => {
+  if (Array.isArray(e)) {
+    return e;
+  }
+  return e && e.fileList;
+};
+
 
 export const COMPANY = gql`
   query Company($input: CompanyQueryInput) {
@@ -19,6 +42,11 @@ export const COMPANY = gql`
         name
         status
         adminEmail
+        logo {
+          id
+          url
+          name
+        }
         users {
           id
           phone
@@ -32,27 +60,61 @@ export const COMPANY = gql`
       }
     }
   }
-`
+`;
 
 const EditCompany = () => {
-  let params = useParams()
-  const navigate = useNavigate()
+  let params = useParams();
+  const authData = authVar();
+  const navigate = useNavigate();
+
+  const [fileData, setFile] = useState({
+    id: "",
+    name: "",
+  });
+
+  const props: UploadProps = {
+    name: "file",
+    action: `${constants.apiUrl}/v1/media/upload`,
+    maxCount: 1,
+    headers: {
+      authorization: authData?.token ? `Bearer ${authData?.token}` : "",
+    },
+    onChange(info) {
+      if (info.file.status === "done") {
+        setFile({
+          name: info?.file?.name,
+          id: info?.file?.response?.data?.id,
+        });
+      } else if (info.file.status === "error") {
+        message.error(`${info.file.name} file upload failed.`);
+      }
+    },
+  };
+
   const { data: companyData } = useQuery(COMPANY, {
     variables: {
       input: {
         query: {
-          id: params?.id ?? '',
-        }
-      }
-    }
-  })
-  const [form] = Form.useForm()
+          id: params?.id ?? "",
+        },
+      },
+    },
+    onCompleted: (response) => {
+      setFile({
+        id: "",
+        name: response?.Company?.data[0]?.logo?.name,
+      });
+    },
+  });
+
+
+  const [form] = Form.useForm();
   const [updateCompany] = useMutation(COMPANY_UPDATE, {
     onCompleted: () => {
-      message.success(`Company is updated successfully!`)
-      navigate(-1)
+      message.success(`Company is updated successfully!`);
+      navigate(-1);
     },
-  })
+  });
 
   const onSubmitForm = (values: any) => {
     updateCompany({
@@ -60,126 +122,146 @@ const EditCompany = () => {
         input: {
           id: params?.id,
           name: values.name,
-          status: values.status
+          status: values.status,
+          logo_id: fileData?.id,
+        },
+      },
+    })
+      .then((response) => {
+        if (response.errors) {
+          return notifyGraphqlError(response.errors);
         }
-      }
-    }).then((response) => {
-      if (response.errors) {
-        return notifyGraphqlError((response.errors))
-      };
-    }).catch(notifyGraphqlError)
+      })
+      .catch(notifyGraphqlError);
   };
-
   return (
-    <div className={styles['company-main-div']}>
+    <div className={styles["company-main-div"]}>
       <Card bordered={false}>
         <Row>
-          <Col
-            span={24}
-            className={styles['form-col']}>
+          <Col span={24} className={styles["form-col"]}>
             <h1>
-              <ArrowLeftOutlined
-                onClick={() => navigate(-1)} />
-              &nbsp;
-              Edit Company
+              <ArrowLeftOutlined onClick={() => navigate(-1)} />
+              &nbsp; Edit Company
             </h1>
           </Col>
         </Row>
-        {companyData &&
+        {companyData && (
           <Form
             form={form}
             layout="vertical"
             onFinish={onSubmitForm}
             initialValues={{
-              name: companyData?.Company?.data[0]?.name ?? '',
-              email: companyData?.Company?.data[0]?.adminEmail ?? '',
-              status: companyData?.Company?.data[0]?.status ?? ''
-            }}>
+              name: companyData?.Company?.data[0]?.name ?? "",
+              email: companyData?.Company?.data[0]?.adminEmail ?? "",
+              status: companyData?.Company?.data[0]?.status ?? "",
+              file: companyData?.Company?.data[0]?.logo?.url,
+            }}
+          >
             <Row gutter={[24, 0]}>
-              <Col
-                xs={24}
-                sm={24}
-                md={12}>
+              <Col xs={24} sm={24} md={12}>
                 <Form.Item
                   label="Company Name"
                   name="name"
-                  rules={[{
-                    required: true,
-                    message: 'Enter a company name.'
-                  }, {
-                    max: 50,
-                    message: "Name should be less than 50 character"
-                  }]}>
+                  rules={[
+                    {
+                      required: true,
+                      message: "Enter a company name.",
+                    },
+                    {
+                      max: 50,
+                      message: "Name should be less than 50 character",
+                    },
+                  ]}
+                >
                   <Input
                     placeholder="Enter Name of the company"
-                    autoComplete="off" />
+                    autoComplete="off"
+                  />
                 </Form.Item>
               </Col>
-              <Col
-                xs={24}
-                sm={24}
-                md={12}>
+              <Col xs={24} sm={24} md={12}>
                 <Form.Item
                   name="status"
                   label="Company Status"
-                  rules={[{
-                    required: true,
-                    message: 'Select a company status.'
-                  }]}>
+                  rules={[
+                    {
+                      required: true,
+                      message: "Select a company status.",
+                    },
+                  ]}
+                >
                   <Select placeholder="Active">
-                    <Option value="Active">
-                      Active
-                    </Option>
-                    <Option value="Inactive">
-                      In Active
-                    </Option>
+                    <Option value="Active">Active</Option>
+                    <Option value="Inactive">In Active</Option>
                   </Select>
                 </Form.Item>
               </Col>
-              <Col
-                xs={24}
-                sm={24}
-                md={24}>
+              <Col xs={24} sm={24} md={24}>
                 <Form.Item
                   label="Email"
-                  name='email'
-                  rules={[{
-                    type: 'email',
-                    message: 'The input is not valid E-mail!'
-                  }, {
-                    required: true,
-                    message: 'Please input your E-mail!'
-                  },]}>
+                  name="email"
+                  rules={[
+                    {
+                      type: "email",
+                      message: "The input is not valid E-mail!",
+                    },
+                    {
+                      required: true,
+                      message: "Please input your E-mail!",
+                    },
+                  ]}
+                >
                   <Input
                     disabled
                     placeholder="Company Admin Email"
-                    autoComplete="off" />
+                    autoComplete="off"
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={24} md={12} lg={12}>
+                <Form.Item
+                  name="upload"
+                  label="Upload Profile Image"
+                  valuePropName="filelist"
+                  getValueFromEvent={normFile}
+                  style={{ position: "relative" }}
+                >
+                  <div className={styles["upload-file"]}>
+                    <div>
+                      <span>
+                        {fileData?.name
+                          ? fileData?.name
+                          : " Attach your files here"}
+                      </span>
+                    </div>
+                    <div className={styles["browse-file"]}>
+                      <Upload {...props}>Click to Upload</Upload>
+                    </div>
+                  </div>
                 </Form.Item>
               </Col>
             </Row>
-            <br /><br />
+            <br />
+            <br />
             <Row justify="end">
               <Col>
                 <Form.Item>
-                  <Space size={'large'}>
-                    <Button
-                      type="default"
-                      htmlType="button">
+                  <Space size={"large"}>
+                    <Button type="default" htmlType="button">
                       Cancel
                     </Button>
-                    <Button
-                      type="primary"
-                      htmlType="submit">
+                    <Button type="primary" htmlType="submit">
                       Edit Company
                     </Button>
                   </Space>
                 </Form.Item>
               </Col>
             </Row>
-          </Form>}
+          </Form>
+        )}
       </Card>
     </div>
-  )
-}
+  );
+};
 
 export default EditCompany;
