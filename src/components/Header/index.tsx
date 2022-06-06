@@ -63,13 +63,17 @@ const TopHeader = (props: any) => {
     },
   });
 
+  const profile = ()=>{
+    navigate(routes.profile.path(loggedInUser?.company?.code as string,loggedInUser?.user?.id as string))
+  }
   const menu = (
     <Menu style={{ width: 120 }}>
-      <Menu.Item key={'1'}>
-        <div onClick={() => logout()}>
-          Logout
-        </div>
-      </Menu.Item>
+     <Menu.Item key={"1"}>
+       <div onClick={() => profile()}>Profile</div>
+     </Menu.Item>
+     <Menu.Item key={"2"}>
+       <div onClick={() => logout()}>Logout</div>
+     </Menu.Item>
     </Menu>
   );
 

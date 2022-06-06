@@ -36,7 +36,10 @@ const EditEmployee = () => {
     name: ''
   })
   const [userUpdate] = useMutation(USER_UPDATE, {
+    
     onCompleted: () => {
+      console.log('complete')
+      console.log(fileData)
       if (fileData?.id) {
         changeProfilePictureInput({
           variables: {
@@ -46,6 +49,7 @@ const EditEmployee = () => {
             }
           }
         }).then((response) => {
+          console.log(response)
           if (response.errors) {
             return notifyGraphqlError((response.errors))
           } else if (response?.data) {
@@ -97,10 +101,11 @@ const EditEmployee = () => {
       'authorization': authData?.token ? `Bearer ${authData?.token}` : '',
     },
     onChange(info) {
+      console.log(info)
       if (info.file.status === 'done') {
         setFile({
           name: info?.file?.name,
-          id: info?.file?.response?.data?.idu
+          id: info?.file?.response?.data?.id
         })
       } else if (info.file.status === 'error') {
         message.error(`${info.file.name} file upload failed.`);
@@ -126,11 +131,12 @@ const EditEmployee = () => {
         variables: {
           input: formData
         }
-      }).then((response) => {
-        if (response.errors) {
-          return notifyGraphqlError((response.errors))
-        };
-      }).catch(notifyGraphqlError)
+      })
+      // .then((response) => {
+      //   if (response.errors) {
+      //     return notifyGraphqlError((response.errors))
+      //   };
+      // }).catch(notifyGraphqlError)
     } else {
       navigate(-1)
     }
@@ -224,25 +230,6 @@ const EditEmployee = () => {
                   }]}>
                   <Input
                     placeholder="Enter lastname"
-                    autoComplete="off" />
-                </Form.Item>
-              </Col>
-              <Col xs={24}
-                sm={24}
-                md={12}
-                lg={12}>
-                <Form.Item
-                  label="Email"
-                  name='email'
-                  rules={[{
-                    type: 'email',
-                    message: 'The input is not valid E-mail!'
-                  }, {
-                    required: true,
-                    message: 'Please input your E-mail!'
-                  }]}>
-                  <Input
-                    placeholder="Enter your email"
                     autoComplete="off" />
                 </Form.Item>
               </Col>

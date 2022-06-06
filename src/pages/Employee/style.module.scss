@@ -214,6 +214,18 @@ h1 {
     border-radius: 6px;
   }
 
+  .active {
+    position: absolute;
+    width: 40px;
+    height: 40px;
+    color: var(--white);
+    margin-left: 40%;
+    margin-right: 50%;
+    bottom:0px;
+    background: var(--primary-green);
+    border-radius: 50%;
+  }
+
   .employee-name {
     font-weight: 600;
     font-size: 24px;
