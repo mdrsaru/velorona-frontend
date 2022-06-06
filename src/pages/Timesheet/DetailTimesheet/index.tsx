@@ -1,7 +1,7 @@
 import moment from 'moment';
 import { useRef, useState } from 'react';
 import { gql, useLazyQuery, useQuery, useMutation } from '@apollo/client';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import groupBy from 'lodash/groupBy';
 import find from 'lodash/find';
 import { Card, Col, Row, Button, Space, message, Modal, Form, Select, Spin } from 'antd';
@@ -154,6 +154,7 @@ export const getTotalTimeForADay = (entries: any) => {
 
 const DetailTimesheet = () => {
   let params = useParams();
+  let navigate = useNavigate();
   const { Option } = Select;
   const authData = authVar();
   const roles = authData?.user?.roles ?? [];
@@ -410,6 +411,19 @@ const DetailTimesheet = () => {
     });
   }
 
+  const saveAndExit = () => {
+    const admin = checkRoles({
+      expectedRoles: [constants.roles.CompanyAdmin, constants.roles.SuperAdmin, constants.roles.TaskManager],
+      userRoles: roles,
+    })
+
+    if(admin) {
+      navigate(routes.employeeTimesheet.path(authData?.company?.code as string))
+    } else {
+      navigate(routes.timesheet.path(authData?.company?.code as string))
+    }
+  }
+
   const timesheetDetail = timeSheetDetail?.Timesheet?.data[0];
 
   return (
@@ -585,15 +599,21 @@ const DetailTimesheet = () => {
                   <Space>
                     <Button
                       type="primary"
-                      htmlType="button">
+                      htmlType="button"
+                      onClick={saveAndExit}
+                    >
                       Save and Exit
                     </Button>
+                    {
+                      /* 
                     <Button
                       type="default"
                       htmlType="button"
                       onClick={onSubmitTimesheet}>
                       Submit
                     </Button>
+                       * */
+                    }
                   </Space>
                 </Col>
               </Row>
@@ -664,7 +684,8 @@ const DetailTimesheet = () => {
               &nbsp; &nbsp;
               <Button
                 type="primary"
-                htmlType="submit">
+                htmlType="submit"
+              >
                 Create
               </Button>
             </Form.Item>
