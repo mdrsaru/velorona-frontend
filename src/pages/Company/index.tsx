@@ -43,7 +43,7 @@ export const COMPANY_UPDATE = gql`
     }
   }
 `
-const deleteBody = () => {
+const DeleteBody = () => {
   return (
     <div className={styles['modal-message']}>
       <div>
@@ -60,7 +60,7 @@ const deleteBody = () => {
   )
 }
 
-const archiveBody = () => {
+const ArchiveBody = () => {
   return (
     <div className={styles['modal-message']}>
       <div>
@@ -251,13 +251,14 @@ const Company = () => {
         setModalVisibility={setModalVisibility}
         imgSrc={deleteImg}
         okText={'Delete'}
-        modalBody={deleteBody} />
+        modalBody={<DeleteBody />} 
+      />
       <ModalConfirm
         visibility={showArchive}
         setModalVisibility={setArchiveVisibility}
         imgSrc={archiveImg}
         okText={'Archive'}
-        modalBody={archiveBody} />
+        modalBody={<ArchiveBody />} />
     </div>
   )
 }

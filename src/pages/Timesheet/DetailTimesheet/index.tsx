@@ -1,93 +1,110 @@
-import { Card, Col, Row, Button, Space, Input, message, Modal, Form, Select } from 'antd';
+import moment from 'moment';
+import { useRef } from 'react';
+import { gql, useLazyQuery, useQuery, useMutation } from '@apollo/client';
+import { useParams, Link } from 'react-router-dom';
+import groupBy from 'lodash/groupBy';
+import find from 'lodash/find';
+import { Card, Col, Row, Button, Space, message, Modal, Form, Select, Spin } from 'antd';
 import {
-  ArrowLeftOutlined,
-  CloseCircleOutlined,
   CloseOutlined
 } from '@ant-design/icons';
-import moment from 'moment';
 
-import { gql, useLazyQuery, useQuery, useMutation } from '@apollo/client';
-import { useNavigate, useParams } from 'react-router-dom';
 import { authVar } from '../../../App/link';
-import _ from 'lodash';
-
+import { _cs, checkRoles } from '../../../utils/common';
+import routes from '../../../config/routes';
 import { notifyGraphqlError } from "../../../utils/error";
 import { useState } from 'react';
-import { getTimeFormat } from '..';
-import deleteImg from "../../../assets/images/delete_btn.svg";
-import ModalConfirm from '../../../components/Modal';
-import EditTimeSheet from '../EditTimesheet';
-
 import constants from "../../../config/constants";
+import { TimeEntry, QueryTimesheetArgs, TimeSheetPagingResult, MutationTimeEntriesApproveRejectArgs } from '../../../interfaces/generated';
+import { GraphQLResponse } from '../../../interfaces/graphql.interface';
 import { TASK } from '../../Tasks';
 import { PROJECT } from '../../Project';
+import { IGroupedTimeEntries } from '../../../interfaces/common.interface';
+
 import TimeSheetLoader from '../../../components/Skeleton/TimeSheetLoader';
-import styles from '../style.module.scss';
+import TimesheetInformation from './TimesheetInformation';
+import PageHeader from '../../../components/PageHeader';
+import TimeEntryDetail from './TimeEntryDetail';
+
+import styles from './style.module.scss';
+
+type InvoicedTimeEntries = {
+  invoice_id: string;
+  group: IGroupedTimeEntries[],
+};
+
+type EntriesByStatus = {
+  approved: IGroupedTimeEntries[],
+  pending: IGroupedTimeEntries[],
+  rejected: IGroupedTimeEntries[],
+};
 
 export const TIME_SHEET = gql`
-query Timesheet($input: TimesheetQueryInput!) {
-  Timesheet(input: $input) {
-    paging {
-      total
-      startIndex
-      endIndex
-      hasNextPage
-    }
-    data {
-      id
-      weekStartDate
-      weekEndDate
-      totalExpense
-      duration
-      durationFormat
-      
-      user {
-        id
-        email
+  query Timesheet($input: TimesheetQueryInput!) {
+    Timesheet(input: $input) {
+      paging {
+        total
+        startIndex
+        endIndex
+        hasNextPage
       }
-      client {
+      data {
         id
-        name
-      }
-      company {
-        id
-        name
-      }
-      projectItems {
-        project_id
-        totalDuration
+        weekStartDate
+        weekEndDate
         totalExpense
-        hourlyRate
-      }
-      durationMap
-      timeEntries {
-        id
-        startTime
-        endTime
         duration
-        task {
+        durationFormat
+        
+        user {
+          id
+          email
+        }
+        client {
           id
           name
         }
-        project {
+        company {
           id
           name
         }
-        task_id
+        projectItems {
+          project_id
+          totalDuration
+          totalExpense
+          hourlyRate
+        }
+        durationMap
+        timeEntries {
+          ...timeEntry
+        }
+        entriesGroup {
+          byInvoice {
+            invoice_id
+            entries {
+              ...timeEntry
+            }
+          }
+          byStatus {
+            approvalStatus
+            entries {
+              ...timeEntry
+            }
+          }
+        }
       }
     }
   }
-}
-`
 
-export const TIME_ENTRY_WEEKLY_DETAILS = gql`
-query TimesheetWeeklyDetails($input: TimeEntryWeeklyDetailsInput!) {
-  TimeEntryWeeklyDetails(input: $input) {
+  fragment timeEntry on TimeEntry {
     id
     startTime
     endTime
     duration
-    task_id
+    approvalStatus
+    timesheet {
+      id
+    }
     task {
       id
       name
@@ -96,9 +113,17 @@ query TimesheetWeeklyDetails($input: TimeEntryWeeklyDetailsInput!) {
       id
       name
     }
+    task_id
+
   }
-}
+
 `
+
+export const APPROVE_REJECT_TIME_ENTRIES = gql`
+  mutation TimeEntryApproveReject($input: TimeEntryApproveRejectInput!) {
+    TimeEntriesApproveReject(input: $input)
+  }
+`;
 
 export const TIMESHEET_SUBMIT = gql`
   mutation TimesheetSubmit($input: TimesheetSubmitInput!) {
@@ -115,36 +140,6 @@ export const TIMESHEET_SUBMIT = gql`
   }
 `
 
-export const TIME_ENTRY_BULK_DELETE = gql`
-  mutation TimeEntryBulkDelete($input: TimeEntryBulkDeleteInput!) {
-    TimeEntryBulkDelete(input: $input) {
-      id
-    }
-  }
-`
-
-const deleteBody = () => {
-  return (
-    <div className={styles['modal-message']}>
-      <div>
-        <img src={deleteImg} alt="confirm" />
-      </div>
-      <br />
-      <p>
-        <strong>
-          Are you sure you want to delete the current time entry?
-        </strong>
-      </p>
-      <p className={styles['warning-text']}>
-        Your current time tracking will be deleted.
-      </p>
-    </div>
-  )
-}
-
-function getWeekDays(date: any) {
-  return Array(7).fill(new Date(date)).map((el, idx) => new Date(el.setDate(el.getDate() - el.getDay() + idx + 1)))
-}
 
 export const getTotalTimeForADay = (entries: any) => {
   let sum = 0;
@@ -157,24 +152,41 @@ export const getTotalTimeForADay = (entries: any) => {
   return sum
 }
 
-
-
 const DetailTimesheet = () => {
   let params = useParams();
   const { Option } = Select;
   const authData = authVar();
+  const roles = authData?.user?.roles ?? [];
   const [form] = Form.useForm();
-  const navigate = useNavigate();
   const [filteredTasks, setTasks] = useState([]);
-  const [timesheet, setTimesheet] = useState<any>();
-  const [editTimesheet, setEditTimesheet] = useState('');
   const [submitTimesheet] = useMutation(TIMESHEET_SUBMIT);
-  const [selectedEntries, setCurrentEntries] = useState('');
   const [timeSheetWeekly, setTimeSheetWeekly] = useState<Array<any>>([]);
+  const entriesByStatusRef = useRef<any>({});
+
+  const [invoicedTimeEntries, setInvoicedTimeEntries] = useState<InvoicedTimeEntries[]>([])
+  const [entriesByStatus, setEntriesByStatus] = useState<EntriesByStatus>({
+    approved: [],
+    pending: [],
+    rejected: [],
+  });
+
   /** Modal Visibility **/
-  const [visibility, setVisibility] = useState<boolean>(false);
-  const [showEditModal, setEditModal] = useState<boolean>(false);
   const [showAddNewEntry, setShowAddNewEntry] = useState<boolean>(false);
+
+  const canApproveReject = checkRoles({
+    expectedRoles: [constants.roles.SuperAdmin, constants.roles.CompanyAdmin, constants.roles.TaskManager],
+    userRoles: roles,
+  });
+
+  const [approveRejectTimeEntries] = useMutation<
+    GraphQLResponse<'TimeEntriesApproveReject', boolean>,
+    MutationTimeEntriesApproveRejectArgs
+  >(APPROVE_REJECT_TIME_ENTRIES, {
+    onCompleted() {
+      refetchTimeSheet();
+    },
+    onError: notifyGraphqlError,
+  });
 
   const [getTask, { data: taskData }] = useLazyQuery(TASK, {
     fetchPolicy: "network-only",
@@ -242,10 +254,6 @@ const DetailTimesheet = () => {
     }
   })
 
-  const setModalVisibility = (value: boolean) => {
-    setVisibility(value)
-  }
-
   const onChangeProjectSelect = (value: string) => {
     getTask({
       variables: {
@@ -265,28 +273,16 @@ const DetailTimesheet = () => {
     }
   }
 
-
-  const [deleteBulkTimeEntry] = useMutation(TIME_ENTRY_BULK_DELETE, {
-    onCompleted: () => {
-      const newTimeSheets = timeSheetWeekly.filter((entry: any) => {
-        return entry?.id !== selectedEntries
-      });
-      setTimeSheetWeekly(newTimeSheets);
-      setModalVisibility(false);
-      message.success({
-        content: `Time entry is deleted successfully!`,
-        className: 'custom-message'
-      });
-    }
-  });
-
-  const { data: timeSheetDetail, loading: loadWeekly, refetch: refetchTimeSheet } = useQuery(TIME_SHEET, {
+  const { data: timeSheetDetail, loading: timesheetLoading, refetch: refetchTimeSheet } = useQuery<
+    GraphQLResponse<'Timesheet', TimeSheetPagingResult>,
+    QueryTimesheetArgs
+  >(TIME_SHEET, {
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
     variables: {
       input: {
         query: {
-          company_id: authData?.company?.id,
+          company_id: authData?.company?.id as string,
           id: params?.id
         },
         paging: {
@@ -294,14 +290,45 @@ const DetailTimesheet = () => {
         }
       }
     },
-    onCompleted: (timeData) => {
-      groupByDate()
+    onCompleted: (response) => {
+      const timesheet = response.Timesheet?.data?.[0];
+      const byStatus = timesheet?.entriesGroup?.byStatus ?? [];
+      const byInvoice = timesheet?.entriesGroup?.byInvoice ?? [];
+
+      let approvedTimeEntries: TimeEntry[] = find(byStatus,{ approvalStatus: 'Approved' })?.entries ?? [];
+      let pendingTimeEntries: TimeEntry[] = find(byStatus,{ approvalStatus: 'Pending' })?.entries ?? [];
+      let rejectedTimeEntries: TimeEntry[] = find(byStatus,{ approvalStatus: 'Rejected' })?.entries ?? [];
+
+      let invoiced: InvoicedTimeEntries[] = [];
+
+      byInvoice.forEach((byInv) => {
+        const _invoiced: InvoicedTimeEntries = {
+          invoice_id: byInv.invoice_id,
+          group: groupEntriesByTask(byInv.entries),
+        };
+
+        invoiced.push(_invoiced);
+      })
+
+      entriesByStatusRef.current = {
+        approved: approvedTimeEntries,
+        pending: pendingTimeEntries,
+        rejected: rejectedTimeEntries,
+      }
+
+      setInvoicedTimeEntries(invoiced);
+      setEntriesByStatus({
+        approved: groupEntriesByTask(approvedTimeEntries),
+        pending: groupEntriesByTask(pendingTimeEntries),
+        rejected: groupEntriesByTask(rejectedTimeEntries),
+      })
+
       getProject({
         variables: {
           input: {
             query: {
               company_id: authData?.company?.id,
-              client_id: timeData?.Timesheet?.data[0]?.client?.id,
+              client_id: response?.Timesheet?.data[0]?.client?.id,
             },
             paging: {
               order: ['updatedAt:DESC']
@@ -311,41 +338,6 @@ const DetailTimesheet = () => {
       }).then(r => { })
     }
   })
-
-  const getTotalTimeByTask = (entries: any) => {
-    let durations: any = [];
-    const data = Object.values(entries);
-    data.forEach((tasks: any) => {
-      tasks.forEach((data: any) => {
-        durations.push(data?.duration)
-      })
-    });
-    let sum = durations.reduce((entry1: any, entry2: any) => {
-      return entry1 + entry2
-    }, 0);
-    return getTimeFormat(sum)
-  }
-
-
-  function groupByTimeEntry(array: any) {
-    const monthDate = (entry: any) => moment(entry?.startTime).format('ddd, MMM D');
-    return _.groupBy(array, monthDate);
-  }
-
-  function groupByDate() {
-    let grouped: any = [];
-    const tasks = _.groupBy(timeSheetDetail?.Timesheet?.data[0]?.timeEntries, 'task_id');
-    for (const [key, value] of Object.entries(tasks)) {
-      grouped.push({
-        id: key,
-        name: value[0]?.task?.name,
-        project: value[0]?.project?.name,
-        project_id: value[0]?.project?.id,
-        entries: groupByTimeEntry(value)
-      })
-    }
-    setTimeSheetWeekly(grouped)
-  };
 
   const onSubmitTimesheet = () => {
     submitTimesheet({
@@ -367,326 +359,225 @@ const DetailTimesheet = () => {
     }).catch(notifyGraphqlError)
   }
 
-  const showEditTimesheet = (value: any, timesheet: any) => {
-    setEditTimesheet(value);
-    setTimesheet(timesheet);
-    refetchTimeSheet({
-      input: {
-        query: {
-          company_id: authData?.company?.id,
-          id: params?.id
-        },
-        paging: {
-          order: ['weekStartDate:DESC']
-        }
-      }
-    })
-    setEditModal(true);
-  }
+  const approveRejectAll = (status: string) => {
+    const ids: string[] = [];
 
-  const editModal = () => {
-    refetchTimeSheet({
-      input: {
-        query: {
-          company_id: authData?.company?.id,
-          id: params?.id
-        },
-        paging: {
-          order: ['weekStartDate:DESC']
-        }
-      }
+    entriesByStatusRef?.current?.pending?.forEach((entry: any) => {
+      ids.push(entry.id);
     })
-    setEditModal(false)
-  }
 
-  const onDeleteBulkTimeEntry = () => {
-    if (selectedEntries) {
-      const taskEntries: any = timeSheetWeekly.filter((entry: any) => {
-        return entry?.id === selectedEntries
-      });
-      const arrayEntries = Object.values(taskEntries[0]?.entries).map((timesheet: any) => {
-        return timesheet.map((data: any) => {
-          return data?.id
-        })
+    if(status === 'Approved') {
+      entriesByStatusRef?.current?.rejected?.forEach((entry: any) => {
+        ids.push(entry.id);
       })
-      deleteBulkTimeEntry({
-        variables: {
-          input: {
-            ids: arrayEntries.flat(),
-            company_id: authData?.company?.id,
-            created_by: authData?.user?.id,
-            client_id: timeSheetDetail?.Timesheet?.data[0]?.client?.id
-          }
-        }
-      }).then((response) => {
-        if (response.errors) {
-          return notifyGraphqlError((response.errors))
-        }
-      }).catch(notifyGraphqlError)
+    } else if(status === 'Rejected') {
+      entriesByStatusRef?.current?.approved?.forEach((entry: any) => {
+        ids.push(entry.id);
+      })
     }
+
+    approveRejectTimeEntries({
+      variables: {
+        input: {
+          ids,
+          approvalStatus: 'Approved',
+          company_id: authData?.company?.id as string,
+        },
+      },
+    })
+
+
   }
+
+  const timesheetDetail = timeSheetDetail?.Timesheet?.data[0];
 
   return (
     <>
-      {loadWeekly ? <TimeSheetLoader /> :
-        <div className={styles['site-card-wrapper']}>
-          <Card
-            bordered={false}
-            className={styles['timesheet-card']}>
-            <Row className={styles['card-header']}>
-              <Col
-                span={24}
-                className={styles['form-col-detail']}>
-                <ArrowLeftOutlined onClick={() => navigate(-1)} />
-                &nbsp; &nbsp;
-                <span> My Timesheet</span>
-              </Col>
-            </Row>
+      {timesheetLoading ? <TimeSheetLoader /> :
+        <Spin spinning={timesheetLoading}>
+          <div className={styles['site-card-wrapper']}>
+            {
+              !!timesheetDetail && <TimesheetInformation timesheet={timesheetDetail} />
+            }
 
-            <Row className={styles['card-body']}>
-              <Col
-                xs={24}
-                sm={24}
-                md={24}
-                lg={12}
-                xl={12}>
-                <div className={styles['timesheet-div']}>
-                  <div className={styles.header}>
-                    Candidate Name
-                  </div>
-                  <div>
-                    {timeSheetDetail?.Timesheet?.data[0]?.user?.email}
-                  </div>
-                </div>
+            <br />
 
-                <div className={styles['timesheet-div']}>
-                  <div className={styles.header}>
-                    Time Period
-                  </div>
-                  <div>Mon-Sun</div>
-                </div>
+            <Card bordered={false} className={styles['time-entries']}>
+              <Row className={styles['timesheet-detail']}>
+                <PageHeader 
+                  title="Time Entry Details"
+                  extra={[
+                    <span key="new-entry">
+                      {
+                        roles.includes(constants.roles.Employee) &&
+                          <span
+                            key="new-entry"
+                            className={styles['add-entry']}
+                            onClick={() => {
+                              setShowAddNewEntry(true)
+                              form.resetFields();
+                            }}
+                          >
+                            Add New Time Entry
+                          </span>
+                      }
+                    </span>
+                  ]}
+                />
+              </Row>
 
-                <div className={styles['timesheet-div']}>
-                  <div className={styles.header}>
-                    Total Expense
-                  </div>
-                  <div>
-                    {timeSheetDetail?.Timesheet?.data[0]?.totalExpense ?? 'N/A'}
-                  </div>
-                </div>
-
-                <div className={styles['timesheet-div']}>
-                  <div className={styles.header}>
-                    Approver/Manager
-                  </div>
-                  <div>
-                    {timeSheetDetail?.Timesheet?.data[0]?.approver?.fullName ?? 'N/A'}
-                  </div>
-                </div>
-
-                <div className={styles['timesheet-div']}>
-                  <div className={styles.header}>
-                    Status
-                  </div>
-                  <div>
-                    {timeSheetDetail?.Timesheet?.data[0]?.status}
-                  </div>
-                </div>
-              </Col>
-
-              <Col
-                xs={24}
-                sm={24}
-                md={24}
-                lg={12}
-                xl={12}>
-                <div className={styles['timesheet-div']}>
-                  <div className={styles.header}>
-                    Project Name
-                  </div>
-                  <div>
-                    {timeSheetDetail?.Timesheet?.data[0]?.project?.name ?? 'N/A'}
-                  </div>
-                </div>
-                <div className={styles['timesheet-div']}>
-                  <div className={styles.header}>
-                    Client Name
-                  </div>
-                  <div>
-                    {timeSheetDetail?.Timesheet?.data[0]?.client?.name ?? 'N/A'}
-                  </div>
-                </div>
-                <div className={styles['timesheet-div']}>
-                  <div className={styles.header}>
-                    Client Location
-                  </div>
-                  <div>
-                    {timeSheetDetail?.Timesheet?.data[0]?.clientLocation ?? 'N/A'}
-                  </div>
-                </div>
-                <div className={styles['timesheet-div']}>
-                  <div className={styles.header}>
-                    Last Submitted
-                  </div>
-                  <div>
-                    {moment(timeSheetDetail?.Timesheet?.data[0]?.weekEndDate).format('L')}
-                  </div>
-                </div>
-                <div className={styles['timesheet-div']}>
-                  <div className={styles.header}>
-                    Last Approved
-                  </div>
-                  <div>
-                    {timeSheetDetail?.Timesheet?.data[0]?.approver?.createdAt ?? 'N/A'}
-                  </div>
-                </div>
-              </Col>
-            </Row>
-          </Card>
-          <br />
-          <Card bordered={false}>
-            <Row className={styles['timesheet-detail']}>
-              <Col
-                span={12}
-                className={styles['form-col1']}>
-                <span>
-                  Time Entry Details
-                </span>
-              </Col>
-              <Col
-                span={12}
-                className={styles['form-col1']}>
-                <span
-                  className={styles['add-entry']}
-                  onClick={() => {
-                    setShowAddNewEntry(true)
-                    form.resetFields();
-                  }}>
-                  Add New Time Entry
-                </span>
-              </Col>
-            </Row>
-
-            <Row>
-              <Col
-                span={24}
-                className={styles['form-col']}>
-                <div className={styles['resp-table']}>
-                  <div className={styles["resp-table-header"]}>
-                    <div className={styles['table-header-cell']}>
-                      Project Name
-                    </div>
-                    <div className={styles['table-header-cell']}>
-                      Task
-                    </div>
-                    {getWeekDays(timeSheetDetail?.Timesheet?.data[0]?.weekStartDate).map((day: any, index: number) =>
-                      <div
-                        className={styles['table-header-cell']}
-                        key={index}>
-                        {moment(day).format('ddd, MMM D')}
-                      </div>)}
-                    <div className={styles['table-header-cell']}>
-                      Total
-                    </div>
-                  </div>
-
-                  {timeSheetWeekly && timeSheetWeekly?.map((timesheet: any, index: number) =>
-                    <div
-                      className={styles["resp-table-body"]}
-                      key={index}>
-                      <div className={styles["table-body-cell"]}>
-                        {timesheet?.project}
+              <div className={styles['resp-table']}>
+                {
+                  !!entriesByStatus.pending?.length && 
+                    <div className={styles['timesheet-section']}>
+                      <div className={styles['timesheet-status']}>
+                        Unapproved Timesheet
                       </div>
-                      <div className={styles["table-body-cell"]}>
-                        {timesheet?.name}
-                      </div>
-                      {getWeekDays(timeSheetDetail?.Timesheet?.data[0]?.weekStartDate).map((day: any, timeIndex: number) =>
-                        <div
-                          className={styles["table-body-cell"]}
-                          key={timeIndex}>
-                          {authData?.user?.roles.includes(constants.roles.TaskManager) ?
-                            <div>
-                              {getTimeFormat(getTotalTimeForADay(timesheet?.entries[moment(day).format('ddd, MMM D')]))}
-                            </div> :
-                            <Input
-                              type="text"
-                              onClick={() =>
-                                showEditTimesheet(moment(day).format('YYYY-MM-DD'), timesheet)
-                              }
-                              value={
-                                getTimeFormat(getTotalTimeForADay(timesheet?.entries[moment(day).format('ddd, MMM D')]))
-                              } />
-                          }
+
+                      <TimeEntryDetail 
+                        startDate={timeSheetDetail?.Timesheet?.data[0]?.weekStartDate as string}
+                        groupedTimeEntries={entriesByStatus.pending}
+                        durationMap={timesheetDetail?.durationMap?.['Pending']}
+                        client_id={timesheetDetail?.client?.id as string}
+                        refetch={refetchTimeSheet}
+                        status='Pending'
+                        needAction
+                      />
+
+                      {
+                        canApproveReject && (
+                          <Row justify="end" style={{ margin: '36px 0' }}>
+                            <Space>
+                              <Button onClick={() => {approveRejectAll('Approved')}} >
+                                Approve All
+                              </Button>
+
+                              <Button onClick={() => {approveRejectAll('Rejected')}} >
+                                Reject All
+                              </Button>
+
+                              <Button type="primary">Exit</Button>
+                            </Space>
+                          </Row>
+
+                        )
+                      }
+                    </div>
+                }
+
+                {
+                  invoicedTimeEntries.map((invoiced) => (
+                    <div key={invoiced.invoice_id} className={styles['timesheet-section']}>
+                      <div 
+                        className={
+                          _cs([styles['timesheet-status'], styles['approved-status']])
+                        }
+                      >
+                        <div>
+                          Invoiced Timesheet
                         </div>
-                      )}
-                      <div className={styles["table-body-cell"]}>
-                        <span>
-                          {getTotalTimeByTask(timesheet?.entries)}
-                        </span>
-                        &nbsp; &nbsp;
-                        <CloseCircleOutlined
-                          onClick={() => {
-                            setModalVisibility(true);
-                            setCurrentEntries(timesheet?.id)
-                          }} />
-                      </div>
-                    </div>)}
-                </div>
-              </Col>
-            </Row>
-            <Row>
-              <Col
-                span={24}
-                className={styles['form-col']}>
-                <div className={styles['resp-table']}>
-                  <div className={styles["resp-table-header"]}>
-                    <div className={styles['table-header-cell']}>
-                      Total
-                    </div>
-                    <div className={styles['table-header-cell']}>
-                    </div>
-                    {getWeekDays(timeSheetDetail?.Timesheet?.data[0]?.weekStartDate).map((day: any, index: number) =>
-                      <div
-                        className={styles['table-header-cell']}
-                        key={index}>
-                        {getTimeFormat(timeSheetDetail?.Timesheet?.data[0]?.durationMap[moment(day).format('YYYY-MM-DD')])}
-                      </div>)}
-                    <div className={styles['table-header-cell']}>
-                      Total
-                    </div>
-                  </div>
-                </div>
-              </Col>
-            </Row>
-            <br />
-            <Row justify={"end"}>
-              <Col className={styles['form-col']}>
-                <Space>
-                  <Button
-                    type="primary"
-                    htmlType="button">
-                    Save and Exit
-                  </Button>
-                  <Button
-                    type="default"
-                    htmlType="button"
-                    onClick={onSubmitTimesheet}>
-                    Submit
-                  </Button>
-                </Space>
-              </Col>
-            </Row>
-            <br />
-          </Card>
-        </div>
-      }
 
-      <EditTimeSheet
-        setVisibility={editModal}
-        visible={showEditModal}
-        day={editTimesheet}
-        total={getTotalTimeForADay(timesheet?.entries[moment(editTimesheet).format('ddd, MMM D')])}
-        timesheetDetail={timesheet ?? []} />
+                        {
+                          roles.includes(constants.roles.CompanyAdmin) && (
+                            <div className={styles['action']}>
+                              View Invoice
+                            </div>
+                          )
+                        }
+                      </div>
+
+                      <TimeEntryDetail 
+                        startDate={timeSheetDetail?.Timesheet?.data[0]?.weekStartDate as string}
+                        groupedTimeEntries={invoiced.group}
+                        durationMap={timesheetDetail?.durationMap?.[invoiced.invoice_id]}
+                        client_id={timesheetDetail?.client?.id as string}
+                        refetch={refetchTimeSheet}
+                        status='Invoiced'
+                      />
+                    </div>
+                  ))
+                }
+
+                {
+                  !!entriesByStatus.approved.length && 
+                    <div className={styles['timesheet-section']}>
+                      <div 
+                        className={
+                          _cs([styles['timesheet-status'], styles['approved-status']])
+                        }
+                      >
+                        <div>
+                          Approved Timesheet
+                        </div>
+
+                        {
+                          roles.includes(constants.roles.CompanyAdmin) && (
+                            <div className={styles['action']}>
+                              <Link
+                                className={styles['invoice-link']}
+                                to={routes.timesheetInvoice.path(authData?.company?.code as string, params?.id as string)}
+                              >
+                                Generate Invoice
+                              </Link>
+                            </div>
+                          )
+                        }
+                      </div>
+
+                      <TimeEntryDetail 
+                        startDate={timeSheetDetail?.Timesheet?.data[0]?.weekStartDate as string}
+                        groupedTimeEntries={entriesByStatus.approved}
+                        durationMap={timesheetDetail?.durationMap?.['Approved']}
+                        client_id={timesheetDetail?.client?.id as string}
+                        refetch={refetchTimeSheet}
+                        status='Approved'
+                        needAction
+                      />
+                    </div>
+                }
+
+                {
+                  !!entriesByStatus.rejected.length && 
+                    <div className={styles['timesheet-section']}>
+                      <div className={styles['timesheet-status']}>
+                        Rejected Timesheet
+                      </div>
+                      <TimeEntryDetail 
+                        startDate={timeSheetDetail?.Timesheet?.data[0]?.weekStartDate as string}
+                        groupedTimeEntries={entriesByStatus.rejected}
+                        durationMap={timesheetDetail?.durationMap?.['Rejected']}
+                        client_id={timesheetDetail?.client?.id as string}
+                        status='Rejected'
+                        refetch={refetchTimeSheet}
+                        needAction
+                      />
+                    </div>
+                }
+              </div>
+
+              <br />
+              <Row justify={"end"}>
+                <Col className={styles['form-col']}>
+                  <Space>
+                    <Button
+                      type="primary"
+                      htmlType="button">
+                      Save and Exit
+                    </Button>
+                    <Button
+                      type="default"
+                      htmlType="button"
+                      onClick={onSubmitTimesheet}>
+                      Submit
+                    </Button>
+                  </Space>
+                </Col>
+              </Row>
+              <br />
+            </Card>
+          </div>
+        </Spin>
+      }
 
       <Modal
         centered
@@ -756,15 +647,32 @@ const DetailTimesheet = () => {
           </div>
         </Form>
       </Modal>
-
-      <ModalConfirm
-        visibility={visibility}
-        setModalVisibility={setModalVisibility}
-        imgSrc={deleteImg}
-        okText={'Delete'}
-        onOkClick={() => onDeleteBulkTimeEntry()}
-        modalBody={deleteBody} />
     </>
   )
 }
+
+function groupEntriesByTask(entries: TimeEntry[]) {
+  function groupByStartDate(array: any) {
+    const startDateFn = (entry: any) => moment(entry?.startTime).format('ddd, MMM D');
+    return groupBy(array, startDateFn);
+  }
+
+  let grouped: any = [];
+
+  const tasks = groupBy(entries, 'task_id');
+
+  for (const [key, _entries] of Object.entries(tasks)) {
+    grouped.push({
+      id: key,
+      name: _entries[0]?.task?.name,
+      project: _entries[0]?.project?.name,
+      project_id: _entries[0]?.project?.id,
+      entries: groupByStartDate(_entries)
+    });
+  }
+
+  return grouped;
+};
+
+
 export default DetailTimesheet;

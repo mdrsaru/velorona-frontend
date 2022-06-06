@@ -63,7 +63,7 @@ export const PROJECT_UPDATE = gql`
   }
 `;
 
-const deleteBody = () => {
+const DeleteBody = () => {
   return (
     <div className={styles["modal-message"]}>
       <div>
@@ -367,7 +367,7 @@ const ProjectPage = () => {
         setModalVisibility={setModalVisibility}
         imgSrc={deleteImg}
         okText={"Delete"}
-        modalBody={deleteBody}
+        modalBody={<DeleteBody />}
       />
 
       <ModalConfirm
@@ -376,18 +376,17 @@ const ProjectPage = () => {
         imgSrc={archiveImg}
         okText={project?.archived ? "Unarchive" : "Archive"}
         closable
-        modalBody={() =>
-          ArchiveBody({
-            title: (
+        modalBody={
+          <ArchiveBody
+            title={
               <>
                 Are you sure you want to{" "}
                 {project?.archived ? "unarchive" : "archive"}
                 <strong> {project?.name}?</strong>
               </>
-            ),
-            subText: `Project will ${project?.archived ? "" : "not"
-              } be able to assigned to any employee`,
-          })
+            }
+            subText={`Project will ${project?.archived ? "" : "not" } be able to assigned to any employee`}
+          />
         }
         onOkClick={archiveProject}
       />

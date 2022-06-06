@@ -1,5 +1,9 @@
 import * as interfaces from './generated';
 
+export type GraphQLResponse<K extends string, T> = {
+  [key in K]: T;
+}
+
 export interface InvoicePagingData {
   Invoice: {
     data: interfaces.Invoice[];

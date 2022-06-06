@@ -426,21 +426,21 @@ const DetailProject = () => {
         okText={"Delete"}
         closable
         modalBody={() =>
-          DeleteBody({
-            title: (
+          <DeleteBody 
+            title={
               <>
                 {" "}
                 Are you sure you want to delete
                 <strong> {task?.name}?</strong>
               </>
-            ),
-            subText: (
+            }
+            subText={
               <>
-                ` All the data associated with the task will be deleted
-                permanently.`
+                All the data associated with the task will be deleted
+                permanently.
               </>
-            ),
-          })
+            }
+          />
         }
         onOkClick={deleteTask}
       />
@@ -451,18 +451,24 @@ const DetailProject = () => {
         imgSrc={archiveImg}
         okText={task?.archived ? "Unarchive" : "Archive"}
         closable
-        modalBody={() =>
-          ArchiveBody({
-            title: (
+        modalBody={
+          <ArchiveBody 
+            title={
               <>
                 Are you sure you want to{" "}
                 {task?.archived ? "unarchive" : "archive"}
                 <strong> {task?.name}?</strong>
               </>
+<<<<<<< HEAD
             ),
             subText: `Task will ${task?.archived ? "" : "not"
               } be able to assigned to any employee`,
           })
+=======
+            }
+            subText={`Task will ${ task?.archived ? "" : "not" } be able to assigned to any employee`}
+          />
+>>>>>>> develop
         }
         onOkClick={archiveTask}
       />
