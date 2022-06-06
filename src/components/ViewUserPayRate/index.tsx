@@ -13,7 +13,7 @@ interface IProps {
   data: any;
 }
 
-const USER_PAY_RATE = gql`
+export const USER_PAY_RATE = gql`
   query UserPayRate($input: UserPayRateQueryInput!) {
     UserPayRate(input: $input) {
       data {
