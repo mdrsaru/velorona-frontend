@@ -426,7 +426,7 @@ const DetailProject = () => {
         okText={"Delete"}
         closable
         modalBody={() =>
-          <DeleteBody 
+          <DeleteBody
             title={
               <>
                 {" "}
@@ -452,23 +452,16 @@ const DetailProject = () => {
         okText={task?.archived ? "Unarchive" : "Archive"}
         closable
         modalBody={
-          <ArchiveBody 
+          <ArchiveBody
             title={
               <>
                 Are you sure you want to{" "}
                 {task?.archived ? "unarchive" : "archive"}
                 <strong> {task?.name}?</strong>
               </>
-<<<<<<< HEAD
-            ),
-            subText: `Task will ${task?.archived ? "" : "not"
-              } be able to assigned to any employee`,
-          })
-=======
             }
-            subText={`Task will ${ task?.archived ? "" : "not" } be able to assigned to any employee`}
+            subText={`Task will ${task?.archived ? "" : "not"} be able to assigned to any employee`}
           />
->>>>>>> develop
         }
         onOkClick={archiveTask}
       />

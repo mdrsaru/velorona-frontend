@@ -1,8 +1,5 @@
-import React from "react";
-import moment from "moment";
-
 import { Avatar, Card, Col, Row, Button } from "antd";
-import { ArrowLeftOutlined, AntDesignOutlined } from "@ant-design/icons";
+import { ArrowLeftOutlined } from "@ant-design/icons";
 
 import { useQuery } from "@apollo/client";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
