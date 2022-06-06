@@ -76,6 +76,10 @@ const TimeEntryDetails = (props: IProps) => {
     }
   })
 
+  const refetchGroups = () => {
+    props?.refetch()
+  }
+
   const onApproveRejectTimeEntriesClick = (status: string, group: IGroupedTimeEntries) => {
     const ids = getEntryIdsFromGroup(group);
 
@@ -120,11 +124,12 @@ const TimeEntryDetails = (props: IProps) => {
     }
   }
 
-  const showEditTimesheet = (day: string, group: IGroupedTimeEntries) => {
+  const showEditTimesheet = (day: string, group: IGroupedTimeEntries, total: number) => {
     setShowEditModal(true);
     setSelectedGroup({
       day,
       group,
+      total
     });
   }
 
@@ -192,7 +197,7 @@ const TimeEntryDetails = (props: IProps) => {
                           ) : (
                             <Input
                               type="text"
-                              onClick={() => showEditTimesheet(moment(day).format('YYYY-MM-DD'), group)}
+                              onClick={() => showEditTimesheet(moment(day).format('YYYY-MM-DD'), group, getTotalTimeForADay(group?.entries[moment(day).format('ddd, MMM D')]))}
                               value={
                                 getTimeFormat(getTotalTimeForADay(group?.entries[moment(day).format('ddd, MMM D')]))
                               }
@@ -311,7 +316,8 @@ const TimeEntryDetails = (props: IProps) => {
         setVisibility={() => { setShowEditModal(false) }}
         visible={showEditModal}
         day={selectedGroup?.day}
-        total={0}
+        refetch={refetchGroups}
+        total={selectedGroup?.total ?? 0}
         timesheetDetail={selectedGroup?.group ?? []}
       />
 

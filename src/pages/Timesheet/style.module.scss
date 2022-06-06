@@ -1,10 +1,16 @@
 .site-card-wrapper {
   :global {
-    .ant-card-body { 
+    .ant-card-body {
+      padding: 0
+    }
+
+    .ant-collapse>.ant-collapse-item>.ant-collapse-header,
+    .ant-collapse-ghost>.ant-collapse-item>.ant-collapse-content>.ant-collapse-content-box {
       padding: 0
     }
   }
 }
+
 .card-col-timesheet {
   overflow-x: auto;
   overflow-y: auto;
@@ -66,6 +72,11 @@
 .task-card {
   padding: 2rem 1rem 2rem 1rem;
 
+  .end-time {
+    display: flex;
+    align-items: center;
+  }
+
   :global {
     .ant-form-item-control {
       margin-right: 2rem;
@@ -81,7 +92,6 @@
 
   .total-time {
     padding-left: 2rem;
-    padding-top: 1rem;
   }
 
   .task-row {
@@ -145,10 +155,6 @@
     }
   }
 
-  .task-name {
-    display: flex;
-    align-items: center;
-  }
 
   div.task-name>div:first-child {
     font-size: 13px;
@@ -333,6 +339,8 @@
 .start-time,
 .total-time,
 .play-button {
+  display: flex;
+  align-items: center;
   padding: 0 1.5% 0 0;
 }
 
