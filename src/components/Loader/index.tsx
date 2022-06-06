@@ -2,11 +2,11 @@ import { Spin } from 'antd';
 
 import styles from './style.module.scss';
 
-const SpinLoader = () => (
+const Loader = () => (
   <div className={styles.spin}>
     <Spin />
   </div>
 );
 
-export default SpinLoader;
+export default Loader;
 

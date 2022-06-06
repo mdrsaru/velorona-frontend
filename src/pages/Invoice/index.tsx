@@ -1,6 +1,6 @@
 import moment from 'moment';
 import { useState } from 'react';
-import { Card, Col, Dropdown, Menu, Row, Table, message } from 'antd';
+import { Card, Col, Dropdown, Menu, Row, Table, message, Modal } from 'antd';
 import { MoreOutlined } from '@ant-design/icons';
 import { gql, useQuery, useMutation } from '@apollo/client';
 
@@ -13,6 +13,7 @@ import constants from '../../config/constants';
 
 import { Invoice as IInvoice, InvoiceQueryInput, InvoiceStatus, InvoiceUpdateInput } from '../../interfaces/generated';
 import { InvoicePagingData } from '../../interfaces/graphql.interface';
+import InvoiceViewer from '../../components/InvoiceViewer';
 
 import styles from './style.module.scss';
 
@@ -55,6 +56,13 @@ const Invoice = () => {
     skip: 0,
     currentPage: 1,
   });
+  const [invoiceViewer, setInvoiceViewer] = useState<{
+    isVisible: boolean,
+    invoice_id: string | undefined;
+  }>({
+    isVisible: false,
+    invoice_id: undefined,
+  })
 
   const [updateStatus, { loading: updateLoading }] = useMutation<
     { 
@@ -112,6 +120,20 @@ const Invoice = () => {
     });
   };
 
+  const handleViewInvoiceClick = (invoice_id: string) => {
+    setInvoiceViewer({
+      isVisible: true,
+      invoice_id,
+    });
+  }
+
+  const handleViewInvoiceCancel = () => {
+    setInvoiceViewer({
+      isVisible: false,
+      invoice_id: undefined,
+    });
+  }
+
   const dataSource = invoiceData?.Invoice?.data ?? [];
 
   const columns = [
@@ -147,63 +169,73 @@ const Invoice = () => {
     },
     {
       title: 'Actions',
-      render: (invoice: IInvoice) =>
-        <div className={styles['actions']} onClick={(event) => event.stopPropagation()}>
+      render: (invoice: IInvoice) => {
+        return (
+          <div className={styles['actions']} onClick={(event) => event.stopPropagation()}>
+            <Dropdown
+              overlay={
+                <>
+                  <Menu>
+                    <Menu.Item key="edit">
+                      {
+                        invoice.status === 'Pending' ? (
+                          <Link
+                            to={routes.editInvoice.path(loggedInUser?.company?.code as string, invoice.id)}
+                          >
+                            Edit Invoice 
+                          </Link>
+                        ): (
+                          <div 
+                            onClick={() => handleViewInvoiceClick(invoice.id)}
+                          >
+                            View Invoice
+                          </div>
+                        )
+                      }
+                    </Menu.Item>
 
-          <Dropdown
-            overlay={
-              <>
-                <Menu>
-                  <Menu.Item key="edit">
-                    <div>
-                      <Link
-                        to={routes.editInvoice.path(loggedInUser?.company?.code as string, invoice.id)}
+                    <Menu.SubMenu title="Change status" key="mainMenu">
+                      <Menu.Item 
+                        key="Pending"
+                        onClick={() => changeStatus(invoice.id, InvoiceStatus.Pending)}
                       >
-                        Edit Invoice 
-                      </Link>
-                    </div>
-                  </Menu.Item>
+                        Pending
+                      </Menu.Item>
 
-                  <Menu.SubMenu title="Change status" key="mainMenu">
-                    <Menu.Item 
-                      key="Pending"
-                      onClick={() => changeStatus(invoice.id, InvoiceStatus.Pending)}
-                    >
-                      Pending
-                    </Menu.Item>
+                      <Menu.Divider />
 
-                    <Menu.Divider />
+                      <Menu.Item 
+                        key="Received"
+                        onClick={() => changeStatus(invoice.id, InvoiceStatus.Received)}
+                      >
+                        Received
+                      </Menu.Item>
 
-                    <Menu.Item 
-                      key="Received"
-                      onClick={() => changeStatus(invoice.id, InvoiceStatus.Received)}
-                    >
-                      Received
-                    </Menu.Item>
+                      <Menu.Divider />
 
-                    <Menu.Divider />
-
-                    <Menu.Item 
-                      key="Sent"
-                      onClick={() => changeStatus(invoice.id, InvoiceStatus.Sent)}
-                    >
-                      Sent
-                    </Menu.Item>
-                  </Menu.SubMenu>
-                </Menu>
-              </>
-            }
-            trigger={['click']}
-            placement="bottomRight"
-          >
-            <div
-              className="ant-dropdown-link"
-              onClick={e => e.preventDefault()}
-              style={{ paddingLeft: '1rem' }}>
-              <MoreOutlined />
-            </div>
-          </Dropdown>
-        </div>,
+                      <Menu.Item 
+                        key="Sent"
+                        onClick={() => changeStatus(invoice.id, InvoiceStatus.Sent)}
+                      >
+                        Sent
+                      </Menu.Item>
+                    </Menu.SubMenu>
+                  </Menu>
+                </>
+              }
+              trigger={['click']}
+              placement="bottomRight"
+            >
+              <div
+                className="ant-dropdown-link"
+                onClick={e => e.preventDefault()}
+                style={{ paddingLeft: '1rem' }}>
+                <MoreOutlined />
+              </div>
+            </Dropdown>
+          </div>
+        )
+      }
     },
   ];
 
@@ -239,6 +271,18 @@ const Invoice = () => {
         </Row>
 
       </Card>
+
+      <Modal
+        centered
+        width={1000}
+        footer={null}
+        visible={invoiceViewer.isVisible}
+        onCancel={handleViewInvoiceCancel}
+      >
+        {
+          invoiceViewer.invoice_id && <InvoiceViewer id={invoiceViewer.invoice_id} />
+        }
+      </Modal>
     </div>
   )
 }
