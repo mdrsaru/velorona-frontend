@@ -8,6 +8,7 @@ import { UserPayRate } from "../../interfaces/generated"
 import { notifyGraphqlError } from "../../utils/error"
 
 import styles from "./styles.module.scss"
+import { USER_PAY_RATE } from "../ViewUserPayRate"
 
 interface IProps {
   visibility: boolean;
@@ -50,6 +51,20 @@ const UserPayRateModal = (props: IProps) => {
 
 
   const [userPayRateCreate] = useMutation<UserPayRateResponse>(USER_PAYRATE_CREATE, {
+    refetchQueries: [
+      {query: USER_PAY_RATE,
+        variables: {
+        input: {
+          query: {
+            user_id: user?.id,
+          },
+          paging: {
+            order: ["updatedAt:DESC"],
+          },
+        },}, },
+      
+      'UserPayRate'
+    ],
     onCompleted() {
       message.success({
         content: `User pay rate added successfully!`,
