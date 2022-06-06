@@ -37,8 +37,15 @@ const EMPLOYEE_TIMESHEET = gql`
   }
 `;
 
+const csvHeader: Array<{ label: string, key: string, subKey?: string }> = [
+  { label: "Employee Name", key: "client", subKey: "name" },
+  { label: "Total Time", key: "durationFormat" },
+  { label: "Status", key: "status" },
+  { label: "Total Expense", key: "totalExpense" },
+  { label: "Last Approved", key: "lastApprovedAt" }
+]
+
 const EmployeeTimesheet = () => {
-  let csv: any;
   const authData = authVar();
   const company_id = authData.company?.id as string
   const [pagingInput, setPagingInput] = useState<{
@@ -76,16 +83,35 @@ const EmployeeTimesheet = () => {
     });
   };
 
-  const downloadReport = () => {
-    const items = timesheetData?.Timesheet?.data ?? []
-    const replacer = (key: string, value: string) => value === null ? '' : value
-    const header = Object.keys(items[0])
-    csv = [
-      header.join(','),
-      ...items.map((row: any) => header.map(fieldName => JSON.stringify(row[fieldName], replacer)).join(','))
-    ].join('\r\n')
-    console.log(csv);
+  const arrayToCsv = () => {
+    let csvRows = [];
+    let data = timesheetData?.Timesheet?.data ?? []
+
+    const headerValues = csvHeader.map(header => header.label);
+    csvRows.push(headerValues.join(','));
+    data.forEach((row: any) => {
+      const rowValues = csvHeader.map((header: { key: string, label: string, subKey?: string }) => {
+        const escaped = header?.subKey ? ('' + row[header.key][header?.subKey] ?? '').replace(/"/g, '\\"') :
+          ('' + row[header.key] ?? '').replace(/"/g, '\\"')
+        return `"${escaped}"`;
+      });
+      csvRows.push(rowValues.join(','));
+    })
+    return csvRows.join('\n');
   }
+
+  const downloadReport = () => {
+    const csvData = arrayToCsv()
+    const blob = new Blob([csvData], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.setAttribute('hidden', '');
+    a.setAttribute('href', url);
+    a.setAttribute('download', 'Employee_timesheet.csv');
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
 
   const dataSource = timesheetData?.Timesheet?.data ?? [];
 

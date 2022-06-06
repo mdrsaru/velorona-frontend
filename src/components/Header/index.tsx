@@ -10,7 +10,7 @@ import { /*sidebarVar, */authVar } from '../../App/link';
 import logo from '../../assets/images/logo.svg';
 import logoContent from '../../assets/images/logo-01.svg';
 import downArrow from '../../assets/images/down-arrow.svg';
-import notification from '../../assets/images/notification.svg';
+// import notification from '../../assets/images/notification.svg';
 import routes from '../../config/routes';
 
 import styles from './style.module.scss';

@@ -24,7 +24,12 @@ import Status from '../../../components/Status';
 import InfoCircleOutlined from '@ant-design/icons/lib/icons/InfoCircleOutlined';
 import { ProjectPagingData } from '../../../interfaces/graphql.interface';
 import styles from '../style.module.scss';
-import { DeleteInput, MutationTaskDeleteArgs, Task, TaskUpdateInput } from '../../../interfaces/generated';
+import {
+  DeleteInput,
+  // MutationTaskDeleteArgs, 
+  Task,
+  TaskUpdateInput
+} from '../../../interfaces/generated';
 
 const { SubMenu } = Menu;
 
@@ -59,25 +64,25 @@ const DetailProject = () => {
   const navigate = useNavigate();
   const loggedInUser = authVar();
 
-  const [taskUpdate, { loading: updateLoading }] = useMutation<{TaskUpdate: Task },{input: TaskUpdateInput}>(TASK_UPDATE, {
-      onCompleted() {
-        message.success({
-          content: `Task is updated successfully!`,
-          className: "custom-message",
-        });
-        setArchiveVisibility(false);
-      },
-      onError(err) {
-        setArchiveVisibility(false);
-        notifyGraphqlError(err);
-      },
-      update(cache) {
-        const normalizedId = cache.identify({ id: task?.id, __typename: "Task" });
-        cache.evict({ id: normalizedId });
-        cache.gc();
-      },
-    });
-  const [taskDelete, { loading }] = useMutation<{input: DeleteInput}>(TASK_DELETE, {
+  const [taskUpdate, { loading: updateLoading }] = useMutation<{ TaskUpdate: Task }, { input: TaskUpdateInput }>(TASK_UPDATE, {
+    onCompleted() {
+      message.success({
+        content: `Task is updated successfully!`,
+        className: "custom-message",
+      });
+      setArchiveVisibility(false);
+    },
+    onError(err) {
+      setArchiveVisibility(false);
+      notifyGraphqlError(err);
+    },
+    update(cache) {
+      const normalizedId = cache.identify({ id: task?.id, __typename: "Task" });
+      cache.evict({ id: normalizedId });
+      cache.gc();
+    },
+  });
+  const [taskDelete, { loading }] = useMutation<{ input: DeleteInput }>(TASK_DELETE, {
     onCompleted() {
       message.success({
         content: `Task is deleted successfully!`,
