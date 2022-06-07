@@ -206,7 +206,7 @@ const DetailProject = () => {
       </Menu.Item>
       <Menu.Divider />
 
-      <Menu.Item key="delete" className={styles.list}>
+      <Menu.Item key="viewDetails" className={styles.list}>
         <div
           onClick={() => {
             setDetailVisibility(!detailVisibility);
@@ -217,7 +217,7 @@ const DetailProject = () => {
         </div>
       </Menu.Item>
 
-      <Menu.Item key="delete" className={styles.list}>
+      <Menu.Item key="edit" className={styles.list}>
         <div
           onClick={() => {
             navigate(
