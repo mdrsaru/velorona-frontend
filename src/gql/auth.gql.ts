@@ -9,6 +9,15 @@ export const AUTH = gql`
         id
         roles
       }
+      company {
+        code
+        id
+      }
+      avatar {
+        id
+        url
+      }
+      fullName
     }
   }
 `;
