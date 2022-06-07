@@ -132,7 +132,7 @@ export const APPROVE_REJECT_TIME_ENTRIES = gql`
 
 export const TIMESHEET_SUBMIT = gql`
   mutation TimesheetSubmit($input: TimesheetSubmitInput!) {
-    TimesheetSubmit(input: $input) {Form
+    TimesheetSubmit(input: $input) {
       id
       isSubmitted
       lastSubmittedAt
@@ -158,15 +158,14 @@ export const getTotalTimeForADay = (entries: any) => {
 }
 
 const DetailTimesheet = () => {
-  let params = useParams();
+  let params = useParams()
   // let navigate = useNavigate();
-  const { Option } = Select;
-  const authData = authVar();
-  const roles = authData?.user?.roles ?? [];
-  const [form] = Form.useForm();
-  const [filteredTasks, setTasks] = useState([]);
-  const [submitTimesheet] = useMutation(TIMESHEET_SUBMIT);
-  const [timeSheetWeekly, setTimeSheetWeekly] = useState<Array<any>>([]);
+  const { Option } = Select
+  const authData = authVar()
+  const roles = authData?.user?.roles ?? []
+  const [form] = Form.useForm()
+  const [filteredTasks, setTasks] = useState([])
+  const [submitTimesheet] = useMutation(TIMESHEET_SUBMIT)
 
   const [invoiceViewer, setInvoiceViewer] = useState<{
     isVisible: boolean,
@@ -218,7 +217,7 @@ const DetailTimesheet = () => {
       }
     },
     onCompleted: (response: any) => {
-      const taskIds = timeSheetWeekly.map((timesheet: any) => {
+      const taskIds = entriesByStatus?.pending.map((timesheet: any) => {
         return timesheet?.id
       });
       const filtered = response?.Task?.data?.filter((task: any) => {
@@ -243,12 +242,14 @@ const DetailTimesheet = () => {
       project_id: project[0]?.id,
       name: task[0]?.name
     }
-    const ids = timeSheetWeekly?.map((timesheet: any) => {
+    const ids = entriesByStatus.pending?.map((timesheet: any) => {
       return timesheet?.id
     })
+
     if (!ids.includes(task[0]?.id)) {
-      setTimeSheetWeekly([...timeSheetWeekly, timeEntry])
+      setEntriesByStatus({ ...entriesByStatus, pending: [...entriesByStatus.pending, timeEntry] });
     };
+
     setShowAddNewEntry(false);
     form.resetFields();
   }
@@ -429,6 +430,11 @@ const DetailTimesheet = () => {
   //   }
   // }
 
+  const deletePendingGroups = (id: string) => {
+    const filteredPendingArray = entriesByStatus?.pending?.filter(entry => entry?.id !== id)
+    setEntriesByStatus({ ...entriesByStatus, pending: filteredPendingArray });
+  }
+
   const timesheetDetail = timeSheetDetail?.Timesheet?.data[0];
 
   return (
@@ -481,6 +487,7 @@ const DetailTimesheet = () => {
                       client_id={timesheetDetail?.client?.id as string}
                       refetch={refetchTimeSheet}
                       status='Pending'
+                      deleteAction={deletePendingGroups}
                       needAction
                     />
 

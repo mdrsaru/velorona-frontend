@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Modal, Row, Col, Button, TimePicker, message } from 'antd';
+import { Modal, Row, Col, Button, TimePicker } from 'antd';
 import { CloseOutlined } from "@ant-design/icons";
 import { Form, Input } from 'antd';
 import moment, { Moment } from 'moment';
@@ -121,7 +121,7 @@ const EditTimeSheet = (props: IProps) => {
   }
 
   const resetForm = () => {
-    props?.refetch();
+    props?.refetch()
     form.resetFields()
     setTotalDuration(0)
     props?.setVisibility()
