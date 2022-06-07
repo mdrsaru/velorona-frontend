@@ -4,12 +4,11 @@ import { ArrowLeftOutlined } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { authVar } from "../../../App/link";
-import { InvoiceQueryInput } from '../../../interfaces/generated';
+import { QueryInvoiceArgs, InvoicePagingResult } from '../../../interfaces/generated';
+import { IInvoiceInput, GraphQLResponse } from '../../../interfaces/graphql.interface';
+
 import PageHeader from '../../../components/PageHeader';
 import InvoiceForm from '../../../components/InvoiceForm';
-import { IInvoiceInput } from '../../../interfaces/graphql.interface';
-
-import { InvoicePagingData } from '../../../interfaces/graphql.interface';
 
 import styles from './style.module.scss';
 
@@ -49,10 +48,8 @@ const EditInvoice = () => {
   const company_id = loggedInUser?.company?.id as string;
 
   const { data: invoiceData, loading: invoiceLoading } = useQuery<
-    InvoicePagingData,
-    {
-      input: InvoiceQueryInput,
-    }
+    GraphQLResponse<'Invoice', InvoicePagingResult>,
+    QueryInvoiceArgs
   >(INVOICE, {
     fetchPolicy: 'network-only',
     nextFetchPolicy: 'cache-first',

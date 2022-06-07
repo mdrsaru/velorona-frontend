@@ -210,7 +210,8 @@ const EditTimeSheet = (props: IProps) => {
                           use12Hours
                           format="h:mm:ss A"
                           onChange={(event: any) => onChangeTime(event, entry?.id, 'start')}
-                          defaultValue={moment(entry?.startTime)} />
+                          defaultValue={moment.utc(entry?.startTime)} 
+                        />
                       </Form.Item>
                     </Col>
 
@@ -222,7 +223,7 @@ const EditTimeSheet = (props: IProps) => {
                           use12Hours
                           format="h:mm:ss A"
                           onChange={(event: any) => onChangeTime(event, entry?.id, 'end')}
-                          defaultValue={moment(entry?.endTime)} />
+                          defaultValue={moment.utc(entry?.endTime)} />
                       </Form.Item>
                     </Col>
 

@@ -318,13 +318,6 @@ const Employee = () => {
           {data?.archived ? "Unarchive Employee" : "Archive Employee"}
         </div>
       </Menu.Item>
-      {/* <Menu.Divider /> */}
-
-      {/* <Menu.Item key="delete">
-        <div onClick={() => setModalVisibility(true)}>
-          Delete Employee
-        </div>
-      </Menu.Item> */}
     </Menu>
   );
 
@@ -332,13 +325,7 @@ const Employee = () => {
     {
       title: "Name",
       key: "fullName",
-      render: (user: any) => {
-        return (
-          <div className={styles["user-name"]}>
-            <p>{user?.fullName}</p>
-          </div>
-        );
-      },
+     dataIndex:"fullName",
       onCell: (record: any) => {
         return {
           onClick: () => {
@@ -352,48 +339,12 @@ const Employee = () => {
         };
       },
     },
-    // {
-    //   title: "Role",
-    //   dataIndex: "roles",
-    //   key: "roles",
-    //   render: (roles: { name: string; id: string }[]) => `${roles[0]?.name}`,
-    // },
-    // {
-    //   title: 'Start Date',
-    //   render: (user: any) => {
-    //     console.log(user)
-    //     return <div>
-    //       <p>{moment(user?.record?.startDate).format('Do MMMM YYYY') ??
-    //         <span className={styles['blankSpan']}> N/A </span>}</p>
-    //     </div>
-    //   }
-    // },
-    // {
-    //   title: 'End Date',
-    //   render: (user: any) => {
-    //     return <div>
-    //       <p>{moment(user?.record?.endDate).format('Do MMMM YYYY') ??
-    //         <span className={styles['blankSpan']}> N/A </span>}</p>
-    //     </div>
-    //   }
-    // },
     {
       title: "Pay Rate",
       render: (user: any) => {
         return <div onClick={()=>handleViewPayRate(user)}  className={styles["add-pay-rate"]}>View PayRate</div>;
       },
     },
-    // {
-    //   title: "Client",
-    //   key: "client",
-    //   render: (client: any) => (
-    //     <span>
-    //       {client?.activeClient?.name ?? (
-    //         <span className={styles["blankSpan"]}> N/A </span>
-    //       )}
-    //     </span>
-    //   ),
-    // },
     {
       title: "Status",
       dataIndex: "status",
@@ -414,7 +365,7 @@ const Employee = () => {
       title: "Actions",
       key: "actions",
       render: (record: any) => (
-        <Row>
+        <Row style={{marginTop:'11px'}}>
           <Col>
             <p
               onClick={() => handleUserPayRate(record)}

@@ -1,20 +1,28 @@
 import moment from 'moment';
 import { useState } from 'react';
-import { Card, Col, Dropdown, Menu, Row, Table, message, Modal } from 'antd';
-import { MoreOutlined } from '@ant-design/icons';
+import { Link } from 'react-router-dom';
 import { gql, useQuery, useMutation } from '@apollo/client';
+import { MoreOutlined } from '@ant-design/icons';
+import { Card, Col, Dropdown, Menu, Row, Table, message, Modal } from 'antd';
 
 import { authVar } from '../../App/link';
-import { Link } from 'react-router-dom';
+import constants from '../../config/constants';
 import routes from '../../config/routes';
 import { notifyGraphqlError } from '../../utils/error';
+
+import { 
+  Invoice as IInvoice,
+  InvoiceQueryInput,
+  InvoiceStatus,
+  InvoicePagingResult,
+  MutationInvoiceUpdateArgs,
+  QueryInvoiceArgs
+} from '../../interfaces/generated';
+import { GraphQLResponse } from '../../interfaces/graphql.interface';
+
 import PageHeader from '../../components/PageHeader';
-import constants from '../../config/constants';
-
-import { Invoice as IInvoice, InvoiceQueryInput, InvoiceStatus, InvoiceUpdateInput } from '../../interfaces/generated';
-import { InvoicePagingData } from '../../interfaces/graphql.interface';
+import Status from '../../components/Status';
 import InvoiceViewer from '../../components/InvoiceViewer';
-
 import styles from './style.module.scss';
 
 const INVOICE = gql`
@@ -65,12 +73,8 @@ const Invoice = () => {
   })
 
   const [updateStatus, { loading: updateLoading }] = useMutation<
-    { 
-      InvoiceUpdate: IInvoice 
-    }, 
-    { 
-      input: InvoiceUpdateInput 
-    }
+    GraphQLResponse<'InvoiceUpdate', IInvoice>,
+    MutationInvoiceUpdateArgs
   >(INVOICE_STATUS_UPDATE, {
     onCompleted(data) {
       if(data.InvoiceUpdate) {
@@ -84,14 +88,17 @@ const Invoice = () => {
     paging: {
       skip: pagingInput.skip,
       take: constants.paging.perPage,
-      order: ['issueDate:DESC'],
+      order: ['issueDate:ASC'],
     },
     query: {
       company_id: loggedInUser?.company?.id as string,
     },
   };
 
-  const { data: invoiceData, loading } = useQuery<InvoicePagingData>(INVOICE, {
+  const { data: invoiceData, loading } = useQuery<
+    GraphQLResponse<'Invoice', InvoicePagingResult>,
+    QueryInvoiceArgs
+  >(INVOICE, {
     fetchPolicy: 'network-only',
     nextFetchPolicy: 'cache-first',
     variables: {
@@ -166,6 +173,9 @@ const Invoice = () => {
     {
       title: 'Status',
       dataIndex: 'status',
+      render: (status: string) => {
+        return <Status status={status} />
+      }
     },
     {
       title: 'Actions',
@@ -213,12 +223,16 @@ const Invoice = () => {
 
                       <Menu.Divider />
 
-                      <Menu.Item 
-                        key="Sent"
-                        onClick={() => changeStatus(invoice.id, InvoiceStatus.Sent)}
-                      >
-                        Sent
-                      </Menu.Item>
+                      {
+                        invoice.status === InvoiceStatus.Pending && (
+                          <Menu.Item 
+                            key="Sent"
+                            onClick={() => changeStatus(invoice.id, InvoiceStatus.Sent)}
+                          >
+                            Sent
+                          </Menu.Item>
+                        )
+                      }
                     </Menu.SubMenu>
                   </Menu>
                 </>

@@ -9,8 +9,16 @@ import { round } from '../../utils/common';
 import { notifyGraphqlError } from '../../utils/error';
 import routes from '../../config/routes';
 import { authVar } from '../../App/link';
-import { Invoice, ProjectQueryInput, InvoiceCreateInput, InvoiceUpdateInput } from '../../interfaces/generated';
-import { ProjectPagingData, IInvoiceInput } from '../../interfaces/graphql.interface';
+import { GraphQLResponse, IInvoiceInput } from '../../interfaces/graphql.interface';
+import {
+  Invoice,
+  InvoiceCreateInput,
+  InvoiceUpdateInput,
+  ProjectPagingResult,
+  MutationInvoiceUpdateArgs,
+  MutationInvoiceCreateArgs,
+  QueryProjectArgs
+} from '../../interfaces/generated';
 
 import addIcon from '../../assets/images/add_icon.svg';
 import styles from './style.module.scss';
@@ -61,7 +69,8 @@ const InvoiceForm = (props: IProps) => {
   const company_id = loggedInUser?.company?.id as string
 
   const [createInvoice, { loading: creatingInvoice }] = useMutation<
-    { InvoiceCreate: Invoice }, { input: InvoiceCreateInput }
+    GraphQLResponse<'InvoiceCreate', Invoice>,
+    MutationInvoiceCreateArgs
   >(
     INVOICE_CREATE, {
       onCompleted(data) {
@@ -75,7 +84,8 @@ const InvoiceForm = (props: IProps) => {
   );
 
   const [updateInvoice, { loading: updatingInvoice }] = useMutation<
-    { InvoiceUpdate: Invoice }, { input: InvoiceUpdateInput }
+    GraphQLResponse<'InvoiceUpdate', Invoice>,
+    MutationInvoiceUpdateArgs
   >(
     INVOICE_UPDATE, {
       onCompleted(data) {
@@ -89,10 +99,8 @@ const InvoiceForm = (props: IProps) => {
   );
 
   const { data: projectData, loading: projectLoading } = useQuery<
-    ProjectPagingData,
-    {
-      input: ProjectQueryInput,
-    }
+    GraphQLResponse<'Project', ProjectPagingResult>,
+    QueryProjectArgs
   >(PROJECT_LIST, {
     fetchPolicy: 'network-only',
     nextFetchPolicy: 'cache-only',
