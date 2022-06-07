@@ -1,28 +1,35 @@
-import { Card, Col, Dropdown, Menu, Row, Table, message } from "antd";
-import { ArrowLeftOutlined, MoreOutlined } from "@ant-design/icons";
-import React, { useState } from "react";
-import { Link, useNavigate, useParams } from "react-router-dom";
+import { Card, Col, Dropdown, Menu, Row, Table, message } from 'antd';
+import { ArrowLeftOutlined, MoreOutlined } from '@ant-design/icons';
+import React, { useState } from 'react';
+import { Link, useNavigate, useParams } from 'react-router-dom';
 
-import { authVar } from "../../../App/link";
-import { gql, useMutation, useQuery } from "@apollo/client";
-import { notifyGraphqlError } from "../../../utils/error";
+import { authVar } from '../../../App/link';
+import { gql, useMutation, useQuery } from '@apollo/client';
+import { notifyGraphqlError } from '../../../utils/error';
 
-import { PROJECT } from "../index";
-import { TASK } from "../../Tasks";
-import routes from "../../../config/routes";
+import { PROJECT } from '../index';
+import { TASK } from '../../Tasks';
+import routes from '../../../config/routes';
 import constants from '../../../config/constants';
 
-import deleteImg from "../../../assets/images/delete_btn.svg";
-import archiveImg from "../../../assets/images/archive_btn.svg";
+import deleteImg from '../../../assets/images/delete_btn.svg';
+import archiveImg from '../../../assets/images/archive_btn.svg';
 
-import styles from "../style.module.scss";
-import ModalConfirm from "../../../components/Modal";
-import ArchiveBody from "../../../components/Archive";
-import DeleteBody from "../../../components/Delete";
-import TaskDetail from "../../../components/TaskDetail";
-import Status from "../../../components/Status";
+import ModalConfirm from '../../../components/Modal';
+import ArchiveBody from '../../../components/Archive';
+import DeleteBody from '../../../components/Delete';
+import TaskDetail from '../../../components/TaskDetail';
+import Status from '../../../components/Status';
 
-import InfoCircleOutlined from "@ant-design/icons/lib/icons/InfoCircleOutlined";
+import InfoCircleOutlined from '@ant-design/icons/lib/icons/InfoCircleOutlined';
+import { ProjectPagingData } from '../../../interfaces/graphql.interface';
+import styles from '../style.module.scss';
+import {
+  DeleteInput,
+  // MutationTaskDeleteArgs, 
+  Task,
+  TaskUpdateInput
+} from '../../../interfaces/generated';
 
 const { SubMenu } = Menu;
 
@@ -57,7 +64,7 @@ const DetailProject = () => {
   const navigate = useNavigate();
   const loggedInUser = authVar();
 
-  const [taskUpdate, { loading: updateLoading }] = useMutation(TASK_UPDATE, {
+  const [taskUpdate, { loading: updateLoading }] = useMutation<{ TaskUpdate: Task }, { input: TaskUpdateInput }>(TASK_UPDATE, {
     onCompleted() {
       message.success({
         content: `Task is updated successfully!`,
@@ -70,12 +77,12 @@ const DetailProject = () => {
       notifyGraphqlError(err);
     },
     update(cache) {
-      const normalizedId = cache.identify({ id: task.id, __typename: "Task" });
+      const normalizedId = cache.identify({ id: task?.id, __typename: "Task" });
       cache.evict({ id: normalizedId });
       cache.gc();
     },
   });
-  const [taskDelete, { loading }] = useMutation(TASK_DELETE, {
+  const [taskDelete, { loading }] = useMutation<{ input: DeleteInput }>(TASK_DELETE, {
     onCompleted() {
       message.success({
         content: `Task is deleted successfully!`,
@@ -89,7 +96,7 @@ const DetailProject = () => {
     },
 
     update(cache) {
-      const normalizedId = cache.identify({ id: task.id, __typename: "Task" });
+      const normalizedId = cache.identify({ id: task?.id, __typename: "Task" });
       cache.evict({ id: normalizedId });
       cache.gc();
     },
@@ -112,7 +119,7 @@ const DetailProject = () => {
     });
   };
 
-  const [task, setTask] = useState<any>("");
+  const [task, setTask] = useState<Task>();
   const [visibility, setVisibility] = useState<boolean>(false);
   const [showArchive, setArchiveModal] = useState<boolean>(false);
 
@@ -130,7 +137,7 @@ const DetailProject = () => {
         input: {
           active: value,
           id: id,
-          company_id: loggedInUser?.company?.id,
+          company_id: loggedInUser?.company?.id ?? '',
         },
       },
     });
@@ -140,9 +147,9 @@ const DetailProject = () => {
     taskUpdate({
       variables: {
         input: {
-          id: task?.id,
+          id: task?.id ?? '',
           archived: !task?.archived,
-          company_id: loggedInUser?.company?.id,
+          company_id: loggedInUser?.company?.id ?? '',
         },
       },
     });
@@ -332,7 +339,7 @@ const DetailProject = () => {
     },
   ];
 
-  const { data: projectData } = useQuery(PROJECT, {
+  const { data: projectData } = useQuery<ProjectPagingData>(PROJECT, {
     variables: {
       input: {
         query: {
@@ -419,7 +426,7 @@ const DetailProject = () => {
         okText={"Delete"}
         closable
         modalBody={() =>
-          <DeleteBody 
+          <DeleteBody
             title={
               <>
                 {" "}
@@ -445,15 +452,15 @@ const DetailProject = () => {
         okText={task?.archived ? "Unarchive" : "Archive"}
         closable
         modalBody={
-          <ArchiveBody 
+          <ArchiveBody
             title={
               <>
                 Are you sure you want to{" "}
                 {task?.archived ? "unarchive" : "archive"}
-                <strong> {task.name}?</strong>
+                <strong> {task?.name}?</strong>
               </>
             }
-            subText={`Task will ${ task?.archived ? "" : "not" } be able to assigned to any employee`}
+            subText={`Task will ${task?.archived ? "" : "not"} be able to assigned to any employee`}
           />
         }
         onOkClick={archiveTask}

@@ -7,6 +7,7 @@ import { authVar } from "../../../App/link";
 import { InvoiceQueryInput } from '../../../interfaces/generated';
 import PageHeader from '../../../components/PageHeader';
 import InvoiceForm from '../../../components/InvoiceForm';
+import { IInvoiceInput } from '../../../interfaces/graphql.interface';
 
 import { InvoicePagingData } from '../../../interfaces/graphql.interface';
 
@@ -34,6 +35,7 @@ const INVOICE = gql`
           rate
           amount
           project_id
+          description
         }
       }
     }
@@ -75,7 +77,7 @@ const EditInvoice = () => {
           !invoiceLoading  && (
             <InvoiceForm 
               client_id={invoiceData?.Invoice?.data?.[0]?.client_id as string} 
-              invoice={invoiceData?.Invoice?.data?.[0]}
+              invoice={invoiceData?.Invoice?.data?.[0] as IInvoiceInput}
             />
           )
         }

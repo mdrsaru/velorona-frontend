@@ -129,14 +129,14 @@ const TaskDetail = (props: IProps) => {
       centered
       visible={visibility}
       closeIcon={[
-        <div onClick={() => setVisibility(false)}>
+        <div onClick={() => setVisibility(false)} key={1}>
           <span className={styles["close-icon-div"]}>
             <CloseOutlined />
           </span>
         </div>,
       ]}
       footer={[
-        <div className={styles["modal-footer"]}>
+        <div className={styles["modal-footer"]} key={2}>
           {data?.attachments?.length ? (
             <>
               <span>Attachments</span> &nbsp; &nbsp;
@@ -293,7 +293,7 @@ const TaskDetail = (props: IProps) => {
             {data?.project?.client?.name}:{data?.project?.name}
           </span>
           <div className={styles["task-body"]}>
-            {data ? parse(data?.description) : ""}
+            {data?.description ? parse(data?.description) : ""}
           </div>
         </div>
       </div>

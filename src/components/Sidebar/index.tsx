@@ -1,6 +1,7 @@
 import {
   Link,
-  // useLocation
+  useLocation,
+  useParams
 } from 'react-router-dom';
 import { Menu, Layout } from 'antd';
 import {
@@ -21,24 +22,31 @@ import routes from '../../config/routes';
 import { authVar } from '../../App/link';
 
 import styles from './style.module.scss';
-import {useState} from "react";
+import { useEffect, useState } from "react";
 
 const { Sider } = Layout;
-
-// const menuKeys = [
-//   routes.dashboard.path,
-//   routes.home.path,
-//   routes.timesheet.path,
-//   routes.tasks.path,
-//   routes.schedule.path,
-// ];
-
 
 const Sidebar = (props: any) => {
   const { collapsed, onCollapse } = props
   const [selectedMenuKey, setMenuKey] = useState('')
-  // const location = useLocation();
+  const location = useLocation();
+  const params = useParams();
   const loggedInUser = authVar();
+
+  useEffect(() => {
+    let path = ''
+    if (location?.pathname === '/' + params?.id) {
+      path = routes.companyDashboard.key
+    } else if (params?.id && location?.pathname !== '/' + params?.id) {
+      path = location?.pathname?.split('/').slice(2, 3).toString()
+    } else if (!params.id && location?.pathname !== routes.home.path) {
+      path = location?.pathname?.split('/').slice(1, 2).toString()
+    } else {
+      path = routes.home.key
+    }
+    setMenuKey(path)
+  }, [location, params?.id])
+
   const menuItems = [
     {
       key: routes.dashboard.key,
@@ -55,7 +63,7 @@ const Sidebar = (props: any) => {
       accessRoles: [constants.roles.CompanyAdmin]
     },
     {
-      key: routes.role.name,
+      key: routes.role.key,
       name: routes.role.name,
       icon: <UserSwitchOutlined />,
       route: routes.role.path,
@@ -97,10 +105,10 @@ const Sidebar = (props: any) => {
       accessRoles: [constants.roles.Employee]
     },
     {
-      key: routes.tasks.key,
-      name: routes.tasks.name,
+      key: routes.schedule.key,
+      name: routes.schedule.name,
       icon: <ScheduleOutlined />,
-      route: routes.tasks.path(loggedInUser?.company?.code ?? ''),
+      route: routes.schedule.path(loggedInUser?.company?.code ?? ''),
       accessRoles: [constants.roles.Employee]
     },
     {
@@ -132,7 +140,7 @@ const Sidebar = (props: any) => {
     //   accessRoles: [constants.roles.Employee]
     // }
   ]
-  const menuArray = menuItems.filter(menu => {return loggedInUser?.user?.roles?.some(role => menu.accessRoles.includes(role))})
+  const menuArray = menuItems.filter(menu => { return loggedInUser?.user?.roles?.some(role => menu.accessRoles.includes(role)) })
   // const selectedMenuKey = menuKeys.find(key => key.split('/')?.[1] === location.pathname?.split('/')?.[1]) ?? '';
 
   return (
@@ -152,7 +160,7 @@ const Sidebar = (props: any) => {
         style={{ height: '100%', borderRight: 0 }}
         selectedKeys={[selectedMenuKey]}>
         {menuArray && menuArray.map((menu) => (
-          <Menu.Item key={menu?.key} icon={menu?.icon} onClick={(e: any) =>{setMenuKey(e.key)}}>
+          <Menu.Item key={menu?.key} icon={menu?.icon} onClick={(e: any) => { setMenuKey(e.key) }}>
             <Link to={menu.route}>{menu.name}</Link>
           </Menu.Item>
         ))}

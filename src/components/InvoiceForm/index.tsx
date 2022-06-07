@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { ChangeEvent } from 'react';
+import { ChangeEvent, useState } from 'react';
 import { gql, useQuery, useMutation } from '@apollo/client';
 import { useNavigate } from 'react-router-dom';
 import { Button, Col, Form, Input, Row, Select, Image, DatePicker, InputNumber, Space, message } from 'antd';
@@ -56,6 +56,7 @@ const InvoiceForm = (props: IProps) => {
   const navigate = useNavigate();
   const loggedInUser = authVar();
   const [form] = Form.useForm();
+  const [isSendInvoiceClicked, setIsSendInvoiceClicked] = useState(false);
 
   const company_id = loggedInUser?.company?.id as string
 
@@ -206,7 +207,8 @@ const InvoiceForm = (props: IProps) => {
       issueDate: values.issueDate?.toISOString(),
       dueDate: values.dueDate?.toISOString(),
       notes: values.notes,
-      taxPercent: values.taxPercent,
+      taxPercent: parseFloat(values.taxPercent),
+      taxAmount: parseFloat(values.taxAmount),
       totalAmount: parseFloat(values.totalAmount),
       subtotal: parseFloat(values.subtotal),
       totalQuantity: values.totalQuantity,
@@ -220,16 +222,22 @@ const InvoiceForm = (props: IProps) => {
           id: item.id,
           project_id: item.project_id,
           description: item.description,
-          quantity: item.quantity,
-          rate: item.rate,
-          amount: item.amount,
+          quantity: parseFloat(item.quantity),
+          rate: parseFloat(item.rate),
+          amount: parseFloat(item.amount),
         })),
       };
+
+      if(values.status) {
+        input.status = values.status
+      }
 
       updateInvoice({
         variables: {
           input,
         }
+      }).finally(() => {
+        setIsSendInvoiceClicked(false)
       });
 
     } else {
@@ -239,11 +247,15 @@ const InvoiceForm = (props: IProps) => {
         items: values.items.map((item: any) => ({
           project_id: item.project_id,
           description: item.description,
-          quantity: item.quantity,
-          rate: item.rate,
-          amount: item.amount,
+          quantity: parseFloat(item.quantity),
+          rate: parseFloat(item.rate),
+          amount: parseFloat(item.amount),
         })),
       }; 
+
+      if(values.status) {
+        input.status = values.status
+      }
 
       if(props.timesheet_id) {
         input['timesheet_id'] = props.timesheet_id;
@@ -253,10 +265,19 @@ const InvoiceForm = (props: IProps) => {
         variables: {
           input,
         }
+      }).finally(() => {
+        setIsSendInvoiceClicked(false)
       });
 
     }
   } 
+
+  const saveAndSend = () => {
+    setIsSendInvoiceClicked(true);
+    const values = form.getFieldsValue();
+    values.status = 'Sent';
+    onSubmit(values);
+  }
 
   return (
     <Form
@@ -539,9 +560,21 @@ const InvoiceForm = (props: IProps) => {
 
       <Row justify="end">
         <Space>
-          <Button type="primary" htmlType="submit" loading={creatingInvoice || updatingInvoice}>Save and Exit</Button>
+          <Button 
+            type="primary" 
+            htmlType="submit" 
+            loading={!isSendInvoiceClicked && (creatingInvoice || updatingInvoice)}
+          >
+            Save and Exit
+          </Button>
 
-          {/*<Button type="primary">Send Invoice</Button>*/}
+          <Button 
+            type="primary" 
+            loading={isSendInvoiceClicked && (creatingInvoice || updatingInvoice)}
+            onClick={saveAndSend}
+          >
+            Send Invoice
+          </Button>
         </Space>
       </Row>
     </Form>

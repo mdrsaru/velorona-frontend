@@ -1,7 +1,11 @@
 import moment from 'moment';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 import { gql, useLazyQuery, useQuery, useMutation } from '@apollo/client';
-import { useParams, Link } from 'react-router-dom';
+import {
+  useParams,
+  Link,
+  // useNavigate 
+} from 'react-router-dom';
 import groupBy from 'lodash/groupBy';
 import find from 'lodash/find';
 import { Card, Col, Row, Button, Space, message, Modal, Form, Select, Spin } from 'antd';
@@ -13,7 +17,6 @@ import { authVar } from '../../../App/link';
 import { _cs, checkRoles } from '../../../utils/common';
 import routes from '../../../config/routes';
 import { notifyGraphqlError } from "../../../utils/error";
-import { useState } from 'react';
 import constants from "../../../config/constants";
 import { TimeEntry, QueryTimesheetArgs, TimeSheetPagingResult, MutationTimeEntriesApproveRejectArgs } from '../../../interfaces/generated';
 import { GraphQLResponse } from '../../../interfaces/graphql.interface';
@@ -25,6 +28,7 @@ import TimeSheetLoader from '../../../components/Skeleton/TimeSheetLoader';
 import TimesheetInformation from './TimesheetInformation';
 import PageHeader from '../../../components/PageHeader';
 import TimeEntryDetail from './TimeEntryDetail';
+import InvoiceViewer from '../../../components/InvoiceViewer';
 
 import styles from './style.module.scss';
 import NoContent from '../../../components/NoContent';
@@ -155,6 +159,7 @@ export const getTotalTimeForADay = (entries: any) => {
 
 const DetailTimesheet = () => {
   let params = useParams();
+  // let navigate = useNavigate();
   const { Option } = Select;
   const authData = authVar();
   const roles = authData?.user?.roles ?? [];
@@ -162,6 +167,15 @@ const DetailTimesheet = () => {
   const [filteredTasks, setTasks] = useState([]);
   const [submitTimesheet] = useMutation(TIMESHEET_SUBMIT);
   const [timeSheetWeekly, setTimeSheetWeekly] = useState<Array<any>>([]);
+
+  const [invoiceViewer, setInvoiceViewer] = useState<{
+    isVisible: boolean,
+    invoice_id: string | undefined;
+  }>({
+    isVisible: false,
+    invoice_id: undefined,
+  })
+
   const entriesByStatusRef = useRef<any>({});
 
   const [invoicedTimeEntries, setInvoicedTimeEntries] = useState<InvoicedTimeEntries[]>([])
@@ -386,9 +400,34 @@ const DetailTimesheet = () => {
         },
       },
     })
-
-
   }
+
+  const handleViewInvoiceClick = (invoice_id: string) => {
+    setInvoiceViewer({
+      isVisible: true,
+      invoice_id,
+    });
+  }
+
+  const handleViewInvoiceCancel = () => {
+    setInvoiceViewer({
+      isVisible: false,
+      invoice_id: undefined,
+    });
+  }
+
+  // const saveAndExit = () => {
+  //   const admin = checkRoles({
+  //     expectedRoles: [constants.roles.CompanyAdmin, constants.roles.SuperAdmin, constants.roles.TaskManager],
+  //     userRoles: roles,
+  //   })
+
+  //   if(admin) {
+  //     navigate(routes.employeeTimesheet.path(authData?.company?.code as string))
+  //   } else {
+  //     navigate(routes.timesheet.path(authData?.company?.code as string))
+  //   }
+  // }
 
   const timesheetDetail = timeSheetDetail?.Timesheet?.data[0];
 
@@ -480,7 +519,10 @@ const DetailTimesheet = () => {
 
                         {
                           roles.includes(constants.roles.CompanyAdmin) && (
-                            <div className={styles['action']}>
+                            <div
+                              className={styles['action']}
+                              onClick={() => handleViewInvoiceClick(invoiced.invoice_id)}
+                            >
                               View Invoice
                             </div>
                           )
@@ -566,7 +608,7 @@ const DetailTimesheet = () => {
                       <Button
                         type="primary"
                         htmlType="button">
-                        Save and Exit
+                        Exit
                       </Button>
                       <Button
                         type="default"
@@ -644,12 +686,25 @@ const DetailTimesheet = () => {
               &nbsp; &nbsp;
               <Button
                 type="primary"
-                htmlType="submit">
+                htmlType="submit"
+              >
                 Create
               </Button>
             </Form.Item>
           </div>
         </Form>
+      </Modal>
+
+      <Modal
+        centered
+        width={1000}
+        footer={null}
+        visible={invoiceViewer.isVisible}
+        onCancel={handleViewInvoiceCancel}
+      >
+        {
+          invoiceViewer.invoice_id && <InvoiceViewer id={invoiceViewer.invoice_id} />
+        }
       </Modal>
     </>
   )
