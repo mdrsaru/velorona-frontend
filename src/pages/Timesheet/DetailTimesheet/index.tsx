@@ -1,10 +1,10 @@
 import moment from 'moment';
 import { useRef, useState } from 'react';
-import { gql, useLazyQuery, useQuery, useMutation } from '@apollo/client';
+import { gql, useLazyQuery, useQuery, useMutation, NetworkStatus } from '@apollo/client';
 import {
   useParams,
   Link,
-  // useNavigate 
+  useNavigate 
 } from 'react-router-dom';
 import groupBy from 'lodash/groupBy';
 import find from 'lodash/find';
@@ -159,7 +159,7 @@ export const getTotalTimeForADay = (entries: any) => {
 
 const DetailTimesheet = () => {
   let params = useParams()
-  // let navigate = useNavigate();
+  let navigate = useNavigate();
   const { Option } = Select
   const authData = authVar()
   const roles = authData?.user?.roles ?? []
@@ -289,12 +289,13 @@ const DetailTimesheet = () => {
     }
   }
 
-  const { data: timeSheetDetail, loading: timesheetLoading, refetch: refetchTimeSheet } = useQuery<
+  const { data: timeSheetDetail, loading: timesheetLoading, refetch: refetchTimeSheet, networkStatus } = useQuery<
     GraphQLResponse<'Timesheet', TimeSheetPagingResult>,
     QueryTimesheetArgs
   >(TIME_SHEET, {
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
+    notifyOnNetworkStatusChange: true,
     variables: {
       input: {
         query: {
@@ -417,18 +418,18 @@ const DetailTimesheet = () => {
     });
   }
 
-  // const saveAndExit = () => {
-  //   const admin = checkRoles({
-  //     expectedRoles: [constants.roles.CompanyAdmin, constants.roles.SuperAdmin, constants.roles.TaskManager],
-  //     userRoles: roles,
-  //   })
+   const exit = () => {
+     const admin = checkRoles({
+       expectedRoles: [constants.roles.CompanyAdmin, constants.roles.SuperAdmin, constants.roles.TaskManager],
+       userRoles: roles,
+     })
 
-  //   if(admin) {
-  //     navigate(routes.employeeTimesheet.path(authData?.company?.code as string))
-  //   } else {
-  //     navigate(routes.timesheet.path(authData?.company?.code as string))
-  //   }
-  // }
+     if(admin) {
+       navigate(routes.employeeTimesheet.path(authData?.company?.code as string))
+     } else {
+       navigate(routes.timesheet.path(authData?.company?.code as string))
+     }
+   }
 
   const deletePendingGroups = (id: string) => {
     const filteredPendingArray = entriesByStatus?.pending?.filter(entry => entry?.id !== id)
@@ -439,7 +440,7 @@ const DetailTimesheet = () => {
 
   return (
     <>
-      {timesheetLoading ? <TimeSheetLoader /> :
+      {(timesheetLoading && networkStatus !== NetworkStatus.refetch) ? <TimeSheetLoader /> :
         <Spin spinning={timesheetLoading}>
           <div className={styles['site-card-wrapper']}>
             {
@@ -502,8 +503,6 @@ const DetailTimesheet = () => {
                             <Button onClick={() => { approveRejectAll('Rejected') }} >
                               Reject All
                             </Button>
-
-                            <Button type="primary">Exit</Button>
                           </Space>
                         </Row>
 
@@ -614,7 +613,9 @@ const DetailTimesheet = () => {
                     <Space>
                       <Button
                         type="primary"
-                        htmlType="button">
+                        htmlType="button"
+                        onClick={exit}
+                      >
                         Exit
                       </Button>
                       <Button

@@ -60,7 +60,7 @@ const EmployeeTimesheet = () => {
     paging: {
       skip: pagingInput.skip,
       take: constants.paging.perPage,
-      order: ['issueDate:DESC'],
+      order: ['weekStartDate:DESC'],
     },
     query: {
       company_id: company_id
