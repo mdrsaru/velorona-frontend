@@ -295,7 +295,7 @@ const AddTasks = () => {
                 <Space>
                   <Button
                     type="default"
-                    htmlType="button" onClick={()=>navigate(-1)}>
+                    htmlType="button" onClick={()=>navigate(routes.projects.path(loggedInUser?.company?.id as string))}>
                     Cancel
                   </Button>
                   <Button
