@@ -11,9 +11,10 @@ import routes from '../../config/routes';
 
 import logo from '../../assets/images/main_logo.svg';
 import highFiveImg from '../../assets/images/High_five.svg';
-import { LoginResponse } from '../../interfaces/generated';
+import { LoginResponse, MutationLoginArgs } from '../../interfaces/generated';
 
 import styles from './style.module.scss';
+import { GraphQLResponse } from '../../interfaces/graphql.interface';
 
 const LOGIN = gql`
   mutation Login($input: LoginInput!) {
@@ -44,17 +45,16 @@ const FORGOT_PASSWORD = gql`
   }
 `
 
-interface LoginResponseData {
-  Login: LoginResponse
-}
-
 const Login = () => {
   let key = 'login'
   let { role } = useParams();
   const [form] = Form.useForm();
   const [forgetForm] = Form.useForm();
   const navigate = useNavigate();
-  const [login] = useMutation<LoginResponseData>(LOGIN, {
+  const [login] = useMutation<
+    GraphQLResponse<'Login', LoginResponse>,
+    MutationLoginArgs
+  >(LOGIN, {
     onCompleted: (response: any) => {
       message.success({ content: `LoggedIn successfully!`, key, className: 'custom-message' })
       const loginData = response?.Login;
@@ -69,7 +69,7 @@ const Login = () => {
           id: loginData?.company?.id ?? '',
           code: loginData?.company?.companyCode ?? ''
         },
-        fullName:loginData?.fullName,
+        fullName: loginData?.fullName,
         avatar: {
           id: loginData?.avatar?.id ?? '',
           url: loginData?.avatar?.url ?? ''

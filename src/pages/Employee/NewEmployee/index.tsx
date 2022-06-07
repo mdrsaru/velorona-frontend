@@ -11,11 +11,12 @@ import { notifyGraphqlError } from "../../../utils/error";
 import { authVar } from "../../../App/link";
 
 import routes from "../../../config/routes";
-import { User, UserPagingResult } from "../../../interfaces/generated";
+import { MutationChangeProfilePictureArgs, MutationUserCreateArgs, User, UserPagingResult } from "../../../interfaces/generated";
 import { USER } from "../index";
 import { STATE_CITIES, USA_STATES } from "../../../utils/cities";
 
 import styles from "../style.module.scss";
+import { GraphQLResponse } from "../../../interfaces/graphql.interface";
 
 const normFile = (e: any) => {
   if (Array.isArray(e)) {
@@ -79,10 +80,6 @@ export const USER_CREATE = gql`
       }
   }
 `
-interface UserResponse {
-  UserCreate: User
-}
-
 interface UserResponseArray {
   User: UserPagingResult
 }
@@ -96,7 +93,10 @@ const NewEmployee = () => {
     id: '',
     name: ''
   })
-  const [changeProfilePictureInput] = useMutation(CHANGE_PROFILE_IMAGE);
+  const [changeProfilePictureInput] = useMutation<
+    GraphQLResponse<'ChangeProfilePicture', User>,
+    MutationChangeProfilePictureArgs
+  >(CHANGE_PROFILE_IMAGE);
   const [form] = Form.useForm();
   const { Option } = Select;
 
@@ -137,7 +137,9 @@ const NewEmployee = () => {
     setCountryCities(STATE_CITIES[data]);
   }
 
-  const [userCreate] = useMutation<UserResponse>(USER_CREATE, {
+  const [userCreate] = useMutation<GraphQLResponse<'UserCreate', User>,
+    MutationUserCreateArgs
+  >(USER_CREATE, {
     onCompleted: (response) => {
       const user = response?.UserCreate;
       if (fileData?.id) {
@@ -201,7 +203,7 @@ const NewEmployee = () => {
           middleName: values.middleName,
           lastName: values.lastName,
           status: values.status,
-          company_id: authData?.company?.id,
+          company_id: authData?.company?.id as string,
           roles: [values?.roles],
           address: {
             streetAddress: values.streetAddress,

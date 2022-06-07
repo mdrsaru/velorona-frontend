@@ -22,10 +22,11 @@ import { notifyGraphqlError } from "../../../utils/error";
 import routes from "../../../config/routes";
 import { UserData } from "../../Client";
 import constants from "../../../config/constants";
-import { TaskStatus } from "../../../interfaces/generated";
+import { MutationTaskCreateArgs, Task, TaskStatus } from "../../../interfaces/generated";
 import { ITasks } from "../../../interfaces/ITasks";
 
 import styles from "../style.module.scss";
+import { GraphQLResponse } from "../../../interfaces/graphql.interface";
 
 const USER = gql`
   query User($input: UserQueryInput!) {
@@ -83,7 +84,7 @@ const AddTasks = () => {
 
   const [form] = Form.useForm();
   const navigate = useNavigate();
-  const [createTask] = useMutation(TASK_CREATE, {
+  const [createTask] = useMutation<GraphQLResponse<'TaskCreate',Task>,MutationTaskCreateArgs>(TASK_CREATE, {
     onCompleted() {
       message.success({
         content: `New task is added successfully!`,
@@ -147,9 +148,9 @@ const AddTasks = () => {
           description: values?.description,
           status: values?.status,
           attachment_ids: fileData?.ids,
-          company_id: loggedInUser?.company?.id,
+          company_id: loggedInUser?.company?.id as string,
           manager_id: values?.taskManager,
-          project_id: params?.pid,
+          project_id: params?.pid as string,
           user_ids: values?.assignee,
         },
       },
