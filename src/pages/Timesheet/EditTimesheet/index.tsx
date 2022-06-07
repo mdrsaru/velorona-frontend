@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Modal, Row, Col, Button, TimePicker, message } from 'antd';
+import { Modal, Row, Col, Button, TimePicker } from 'antd';
 import { CloseOutlined } from "@ant-design/icons";
 import { Form, Input } from 'antd';
 import moment, { Moment } from 'moment';
@@ -121,15 +121,10 @@ const EditTimeSheet = (props: IProps) => {
   }
 
   const resetForm = () => {
-    let data = form.getFieldsValue(['start-time', 'end-time']);
-    if (data['start-time'] && !data['end-time']) {
-      message.error('Update the end-time before closing.');
-    } else {
-      props?.refetch();
-      form.resetFields();
-      setTotalDuration(0);
-      props?.setVisibility()
-    };
+    props?.refetch()
+    form.resetFields()
+    setTotalDuration(0)
+    props?.setVisibility()
   };
 
   return (

@@ -294,7 +294,7 @@ const AddTasks = () => {
                 <Space>
                   <Button
                     type="default"
-                    htmlType="button">
+                    htmlType="button" onClick={()=>navigate(-1)}>
                     Cancel
                   </Button>
                   <Button

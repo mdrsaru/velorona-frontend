@@ -67,7 +67,7 @@ const EditTasks = () => {
   const [updateTask] = useMutation(TASK_UPDATE, {
     onCompleted() {
       message.success({
-        content: `New task is added successfully!`,
+        content: `Task is updated successfully!`,
         className: "custom-message",
       });
       navigate(
@@ -170,7 +170,7 @@ const EditTasks = () => {
           company_id: loggedInUser?.company?.id,
           manager_id: values?.taskManager,
           project_id: params?.pid,
-          // attachment_ids: fileData?.ids,
+          attachment_ids: fileData?.ids,
           user_ids: values?.assignee,
         },
       },
@@ -197,7 +197,7 @@ const EditTasks = () => {
             name: task?.name ?? "",
             description: task?.description ?? "",
             assignee: task?.users?.map((user: ITaskUsers) => { return user?.id }) ?? "",
-            taskManager: task?.manager?.fullName ?? "",
+            taskManager: task?.manager?.id ?? "",
             status: task?.status ?? "",
             file: task?.attachments
           }}>
