@@ -4,7 +4,13 @@ code {
 }
 
 ::-webkit-scrollbar {
-  width: 0.3em;
+  width: 0.2em;
+}
+
+@media screen and (max-width: 850px) {
+  ::-webkit-scrollbar {
+    height: 0.5rem;
+  }
 }
 
 ::-webkit-scrollbar-track {
@@ -13,4 +19,15 @@ code {
 
 ::-webkit-scrollbar-thumb {
   background-color: darkgrey;
+}
+
+
+@media screen and (max-width: 850px) {
+  .container-row {
+    padding-bottom: 2rem;
+  }
+}
+
+.container-row {
+  overflow-x: auto;
 }

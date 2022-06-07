@@ -60,7 +60,7 @@ const EmployeeTimesheet = () => {
     paging: {
       skip: pagingInput.skip,
       take: constants.paging.perPage,
-      order: ['issueDate:DESC'],
+      order: ['weekStartDate:DESC'],
     },
     query: {
       company_id: company_id
@@ -194,7 +194,7 @@ const EmployeeTimesheet = () => {
       <Card bordered={false}>
         <PageHeader title="Employee Timesheet" />
 
-        <Row>
+        <Row className='container-row'>
           <Col span={24}>
             <Table
               loading={timesheetLoading}

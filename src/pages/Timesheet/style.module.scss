@@ -82,11 +82,22 @@
       margin-right: 2rem;
     }
 
-    .ant-input {
-      font-weight: 600;
-      font-size: 18px;
-      width: 100%;
-      line-height: 22px;
+    @media screen and (max-width : 850px) {
+      .ant-input {
+        font-weight: 400;
+        font-size: 14px;
+        width: 100%;
+        line-height: 22px;
+      }
+    }
+
+    @media screen and (min-width : 851px) {
+      .ant-input {
+        font-weight: 600;
+        font-size: 18px;
+        width: 100%;
+        line-height: 22px;
+      }
     }
   }
 
@@ -96,6 +107,7 @@
 
   .task-row {
     padding: 0 1.2rem 0 1.2rem;
+    overflow-x: auto;
   }
 
   .start-time,
@@ -140,19 +152,38 @@
       cursor: pointer;
     }
 
-    div {
-      font-weight: 600;
-      font-size: 18px;
-      line-height: 22px;
+    @media screen and (max-width:850px) {
+      div {
+        font-weight: 600;
+        font-size: 14px;
+        line-height: 22px;
+      }
+
+      span {
+        font-weight: 600;
+        font-size: 14px;
+        line-height: 22px;
+        width: 100%;
+        color: var(--primary-blue);
+      }
     }
 
-    span {
-      font-weight: 600;
-      font-size: 18px;
-      line-height: 22px;
-      width: 100%;
-      color: var(--primary-blue);
+    @media screen and (min-width:851px) {
+      div {
+        font-weight: 600;
+        font-size: 18px;
+        line-height: 22px;
+      }
+
+      span {
+        font-weight: 600;
+        font-size: 18px;
+        line-height: 22px;
+        width: 100%;
+        color: var(--primary-blue);
+      }
     }
+
   }
 
 
@@ -242,7 +273,7 @@
   justify-content: center;
   align-items: center;
 
-  @media screen and (max-width: 767px)  {
+  @media screen and (max-width: 767px) {
     padding: 2rem;
   }
 

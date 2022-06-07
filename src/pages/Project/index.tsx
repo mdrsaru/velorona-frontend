@@ -322,7 +322,7 @@ const ProjectPage = () => {
             </div>
           </Col>
         </Row>
-        <Row>
+        <Row className='container-row'>
           <Col span={24}>
             <Table
               dataSource={projectData?.Project?.data}
