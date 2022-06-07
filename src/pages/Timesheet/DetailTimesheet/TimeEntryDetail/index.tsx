@@ -1,7 +1,7 @@
 import moment from 'moment';
 import { useState } from 'react';
 import { gql, useMutation } from '@apollo/client';
-import { Col, Row, Space, Input } from 'antd';
+import { Col, Row, Space, Input, message } from 'antd';
 import {
   CloseCircleOutlined,
   CheckCircleOutlined,
@@ -42,6 +42,7 @@ interface IProps {
   groupedTimeEntries: IGroupedTimeEntries[];
   status: string;
   needAction?: boolean;
+  deleteAction?: (a: string) => void;
   client_id: string;
   refetch: any;
 }
@@ -55,7 +56,10 @@ const TimeEntryDetails = (props: IProps) => {
 
   const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [entriesToDelete, setEntriesToDelete] = useState<undefined | string[]>();
+  const [entriesToDelete, setEntriesToDelete] = useState<{ entryIds: string[], task_id: string }>({
+    entryIds: [],
+    task_id: ''
+  });
   const [selectedGroup, setSelectedGroup] = useState<any>();
 
   const canApproveReject = checkRoles({
@@ -96,7 +100,11 @@ const TimeEntryDetails = (props: IProps) => {
 
   const [deleteBulkTimeEntry, { loading: deleting }] = useMutation(TIME_ENTRY_BULK_DELETE, {
     onCompleted: () => {
-      setEntriesToDelete(undefined);
+      setEntriesToDelete({
+        entryIds: [],
+        task_id: ''
+      });
+      message.success('Entries deleted successfully!')
       setShowDeleteModal(false);
       props.refetch();
     }
@@ -104,23 +112,32 @@ const TimeEntryDetails = (props: IProps) => {
 
   const onDeleteClick = (group: IGroupedTimeEntries) => {
     const ids = getEntryIdsFromGroup(group);
-    setEntriesToDelete(ids);
+    setEntriesToDelete({
+      entryIds: ids,
+      task_id: group?.id
+    });
     setShowDeleteModal(true);
   }
 
   const deleteTimeEntries = () => {
-    if (entriesToDelete?.length) {
+    props?.deleteAction?.(entriesToDelete?.task_id)
+    if (entriesToDelete?.entryIds?.length) {
       deleteBulkTimeEntry({
         variables: {
           input: {
-            ids: entriesToDelete,
+            ids: entriesToDelete?.entryIds,
             company_id: authData?.company?.id,
             created_by: authData?.user?.id,
             client_id: props.client_id,
           }
         }
-      }).then((response) => {
       }).catch(notifyGraphqlError)
+    } else {
+      setEntriesToDelete({
+        entryIds: [],
+        task_id: ''
+      });
+      setShowDeleteModal(false);
     }
   }
 
@@ -197,6 +214,7 @@ const TimeEntryDetails = (props: IProps) => {
                           ) : (
                             <Input
                               type="text"
+                              disabled={props?.status !== 'Pending'}
                               onClick={() => showEditTimesheet(moment(day).format('YYYY-MM-DD'), group, getTotalTimeForADay(group?.entries[moment(day).format('ddd, MMM D')]))}
                               value={
                                 getTimeFormat(getTotalTimeForADay(group?.entries[moment(day).format('ddd, MMM D')]))
