@@ -1,4 +1,4 @@
-import { gql, useMutation, useApolloClient } from '@apollo/client';
+import { gql, useMutation, useApolloClient, useQuery } from '@apollo/client';
 import { Layout, Menu, Avatar, Dropdown } from 'antd';
 import {
   MenuOutlined,
@@ -13,6 +13,7 @@ import logoContent from '../../assets/images/logo-01.svg';
 import downArrow from '../../assets/images/down-arrow.svg';
 // import notification from '../../assets/images/notification.svg';
 import routes from '../../config/routes';
+import { AUTH } from '../../gql/auth.gql';
 
 import styles from './style.module.scss';
 
@@ -28,7 +29,9 @@ const TopHeader = (props: any) => {
   const { onCollapse } = props;
   const client = useApolloClient();
   const navigate = useNavigate();
-  const loggedInUser = authVar();
+  //const loggedInUser = authVar();
+  const { loading, data: loginData } = useQuery(AUTH)
+  const loggedInUser = loginData?.AuthUser;
   /* Uncomment it to make sidebar toggle
   const { data: sidebarData } = useQuery(SIDEBAR);
   const onClick = () => {

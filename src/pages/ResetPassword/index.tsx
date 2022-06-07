@@ -11,6 +11,8 @@ import resetImg from "../../assets/images/reset.svg";
 
 import successImg from "../../assets/images/success.svg";
 import styles from './style.module.scss';
+import { GraphQLResponse } from '../../interfaces/graphql.interface';
+import { MutationResetPasswordArgs } from '../../interfaces/generated';
 
 const RESET_PASSWORD = gql`
   mutation ResetPassword($input: ResetPasswordInput!) {
@@ -23,14 +25,17 @@ const ResetPassword = () => {
   const navigate = useNavigate();
   const [ searchParams ] = useSearchParams();
   const [modalVisible, setModalVisible] = useState<boolean>(false);
-  const [resetPassword] = useMutation(RESET_PASSWORD);
+  const [resetPassword] = useMutation<
+  GraphQLResponse<'ResetPassword', string>,
+  MutationResetPasswordArgs
+  >(RESET_PASSWORD);
 
   const onFinish = (values: any) => {
     resetPassword({
       variables: {
         input: {
           password: values?.password,
-          token: searchParams.get("token")
+          token: searchParams.get("token") as string
         }
       }
     }).then((response) => {

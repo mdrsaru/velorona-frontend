@@ -24,6 +24,8 @@ import styles from "../style.module.scss";
 import { STATE_CITIES, USA_STATES } from "../../../utils/cities";
 import constants from "../../../config/constants";
 import { authVar } from "../../../App/link";
+import { GraphQLResponse } from "../../../interfaces/graphql.interface";
+import { Company, CompanyCreateInput, MutationCompanyCreateArgs } from "../../../interfaces/generated";
 
 const { Option } = Select;
 
@@ -50,13 +52,16 @@ const NewCompany = () => {
   const navigate = useNavigate();
   const authData = authVar();
 
-  const [createCompany] = useMutation(COMPANY_CREATE);
+  const [createCompany] = useMutation<
+    GraphQLResponse<'CompanyCreate', Company>,
+    MutationCompanyCreateArgs
+  >(COMPANY_CREATE);
   const [cities, setCountryCities] = useState<string[]>([]);
   const setState = (data: string) => {
     setCountryCities(STATE_CITIES[data]);
   };
   const [fileData, setFile] = useState({
-    id: "",
+    id: null,
     name: "",
   });
 
@@ -80,26 +85,30 @@ const NewCompany = () => {
   };
 
   const onSubmitForm = (values: any) => {
+    const input: CompanyCreateInput = {
+      name: values.name,
+      status: values.status,
+      user: {
+        firstName: values.firstName,
+        middleName: values.middleName,
+        lastName: values.lastName,
+        email: values.email,
+        address: {
+          streetAddress: values.streetAddress,
+          state: values.state,
+          city: values.city,
+          zipcode: values.zipcode,
+        },
+        phone: values.phone,
+      },
+
+    }
+    if(fileData?.id) {
+      input.logo_id = fileData.id;
+    }
     createCompany({
       variables: {
-        input: {
-          name: values.name,
-          status: values.status,
-          logo_id:fileData?.id,
-          user: {
-            firstName: values.firstName,
-            middleName: values.middleName,
-            lastName: values.lastName,
-            email: values.email,
-            address: {
-              streetAddress: values.streetAddress,
-              state: values.state,
-              city: values.city,
-              zipcode: values.zipcode,
-            },
-            phone: values.phone,
-          },
-        },
+        input,
       },
     })
       .then((response) => {

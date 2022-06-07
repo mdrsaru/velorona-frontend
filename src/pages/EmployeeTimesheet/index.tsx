@@ -193,28 +193,29 @@ const EmployeeTimesheet = () => {
     <div className={styles['container']}>
       <Card bordered={false}>
         <PageHeader title="Employee Timesheet" />
-
-        <Row className='container-row'>
-          <Col span={24}>
-            <Table
-              loading={timesheetLoading}
-              dataSource={dataSource}
-              columns={columns}
-              rowKey={(record => record.id)}
-              pagination={{
-                current: pagingInput.currentPage,
-                onChange: changePage,
-                total: timesheetData?.Timesheet?.paging?.total,
-                pageSize: constants.paging.perPage
-              }}
-            />
-          </Col>
-          <Col>
-            <Button type="primary" onClick={downloadReport}>
-              Download Report
-            </Button>
-          </Col>
-        </Row>
+        <div className='container-row'>
+          <Table
+            loading={timesheetLoading}
+            dataSource={dataSource}
+            columns={columns}
+            rowKey={(record => record.id)}
+            pagination={{
+              current: pagingInput.currentPage,
+              onChange: changePage,
+              total: timesheetData?.Timesheet?.paging?.total,
+              pageSize: constants.paging.perPage
+            }}
+          />
+          {
+            !!dataSource?.length && (
+              <div className={styles['download-report']}>
+                <Button type="primary" onClick={downloadReport}>
+                  Download Report
+                </Button>
+              </div>
+            )
+          }
+        </div>
       </Card>
     </div>
 

@@ -135,18 +135,18 @@ const routes = {
     key: 'timesheet'
   },
   employeeTimesheet: {
-    childPath: 'employee-timesheet',
-    path: (id: string) => `/${id}/employee-timesheet`,
+    childPath: 'timesheet/employee',
+    path: (id: string) => `/${id}/timesheet/employee`,
     component: lazy(() => import('../pages/EmployeeTimesheet')),
     name: 'Employee Timesheet',
-    key: 'employee-timesheet'
+    key: 'timesheet'
   },
   timesheetInvoice: {
-    childPath: 'employee-timesheet/:timesheetId/add-invoice',
-    path: (code: string, id: string) => `/${code}/employee-timesheet/${id}/add-invoice`,
+    childPath: 'timesheet/employee/:timesheetId/add-invoice',
+    path: (code: string, id: string) => `/${code}/timesheet/employee/${id}/add-invoice`,
     component: lazy(() => import('../pages/TimesheetInvoice')),
     name: 'Add Invoice',
-    key: 'employee-timesheet'
+    key: 'timesheet'
   },
   schedule: {
     childPath: 'schedule',

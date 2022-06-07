@@ -17,8 +17,8 @@ import ArchiveBody from '../../components/Archive';
 import { notifyGraphqlError } from '../../utils/error';
 import SubMenu from 'antd/lib/menu/SubMenu';
 
-import { Project, ProjectQueryInput, ProjectStatus, ProjectUpdateInput } from '../../interfaces/generated';
-import { ProjectPagingData } from '../../interfaces/graphql.interface';
+import { MutationProjectUpdateArgs, Project, ProjectPagingResult, ProjectStatus, QueryProjectArgs } from '../../interfaces/generated';
+import { GraphQLResponse } from '../../interfaces/graphql.interface';
 import styles from './style.module.scss';
 
 export const PROJECT = gql`
@@ -110,8 +110,7 @@ const ProjectPage = () => {
   const setArchiveVisibility = (value: boolean) => {
     setArchiveModal(value);
   };
-
-  const { data: projectData } = useQuery<ProjectPagingData, { input: ProjectQueryInput }>(PROJECT, {
+  const { data: projectData } = useQuery<GraphQLResponse<'Project',ProjectPagingResult>,QueryProjectArgs>(PROJECT, {
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
     variables: {
@@ -126,7 +125,7 @@ const ProjectPage = () => {
     },
   });
 
-  const [projectUpdate, { loading: updateLoading }] = useMutation<{ ProjectUpdate: Project }, { input: ProjectUpdateInput }>(
+  const [projectUpdate, { loading: updateLoading }] = useMutation<GraphQLResponse<'ProjectUpdate',Project>,MutationProjectUpdateArgs>(
     PROJECT_UPDATE, {
     onCompleted() {
       message.success({
@@ -138,6 +137,11 @@ const ProjectPage = () => {
     onError(err) {
       setArchiveVisibility(false);
       notifyGraphqlError(err);
+    },
+    update(cache) {
+      const normalizedId = cache.identify({ id: project?.id, __typename: "Project" });
+      cache.evict({ id: normalizedId });
+      cache.gc();
     },
   }
   );

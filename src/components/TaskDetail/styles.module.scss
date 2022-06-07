@@ -15,12 +15,6 @@
   .ant-modal-close-x {
     padding-top: 0.3rem;
   }
-  .ant-picker,
-  .ant-picker.ant-picker-borderless,
-  .ant-input {
-    background-color: #fff;
-    color: black;
-  }
 
   .ant-picker-suffix {
     font-weight: 600;
@@ -30,6 +24,15 @@
   }
 }
 
+.modal-body {
+  :global {
+    .ant-picker,
+    .ant-picker.ant-picker-borderless,
+    .ant-input {
+      background-color: var(--white) !important;
+    }
+  }
+}
 .modal-footer {
   justify-items: left;
   align-items: flex-start;

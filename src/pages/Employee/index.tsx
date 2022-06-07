@@ -14,12 +14,13 @@ import { notifyGraphqlError } from "../../utils/error";
 import deleteImg from "../../assets/images/delete_btn.svg";
 import archiveImg from "../../assets/images/archive_btn.svg";
 import constants from "../../config/constants";
-import { UserData } from "../Client";
 
 import RouteLoader from "../../components/Skeleton/RouteLoader";
 import UserPayRateModal from "../../components/UserPayRate";
 import styles from "./style.module.scss";
 import ViewUserPayRate from "../../components/ViewUserPayRate";
+import { GraphQLResponse } from "../../interfaces/graphql.interface";
+import { QueryUserArgs, RoleName, UserPagingResult } from "../../interfaces/generated";
 
 const { SubMenu } = Menu;
 
@@ -180,8 +181,11 @@ const Employee = () => {
       </div>
     );
   };
-
-  const { loading: employeeLoading, data: employeeData } = useQuery<UserData>(
+const role = Object.values(RoleName)
+  const { loading: employeeLoading, data: employeeData } = useQuery<
+    GraphQLResponse<'User', UserPagingResult>,
+    QueryUserArgs
+  >(
     USER,
     {
       fetchPolicy: "network-only",
@@ -189,7 +193,7 @@ const Employee = () => {
       variables: {
         input: {
           query: {
-            role: constants.roles.Employee,
+            role: role[2],
           },
           paging: {
             order: ["updatedAt:DESC"],
@@ -262,7 +266,7 @@ const Employee = () => {
     setUserPayRateVisibility(!showUserPayRate);
   };
 
-  const handleViewPayRate = (user:any) =>{
+  const handleViewPayRate = (user: any) => {
     setEmployee(user)
     setViewUserPayRateVisibility(!showViewUserPayRate)
   }
@@ -325,7 +329,7 @@ const Employee = () => {
     {
       title: "Name",
       key: "fullName",
-     dataIndex:"fullName",
+      dataIndex: "fullName",
       onCell: (record: any) => {
         return {
           onClick: () => {
@@ -342,7 +346,7 @@ const Employee = () => {
     {
       title: "Pay Rate",
       render: (user: any) => {
-        return <div onClick={()=>handleViewPayRate(user)}  className={styles["add-pay-rate"]}>View PayRate</div>;
+        return <div onClick={() => handleViewPayRate(user)} className={styles["add-pay-rate"]}>View PayRate</div>;
       },
     },
     {
@@ -365,7 +369,7 @@ const Employee = () => {
       title: "Actions",
       key: "actions",
       render: (record: any) => (
-        <Row style={{marginTop:'11px'}}>
+        <Row style={{ marginTop: '11px' }}>
           <Col>
             <p
               onClick={() => handleUserPayRate(record)}

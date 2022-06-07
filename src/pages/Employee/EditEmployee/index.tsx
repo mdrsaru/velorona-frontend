@@ -29,6 +29,8 @@ import styles from '../style.module.scss'
 import { authVar } from '../../../App/link'
 import RouteLoader from '../../../components/Skeleton/RouteLoader'
 import routes from '../../../config/routes'
+import { MutationChangeProfilePictureArgs, MutationUserUpdateArgs, User } from "../../../interfaces/generated";
+import { GraphQLResponse } from "../../../interfaces/graphql.interface";
 
 const dateFormat = "YYYY-MM-DD HH:mm:ss";
 const profileFile = (e: any) => {
@@ -47,14 +49,17 @@ const EditEmployee = () => {
     id: "",
     name: "",
   });
-  const [userUpdate] = useMutation(USER_UPDATE, {
+  const [userUpdate] = useMutation<
+    GraphQLResponse<'UserUpdate', User>,
+    MutationUserUpdateArgs
+  >(USER_UPDATE, {
 
     onCompleted: () => {
       if (fileData?.id) {
         changeProfilePictureInput({
           variables: {
             input: {
-              id: params?.eid,
+              id: params?.eid as string,
               avatar_id: fileData?.id,
             },
           },
@@ -72,7 +77,10 @@ const EditEmployee = () => {
       }
     },
   });
-  const [changeProfilePictureInput] = useMutation(CHANGE_PROFILE_IMAGE);
+  const [changeProfilePictureInput] = useMutation<
+    GraphQLResponse<'ChangeProfilePicture', User>,
+    MutationChangeProfilePictureArgs
+  >(CHANGE_PROFILE_IMAGE);
   const { data: roles } = useQuery(ROLES, {
     fetchPolicy: "cache-first",
   });

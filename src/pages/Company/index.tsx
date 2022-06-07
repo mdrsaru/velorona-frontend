@@ -15,6 +15,8 @@ import constants from '../../config/constants';
 import { notifyGraphqlError } from '../../utils/error';
 import moment from 'moment';
 import styles from './style.module.scss';
+import { GraphQLResponse } from '../../interfaces/graphql.interface';
+import { Company as ICompany,CompanyPagingResult, CompanyStatus, MutationCompanyUpdateArgs, QueryCompanyArgs } from '../../interfaces/generated';
 
 const { SubMenu } = Menu;
 export const COMPANY = gql`
@@ -80,7 +82,10 @@ const ArchiveBody = () => {
 
 const Company = () => {
   const navigate = useNavigate();
-  const { data: companyData, loading: dataLoading } = useQuery(COMPANY, {
+  const { data: companyData, loading: dataLoading } = useQuery<
+    GraphQLResponse<'Company', CompanyPagingResult>,
+    QueryCompanyArgs
+  >(COMPANY, {
     fetchPolicy: 'network-only',
     nextFetchPolicy: 'cache-only'
   });
@@ -91,7 +96,10 @@ const Company = () => {
     skip: 0,
     currentPage: 1,
   });
-  const [updateCompany] = useMutation(COMPANY_UPDATE)
+  const [updateCompany] = useMutation<
+  GraphQLResponse<'CompanyUpdate', ICompany>,
+    MutationCompanyUpdateArgs
+  >(COMPANY_UPDATE)
   const [visibility, setVisibility] = useState(false);
   const [showArchive, setArchiveModal] = useState(false);
   const setModalVisibility = (value: boolean) => {
@@ -106,7 +114,7 @@ const Company = () => {
     updateCompany({
       variables: {
         input: {
-          status: value,
+          status: value as CompanyStatus,
           id: id
         }
       }
@@ -211,7 +219,7 @@ const Company = () => {
   ];
 
   return (
-    
+
     <div className={styles['company-main-div']}>
       <Card bordered={false}>
         <Row>
@@ -251,7 +259,7 @@ const Company = () => {
         setModalVisibility={setModalVisibility}
         imgSrc={deleteImg}
         okText={'Delete'}
-        modalBody={<DeleteBody />} 
+        modalBody={<DeleteBody />}
       />
       <ModalConfirm
         visibility={showArchive}
