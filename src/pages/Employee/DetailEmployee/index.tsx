@@ -131,7 +131,7 @@ const DetailEmployee = () => {
                   <div className={styles["camera-div"]}>
                     <div className={styles["browse-file"]}>
                       <Upload {...props}>
-                        <img src={camera} />
+                        <img src={camera} alt="camera-src" />
                       </Upload>
                     </div>
                   </div>

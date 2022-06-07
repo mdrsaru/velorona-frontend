@@ -1,3 +1,17 @@
+.resp-table-body {
+  :global {
+    .ant-card-body { 
+      padding: 0
+    }
+
+    .ant-input, input {
+      font-weight: 600;
+      font-size: 14px;
+      line-height: 22px;
+    }
+  }
+}
+
 .card-col-timesheet {
   overflow-x: auto;
   overflow-y: auto;

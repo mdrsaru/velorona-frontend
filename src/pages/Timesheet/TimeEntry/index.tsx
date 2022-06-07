@@ -1,7 +1,6 @@
 import {
   Col,
   Row,
-  Form,
   Input
 } from 'antd';
 import moment from 'moment';
@@ -11,7 +10,7 @@ import { getTimeFormat } from '..';
 import styles from '../style.module.scss';
 
 const TimeEntry = (props: any) => {
-  const { length, data, index, clickPlayButton, rowClassName } = props
+  const { length, data, clickPlayButton, rowClassName } = props
 
   return (
     <Row className={styles[rowClassName]}>
@@ -48,20 +47,16 @@ const TimeEntry = (props: any) => {
       <Col
         span={3}
         className={styles['end-time']} onClick={event => { event.stopPropagation() }}>
-        <Form.Item
-          name={`end${index}`}
-          rules={[{ required: true }]}>
-          <Input
-            type="text"
-            defaultValue={moment(data?.endTime).format('LT')}
-            value={moment(data?.endTime).format('LT')} />
-        </Form.Item>
+        <Input
+          type="text"
+          defaultValue={moment(data?.endTime).format('LT')}
+          value={moment(data?.endTime).format('LT')} />
       </Col>
 
       <Col
         span={4}
         className={styles['total-time']} onClick={event => { event.stopPropagation() }}>
-        <span>{getTimeFormat(data?.duration) ?? 'N/A'}</span>
+        <div>{getTimeFormat(data?.duration) ?? 'N/A'}</div>
       </Col>
 
       <Col

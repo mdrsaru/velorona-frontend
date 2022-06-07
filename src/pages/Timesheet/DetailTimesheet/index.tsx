@@ -1,7 +1,11 @@
 import moment from 'moment';
 import { useRef, useState } from 'react';
 import { gql, useLazyQuery, useQuery, useMutation } from '@apollo/client';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import {
+  useParams,
+  Link,
+  // useNavigate 
+} from 'react-router-dom';
 import groupBy from 'lodash/groupBy';
 import find from 'lodash/find';
 import { Card, Col, Row, Button, Space, message, Modal, Form, Select, Spin } from 'antd';
@@ -27,6 +31,7 @@ import TimeEntryDetail from './TimeEntryDetail';
 import InvoiceViewer from '../../../components/InvoiceViewer';
 
 import styles from './style.module.scss';
+import NoContent from '../../../components/NoContent';
 
 type InvoicedTimeEntries = {
   invoice_id: string;
@@ -154,7 +159,7 @@ export const getTotalTimeForADay = (entries: any) => {
 
 const DetailTimesheet = () => {
   let params = useParams();
-  let navigate = useNavigate();
+  // let navigate = useNavigate();
   const { Option } = Select;
   const authData = authVar();
   const roles = authData?.user?.roles ?? [];
@@ -305,9 +310,9 @@ const DetailTimesheet = () => {
       const byStatus = timesheet?.entriesGroup?.byStatus ?? [];
       const byInvoice = timesheet?.entriesGroup?.byInvoice ?? [];
 
-      let approvedTimeEntries: TimeEntry[] = find(byStatus,{ approvalStatus: 'Approved' })?.entries ?? [];
-      let pendingTimeEntries: TimeEntry[] = find(byStatus,{ approvalStatus: 'Pending' })?.entries ?? [];
-      let rejectedTimeEntries: TimeEntry[] = find(byStatus,{ approvalStatus: 'Rejected' })?.entries ?? [];
+      let approvedTimeEntries: TimeEntry[] = find(byStatus, { approvalStatus: 'Approved' })?.entries ?? [];
+      let pendingTimeEntries: TimeEntry[] = find(byStatus, { approvalStatus: 'Pending' })?.entries ?? [];
+      let rejectedTimeEntries: TimeEntry[] = find(byStatus, { approvalStatus: 'Rejected' })?.entries ?? [];
 
       let invoiced: InvoicedTimeEntries[] = [];
 
@@ -376,11 +381,11 @@ const DetailTimesheet = () => {
       ids.push(entry.id);
     })
 
-    if(status === 'Approved') {
+    if (status === 'Approved') {
       entriesByStatusRef?.current?.rejected?.forEach((entry: any) => {
         ids.push(entry.id);
       })
-    } else if(status === 'Rejected') {
+    } else if (status === 'Rejected') {
       entriesByStatusRef?.current?.approved?.forEach((entry: any) => {
         ids.push(entry.id);
       })
@@ -411,18 +416,18 @@ const DetailTimesheet = () => {
     });
   }
 
-  const saveAndExit = () => {
-    const admin = checkRoles({
-      expectedRoles: [constants.roles.CompanyAdmin, constants.roles.SuperAdmin, constants.roles.TaskManager],
-      userRoles: roles,
-    })
+  // const saveAndExit = () => {
+  //   const admin = checkRoles({
+  //     expectedRoles: [constants.roles.CompanyAdmin, constants.roles.SuperAdmin, constants.roles.TaskManager],
+  //     userRoles: roles,
+  //   })
 
-    if(admin) {
-      navigate(routes.employeeTimesheet.path(authData?.company?.code as string))
-    } else {
-      navigate(routes.timesheet.path(authData?.company?.code as string))
-    }
-  }
+  //   if(admin) {
+  //     navigate(routes.employeeTimesheet.path(authData?.company?.code as string))
+  //   } else {
+  //     navigate(routes.timesheet.path(authData?.company?.code as string))
+  //   }
+  // }
 
   const timesheetDetail = timeSheetDetail?.Timesheet?.data[0];
 
@@ -439,22 +444,22 @@ const DetailTimesheet = () => {
 
             <Card bordered={false} className={styles['time-entries']}>
               <Row className={styles['timesheet-detail']}>
-                <PageHeader 
+                <PageHeader
                   title="Time Entry Details"
                   extra={[
                     <span key="new-entry">
                       {
                         roles.includes(constants.roles.Employee) &&
-                          <span
-                            key="new-entry"
-                            className={styles['add-entry']}
-                            onClick={() => {
-                              setShowAddNewEntry(true)
-                              form.resetFields();
-                            }}
-                          >
-                            Add New Time Entry
-                          </span>
+                        <span
+                          key="new-entry"
+                          className={styles['add-entry']}
+                          onClick={() => {
+                            setShowAddNewEntry(true)
+                            form.resetFields();
+                          }}
+                        >
+                          Add New Time Entry
+                        </span>
                       }
                     </span>
                   ]}
@@ -463,47 +468,47 @@ const DetailTimesheet = () => {
 
               <div className={styles['resp-table']}>
                 {
-                  !!entriesByStatus.pending?.length && 
-                    <div className={styles['timesheet-section']}>
-                      <div className={styles['timesheet-status']}>
-                        Unapproved Timesheet
-                      </div>
-
-                      <TimeEntryDetail 
-                        startDate={timeSheetDetail?.Timesheet?.data[0]?.weekStartDate as string}
-                        groupedTimeEntries={entriesByStatus.pending}
-                        durationMap={timesheetDetail?.durationMap?.['Pending']}
-                        client_id={timesheetDetail?.client?.id as string}
-                        refetch={refetchTimeSheet}
-                        status='Pending'
-                        needAction
-                      />
-
-                      {
-                        canApproveReject && (
-                          <Row justify="end" style={{ margin: '36px 0' }}>
-                            <Space>
-                              <Button onClick={() => {approveRejectAll('Approved')}} >
-                                Approve All
-                              </Button>
-
-                              <Button onClick={() => {approveRejectAll('Rejected')}} >
-                                Reject All
-                              </Button>
-
-                              <Button type="primary">Exit</Button>
-                            </Space>
-                          </Row>
-
-                        )
-                      }
+                  !!entriesByStatus.pending?.length &&
+                  <div className={styles['timesheet-section']}>
+                    <div className={styles['timesheet-status']}>
+                      Unapproved Timesheet
                     </div>
+
+                    <TimeEntryDetail
+                      startDate={timeSheetDetail?.Timesheet?.data[0]?.weekStartDate as string}
+                      groupedTimeEntries={entriesByStatus.pending}
+                      durationMap={timesheetDetail?.durationMap?.['Pending']}
+                      client_id={timesheetDetail?.client?.id as string}
+                      refetch={refetchTimeSheet}
+                      status='Pending'
+                      needAction
+                    />
+
+                    {
+                      canApproveReject && (
+                        <Row justify="end" style={{ margin: '36px 0' }}>
+                          <Space>
+                            <Button onClick={() => { approveRejectAll('Approved') }} >
+                              Approve All
+                            </Button>
+
+                            <Button onClick={() => { approveRejectAll('Rejected') }} >
+                              Reject All
+                            </Button>
+
+                            <Button type="primary">Exit</Button>
+                          </Space>
+                        </Row>
+
+                      )
+                    }
+                  </div>
                 }
 
                 {
                   invoicedTimeEntries.map((invoiced) => (
                     <div key={invoiced.invoice_id} className={styles['timesheet-section']}>
-                      <div 
+                      <div
                         className={
                           _cs([styles['timesheet-status'], styles['approved-status']])
                         }
@@ -514,7 +519,7 @@ const DetailTimesheet = () => {
 
                         {
                           roles.includes(constants.roles.CompanyAdmin) && (
-                            <div 
+                            <div
                               className={styles['action']}
                               onClick={() => handleViewInvoiceClick(invoiced.invoice_id)}
                             >
@@ -524,7 +529,7 @@ const DetailTimesheet = () => {
                         }
                       </div>
 
-                      <TimeEntryDetail 
+                      <TimeEntryDetail
                         startDate={timeSheetDetail?.Timesheet?.data[0]?.weekStartDate as string}
                         groupedTimeEntries={invoiced.group}
                         durationMap={timesheetDetail?.durationMap?.[invoiced.invoice_id]}
@@ -537,86 +542,83 @@ const DetailTimesheet = () => {
                 }
 
                 {
-                  !!entriesByStatus.approved.length && 
-                    <div className={styles['timesheet-section']}>
-                      <div 
-                        className={
-                          _cs([styles['timesheet-status'], styles['approved-status']])
-                        }
-                      >
-                        <div>
-                          Approved Timesheet
-                        </div>
-
-                        {
-                          roles.includes(constants.roles.CompanyAdmin) && (
-                            <div className={styles['action']}>
-                              <Link
-                                className={styles['invoice-link']}
-                                to={routes.timesheetInvoice.path(authData?.company?.code as string, params?.id as string)}
-                              >
-                                Generate Invoice
-                              </Link>
-                            </div>
-                          )
-                        }
+                  !!entriesByStatus.approved.length &&
+                  <div className={styles['timesheet-section']}>
+                    <div
+                      className={
+                        _cs([styles['timesheet-status'], styles['approved-status']])
+                      }
+                    >
+                      <div>
+                        Approved Timesheet
                       </div>
 
-                      <TimeEntryDetail 
-                        startDate={timeSheetDetail?.Timesheet?.data[0]?.weekStartDate as string}
-                        groupedTimeEntries={entriesByStatus.approved}
-                        durationMap={timesheetDetail?.durationMap?.['Approved']}
-                        client_id={timesheetDetail?.client?.id as string}
-                        refetch={refetchTimeSheet}
-                        status='Approved'
-                        needAction
-                      />
+                      {
+                        roles.includes(constants.roles.CompanyAdmin) && (
+                          <div className={styles['action']}>
+                            <Link
+                              className={styles['invoice-link']}
+                              to={routes.timesheetInvoice.path(authData?.company?.code as string, params?.id as string)}
+                            >
+                              Generate Invoice
+                            </Link>
+                          </div>
+                        )
+                      }
                     </div>
+
+                    <TimeEntryDetail
+                      startDate={timeSheetDetail?.Timesheet?.data[0]?.weekStartDate as string}
+                      groupedTimeEntries={entriesByStatus.approved}
+                      durationMap={timesheetDetail?.durationMap?.['Approved']}
+                      client_id={timesheetDetail?.client?.id as string}
+                      refetch={refetchTimeSheet}
+                      status='Approved'
+                      needAction
+                    />
+                  </div>
                 }
 
                 {
-                  !!entriesByStatus.rejected.length && 
-                    <div className={styles['timesheet-section']}>
-                      <div className={styles['timesheet-status']}>
-                        Rejected Timesheet
-                      </div>
-                      <TimeEntryDetail 
-                        startDate={timeSheetDetail?.Timesheet?.data[0]?.weekStartDate as string}
-                        groupedTimeEntries={entriesByStatus.rejected}
-                        durationMap={timesheetDetail?.durationMap?.['Rejected']}
-                        client_id={timesheetDetail?.client?.id as string}
-                        status='Rejected'
-                        refetch={refetchTimeSheet}
-                        needAction
-                      />
+                  !!entriesByStatus.rejected.length &&
+                  <div className={styles['timesheet-section']}>
+                    <div className={styles['timesheet-status']}>
+                      Rejected Timesheet
                     </div>
+                    <TimeEntryDetail
+                      startDate={timeSheetDetail?.Timesheet?.data[0]?.weekStartDate as string}
+                      groupedTimeEntries={entriesByStatus.rejected}
+                      durationMap={timesheetDetail?.durationMap?.['Rejected']}
+                      client_id={timesheetDetail?.client?.id as string}
+                      status='Rejected'
+                      refetch={refetchTimeSheet}
+                      needAction
+                    />
+                  </div>
                 }
               </div>
 
               <br />
-              <Row justify={"end"}>
-                <Col className={styles['form-col']}>
-                  <Space>
-                    <Button
-                      type="primary"
-                      htmlType="button"
-                      onClick={saveAndExit}
-                    >
-                      Save and Exit
-                    </Button>
-                    {
-                      /* 
-                    <Button
-                      type="default"
-                      htmlType="button"
-                      onClick={onSubmitTimesheet}>
-                      Submit
-                    </Button>
-                       * */
-                    }
-                  </Space>
-                </Col>
-              </Row>
+              {(!timeSheetDetail?.Timesheet?.data[0]?.entriesGroup?.byStatus.length &&
+                !timeSheetDetail?.Timesheet?.data[0]?.entriesGroup?.byInvoice.length) ?
+                <NoContent title={'No Time Entry added'} subtitle={'There are no entries added at the moment'} /> :
+                <Row justify={"end"}>
+                  <Col className={styles['form-col']}>
+                    <Space>
+                      <Button
+                        type="primary"
+                        htmlType="button">
+                        Exit
+                      </Button>
+                      <Button
+                        type="default"
+                        htmlType="button"
+                        onClick={onSubmitTimesheet}>
+                        Submit
+                      </Button>
+                    </Space>
+                  </Col>
+                </Row>}
               <br />
             </Card>
           </div>

@@ -76,6 +76,10 @@ const TimeEntryDetails = (props: IProps) => {
     }
   })
 
+  const refetchGroups = () => {
+    props?.refetch()
+  }
+
   const onApproveRejectTimeEntriesClick = (status: string, group: IGroupedTimeEntries) => {
     const ids = getEntryIdsFromGroup(group);
 
@@ -120,11 +124,12 @@ const TimeEntryDetails = (props: IProps) => {
     }
   }
 
-  const showEditTimesheet = (day: string, group: IGroupedTimeEntries) => {
+  const showEditTimesheet = (day: string, group: IGroupedTimeEntries, total: number) => {
     setShowEditModal(true);
     setSelectedGroup({
       day,
       group,
+      total
     });
   }
 
@@ -178,84 +183,82 @@ const TimeEntryDetails = (props: IProps) => {
                     {group?.name}
                   </div>
 
-                {
-                  weekDays.map((day: any, timeIndex: number) => (
-                    <div
-                      className={styles["table-body-cell"]}
-                      key={timeIndex}
-                    >
-                      {
-                        (['Approved', 'Rejected'].includes(props.status) || canApproveReject)? (
+                  {
+                    weekDays.map((day: any, timeIndex: number) => (
+                      <div
+                        className={styles["table-body-cell"]}
+                        key={timeIndex}
+                      >
+                        {
+                          (['Approved', 'Rejected'].includes(props.status) || canApproveReject) ? (
                             <div>
                               {getTimeFormat(getTotalTimeForADay(group?.entries[moment(day).format('ddd, MMM D')]))}
-                            </div> 
-                          ): (
+                            </div>
+                          ) : (
                             <Input
                               type="text"
-                              onClick={() => showEditTimesheet(moment(day).format('YYYY-MM-DD'), group)}
+                              onClick={() => showEditTimesheet(moment(day).format('YYYY-MM-DD'), group, getTotalTimeForADay(group?.entries[moment(day).format('ddd, MMM D')]))}
                               value={
                                 getTimeFormat(getTotalTimeForADay(group?.entries[moment(day).format('ddd, MMM D')]))
-                              } 
+                              }
                             />
                           )
-                      }
-                    </div>
-                  ))
-                }
+                        }
+                      </div>
+                    ))
+                  }
 
-                <div className={styles["table-body-cell"]}>
-                  <span>
-                    {getTotalTimeByTask(group?.entries)}
-                  </span>
-                </div>
+                  <div className={styles["table-body-cell"]}>
+                    <span>
+                      {getTotalTimeByTask(group?.entries)}
+                    </span>
+                  </div>
 
 
-                {
-                  props?.needAction && (
-                    <div className={styles["table-body-cell"]}>
-                      {
-                        canDelete && ['Pending'].includes(props.status) && (
-                          <CloseCircleOutlined 
-                            className={styles['delete-entry']} 
-                            onClick={() => onDeleteClick(group)} 
-                          />
-                        )
-                      }
-
-                      <Space>
-                      {
-                        canApproveReject && ['Pending', 'Approved'].includes(props.status) && (
-                          <CloseCircleOutlined 
-                            className={styles['reject-entry']}
-                            onClick={() => {
-                                onApproveRejectTimeEntriesClick('Rejected', group)
-                            }} 
-                          />
-                        )
-                      }
-
-                      {
-                        canApproveReject && ['Pending', 'Rejected'].includes(props.status) && (
-                          <Space>
-                            <CheckCircleOutlined 
-                              style={{ color: 'var(--primary-green)' }}
-                              className={styles['approve-entry']}
-                              onClick={() => {
-                                onApproveRejectTimeEntriesClick('Approved', group)
-                              }} 
+                  {
+                    props?.needAction && (
+                      <div className={styles["table-body-cell"]}>
+                        {
+                          canDelete && ['Pending'].includes(props.status) && (
+                            <CloseCircleOutlined
+                              className={styles['delete-entry']}
+                              onClick={() => onDeleteClick(group)}
                             />
-                          </Space>
+                          )
+                        }
 
-                        )
-                      }
-                      </Space>
-                    </div>
+                        <Space>
+                          {
+                            canApproveReject && ['Pending', 'Approved'].includes(props.status) && (
+                              <CloseCircleOutlined
+                                className={styles['reject-entry']}
+                                onClick={() => {
+                                  onApproveRejectTimeEntriesClick('Rejected', group)
+                                }}
+                              />
+                            )
+                          }
 
+                          {
+                            canApproveReject && ['Pending', 'Rejected'].includes(props.status) && (
+                              <Space>
+                                <CheckCircleOutlined
+                                  style={{ color: 'var(--primary-green)' }}
+                                  className={styles['approve-entry']}
+                                  onClick={() => {
+                                    onApproveRejectTimeEntriesClick('Approved', group)
+                                  }}
+                                />
+                              </Space>
 
-                  )
-                }
-              </div>
-            ))
+                            )
+                          }
+                        </Space>
+                      </div>
+                    )
+                  }
+                </div>
+              ))
             }
           </div>
         </Col>
@@ -280,7 +283,7 @@ const TimeEntryDetails = (props: IProps) => {
                 ))
               }
               <div className={styles['table-header-cell']}>
-                { getTotalTimeFromDurationMap(props?.durationMap ?? {}) }
+                {getTotalTimeFromDurationMap(props?.durationMap ?? {})}
               </div>
 
               {
@@ -302,8 +305,8 @@ const TimeEntryDetails = (props: IProps) => {
         onOkClick={deleteTimeEntries}
         loading={deleting}
         modalBody={
-          <Delete 
-            title="Are you sure you want to delete the current time entry?" 
+          <Delete
+            title="Are you sure you want to delete the current time entry?"
             subText="Your current time tracking will be deleted."
           />
         }
@@ -313,8 +316,9 @@ const TimeEntryDetails = (props: IProps) => {
         setVisibility={() => { setShowEditModal(false) }}
         visible={showEditModal}
         day={selectedGroup?.day}
-        total={0}
-        timesheetDetail={selectedGroup?.group ?? []} 
+        refetch={refetchGroups}
+        total={selectedGroup?.total ?? 0}
+        timesheetDetail={selectedGroup?.group ?? []}
       />
 
     </>
@@ -323,7 +327,7 @@ const TimeEntryDetails = (props: IProps) => {
 
 function getTotalTimeFromDurationMap(durationMap: any): string {
   let sum = 0;
-  for(let date in durationMap) {
+  for (let date in durationMap) {
     sum += durationMap[date];
   }
 
@@ -358,8 +362,8 @@ function getTotalTimeByTask(entries: any) {
 function getEntryIdsFromGroup(group: IGroupedTimeEntries): string[] {
   const entriesObj = group.entries;
   const ids: string[] = [];
-  for(let date in entriesObj) {
-    for(let entry of entriesObj[date]) {
+  for (let date in entriesObj) {
+    for (let entry of entriesObj[date]) {
       ids.push(entry.id);
     }
   }
