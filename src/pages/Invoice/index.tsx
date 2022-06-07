@@ -1,15 +1,16 @@
 import moment from 'moment';
 import { useState } from 'react';
-import { Card, Col, Dropdown, Menu, Row, Table, message, Modal } from 'antd';
-import { MoreOutlined } from '@ant-design/icons';
+import { Link } from 'react-router-dom';
 import { gql, useQuery, useMutation } from '@apollo/client';
+import { MoreOutlined } from '@ant-design/icons';
+import { Card, Col, Dropdown, Menu, Row, Table, message, Modal } from 'antd';
 
 import { authVar } from '../../App/link';
-import { Link } from 'react-router-dom';
+import constants from '../../config/constants';
 import routes from '../../config/routes';
 import { notifyGraphqlError } from '../../utils/error';
 import PageHeader from '../../components/PageHeader';
-import constants from '../../config/constants';
+import Status from '../../components/Status';
 
 import { Invoice as IInvoice, InvoiceQueryInput, InvoiceStatus, InvoiceUpdateInput } from '../../interfaces/generated';
 import { InvoicePagingData } from '../../interfaces/graphql.interface';
@@ -166,6 +167,9 @@ const Invoice = () => {
     {
       title: 'Status',
       dataIndex: 'status',
+      render: (status: string) => {
+        return <Status status={status} />
+      }
     },
     {
       title: 'Actions',
@@ -213,12 +217,16 @@ const Invoice = () => {
 
                       <Menu.Divider />
 
-                      <Menu.Item 
-                        key="Sent"
-                        onClick={() => changeStatus(invoice.id, InvoiceStatus.Sent)}
-                      >
-                        Sent
-                      </Menu.Item>
+                      {
+                        invoice.status === InvoiceStatus.Pending && (
+                          <Menu.Item 
+                            key="Sent"
+                            onClick={() => changeStatus(invoice.id, InvoiceStatus.Sent)}
+                          >
+                            Sent
+                          </Menu.Item>
+                        )
+                      }
                     </Menu.SubMenu>
                   </Menu>
                 </>

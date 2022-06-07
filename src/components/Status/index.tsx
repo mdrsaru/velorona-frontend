@@ -1,4 +1,7 @@
-import styles from "./style.module.scss";
+
+import { _cs } from '../../utils/common';
+
+import styles from './style.module.scss';
 
 interface IProps {
   status: string;
@@ -6,7 +9,7 @@ interface IProps {
 const Status = (props: IProps) => {
   const status = props.status;
 
-  return <span className={styles[status]}>{status}</span>;
+  return <span className={_cs([styles[status], styles['status']])}>{status}</span>;
 };
 
 export default Status;
