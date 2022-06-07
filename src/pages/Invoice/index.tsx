@@ -9,13 +9,20 @@ import { authVar } from '../../App/link';
 import constants from '../../config/constants';
 import routes from '../../config/routes';
 import { notifyGraphqlError } from '../../utils/error';
+
+import { 
+  Invoice as IInvoice,
+  InvoiceQueryInput,
+  InvoiceStatus,
+  InvoicePagingResult,
+  MutationInvoiceUpdateArgs,
+  QueryInvoiceArgs
+} from '../../interfaces/generated';
+import { GraphQLResponse } from '../../interfaces/graphql.interface';
+
 import PageHeader from '../../components/PageHeader';
 import Status from '../../components/Status';
-
-import { Invoice as IInvoice, InvoiceQueryInput, InvoiceStatus, InvoiceUpdateInput } from '../../interfaces/generated';
-import { InvoicePagingData } from '../../interfaces/graphql.interface';
 import InvoiceViewer from '../../components/InvoiceViewer';
-
 import styles from './style.module.scss';
 
 const INVOICE = gql`
@@ -66,12 +73,8 @@ const Invoice = () => {
   })
 
   const [updateStatus, { loading: updateLoading }] = useMutation<
-    { 
-      InvoiceUpdate: IInvoice 
-    }, 
-    { 
-      input: InvoiceUpdateInput 
-    }
+    GraphQLResponse<'InvoiceUpdate', IInvoice>,
+    MutationInvoiceUpdateArgs
   >(INVOICE_STATUS_UPDATE, {
     onCompleted(data) {
       if(data.InvoiceUpdate) {
@@ -85,14 +88,17 @@ const Invoice = () => {
     paging: {
       skip: pagingInput.skip,
       take: constants.paging.perPage,
-      order: ['issueDate:DESC'],
+      order: ['issueDate:ASC'],
     },
     query: {
       company_id: loggedInUser?.company?.id as string,
     },
   };
 
-  const { data: invoiceData, loading } = useQuery<InvoicePagingData>(INVOICE, {
+  const { data: invoiceData, loading } = useQuery<
+    GraphQLResponse<'Invoice', InvoicePagingResult>,
+    QueryInvoiceArgs
+  >(INVOICE, {
     fetchPolicy: 'network-only',
     nextFetchPolicy: 'cache-first',
     variables: {

@@ -5,13 +5,13 @@ import { ArrowLeftOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 
 import { authVar } from "../../../App/link";
-import { Client, ClientQueryInput } from '../../../interfaces/generated';
+import { GraphQLResponse } from '../../../interfaces/graphql.interface';
+import { Client, ClientPagingResult, QueryClientArgs } from '../../../interfaces/generated';
+import { MayBe } from '../../../interfaces/common.interface';
+
 import PageHeader from '../../../components/PageHeader';
 import Label from '../../../components/Label';
 import InvoiceForm from '../../../components/InvoiceForm';
-
-import { MayBe } from '../../../interfaces/common.interface';
-import { ClientPagingData } from '../../../interfaces/graphql.interface';
 
 import styles from './style.module.scss';
 
@@ -52,7 +52,10 @@ const NewInvoice = () => {
   const { 
     data: clientData,
     loading: clientLoading,
-  } = useQuery<ClientPagingData, { input: ClientQueryInput }>(
+  } = useQuery<
+    GraphQLResponse<'Client', ClientPagingResult>, 
+    QueryClientArgs
+  >(
     CLIENT_LIST, 
     {
       fetchPolicy: 'network-only',
@@ -67,7 +70,10 @@ const NewInvoice = () => {
     }
   );
 
-  const [fetchClient] = useLazyQuery<{ ClientById: Client }, { id: string }>(CLIENT, {
+  const [fetchClient] = useLazyQuery<
+    GraphQLResponse<'ClientById', Client>,
+    { id: string }
+  >(CLIENT, {
     fetchPolicy: 'cache-only',
   });
 

@@ -350,7 +350,7 @@ const DetailProject = () => {
     },
   });
 
-  const { data: taskData } = useQuery(TASK, {
+  const { data: taskData, loading: taskLoading } = useQuery(TASK, {
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
     variables: {
@@ -404,7 +404,7 @@ const DetailProject = () => {
         <Row>
           <Col span={24}>
             <Table
-              loading={loading || updateLoading}
+              loading={loading || updateLoading || taskLoading}
               dataSource={taskData?.Task?.data}
               columns={columns}
               rowKey={(record) => record?.id}
