@@ -6,15 +6,13 @@ import { useNavigate, useParams } from "react-router-dom";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { notifyGraphqlError } from "../../../utils/error";
 import { authVar } from "../../../App/link";
-import { Client } from "../../../interfaces/generated";
+import { Client, ClientPagingResult, MutationClientUpdateArgs, QueryClientArgs } from "../../../interfaces/generated";
 import { CLIENT } from "../index";
 
 import styles from "../style.module.scss";
 import { STATE_CITIES, USA_STATES } from "../../../utils/cities";
+import { GraphQLResponse } from "../../../interfaces/graphql.interface";
 
-interface ClientResponseData {
-  ClientCreate: Client
-}
 
 export const CLIENT_UPDATE = gql`
     mutation ClientUpdate($input: ClientUpdateInput!) {
@@ -37,22 +35,29 @@ const EditClient = () => {
   const authData = authVar();
   const navigate = useNavigate();
   const [cities, setCountryCities] = useState<string[]>([]);
-  const [clientUpdate] = useMutation<ClientResponseData>(CLIENT_UPDATE);
+  const [clientUpdate] = useMutation<
+    GraphQLResponse<'ClientUpdate', Client>,
+    MutationClientUpdateArgs
+  >(CLIENT_UPDATE);
   const [form] = Form.useForm();
 
   const cancelAddClient = () => {
     navigate(-1);
   }
-  const { data: userData } = useQuery(CLIENT, {
-    variables: {
-      input: {
-        query: {
-          company_id: authData?.company?.id,
-          id: params?.cid
+  const { data: userData } = useQuery<
+    GraphQLResponse<'Client', ClientPagingResult>,
+    QueryClientArgs
+  >
+    (CLIENT, {
+      variables: {
+        input: {
+          query: {
+            company_id: authData?.company?.id as string,
+            id: params?.cid
+          }
         }
       }
-    }
-  })
+    })
 
   const onSubmitForm = (values: any) => {
     let key = 'message';
@@ -64,9 +69,9 @@ const EditClient = () => {
     clientUpdate({
       variables: {
         input: {
-          id: params?.cid,
+          id: params?.cid as string,
           name: values.name,
-          company_id: authData?.company?.id,
+          company_id: authData?.company?.id as string,
           address: {
             streetAddress: values.streetAddress,
             state: values.state,

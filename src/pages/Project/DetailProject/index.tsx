@@ -22,13 +22,17 @@ import TaskDetail from '../../../components/TaskDetail';
 import Status from '../../../components/Status';
 
 import InfoCircleOutlined from '@ant-design/icons/lib/icons/InfoCircleOutlined';
-import { ProjectPagingData } from '../../../interfaces/graphql.interface';
+import { GraphQLResponse } from '../../../interfaces/graphql.interface';
 import styles from '../style.module.scss';
 import {
-  DeleteInput,
+  MutationTaskDeleteArgs,
+  MutationTaskUpdateArgs,
+  ProjectPagingResult,
+  QueryProjectArgs,
+  QueryTaskArgs,
   // MutationTaskDeleteArgs, 
   Task,
-  TaskUpdateInput
+  TaskPagingResult,
 } from '../../../interfaces/generated';
 
 const { SubMenu } = Menu;
@@ -64,7 +68,7 @@ const DetailProject = () => {
   const navigate = useNavigate();
   const loggedInUser = authVar();
 
-  const [taskUpdate, { loading: updateLoading }] = useMutation<{ TaskUpdate: Task }, { input: TaskUpdateInput }>(TASK_UPDATE, {
+  const [taskUpdate, { loading: updateLoading }] = useMutation<GraphQLResponse<'TaskUpdate',Task>,MutationTaskUpdateArgs>(TASK_UPDATE, {
     onCompleted() {
       message.success({
         content: `Task is updated successfully!`,
@@ -82,7 +86,7 @@ const DetailProject = () => {
       cache.gc();
     },
   });
-  const [taskDelete, { loading }] = useMutation<{ input: DeleteInput }>(TASK_DELETE, {
+  const [taskDelete, { loading }] = useMutation<GraphQLResponse<'TaskDelete',Task>,MutationTaskDeleteArgs>(TASK_DELETE, {
     onCompleted() {
       message.success({
         content: `Task is deleted successfully!`,
@@ -159,7 +163,7 @@ const DetailProject = () => {
     taskDelete({
       variables: {
         input: {
-          id: task?.id,
+          id: task?.id as string,
         },
       },
     });
@@ -339,24 +343,24 @@ const DetailProject = () => {
     },
   ];
 
-  const { data: projectData } = useQuery<ProjectPagingData>(PROJECT, {
+  const { data: projectData } = useQuery<GraphQLResponse<'Project',ProjectPagingResult>,QueryProjectArgs>(PROJECT, {
     variables: {
       input: {
         query: {
-          company_id: loggedInUser?.company?.id,
+          company_id: loggedInUser?.company?.id as string,
           id: params?.pid,
         },
       },
     },
   });
 
-  const { data: taskData, loading: taskLoading } = useQuery(TASK, {
+  const { data: taskData, loading: taskLoading } = useQuery<GraphQLResponse<'Task', TaskPagingResult>,QueryTaskArgs>(TASK, {
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
     variables: {
       input: {
         query: {
-          company_id: loggedInUser?.company?.id,
+          company_id: loggedInUser?.company?.id as string,
           project_id: params?.pid,
         },
         paging: {

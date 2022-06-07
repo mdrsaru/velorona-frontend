@@ -8,13 +8,11 @@ import { notifyGraphqlError } from "../../../utils/error";
 import { authVar } from "../../../App/link";
 
 import ClientForm from "./ClientForm";
-import { User } from "../../../interfaces/generated";
+import { Client, MutationClientCreateArgs } from "../../../interfaces/generated";
 
 import styles from "../style.module.scss";
+import { GraphQLResponse } from "../../../interfaces/graphql.interface";
 
-interface ClientResponseData {
-  ClientCreate: User
-}
 
 export const CLIENT_CREATE = gql`
     mutation ClientCreate($input: ClientCreateInput!) {
@@ -30,7 +28,10 @@ export const CLIENT_CREATE = gql`
 const NewClient = () => {
   const authData = authVar();
   const navigate = useNavigate();
-  const [clientCreate] = useMutation<ClientResponseData>(CLIENT_CREATE);
+  const [clientCreate] = useMutation<
+    GraphQLResponse<'CleintCreate', Client>,
+    MutationClientCreateArgs
+  >(CLIENT_CREATE);
   const [form] = Form.useForm();
 
   const cancelAddClient = () => {
@@ -46,7 +47,7 @@ const NewClient = () => {
           name: values.name,
           email: values.email,
           invoicingEmail: values.invoiceEmail,
-          company_id: authData?.company?.id,
+          company_id: authData?.company?.id as string,
           address: {
             streetAddress: values.streetAddress,
             state: values.state,

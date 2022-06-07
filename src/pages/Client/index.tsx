@@ -17,17 +17,18 @@ import archiveImg from "../../assets/images/archive_btn.svg";
 
 import { notifyGraphqlError } from "../../utils/error";
 
-import { User } from "../../interfaces/generated";
+import { Client as IClient, ClientPagingResult, ClientStatus, MutationClientUpdateArgs, QueryClientArgs, User } from "../../interfaces/generated";
 
 import styles from "./style.module.scss";
 import ArchiveBody from "../../components/Archive";
+import { GraphQLResponse } from "../../interfaces/graphql.interface";
 
 export interface UserData {
   User: {
     data: User[];
     paging: {
       total: number;
-    } 
+    }
   };
 }
 
@@ -94,13 +95,16 @@ const Client = () => {
     setArchiveModal(value);
   };
 
-  const { data: clientData } = useQuery(CLIENT, {
+  const { data: clientData } = useQuery<
+    GraphQLResponse<'Client', ClientPagingResult>,
+    QueryClientArgs
+  >(CLIENT, {
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
     variables: {
       input: {
         query: {
-          company_id: loggedInUser?.company?.id,
+          company_id: loggedInUser?.company?.id as string,
         },
         paging: {
           order: ["updatedAt:DESC"],
@@ -109,7 +113,10 @@ const Client = () => {
     },
   });
 
-  const [clientUpdate, { loading: updateLoading }] = useMutation(
+  const [clientUpdate, { loading: updateLoading }] = useMutation<
+    GraphQLResponse<'ClientUpdate', IClient>,
+    MutationClientUpdateArgs
+  >(
     CLIENT_UPDATE,
     {
       onCompleted() {
@@ -140,9 +147,9 @@ const Client = () => {
     clientUpdate({
       variables: {
         input: {
-          status: value,
+          status: value as ClientStatus,
           id: id,
-          company_id: loggedInUser?.company?.id,
+          company_id: loggedInUser?.company?.id as string,
         },
       },
     });
@@ -156,7 +163,7 @@ const Client = () => {
 
           archived: !client?.archived,
 
-          company_id: loggedInUser?.company?.id,
+          company_id: loggedInUser?.company?.id as string,
         },
       },
     });

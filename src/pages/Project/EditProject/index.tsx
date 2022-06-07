@@ -12,6 +12,8 @@ import { PROJECT } from "../index";
 import { USER } from "../../Employee";
 
 import styles from "../style.module.scss";
+import { GraphQLResponse } from "../../../interfaces/graphql.interface";
+import { MutationProjectUpdateArgs, Project } from "../../../interfaces/generated";
 
 interface ItemProps {
   label: string;
@@ -43,7 +45,8 @@ const EditProject = () => {
   const navigate = useNavigate();
   const loggedInUser = authVar();
   const { Option } = Select;
-  const [projectUpdate] = useMutation(PROJECT_UPDATE);
+
+  const [projectUpdate] = useMutation<GraphQLResponse<'ProjectUpdate',Project>,MutationProjectUpdateArgs>(PROJECT_UPDATE);
 
   const { data: projectData } = useQuery(PROJECT, {
     variables: {
@@ -79,9 +82,9 @@ const EditProject = () => {
     projectUpdate({
       variables: {
         input: {
-          id: params?.pid,
+          id: params?.pid as string,
           name: values.name,
-          company_id: loggedInUser?.company?.id,
+          company_id: loggedInUser?.company?.id as string,
         }
       }
     }).then((response) => {
