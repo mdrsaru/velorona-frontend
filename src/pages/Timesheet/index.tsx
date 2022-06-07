@@ -715,8 +715,8 @@ const Timesheet = () => {
                   xs={24}
                   sm={24}
                   md={12}
-                  lg={16}
-                  xl={18}
+                  lg={12}
+                  xl={16}
                   className={styles['task-col']}>
                   <Form.Item
                     name="task"
@@ -744,8 +744,8 @@ const Timesheet = () => {
                   xs={24}
                   sm={24}
                   md={12}
-                  lg={8}
-                  xl={6}
+                  lg={12}
+                  xl={8}
                   className={styles['time-start-col']}>
                   <div className={styles['timer-div']}>
                     <div>
