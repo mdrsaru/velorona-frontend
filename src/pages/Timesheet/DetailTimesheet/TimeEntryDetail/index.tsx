@@ -1,7 +1,7 @@
 import moment from 'moment';
 import { useState } from 'react';
 import { gql, useMutation } from '@apollo/client';
-import { Col, Row, Space, Input, message } from 'antd';
+import { Space, Input, message } from 'antd';
 import {
   CloseCircleOutlined,
   CheckCircleOutlined,
@@ -9,7 +9,7 @@ import {
 
 import constants from '../../../../config/constants';
 import { notifyGraphqlError } from '../../../../utils/error';
-import { getWeekDays, getTimeFormat, checkRoles, _cs } from '../../../../utils/common';
+import { getWeekDays, getTimeFormat, checkRoles } from '../../../../utils/common';
 import { authVar } from '../../../../App/link';
 import { IGroupedTimeEntries } from '../../../../interfaces/common.interface';
 import { MutationTimeEntriesApproveRejectArgs } from '../../../../interfaces/generated';
@@ -152,169 +152,139 @@ const TimeEntryDetails = (props: IProps) => {
 
   return (
     <>
-      <Row>
-        <Col span={24}>
-          <div className={styles['resp-table']}>
-            <div className={styles["resp-table-header"]}>
-              <div className={styles['table-header-cell']}>
-                Project
-              </div>
-              <div className={styles['table-header-cell']}>
-                Task
-              </div>
-
-              {
-                weekDays.map((day: any, index: number) => (
-                  <div
-                    className={styles['table-header-cell']}
-                    key={index}
-                  >
-                    {moment(day).format('ddd, MMM D')}
-                  </div>
-                ))
-              }
-              <div className={styles['table-header-cell']}>
-                Total
-              </div>
-
-
-              {
-                props?.needAction && (
-                  <div className={styles['table-header-cell']}>
-                    Actions
-                  </div>
-                )
-              }
-            </div>
-
+      <div className={styles['detail-table']}>
+        <table className={styles['main-table']}>
+          <tr className={styles['table-header']}>
+            <th>Project</th>
+            <th>Task</th>
             {
-              groupedTimeEntries && groupedTimeEntries?.map((group: IGroupedTimeEntries, index: number) => (
-                <div
-                  className={styles["resp-table-body"]}
-                  key={index}
-                >
-                  <div className={styles["table-body-cell"]}>
-                    {group?.project}
-                  </div>
-                  <div className={styles["table-body-cell"]}>
-                    {group?.name}
-                  </div>
-
-                  {
-                    weekDays.map((day: any, timeIndex: number) => (
-                      <div
-                        className={styles["table-body-cell"]}
-                        key={timeIndex}
-                      >
-                        {
-                          (['Approved', 'Rejected'].includes(props.status) || canApproveReject) ? (
-                            <div>
-                              {getTimeFormat(getTotalTimeForADay(group?.entries[moment(day).format('ddd, MMM D')]))}
-                            </div>
-                          ) : (
-                            <Input
-                              type="text"
-                              disabled={props?.status !== 'Pending'}
-                              onClick={() => showEditTimesheet(moment(day).format('YYYY-MM-DD'), group, getTotalTimeForADay(group?.entries[moment(day).format('ddd, MMM D')]))}
-                              value={
-                                getTimeFormat(getTotalTimeForADay(group?.entries[moment(day).format('ddd, MMM D')]))
-                              }
-                            />
-                          )
-                        }
-                      </div>
-                    ))
-                  }
-
-                  <div className={styles["table-body-cell"]}>
-                    <span>
-                      {getTotalTimeByTask(group?.entries)}
-                    </span>
-                  </div>
-
-
-                  {
-                    props?.needAction && (
-                      <div className={styles["table-body-cell"]}>
-                        {
-                          canDelete && ['Pending'].includes(props.status) && (
-                            <CloseCircleOutlined
-                              className={styles['delete-entry']}
-                              onClick={() => onDeleteClick(group)}
-                            />
-                          )
-                        }
-
-                        <Space>
-                          {
-                            canApproveReject && ['Pending', 'Approved'].includes(props.status) && (
-                              <CloseCircleOutlined
-                                className={styles['reject-entry']}
-                                onClick={() => {
-                                  onApproveRejectTimeEntriesClick('Rejected', group)
-                                }}
-                              />
-                            )
-                          }
-
-                          {
-                            canApproveReject && ['Pending', 'Rejected'].includes(props.status) && (
-                              <Space>
-                                <CheckCircleOutlined
-                                  style={{ color: 'var(--primary-green)' }}
-                                  className={styles['approve-entry']}
-                                  onClick={() => {
-                                    onApproveRejectTimeEntriesClick('Approved', group)
-                                  }}
-                                />
-                              </Space>
-
-                            )
-                          }
-                        </Space>
-                      </div>
-                    )
-                  }
-                </div>
+              weekDays.map((day: any, index: number) => (
+                <th key={index}>
+                  {moment(day).format('ddd, MMM D')}
+                </th>
               ))
             }
-          </div>
-        </Col>
-      </Row>
-      <Row>
-        <Col
-          span={24}
-          className={styles['form-col']}
-        >
-          <div className={_cs([styles['resp-table'], styles['total-duration']])}>
-            <div className={styles["resp-table-header"]}>
-              <div className={styles['table-header-cell']}>
-                Total
-              </div>
-              <div className={styles['table-header-cell']}>
-              </div>
-              {
-                weekDays.map((day: any, index: number) => (
-                  <div key={index} className={styles['table-header-cell']}>
-                    {getTimeFormat(props?.durationMap?.[moment(day).format('YYYY-MM-DD')])}
-                  </div>
-                ))
-              }
-              <div className={styles['table-header-cell']}>
-                {getTotalTimeFromDurationMap(props?.durationMap ?? {})}
-              </div>
+            <th>Total</th>
+            {
+              props?.needAction && (
+                <th>
+                  Actions
+                </th>
+              )
+            }
+          </tr>
+          {
+            groupedTimeEntries && groupedTimeEntries?.map((group: IGroupedTimeEntries, index: number) => (
+              <tr
+                key={index}
+              >
+                <td>
+                  {group?.project}
+                </td>
+                <td>
+                  {group?.name}
+                </td>
 
-              {
-                props?.needAction && (
-                  <div className={styles['table-header-cell']}>
-                  </div>
-                )
-              }
-            </div>
-          </div>
-        </Col>
-      </Row>
+                {
+                  weekDays.map((day: any, timeIndex: number) => (
+                    <td
+                      key={timeIndex}
+                    >
+                      {
+                        (['Approved', 'Rejected'].includes(props.status) || canApproveReject) ? (
+                          <div>
+                            {getTimeFormat(getTotalTimeForADay(group?.entries[moment(day).format('ddd, MMM D')]))}
+                          </div>
+                        ) : (
+                          <Input
+                            type="text"
+                            disabled={props?.status !== 'Pending'}
+                            onClick={() => showEditTimesheet(moment(day).format('YYYY-MM-DD'), group, getTotalTimeForADay(group?.entries[moment(day).format('ddd, MMM D')]))}
+                            value={
+                              getTimeFormat(getTotalTimeForADay(group?.entries[moment(day).format('ddd, MMM D')]))
+                            }
+                          />
+                        )
+                      }
+                    </td>
+                  ))
+                }
 
+                <td>
+                  <span>
+                    {getTotalTimeByTask(group?.entries)}
+                  </span>
+                </td>
+
+
+                {
+                  props?.needAction && (
+                    <td>
+                      {
+                        canDelete && ['Pending'].includes(props.status) && (
+                          <CloseCircleOutlined
+                            className={styles['delete-entry']}
+                            onClick={() => onDeleteClick(group)}
+                          />
+                        )
+                      }
+
+                      <Space>
+                        {
+                          canApproveReject && ['Pending', 'Approved'].includes(props.status) && (
+                            <CloseCircleOutlined
+                              className={styles['reject-entry']}
+                              onClick={() => {
+                                onApproveRejectTimeEntriesClick('Rejected', group)
+                              }}
+                            />
+                          )
+                        }
+
+                        {
+                          canApproveReject && ['Pending', 'Rejected'].includes(props.status) && (
+                            <Space>
+                              <CheckCircleOutlined
+                                style={{ color: 'var(--primary-green)' }}
+                                className={styles['approve-entry']}
+                                onClick={() => {
+                                  onApproveRejectTimeEntriesClick('Approved', group)
+                                }}
+                              />
+                            </Space>
+
+                          )
+                        }
+                      </Space>
+                    </td>
+                  )
+                }
+              </tr>
+            ))
+          }
+          <tr className={styles['table-total']}>
+            <td>Total</td>
+            <td></td>
+            {
+              weekDays.map((day: any, index: number) => (
+                <td key={index}>
+                  {getTimeFormat(props?.durationMap?.[moment(day).format('YYYY-MM-DD')])}
+                </td>
+              ))
+            }
+            <td>
+              {getTotalTimeFromDurationMap(props?.durationMap ?? {})}
+            </td>
+
+            {
+              props?.needAction && (
+                <td>
+                </td>
+              )
+            }
+          </tr>
+        </table>
+      </div>
       <ModalConfirm
         visibility={showDeleteModal}
         setModalVisibility={setShowDeleteModal}
@@ -338,7 +308,6 @@ const TimeEntryDetails = (props: IProps) => {
         total={selectedGroup?.total ?? 0}
         timesheetDetail={selectedGroup?.group ?? []}
       />
-
     </>
   )
 }

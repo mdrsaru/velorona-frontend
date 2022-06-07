@@ -1,10 +1,11 @@
 .resp-table-body {
   :global {
-    .ant-card-body { 
+    .ant-card-body {
       padding: 0
     }
 
-    .ant-input, input {
+    .ant-input,
+    input {
       font-weight: 600;
       font-size: 14px;
       line-height: 22px;
@@ -25,13 +26,13 @@
     padding-left: 1.5rem;
     padding-right: 1.5rem;
 
-  .add-entry {
-    font-weight: 600;
-    font-size: 18px;
-    line-height: 22px;
-    cursor: pointer;
-    color: var(--primary-blue);
-  }
+    .add-entry {
+      font-weight: 600;
+      font-size: 18px;
+      line-height: 22px;
+      cursor: pointer;
+      color: var(--primary-blue);
+    }
   }
 
   .timesheet {
@@ -105,26 +106,82 @@
   padding: 1rem;
 }
 
-.total-duration {
-  .resp-table-header {
-    background: var(--gray-2);
-    color: var(--black);
-  }
-}
-
 .delete-entry,
 .reject-entry,
 .approve-entry {
   font-size: 23px;
 }
 
-.reject-entry{
+.reject-entry {
   color: var(--primary-red);
+
   &:hover {
     color: var(--primary-red);
   }
 }
+
 .approve-entry {
   color: var(--primary-green);
 }
 
+
+table {
+  font-family: arial, sans-serif;
+  border-collapse: collapse;
+  width: 100%;
+}
+
+th {
+  text-align: left;
+  background: var(--gray-secondary);
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 17px;
+  color: var(--white);
+  padding: 1rem;
+  border: none
+}
+
+td {
+  padding: 8px;
+  white-space: nowrap;
+  text-align: center;
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 22px;
+  color: var(--gray-1);
+  font-family: Montserrat;
+}
+
+.detail-table {
+  overflow-x: auto;
+
+  :global {
+    .ant-input {
+      font-weight: 600;
+      font-size: 14px;
+      line-height: 17px;
+      color: var(--gray-1);
+      font-family: Montserrat;
+    }
+  }
+}
+
+.main-table {
+  width: 100%;
+}
+
+.table-total {
+  background: var(--gray-secondary);
+
+  td {
+    color: var(--white);
+    font-family: 'Montserrat';
+    font-style: normal;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 17px;
+    text-align: left;
+    padding: 1rem 0rem 1rem 1.5rem;
+  }
+}
