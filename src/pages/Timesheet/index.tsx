@@ -795,31 +795,56 @@ const Timesheet = () => {
             </Row>
             <Row className={styles['task-div-header']}>
               <Col
-                span={6}
+                xs={24}
+                sm={24}
+                md={6}
+                lg={6}
+                xl={6}
                 className={styles['task-header']}>
                 Task
               </Col>
               <Col
-                span={4}
+                xs={0}
+                sm={0}
+                md={4}
+                lg={4}
+                xl={4}
                 className={styles['client-header']}>
                 Client: Project
               </Col>
               <Col
-                span={3}
+                xs={0}
+                sm={0}
+                md={3}
+                lg={3}
+                xl={3}
                 className={styles['start-header']}>
                 Start Time
               </Col>
               <Col
-                span={3}
+                xs={0}
+                sm={0}
+                md={3}
+                lg={3}
+                xl={3}
                 className={styles['end-header']}>
                 End Time
               </Col>
               <Col
-                span={4}
+                xs={0}
+                sm={0}
+                md={4}
+                lg={4}
+                xl={4}
                 className={styles['total-header']}>
                 Total
               </Col>
-              <Col span={4}></Col>
+              <Col
+                xs={0}
+                sm={0}
+                md={4}
+                lg={4}
+                xl={4}></Col>
             </Row>
 
             {timeEntryData?.TimeEntry?.data?.length === 0

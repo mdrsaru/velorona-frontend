@@ -267,7 +267,7 @@ const Invoice = () => {
           ]}
         />
 
-        <Row>
+        <Row className='container-row'>
           <Col span={24}>
             <Table
               loading={loading || updateLoading}

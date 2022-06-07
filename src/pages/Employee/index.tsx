@@ -428,7 +428,7 @@ const role = Object.values(RoleName)
                 </div>
               </Col>
             </Row>
-            <Row>
+            <Row className='container-row'>
               <Col span={24}>
                 <Table
                   loading={employeeLoading}

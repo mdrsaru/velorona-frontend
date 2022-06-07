@@ -301,7 +301,7 @@ const Client = () => {
             </div>
           </Col>
         </Row>
-        <Row>
+        <Row className='container-row'>
           <Col span={24}>
             <Table
               dataSource={clientData?.Client?.data}
