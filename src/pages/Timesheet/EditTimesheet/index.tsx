@@ -121,15 +121,10 @@ const EditTimeSheet = (props: IProps) => {
   }
 
   const resetForm = () => {
-    let data = form.getFieldsValue(['start-time', 'end-time']);
-    if (data['start-time'] && !data['end-time']) {
-      message.error('Update the end-time before closing.');
-    } else {
-      props?.refetch();
-      form.resetFields();
-      setTotalDuration(0);
-      props?.setVisibility()
-    };
+    props?.refetch();
+    form.resetFields()
+    setTotalDuration(0)
+    props?.setVisibility()
   };
 
   return (
