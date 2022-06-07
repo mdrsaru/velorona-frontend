@@ -116,7 +116,9 @@ const ClientForm = (props: any) => {
               }]}>
               <Select
                 showSearch
-                placeholder={'Select the state'} onChange={setState}>
+                placeholder={'Select the state'}
+                onChange={setState}
+              >
                 {USA_STATES?.map((state: any, index: number) =>
                   <Select.Option value={state?.name} key={index}>
                     {state?.name}
