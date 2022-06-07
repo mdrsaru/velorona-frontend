@@ -120,9 +120,9 @@ const DetailEmployee = () => {
                     xs: 100,
                     sm: 100,
                     md: 100,
-                    lg: 130,
-                    xl: 130,
-                    xxl: 130,
+                    lg: 100,
+                    xl: 100,
+                    xxl: 100,
                   }}
                 // icon={<AntDesignOutlined />}
                 />

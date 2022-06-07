@@ -13,6 +13,7 @@ import AssignedUserAvatar from '../../components/AssignedUserAvatar'
 import { TaskPagingData } from '../../interfaces/graphql.interface'
 import { Task } from '../../interfaces/generated'
 import styles from './style.module.scss'
+import NoContent from '../../components/NoContent/index';
 
 export const TASK = gql`
   query Task($input: TaskQueryInput!) {
@@ -36,6 +37,7 @@ export const TASK = gql`
         active
         description
         manager {
+          id
           fullName
         }
         users {
@@ -130,7 +132,9 @@ const Tasks = () => {
   return (
     <>
       <EmployeeCard user={authData?.user?.id} />
-      <Space
+     {Object.keys(taskGroups)?.length !== 0 ? 
+     <>
+     <Space
         direction="vertical"
         size="middle"
         style={{ display: "flex", marginTop: "1.5rem" }}
@@ -209,7 +213,10 @@ const Tasks = () => {
           </Collapse>
         )}
       </Space>
-
+      </>
+    :
+        <NoContent title='Task scheduled not added' subtitle='There are no task assigned to you at the moment' />
+  }
       <TaskDetail
         visibility={visibility}
         setVisibility={setVisibility}

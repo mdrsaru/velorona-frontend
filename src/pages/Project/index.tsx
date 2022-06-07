@@ -233,13 +233,9 @@ const ProjectPage = () => {
   const columns = [
     {
       title: "Project Name",
-      render: (task: Project) => {
-        return (
-          <div className={styles["task-name"]}>
-            <p>{task?.name}</p>
-          </div>
-        );
-      },
+      key: "name",
+      dataIndex:"name",
+
       onCell: (record: Project) => {
         return {
           onClick: () => {
@@ -258,24 +254,6 @@ const ProjectPage = () => {
       key: "client",
       render: (record: Project) => <div>{record?.client?.email}</div>,
     },
-    // {
-    //   title: 'Active Employees',
-    //   dataIndex: 'active_employees',
-    //   key: 'active_employees',
-    // },
-    // {
-    //   title: 'Project Deadline',
-    //   dataIndex: 'deadline',
-    //   key: 'deadline',
-    // },
-    // {
-    //   title: 'Project Progress',
-    //   key: 'progress',
-    //   render: (record:any) =>
-    //     <div style={{ width: 170 }}>
-    //       <Progress percent={record?.progress} size="small" />
-    //     </div>
-    // },
     {
       title: "Status",
       dataIndex: "status",
