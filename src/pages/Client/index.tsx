@@ -222,13 +222,7 @@ const Client = () => {
       title: "Client Name",
       dataIndex: "name",
       key: "name",
-      render: (client: any) => {
-        return (
-          <div className={styles["client-name"]}>
-            <p>{client}</p>
-          </div>
-        );
-      },
+   
       onCell: (data: any) => {
         return {
           onClick: () => {
@@ -331,13 +325,13 @@ const Client = () => {
         setModalVisibility={setArchiveVisibility}
         imgSrc={archiveImg}
         okText={client?.archived ? "Unarchive" : "Archive"}
-        modalBody={() =>
+        modalBody={
           <ArchiveBody 
             title={
               <>
                 Are you sure you want to{" "}
                 {client?.archived ? "unarchive" : "archive"}
-                <strong> {client.name}?</strong>
+                <strong> {client?.name}?</strong>
               </>
             }
             subText={`Client will ${client?.archived ? "" : "not" } be able to login to the system` }
