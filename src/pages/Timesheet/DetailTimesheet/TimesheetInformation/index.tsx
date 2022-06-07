@@ -67,40 +67,19 @@ const TimesheetInformation = (props: IProps) => {
 
           <div className={styles['detail-row']}>
             <div className={styles['header']}>
-              Approver/Manager
-            </div>
-            <div>{timesheet?.approver?.fullName ?? 'N/A'}</div>
-          </div>
-
-          <div className={styles['detail-row']}>
-            <div className={styles['header']}>
               Status
             </div>
-            <div>{timesheet?.status}</div>
+            <div>{timesheet?.status ?? 'N/A'}</div>
           </div>
         </Col>
 
         <Col xs={24} sm={24} md={24} lg={12} xl={12}>
-          <div className={styles['detail-row']}>
-            <div className={styles['header']}>
-              Project Name
-            </div>
-            <div>{'N/A'}</div>
-          </div>
 
           <div className={styles['detail-row']}>
             <div className={styles['header']}>
               Client Name
             </div>
             <div>{timesheet?.client?.name ?? 'N/A'}</div>
-          </div>
-
-          <div className={styles['detail-row']}>
-            <div className={styles['header']}>
-              Client Location
-            </div>
-
-            <div>{'N/A'}</div>
           </div>
 
           <div className={styles['detail-row']}>
@@ -117,6 +96,12 @@ const TimesheetInformation = (props: IProps) => {
             </div>
 
             <div>{timesheet?.lastApprovedAt ?? 'N/A'}</div>
+          </div>
+          <div className={styles['detail-row']}>
+            <div className={styles['header']}>
+              Approver/Manager
+            </div>
+            <div>{timesheet?.approver?.fullName ?? 'N/A'}</div>
           </div>
         </Col>
       </Row>

@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { gql, useQuery } from '@apollo/client';
+import { gql, useLazyQuery, useQuery } from '@apollo/client';
 import { Card, Table, Row, Col, Button } from 'antd';
 
 import { authVar } from '../../App/link';
@@ -56,24 +56,53 @@ const EmployeeTimesheet = () => {
     currentPage: 1,
   });
 
+  const input: TimesheetQueryInput = {
+    paging: {
+      skip: pagingInput.skip,
+      take: constants.paging.perPage,
+      order: ['issueDate:DESC'],
+    },
+    query: {
+      company_id: company_id
+    },
+  };
+
   const {
     data: timesheetData,
     loading: timesheetLoading
   } = useQuery<TimesheetPagingData, { input: TimesheetQueryInput }>(
-    EMPLOYEE_TIMESHEET, 
+    EMPLOYEE_TIMESHEET,
     {
       fetchPolicy: 'network-only',
       nextFetchPolicy: 'cache-first',
       variables: {
-        input: {
-          query: {
-            company_id,
-          },
-        },
+        input,
       },
       onError: notifyGraphqlError,
     },
   );
+
+  const [fetchDownloadData, { data: timesheetDownloadData }] = useLazyQuery<TimesheetPagingData,
+    { input: TimesheetQueryInput }>(
+      EMPLOYEE_TIMESHEET,
+      {
+        fetchPolicy: 'network-only',
+        nextFetchPolicy: 'cache-first',
+        onError: notifyGraphqlError,
+        onCompleted: () => {
+          const csvData = arrayToCsv()
+          const blob = new Blob([csvData], { type: 'text/csv' });
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.setAttribute('hidden', '');
+          a.setAttribute('href', url);
+          a.setAttribute('download', 'Employee_timesheet.csv');
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+        }
+      },
+    );
 
   const changePage = (page: number) => {
     const newSkip = (page - 1) * constants.paging.perPage;
@@ -86,7 +115,7 @@ const EmployeeTimesheet = () => {
 
   const arrayToCsv = () => {
     let csvRows = [];
-    let data = timesheetData?.Timesheet?.data ?? []
+    let data = timesheetDownloadData?.Timesheet?.data ?? []
 
     const headerValues = csvHeader.map(header => header.label);
     csvRows.push(headerValues.join(','));
@@ -102,16 +131,15 @@ const EmployeeTimesheet = () => {
   }
 
   const downloadReport = () => {
-    const csvData = arrayToCsv()
-    const blob = new Blob([csvData], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.setAttribute('hidden', '');
-    a.setAttribute('href', url);
-    a.setAttribute('download', 'Employee_timesheet.csv');
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    fetchDownloadData({
+      variables: {
+        input: {
+          query: {
+            company_id: company_id,
+          }
+        }
+      }
+    })
   };
 
   const dataSource = timesheetData?.Timesheet?.data ?? [];
@@ -155,7 +183,7 @@ const EmployeeTimesheet = () => {
             className={styles['invoice-link']}
             to={routes.detailTimesheet.path(authData?.company?.code as string, timesheet.id)}>
             Details
-          </Link> 
+          </Link>
         )
       }
     },

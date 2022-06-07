@@ -205,13 +205,7 @@ const EditTimeSheet = (props: IProps) => {
                     <Col span={6}>
                       <Form.Item
                         name={`start-time-${index}`}
-                        label={`Start Time`}
-                        rules={[
-                          {
-                            required: true,
-                            message: 'Enter Start Time!',
-                          },
-                        ]}>
+                        label={`Start Time`}>
                         <TimePicker
                           use12Hours
                           format="h:mm:ss A"
@@ -223,13 +217,7 @@ const EditTimeSheet = (props: IProps) => {
                     <Col span={6}>
                       <Form.Item
                         name={`end-time-${index}`}
-                        label={`End Time`}
-                        rules={[
-                          {
-                            required: true,
-                            message: 'Enter End Time!'
-                          }
-                        ]}>
+                        label={`End Time`}>
                         <TimePicker
                           use12Hours
                           format="h:mm:ss A"

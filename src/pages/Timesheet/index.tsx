@@ -747,32 +747,29 @@ const Timesheet = () => {
                   lg={8}
                   xl={6}
                   className={styles['time-start-col']}>
-                  <Form.Item>
-                    <div className={styles['timer-div']}>
-                      <div>
-                        <span>
-                          {(hours > 9 ? hours : '0' + hours) + ':' +
-                            (minutes > 9 ? minutes : '0' + minutes) + ':'
-                            + (seconds > 9 ? seconds : '0' + seconds)}
-                        </span>
-                      </div>
-                      &nbsp; &nbsp; &nbsp; &nbsp;
-                      <div>
-                        {isRunning ?
-                          <Button
-                            type="primary"
-                            htmlType="submit"
-                            danger>
-                            Stop
-                          </Button> :
-                          <Button
-                            type="primary"
-                            htmlType="submit">
-                            Start
-                          </Button>}
-                      </div>
+                  <div className={styles['timer-div']}>
+                    <div>
+                      <span>
+                        {(hours > 9 ? hours : '0' + hours) + ':' +
+                          (minutes > 9 ? minutes : '0' + minutes) + ':'
+                          + (seconds > 9 ? seconds : '0' + seconds)}
+                      </span>
                     </div>
-                  </Form.Item>
+                    <div>
+                      {isRunning ?
+                        <Button
+                          type="primary"
+                          htmlType="submit"
+                          danger>
+                          Stop
+                        </Button> :
+                        <Button
+                          type="primary"
+                          htmlType="submit">
+                          Start
+                        </Button>}
+                    </div>
+                  </div>
                 </Col>
               </Row>
             </Form>
