@@ -22,11 +22,12 @@ import routes from "../../../config/routes";
 import { UserData } from "../../Client";
 import constants from "../../../config/constants";
 import type { UploadProps } from 'antd';
-import { TaskStatus } from "../../../interfaces/generated";
+import { MutationTaskUpdateArgs, Task, TaskStatus } from "../../../interfaces/generated";
 import { TASK } from "../../Tasks";
 
 import styles from "../style.module.scss";
 import { ITasks, ITaskUsers } from "../../../interfaces/ITasks";
+import { GraphQLResponse } from "../../../interfaces/graphql.interface";
 
 const USER = gql`
   query User($input: UserQueryInput!) {
@@ -64,7 +65,7 @@ const EditTasks = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
 
-  const [updateTask] = useMutation(TASK_UPDATE, {
+  const [updateTask] = useMutation<GraphQLResponse<'TaskUpdate',Task>,MutationTaskUpdateArgs>(TASK_UPDATE, {
     onCompleted() {
       message.success({
         content: `Task is updated successfully!`,
@@ -163,11 +164,11 @@ const EditTasks = () => {
     updateTask({
       variables: {
         input: {
-          id: params?.tid,
+          id: params?.tid as string,
           name: values?.name,
           description: values?.description,
           status: values?.status,
-          company_id: loggedInUser?.company?.id,
+          company_id: loggedInUser?.company?.id as string,
           manager_id: values?.taskManager,
           project_id: params?.pid,
           attachment_ids: fileData?.ids,

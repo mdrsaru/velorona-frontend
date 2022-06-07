@@ -26,6 +26,8 @@ import ViewUserPayRate from "../../../components/ViewUserPayRate";
 import constants from "../../../config/constants";
 import { CHANGE_PROFILE_IMAGE } from "../NewEmployee";
 import { notifyGraphqlError } from "../../../utils/error";
+import { GraphQLResponse } from "../../../interfaces/graphql.interface";
+import { MutationChangeProfilePictureArgs, QueryUserArgs, User, UserPagingResult } from "../../../interfaces/generated";
 
 const DetailEmployee = () => {
   const navigate = useNavigate();
@@ -40,14 +42,17 @@ const DetailEmployee = () => {
 
   const [isImageLoading, setIsImageLoading] = useState<boolean>(false);
 
-  const [changeProfilePictureInput] = useMutation(CHANGE_PROFILE_IMAGE, {
+  const [changeProfilePictureInput] = useMutation<
+    GraphQLResponse<'ChangeProfilePicture', User>,
+    MutationChangeProfilePictureArgs
+  >(CHANGE_PROFILE_IMAGE, {
     onCompleted(response) {
       const userAuth = authVar();
       authVar({
         ...userAuth,
         avatar: {
-          id: response.ChangeProfilePicture?.avatar?.id,
-          url: response.ChangeProfilePicture?.avatar?.url,
+          id: response.ChangeProfilePicture?.avatar?.id as string,
+          url: response.ChangeProfilePicture?.avatar?.url as string,
         },
       });
       setIsImageLoading(false);
@@ -58,7 +63,10 @@ const DetailEmployee = () => {
     },
   });
 
-  const { data: userData } = useQuery(USER, {
+  const { data: userData } = useQuery<
+    GraphQLResponse<'User', UserPagingResult>,
+    QueryUserArgs
+  >(USER, {
     fetchPolicy: "network-only",
     variables: {
       input: {
@@ -82,7 +90,7 @@ const DetailEmployee = () => {
         changeProfilePictureInput({
           variables: {
             input: {
-              id: userData?.User?.data[0]?.id,
+              id: userData?.User?.data[0]?.id as string,
               avatar_id: info?.file?.response?.data?.id,
             },
           },

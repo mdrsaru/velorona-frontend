@@ -14,6 +14,8 @@ import { CLIENT_CREATE } from "../../Client/NewClient";
 import { CLIENT } from "../../Client";
 
 import styles from "../style.module.scss";
+import { GraphQLResponse } from "../../../interfaces/graphql.interface";
+import { Client, ClientPagingResult, MutationClientCreateArgs, MutationUserClientAssociateArgs, QueryClientArgs, UserClient } from "../../../interfaces/generated";
 
 export const ASSOCIATE_USER_WITH_CLIENT = gql`
     mutation UserClientAssociate($input: UserClientAssociateInput!) {
@@ -41,8 +43,17 @@ const AttachClient = () => {
   const authData = authVar();
   const [form] = Form.useForm();
   const [client, setClient] = useState('');
-  const [associateClient] = useMutation(ASSOCIATE_USER_WITH_CLIENT);
-  const [clientCreate] = useMutation(CLIENT_CREATE);
+  
+  const [associateClient] = useMutation<
+    GraphQLResponse<'UserClientAssociate', UserClient>,
+    MutationUserClientAssociateArgs
+  >(ASSOCIATE_USER_WITH_CLIENT);
+
+  const [clientCreate] = useMutation<
+    GraphQLResponse<'ClientCreate', Client>,
+    MutationClientCreateArgs
+  >(CLIENT_CREATE);
+
   const [visible, setVisible] = useState(false);
   const [searchClients, { loading, data: searchClientData }] = useLazyQuery(
     CLIENT,
@@ -59,13 +70,16 @@ const AttachClient = () => {
     }
   );
 
-  const { data: clientData } = useQuery(CLIENT, {
+  const { data: clientData } = useQuery<
+  GraphQLResponse<'Client', ClientPagingResult>,
+  QueryClientArgs
+  >(CLIENT, {
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
     variables: {
       input: {
         query: {
-          company_id: authData?.company?.id
+          company_id: authData?.company?.id as string
         },
         paging: {
           order: ['updatedAt:DESC']
@@ -111,7 +125,7 @@ const AttachClient = () => {
           name: values.name,
           email: values.email,
           invoicingEmail: values.invoiceEmail,
-          company_id: authData?.company?.id,
+          company_id: authData?.company?.id as string,
           address: {
             streetAddress: values.streetAddress,
             state: values.state,
@@ -142,9 +156,9 @@ const AttachClient = () => {
     associateClient({
       variables: {
         input: {
-          user_id: params?.eid,
-          client_id: client ? client : clientData?.Client?.data[0]?.id,
-          company_id: authData?.company?.id
+          user_id: params?.eid as string,
+          client_id: client ? client : clientData?.Client?.data[0]?.id as string,
+          company_id: authData?.company?.id as string
         }
       }
     }).then((response) => {

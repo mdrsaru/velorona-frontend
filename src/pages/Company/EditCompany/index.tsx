@@ -23,6 +23,8 @@ import styles from "../style.module.scss";
 import { useState } from "react";
 import constants from "../../../config/constants";
 import { authVar } from "../../../App/link";
+import { GraphQLResponse } from "../../../interfaces/graphql.interface";
+import { Company, CompanyPagingResult, MutationCompanyUpdateArgs, QueryCompanyArgs } from "../../../interfaces/generated";
 
 const { Option } = Select;
 
@@ -91,7 +93,10 @@ const EditCompany = () => {
     },
   };
 
-  const { data: companyData } = useQuery(COMPANY, {
+  const { data: companyData } = useQuery<
+    GraphQLResponse<'Company', CompanyPagingResult>,
+    QueryCompanyArgs
+  >(COMPANY, {
     variables: {
       input: {
         query: {
@@ -102,14 +107,17 @@ const EditCompany = () => {
     onCompleted: (response) => {
       setFile({
         id: "",
-        name: response?.Company?.data[0]?.logo?.name,
+        name: response?.Company?.data[0]?.logo?.name as string,
       });
     },
   });
 
 
   const [form] = Form.useForm();
-  const [updateCompany] = useMutation(COMPANY_UPDATE, {
+  const [updateCompany] = useMutation<
+    GraphQLResponse<'CompanyUpdate', Company>,
+    MutationCompanyUpdateArgs
+  >(COMPANY_UPDATE, {
     onCompleted: () => {
       message.success(`Company is updated successfully!`);
       navigate(-1);
@@ -120,7 +128,7 @@ const EditCompany = () => {
     updateCompany({
       variables: {
         input: {
-          id: params?.id,
+          id: params?.id as string,
           name: values.name,
           status: values.status,
           logo_id: fileData?.id,

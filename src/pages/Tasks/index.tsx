@@ -10,10 +10,10 @@ import EmployeeCard from '../../components/EmployeeCard'
 import { useState } from 'react'
 import TaskDetail from '../../components/TaskDetail'
 import AssignedUserAvatar from '../../components/AssignedUserAvatar'
-import { TaskPagingData } from '../../interfaces/graphql.interface'
-import { Task } from '../../interfaces/generated'
+import { QueryTaskArgs, Task, TaskPagingResult } from '../../interfaces/generated'
 import styles from './style.module.scss'
 import NoContent from '../../components/NoContent/index';
+import { GraphQLResponse } from '../../interfaces/graphql.interface'
 
 export const TASK = gql`
   query Task($input: TaskQueryInput!) {
@@ -65,13 +65,17 @@ const Tasks = () => {
   const { Panel } = Collapse;
   const [visibility, setVisibility] = useState<boolean>(false);
   const [task, setTask] = useState<Task>();
-  const { data: taskData, loading: taskLoading } = useQuery<TaskPagingData>(TASK, {
+
+  const { data: taskData, loading: taskLoading } = useQuery<
+    GraphQLResponse<'Task', TaskPagingResult>,
+    QueryTaskArgs
+  >(TASK, {
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
     variables: {
       input: {
         query: {
-          company_id: authData?.company?.id,
+          company_id: authData?.company?.id as string,
           user_id: authData?.user?.id,
         },
         paging: {
@@ -79,7 +83,7 @@ const Tasks = () => {
         },
       },
     },
-  });
+  })
 
   const tasks = taskData?.Task?.data;
   const taskGroups = _.groupBy(tasks, "status");
@@ -132,97 +136,97 @@ const Tasks = () => {
   return (
     <>
       <EmployeeCard user={authData?.user?.id} />
-     {Object.keys(taskGroups)?.length !== 0 ? 
-     <>
-     <Space
-        direction="vertical"
-        size="middle"
-        style={{ display: "flex", marginTop: "1.5rem" }}
-      >
-        {taskGroups?.UnScheduled?.length && (
-          <Collapse accordion>
-            <Panel header="UnScheduled" key="1">
-              <Table
-                loading={taskLoading}
-                dataSource={taskGroups?.UnScheduled}
-                columns={columns}
-                rowKey={(task) => task?.id}
-                pagination={false}
-              />
-            </Panel>
-          </Collapse>
-        )}
-      </Space>
+      {Object.keys(taskGroups)?.length !== 0 ?
+        <>
+          <Space
+            direction="vertical"
+            size="middle"
+            style={{ display: "flex", marginTop: "1.5rem" }}
+          >
+            {taskGroups?.UnScheduled?.length && (
+              <Collapse accordion>
+                <Panel header="UnScheduled" key="1">
+                  <Table
+                    loading={taskLoading}
+                    dataSource={taskGroups?.UnScheduled}
+                    columns={columns}
+                    rowKey={(task) => task?.id}
+                    pagination={false}
+                  />
+                </Panel>
+              </Collapse>
+            )}
+          </Space>
 
-      <Space
-        direction="vertical"
-        size="middle"
-        style={{ display: "flex", marginTop: "1.5rem" }}
-      >
-        {taskGroups?.Scheduled?.length && (
-          <Collapse accordion>
-            <Panel header="Scheduled" key="2">
-              <Table
-                loading={taskLoading}
-                dataSource={taskGroups?.Scheduled}
-                columns={columns}
-                rowKey={(task) => task?.id}
-                pagination={false}
-              />
-            </Panel>
-          </Collapse>
-        )}
-      </Space>
+          <Space
+            direction="vertical"
+            size="middle"
+            style={{ display: "flex", marginTop: "1.5rem" }}
+          >
+            {taskGroups?.Scheduled?.length && (
+              <Collapse accordion>
+                <Panel header="Scheduled" key="2">
+                  <Table
+                    loading={taskLoading}
+                    dataSource={taskGroups?.Scheduled}
+                    columns={columns}
+                    rowKey={(task) => task?.id}
+                    pagination={false}
+                  />
+                </Panel>
+              </Collapse>
+            )}
+          </Space>
 
-      <Space
-        direction="vertical"
-        size="middle"
-        style={{ display: "flex", marginTop: "1.5rem" }}
-      >
-        {taskGroups?.InProgress?.length && (
-          <Collapse accordion>
-            <Panel header="InProgress" key="3">
-              <Table
-                loading={taskLoading}
-                dataSource={taskGroups?.InProgress}
-                columns={columns}
-                rowKey={(task) => task?.id}
-                pagination={false}
-              />
-            </Panel>
-          </Collapse>
-        )}
-      </Space>
+          <Space
+            direction="vertical"
+            size="middle"
+            style={{ display: "flex", marginTop: "1.5rem" }}
+          >
+            {taskGroups?.InProgress?.length && (
+              <Collapse accordion>
+                <Panel header="InProgress" key="3">
+                  <Table
+                    loading={taskLoading}
+                    dataSource={taskGroups?.InProgress}
+                    columns={columns}
+                    rowKey={(task) => task?.id}
+                    pagination={false}
+                  />
+                </Panel>
+              </Collapse>
+            )}
+          </Space>
 
-      <Space
-        direction="vertical"
-        size="middle"
-        style={{ display: "flex", marginTop: "1.5rem" }}
-      >
-        {taskGroups?.Completed?.length && (
-          <Collapse accordion>
-            <Panel header="Completed" key="4">
-              <Table
-                loading={taskLoading}
-                dataSource={taskGroups?.Completed}
-                columns={columns}
-                rowKey={(task) => task?.id}
-                pagination={false}
-              />
-            </Panel>
-          </Collapse>
-        )}
-      </Space>
-      </>
-    :
+          <Space
+            direction="vertical"
+            size="middle"
+            style={{ display: "flex", marginTop: "1.5rem" }}
+          >
+            {taskGroups?.Completed?.length && (
+              <Collapse accordion>
+                <Panel header="Completed" key="4">
+                  <Table
+                    loading={taskLoading}
+                    dataSource={taskGroups?.Completed}
+                    columns={columns}
+                    rowKey={(task) => task?.id}
+                    pagination={false}
+                  />
+                </Panel>
+              </Collapse>
+            )}
+          </Space>
+        </>
+        :
         <NoContent title='Task scheduled not added' subtitle='There are no task assigned to you at the moment' />
-  }
+      }
       <TaskDetail
         visibility={visibility}
         setVisibility={setVisibility}
         data={task}
         employee={true}
-        userId={authData?.user?.id} 
+        userId={authData?.user?.id}
       />
     </>
   );
