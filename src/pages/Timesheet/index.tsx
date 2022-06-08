@@ -204,11 +204,11 @@ export const getTimeFormat = (seconds: any) => {
   return hours + ':' + minutes + ':' + secs;
 };
 
-const getHours = (seconds: any) => {
-  const sec = parseInt(seconds, 10);
-  let sec_num = Math.abs(sec);
-  return Math.floor(sec_num / 3600);
-}
+// const getHours = (seconds: any) => {
+//   const sec = parseInt(seconds, 10);
+//   let sec_num = Math.abs(sec);
+//   return Math.floor(sec_num / 3600);
+// }
 
 const Timesheet = () => {
   const { Option } = Select;
@@ -251,7 +251,7 @@ const Timesheet = () => {
       key: 'duration',
       render: (record: any) =>
         <div>
-          {getHours(record?.durationFormat)}
+          {record?.durationFormat}
         </div>
     },
     {
@@ -536,6 +536,7 @@ const Timesheet = () => {
 
   const filterData = () => {
     const tasks = _.groupBy(timeEntryData?.TimeEntry?.data, 'task_id');
+    console.log(tasks);
     return tasks;
   }
 
@@ -821,7 +822,7 @@ const Timesheet = () => {
                 lg={4}
                 xl={4}
                 className={styles['client-header']}>
-                Client: Project
+                Project
               </Col>
               <Col
                 xs={0}
@@ -896,7 +897,7 @@ const Timesheet = () => {
                               rowClassName={'filter-task-list'}
                               index={index}
                               data={{
-                                project: timeData?.project?.name,
+                                project: `${timeData?.client?.name} : ${timeData?.project?.name}`,
                                 name: timeData?.task?.name,
                                 startTime: timeData?.startTime,
                                 endTime: timeData?.endTime,
