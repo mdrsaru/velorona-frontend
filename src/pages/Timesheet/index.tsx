@@ -37,6 +37,7 @@ import TimeEntry from './TimeEntry';
 import NoContent from '../../components/NoContent';
 
 import styles from './style.module.scss';
+import { getTotalTimeForADay } from './DetailTimesheet';
 
 export const STOP_TIMER = gql`
   mutation TimeEntryStop($input: TimeEntryStopInput!) {
@@ -626,6 +627,16 @@ const Timesheet = () => {
     !isRunning ? createTimeEntries({ task: entry, project: timesheet?.project?.id }) : submitStopTimer();
   }
 
+  const getStartTime = (entries: any) => {
+    const minStartDate = entries.map((entry: any) => { return entry?.startTime })
+    return _.min(minStartDate)
+  }
+
+  const getEndTime = (entries: any) => {
+    const maxEndDate = entries.map((entry: any) => { return entry?.endTime })
+    return _.max(maxEndDate)
+  }
+
   return (
     <>
       {loading ? <TimeSheetLoader /> :
@@ -872,9 +883,9 @@ const Timesheet = () => {
                           data={{
                             project: filterData()[entry][0]?.project?.name,
                             name: filterData()[entry][0]?.task?.name,
-                            startTime: filterData()[entry][0]?.startTime,
-                            endTime: filterData()[entry][0]?.endTime,
-                            duration: filterData()[entry][0]?.duration
+                            startTime: getStartTime(filterData()[entry]),
+                            endTime: getEndTime(filterData()[entry]),
+                            duration: getTotalTimeForADay(filterData()[entry])
                           }}
                           length={filterData()[entry]?.length}
                           clickPlayButton={() => clickPlayButton(entry)} />} key={index}>
