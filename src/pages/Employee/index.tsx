@@ -76,6 +76,7 @@ export const USER_UPDATE = gql`
       id
       firstName
       lastName
+      fullName
       email
       phone
       status

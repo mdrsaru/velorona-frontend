@@ -46,6 +46,8 @@ export const TASK_UPDATE = gql`
       archived
       active
       description
+      deadline
+      priority
     }
   }
 `;
@@ -123,7 +125,7 @@ const DetailProject = () => {
     });
   };
 
-  const [task, setTask] = useState<Task>();
+  const [task, setTask] = useState<any>();
   const [visibility, setVisibility] = useState<boolean>(false);
   const [showArchive, setArchiveModal] = useState<boolean>(false);
 
@@ -354,6 +356,16 @@ const DetailProject = () => {
     },
   });
 
+  const onUpdateAction = (args: any) => {
+    let updatedValue = {};
+    updatedValue = { [args?.title]: args?.value };
+    setTask({
+      ...task,
+      ...updatedValue
+    });
+  }
+
+
   const { data: taskData, loading: taskLoading } = useQuery<GraphQLResponse<'Task', TaskPagingResult>,QueryTaskArgs>(TASK, {
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
@@ -473,6 +485,7 @@ const DetailProject = () => {
         visibility={detailVisibility}
         setVisibility={setDetailVisibility}
         data={task}
+        onUpdateAction={onUpdateAction}
       />
     </div>
   );
