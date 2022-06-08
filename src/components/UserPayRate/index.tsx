@@ -4,11 +4,12 @@ import { CloseOutlined } from "@ant-design/icons"
 import { gql, useMutation, useQuery } from "@apollo/client"
 import { PROJECT } from "../../pages/Project"
 import { authVar } from "../../App/link"
-import { UserPayRate } from "../../interfaces/generated"
+import { MutationUserPayRateCreateArgs, UserPayRate } from "../../interfaces/generated"
 import { notifyGraphqlError } from "../../utils/error"
 
 import styles from "./styles.module.scss"
 import { USER_PAY_RATE } from "../ViewUserPayRate"
+import { GraphQLResponse, UserPayRatePagingData } from "../../interfaces/graphql.interface"
 
 interface IProps {
   visibility: boolean;
@@ -24,10 +25,6 @@ export const USER_PAYRATE_CREATE = gql`
     }
   }
 `;
-
-interface UserPayRateResponse {
-  UserPayRateCreate: UserPayRate
-}
 
 const UserPayRateModal = (props: IProps) => {
   const loggedInUser = authVar();
@@ -49,20 +46,56 @@ const UserPayRateModal = (props: IProps) => {
     },
   });
 
+  const project_ids: any = [];
 
-  const [userPayRateCreate] = useMutation<UserPayRateResponse>(USER_PAYRATE_CREATE, {
+  projectData?.Project?.data?.forEach((project: any, index: number) => {
+    project_ids.push({ id: project?.id, name: project?.name })
+  })
+
+  const { data: userPayRate } = useQuery<UserPayRatePagingData>(USER_PAY_RATE, {
+    fetchPolicy: "network-only",
+    nextFetchPolicy: "cache-first",
+    variables: {
+      input: {
+        query: {
+          user_id: user?.id,
+        },
+        paging: {
+          order: ["updatedAt:DESC"],
+        },
+      },
+    },
+  });
+  const ids: any = []
+
+  userPayRate?.UserPayRate?.data?.forEach((userPayRate, index: number) => {
+    ids.push({ id: userPayRate?.project?.id, name: userPayRate?.project?.name })
+  })
+
+  let projectList = project_ids.filter(function (objOne: any) {
+    return !ids.some(function (objTwo: any) {
+      return objOne.id === objTwo.id;
+    });
+  });
+
+  const [userPayRateCreate] = useMutation<
+  GraphQLResponse<'UserPayRateCreate',UserPayRate>,MutationUserPayRateCreateArgs
+  >(USER_PAYRATE_CREATE, {
     refetchQueries: [
-      {query: USER_PAY_RATE,
+      {
+        query: USER_PAY_RATE,
         variables: {
-        input: {
-          query: {
-            user_id: user?.id,
+          input: {
+            query: {
+              user_id: user?.id,
+            },
+            paging: {
+              order: ["updatedAt:DESC"],
+            },
           },
-          paging: {
-            order: ["updatedAt:DESC"],
-          },
-        },}, },
-      
+        },
+      },
+
       'UserPayRate'
     ],
     onCompleted() {
@@ -79,13 +112,14 @@ const UserPayRateModal = (props: IProps) => {
   })
 
   const onSubmitForm = (values: any) => {
+    form.resetFields()
     userPayRateCreate({
       variables: {
         input: {
           user_id: user.id,
           project_id: values.project_id,
           amount: values.payRate,
-          company_id: loggedInUser.company?.id
+          company_id: loggedInUser.company?.id as string
         }
       }
     })
@@ -133,8 +167,8 @@ const UserPayRateModal = (props: IProps) => {
               <Form.Item
                 label="Project Name"
                 name="project_id">
-                <Select placeholder="Select State">
-                  {projectData?.Project?.data?.map((project: any, index: number) => (
+                <Select placeholder="Select Project">
+                  {projectList?.map((project: any, index: number) => (
                     <Select.Option value={project?.id} key={index}>
                       {project?.name}
                     </Select.Option>
