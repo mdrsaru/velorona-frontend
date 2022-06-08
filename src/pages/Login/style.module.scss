@@ -1,6 +1,8 @@
 :global {
   :local(.login-row) {
-    .ant-form-vertical .ant-form-item-label > label, .ant-input::placeholder {
+
+    .ant-form-vertical .ant-form-item-label>label,
+    .ant-input::placeholder {
       font-weight: 600;
       font-size: 18px;
       line-height: 22px;
@@ -14,6 +16,7 @@
       height: 3rem;
     }
   }
+
   :local(.forget-form) {
     .ant-btn {
       width: 100%;
@@ -32,10 +35,15 @@
 }
 
 .sign-in-content {
+  width: 100%;
+  padding: 0 5rem 0 2rem;
   h3 {
     font-weight: 600;
     font-size: 18px;
     line-height: 22px;
+  }
+  @media screen and (min-width: 1500px) {
+    padding: 0 10rem 0 5rem;
   }
 }
 
@@ -54,9 +62,11 @@
 }
 
 .sign-in-form-col {
-  padding: 6rem 8rem 0 4rem;
+  display: flex;
   align-items: center;
   justify-content: center;
+  width: 100%;
+
   @media screen and (max-width: 767px) {
     padding: 6rem 2rem 0 2rem;
   }
@@ -76,16 +86,15 @@
 }
 
 .image-col {
-  padding-top: 9rem;
+  display: flex;
+  align-items: center;
+
   @media screen and (max-width: 1300px) and (min-width: 767px) {
-    padding-top: 14rem;
     .highFiveImage {
       width: 100%;
     }
   }
-  @media screen and (max-width: 1700px) and (min-width: 1300px) {
-    padding-top: 10rem;
-  }
+
   @media screen and (max-width: 767px) {
     display: none;
   }
@@ -105,7 +114,8 @@
   padding: 1rem 2rem 1rem 2rem;
 }
 
-.modal-subtitle, .modal-header {
+.modal-subtitle,
+.modal-header {
   font-weight: 600;
   font-size: 18px;
   line-height: 22px;
