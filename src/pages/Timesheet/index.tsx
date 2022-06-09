@@ -71,6 +71,10 @@ export const CREATE_TIME_ENTRY = gql`
           project {
             id
             name
+            client {
+              id
+              name
+            }
           }
         }
     }
@@ -97,6 +101,10 @@ export const TIME_ENTRY = gql`
                 project {
                     id
                     name
+                    client {
+                      id
+                      name
+                    }
                 }
             }
             activeEntry {
@@ -118,6 +126,10 @@ export const TIME_ENTRY = gql`
               project {
                   id
                   name
+                  client {
+                    id
+                    name
+                  }
               }
             }
         }
@@ -178,6 +190,10 @@ const UPDATE_TIME_ENTRY = gql`
           project {
             id
             name
+            client {
+              id
+              name
+            }
           }
         }
     }
@@ -216,7 +232,7 @@ const Timesheet = () => {
   let navigate = useNavigate();
   const [form] = Form.useForm()
   const [timeEntryForm] = Form.useForm()
-  const stopwatchOffset = new Date();
+  let stopwatchOffset = new Date();
   const [visible, setVisible] = useState(false);
   const [showDetailTimeEntry, setDetailVisible] = useState<boolean>(false);
   const [pagingInput, setPagingInput] = useState<{
@@ -306,7 +322,8 @@ const Timesheet = () => {
     id: '',
     name: '',
     project: '',
-    task: ''
+    task: '',
+    client: ''
   });
 
   const [newTimeSheet, setNewTimeSheet] = useState({
@@ -323,7 +340,12 @@ const Timesheet = () => {
     project: {
       id: '',
       name: '',
-      __typename: 'Project'
+      __typename: 'Project',
+      client: {
+        _typename: 'Client',
+        id: '',
+        name: ''
+      }
     },
     task_id: '',
     startTime: '',
@@ -388,7 +410,8 @@ const Timesheet = () => {
           id: timeEntry?.TimeEntry?.activeEntry?.id,
           name: timeEntry?.TimeEntry?.activeEntry?.company?.name,
           project: timeEntry?.TimeEntry?.activeEntry?.project?.name,
-          task: timeEntry?.TimeEntry?.activeEntry?.task?.name
+          task: timeEntry?.TimeEntry?.activeEntry?.task?.name,
+          client: timeEntry?.TimeEntry?.activeEntry?.project?.client?.name
         })
         setNewTimeSheet({
           clientLocation: timeEntry?.TimeEntry?.activeEntry?.clientLocation,
@@ -402,9 +425,14 @@ const Timesheet = () => {
           endTime: '',
           id: timeEntry?.TimeEntry?.activeEntry?.id,
           project: {
+            __typename: 'Project',
             id: timeEntry?.TimeEntry?.activeEntry?.project?.id,
             name: timeEntry?.TimeEntry?.activeEntry?.project?.name,
-            __typename: 'Project'
+            client: {
+              _typename: 'Client',
+              id: timeEntry?.TimeEntry?.activeEntry?.project?.client?.id,
+              name: timeEntry?.TimeEntry?.activeEntry?.project?.client?.name
+            },
           },
           startTime: timeEntry?.TimeEntry?.activeEntry?.startTime,
           task_id: timeEntry?.TimeEntry?.activeEntry?.task?.id,
@@ -518,7 +546,8 @@ const Timesheet = () => {
         id: response?.TimeEntryCreate?.id,
         name: response?.TimeEntryCreate?.company?.name,
         project: response?.TimeEntryCreate?.project?.name,
-        task: response?.TimeEntryCreate?.task?.name
+        task: response?.TimeEntryCreate?.task?.name,
+        client: response?.TimeEntryCreate?.project?.client?.name
       });
       setDetailVisible(true);
     }
@@ -587,6 +616,7 @@ const Timesheet = () => {
   }
 
   const createTimeEntries = (values: any) => {
+    stopwatchOffset = new Date()
     createTimeEntry({
       variables: {
         input: {
@@ -624,6 +654,7 @@ const Timesheet = () => {
   }
 
   const clickPlayButton = (entry: string) => {
+    form.resetFields()
     const timesheet = filterData()[entry][0];
     !isRunning ? createTimeEntries({ task: entry, project: timesheet?.project?.id }) : submitStopTimer();
   }
@@ -818,11 +849,11 @@ const Timesheet = () => {
               <Col
                 xs={0}
                 sm={0}
-                md={4}
-                lg={4}
-                xl={4}
+                md={7}
+                lg={7}
+                xl={7}
                 className={styles['client-header']}>
-                Project
+                Client: Project
               </Col>
               <Col
                 xs={0}
@@ -845,18 +876,18 @@ const Timesheet = () => {
               <Col
                 xs={0}
                 sm={0}
-                md={4}
-                lg={4}
-                xl={4}
+                md={3}
+                lg={3}
+                xl={3}
                 className={styles['total-header']}>
                 Total
               </Col>
               <Col
                 xs={0}
                 sm={0}
-                md={4}
-                lg={4}
-                xl={4}></Col>
+                md={2}
+                lg={2}
+                xl={2}></Col>
             </Row>
 
             {timeEntryData?.TimeEntry?.data?.length === 0
@@ -885,6 +916,7 @@ const Timesheet = () => {
                             project: filterData()[entry][0]?.project?.name,
                             name: filterData()[entry][0]?.task?.name,
                             startTime: getStartTime(filterData()[entry]),
+                            client: filterData()[entry][0]?.project?.client?.name,
                             endTime: getEndTime(filterData()[entry]),
                             duration: getTotalTimeForADay(filterData()[entry])
                           }}
@@ -897,9 +929,10 @@ const Timesheet = () => {
                               rowClassName={'filter-task-list'}
                               index={index}
                               data={{
-                                project: `${timeData?.client?.name} : ${timeData?.project?.name}`,
+                                project: timeData?.project?.name,
                                 name: timeData?.task?.name,
                                 startTime: timeData?.startTime,
+                                client: timeData?.project?.client?.name,
                                 endTime: timeData?.endTime,
                                 duration: timeData?.duration
                               }}
@@ -916,6 +949,7 @@ const Timesheet = () => {
                           project: filterData()[entry][0]?.project?.name,
                           name: filterData()[entry][0]?.task?.name,
                           startTime: filterData()[entry][0]?.startTime,
+                          client: filterData()[entry][0]?.project?.client?.name,
                           endTime: filterData()[entry][0]?.endTime,
                           duration: filterData()[entry][0]?.duration
                         }}
