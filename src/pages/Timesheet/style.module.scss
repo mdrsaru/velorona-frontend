@@ -102,7 +102,10 @@
   }
 
   .total-time {
-    padding-left: 2rem;
+    color: var(--black);
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   .task-row {
@@ -552,4 +555,7 @@
   color: var(--black);
   padding: 1rem 2rem 1rem 1rem;
   width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }

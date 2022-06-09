@@ -7,8 +7,7 @@ import {
   Button,
   UploadProps,
   message,
-  Upload,
-  Spin,
+  Upload
 } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 

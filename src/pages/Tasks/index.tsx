@@ -165,7 +165,7 @@ const Tasks = () => {
               style={{ display: "flex", marginTop: "1.5rem" }}
             >
                 <Collapse accordion>
-                  <Panel header="Inprogress" key="3">
+                  <Panel header="In Progress" key="3">
                     <Table
                       loading={taskLoading}
                       dataSource={taskGroups?.InProgress}

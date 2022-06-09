@@ -1,6 +1,7 @@
 import {
   Col,
-  Row
+  Row,
+  Tooltip
 } from 'antd';
 import moment from 'moment';
 import playBtn from '../../../assets/images/play-circle.svg';
@@ -27,21 +28,25 @@ const TimeEntry = (props: any) => {
             </p>}
         </div>
         <div className={styles['data-box']} onClick={event => { event.stopPropagation() }}>
-          {data?.name ?? ''}
+          <Tooltip title={data?.name ?? ''}>
+            <span style={{ color: 'black' }}>{data?.name ?? ''}</span>
+          </Tooltip>
         </div>
       </Col>
 
       <Col
         xs={24}
         sm={24}
-        md={7}
+        md={6}
         lg={7}
         xl={7}
         className={styles['client-name']} onClick={event => { event.stopPropagation() }}>
         <div className={styles['data-box']}>
-          <span>{data?.client ?? ""} </span>
-          {data?.client ? " : " : ""}
-          <span style={{ color: 'black' }}>{data?.project ?? ""}</span>
+          <Tooltip title={data?.client + " : " + data?.project}>
+            <span>{data?.client ?? ""} </span>
+            {data?.client ? " : " : ""}
+            <span style={{ color: 'black' }}>{data?.project ?? ""}</span>
+          </Tooltip>
         </div>
       </Col>
 
@@ -52,11 +57,10 @@ const TimeEntry = (props: any) => {
         lg={3}
         xl={3}
         className={styles['start-time']} onClick={event => { event.stopPropagation() }}>
-        <div className={styles['data-box']}>
+        <span className={styles['data-box']}>
           {moment(data?.startTime).format('LT')}
-        </div>
+        </span>
       </Col>
-
       <Col
         xs={24}
         sm={24}
@@ -64,15 +68,15 @@ const TimeEntry = (props: any) => {
         lg={3}
         xl={3}
         className={styles['end-time']} onClick={event => { event.stopPropagation() }}>
-        <div className={styles['data-box']}>
+        <span className={styles['data-box']}>
           {moment(data?.endTime).format('LT')}
-        </div>
+        </span>
       </Col>
 
       <Col
         xs={12}
         sm={12}
-        md={3}
+        md={4}
         lg={3}
         xl={3}
         className={styles['total-time']} onClick={event => { event.stopPropagation() }}>
