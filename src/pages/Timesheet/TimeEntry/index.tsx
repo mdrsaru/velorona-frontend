@@ -1,7 +1,6 @@
 import {
   Col,
-  Row,
-  Input
+  Row
 } from 'antd';
 import moment from 'moment';
 import playBtn from '../../../assets/images/play-circle.svg';
@@ -27,22 +26,23 @@ const TimeEntry = (props: any) => {
               {length}
             </p>}
         </div>
-        <div onClick={event => { event.stopPropagation() }}>
-          <Input
-            type="text"
-            value={data?.name ?? ''} />
+        <div className={styles['data-box']} onClick={event => { event.stopPropagation() }}>
+          {data?.name ?? ''}
         </div>
       </Col>
 
       <Col
         xs={24}
         sm={24}
-        md={4}
-        lg={4}
-        xl={4}
+        md={7}
+        lg={7}
+        xl={7}
         className={styles['client-name']} onClick={event => { event.stopPropagation() }}>
-        <Input type="text"
-          value={data?.project ?? ''} />
+        <div className={styles['data-box']}>
+          <span>{data?.client ?? ""} </span>
+          {data?.client ? " : " : ""}
+          <span style={{ color: 'black' }}>{data?.project ?? ""}</span>
+        </div>
       </Col>
 
       <Col
@@ -52,8 +52,9 @@ const TimeEntry = (props: any) => {
         lg={3}
         xl={3}
         className={styles['start-time']} onClick={event => { event.stopPropagation() }}>
-        <Input type="text"
-          value={moment(data?.startTime).format('LT')} />
+        <div className={styles['data-box']}>
+          {moment(data?.startTime).format('LT')}
+        </div>
       </Col>
 
       <Col
@@ -63,28 +64,29 @@ const TimeEntry = (props: any) => {
         lg={3}
         xl={3}
         className={styles['end-time']} onClick={event => { event.stopPropagation() }}>
-        <Input
-          type="text"
-          defaultValue={moment(data?.endTime).format('LT')}
-          value={moment(data?.endTime).format('LT')} />
+        <div className={styles['data-box']}>
+          {moment(data?.endTime).format('LT')}
+        </div>
       </Col>
 
       <Col
         xs={12}
         sm={12}
-        md={4}
-        lg={4}
-        xl={4}
+        md={3}
+        lg={3}
+        xl={3}
         className={styles['total-time']} onClick={event => { event.stopPropagation() }}>
-        <div>{getTimeFormat(data?.duration) ?? 'N/A'}</div>
+        <div>
+          {getTimeFormat(data?.duration) ?? 'N/A'}
+        </div>
       </Col>
 
       <Col
         xs={12}
         sm={12}
-        md={4}
-        lg={4}
-        xl={4}
+        md={2}
+        lg={2}
+        xl={2}
         className={styles['play-button']}
         onClick={event => { event.stopPropagation() }}>
         <img src={playBtn} alt="play Button" onClick={clickPlayButton} />
