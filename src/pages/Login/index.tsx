@@ -230,7 +230,10 @@ const Login = () => {
         centered
         width={900}
         visible={modalVisible}
-        onCancel={() => setModalVisible(false)}
+        onCancel={() => {
+          setModalVisible(false)
+          forgetForm.resetFields()
+        }}
         footer={null}>
         <div className={styles['modal-header']}>
           Forgot Password

@@ -37,6 +37,7 @@ import TimeEntry from './TimeEntry';
 import NoContent from '../../components/NoContent';
 
 import styles from './style.module.scss';
+import { getTotalTimeForADay } from './DetailTimesheet';
 
 export const STOP_TIMER = gql`
   mutation TimeEntryStop($input: TimeEntryStopInput!) {
@@ -203,11 +204,11 @@ export const getTimeFormat = (seconds: any) => {
   return hours + ':' + minutes + ':' + secs;
 };
 
-const getHours = (seconds: any) => {
-  const sec = parseInt(seconds, 10);
-  let sec_num = Math.abs(sec);
-  return Math.floor(sec_num / 3600);
-}
+// const getHours = (seconds: any) => {
+//   const sec = parseInt(seconds, 10);
+//   let sec_num = Math.abs(sec);
+//   return Math.floor(sec_num / 3600);
+// }
 
 const Timesheet = () => {
   const { Option } = Select;
@@ -250,7 +251,7 @@ const Timesheet = () => {
       key: 'duration',
       render: (record: any) =>
         <div>
-          {getHours(record?.durationFormat)}
+          {record?.durationFormat}
         </div>
     },
     {
@@ -535,6 +536,7 @@ const Timesheet = () => {
 
   const filterData = () => {
     const tasks = _.groupBy(timeEntryData?.TimeEntry?.data, 'task_id');
+    console.log(tasks);
     return tasks;
   }
 
@@ -624,6 +626,16 @@ const Timesheet = () => {
   const clickPlayButton = (entry: string) => {
     const timesheet = filterData()[entry][0];
     !isRunning ? createTimeEntries({ task: entry, project: timesheet?.project?.id }) : submitStopTimer();
+  }
+
+  const getStartTime = (entries: any) => {
+    const minStartDate = entries.map((entry: any) => { return entry?.startTime })
+    return _.min(minStartDate)
+  }
+
+  const getEndTime = (entries: any) => {
+    const maxEndDate = entries.map((entry: any) => { return entry?.endTime })
+    return _.max(maxEndDate)
   }
 
   return (
@@ -810,7 +822,7 @@ const Timesheet = () => {
                 lg={4}
                 xl={4}
                 className={styles['client-header']}>
-                Client: Project
+                Project
               </Col>
               <Col
                 xs={0}
@@ -872,9 +884,9 @@ const Timesheet = () => {
                           data={{
                             project: filterData()[entry][0]?.project?.name,
                             name: filterData()[entry][0]?.task?.name,
-                            startTime: filterData()[entry][0]?.startTime,
-                            endTime: filterData()[entry][0]?.endTime,
-                            duration: filterData()[entry][0]?.duration
+                            startTime: getStartTime(filterData()[entry]),
+                            endTime: getEndTime(filterData()[entry]),
+                            duration: getTotalTimeForADay(filterData()[entry])
                           }}
                           length={filterData()[entry]?.length}
                           clickPlayButton={() => clickPlayButton(entry)} />} key={index}>
@@ -885,7 +897,7 @@ const Timesheet = () => {
                               rowClassName={'filter-task-list'}
                               index={index}
                               data={{
-                                project: timeData?.project?.name,
+                                project: `${timeData?.client?.name} : ${timeData?.project?.name}`,
                                 name: timeData?.task?.name,
                                 startTime: timeData?.startTime,
                                 endTime: timeData?.endTime,
