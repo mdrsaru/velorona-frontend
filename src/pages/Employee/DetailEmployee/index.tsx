@@ -28,6 +28,7 @@ import { CHANGE_PROFILE_IMAGE } from "../NewEmployee";
 import { notifyGraphqlError } from "../../../utils/error";
 import { GraphQLResponse } from "../../../interfaces/graphql.interface";
 import { MutationChangeProfilePictureArgs, QueryUserArgs, User, UserPagingResult } from "../../../interfaces/generated";
+import Loader from "../../../components/Loader";
 
 const DetailEmployee = () => {
   const navigate = useNavigate();
@@ -42,7 +43,8 @@ const DetailEmployee = () => {
 
   const [isImageLoading, setIsImageLoading] = useState<boolean>(false);
 
-  const [changeProfilePictureInput] = useMutation<
+
+  const [changeProfilePictureInput, loading] = useMutation<
     GraphQLResponse<'ChangeProfilePicture', User>,
     MutationChangeProfilePictureArgs
   >(CHANGE_PROFILE_IMAGE, {
@@ -81,6 +83,7 @@ const DetailEmployee = () => {
     name: "file",
     action: `${constants.apiUrl}/v1/media/upload`,
     maxCount: 1,
+    accept: 'image/*',
     headers: {
       authorization: loggedInUser?.token ? `Bearer ${loggedInUser?.token}` : "",
     },
@@ -121,20 +124,22 @@ const DetailEmployee = () => {
           <Row justify="center">
             <Col className={styles["avatar-col"]}>
               <div className={styles["avatar-image"]}>
-                {isImageLoading ? <Spin className="circular-loading" /> : null}
-                <Avatar
-                  src={userData?.User?.data[0]?.avatar?.url ?? image}
-                  size={{
-                    xs: 100,
-                    sm: 100,
-                    md: 100,
-                    lg: 100,
-                    xl: 100,
-                    xxl: 100,
-                  }}
-                // icon={<AntDesignOutlined />}
-                />
-
+                {isImageLoading && loading ?
+                  <Loader />
+                  :
+                  <Avatar
+                    src={userData?.User?.data[0]?.avatar?.url ?? image}
+                    size={{
+                      xs: 100,
+                      sm: 100,
+                      md: 100,
+                      lg: 100,
+                      xl: 100,
+                      xxl: 100,
+                    }}
+                  // icon={<AntDesignOutlined />}
+                  />
+                }
                 {profile ? (
                   <div className={styles["camera-div"]}>
                     <div className={styles["browse-file"]}>

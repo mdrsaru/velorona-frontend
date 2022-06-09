@@ -127,6 +127,7 @@ const EditEmployee = () => {
     name: "file",
     action: `${constants.apiUrl}/v1/media/upload`,
     maxCount: 1,
+    accept:'image/*',
     headers: {
       authorization: authData?.token ? `Bearer ${authData?.token}` : "",
     },
@@ -273,6 +274,22 @@ const EditEmployee = () => {
                 md={12}
                 lg={12}>
                 <Form.Item
+                  label="Email"
+                  name="email"
+                >
+                  <Input
+                    placeholder="Enter your email"
+                    autoComplete="off"
+                    disabled
+                  />
+                </Form.Item>
+              </Col>
+              <Col
+                xs={24}
+                sm={24}
+                md={12}
+                lg={12}>
+                <Form.Item
                   label="Phone Number"
                   name="phone"
                   rules={[
@@ -382,7 +399,7 @@ const EditEmployee = () => {
                     },
                   ]}
                 >
-                  <Select placeholder="Employee" disabled={true}>
+                  <Select placeholder="Employee" disabled={location.pathname.includes(routes.editProfile?.key) ? true :false }>
                     {roles &&
                       roles?.Role?.data.map((role: IRole, index: number) => (
                         <Option value={role?.id} key={index}>
@@ -402,7 +419,7 @@ const EditEmployee = () => {
                     },
                   ]}
                 >
-                  <Select placeholder="Select status">
+                  <Select placeholder="Select status"  disabled={location.pathname.includes(routes.editProfile?.key) ? true :false }>
                     <Option value="Active">Active</Option>
                     <Option value="Inactive">InActive</Option>
                   </Select>
