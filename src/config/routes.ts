@@ -79,31 +79,38 @@ const routes = {
     key: 'company'
   },
   employee: {
-    childPath: 'employee',
-    path: (id: string) => `/${id}/employee`,
+    childPath: 'user',
+    path: (id: string) => `/${id}/user`,
     component: lazy(() => import('../pages/Employee')),
-    name: 'Employee',
+    name: 'User',
     key: 'employee'
+  },
+  user: {
+    childPath: 'user',
+    path: (id: string) => `/${id}/user`,
+    component: lazy(() => import('../pages/Employee')),
+    name: 'User',
+    key: 'user'
   },
   editEmployee: {
     childPath: ':eid',
-    path: (id: string, eid: string) => `/${id}/employee/${eid}`,
+    path: (id: string, eid: string) => `/${id}/user/${eid}`,
     component: lazy(() => import('../pages/Employee/EditEmployee')),
-    name: 'Edit Employee',
+    name: 'Edit User',
     key: 'employee'
   },
   editProfile: {
     childPath: '/profile-edit/:eid',
     path: (eid: string) => `/profile-edit/${eid}`,
     component: lazy(() => import('../pages/Employee/EditEmployee')),
-    name: 'Edit Employee',
+    name: 'Edit User',
     key: 'profile-edit'
   },
   detailEmployee: {
     childPath: ':eid/detail',
-    path: (id: string, eid: string) => `/${id}/employee/${eid}/detail`,
+    path: (id: string, eid: string) => `/${id}/user/${eid}/detail`,
     component: lazy(() => import('../pages/Employee/DetailEmployee')),
-    name: 'Employee Detail',
+    name: 'User Detail',
     key: 'employee'
   },
   profile: {
@@ -115,9 +122,9 @@ const routes = {
   },
   addEmployee: {
     childPath: 'add',
-    path: (id: string) => `/${id}/employee/add`,
+    path: (id: string) => `/${id}/user/add`,
     component: lazy(() => import('../pages/Employee/NewEmployee')),
-    name: 'New Employee',
+    name: 'New User',
     key: 'employee'
   },
   attachClient: {

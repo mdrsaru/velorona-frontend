@@ -411,7 +411,7 @@ const EditEmployee = () => {
               <Col xs={24} sm={24} md={12} lg={12}>
                 <Form.Item
                   name="status"
-                  label="Employee Status"
+                  label="User Status"
                   rules={[
                     {
                       message: "Please select the status",
