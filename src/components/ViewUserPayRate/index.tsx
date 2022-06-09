@@ -1,9 +1,11 @@
 import CloseOutlined from "@ant-design/icons/lib/icons/CloseOutlined";
+import EditOutlined from "@ant-design/icons/lib/icons/EditOutlined";
 import { gql, useQuery } from "@apollo/client";
 import { Modal } from "antd";
 import { Table } from "antd";
-// import { UserPayRate } from "../../interfaces/generated";
+import { useState } from "react";
 import { UserPayRatePagingData } from "../../interfaces/graphql.interface";
+import EditUserPayRateModal from "../EditUserPayRate";
 
 import styles from "./styles.module.scss";
 
@@ -37,15 +39,16 @@ export const USER_PAY_RATE = gql`
 `;
 
 const ViewUserPayRate = (props: IProps) => {
-  const { visibility, data, setVisibility } = props;
-
+  const { visibility, data:employee, setVisibility } = props;
+  const [editVisibility, setEditVisibility] = useState(false);
+  const [userPayRateId,setUserPayRateId] = useState('')
   const { data: userPayRate, loading } = useQuery<UserPayRatePagingData>(USER_PAY_RATE, {
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
     variables: {
       input: {
         query: {
-          user_id: data?.id,
+          user_id: employee?.id,
         },
         paging: {
           order: ["updatedAt:DESC"],
@@ -54,6 +57,11 @@ const ViewUserPayRate = (props: IProps) => {
     },
   });
 
+  const handleEdit = (id: any) => {
+    setUserPayRateId(id)
+    setVisibility(false)
+    setEditVisibility(!editVisibility)
+  }
   const columns = [
     {
       title: "Project Name",
@@ -73,6 +81,10 @@ const ViewUserPayRate = (props: IProps) => {
         return <p>${payRate?.amount}</p>;
       },
     },
+    {
+      title: "Action",
+      render: (payRate: any) => <EditOutlined onClick={() => handleEdit(payRate?.id)} />
+    }
   ];
 
   return (
@@ -108,6 +120,13 @@ const ViewUserPayRate = (props: IProps) => {
           />
         </div>
       </Modal>
+
+      <EditUserPayRateModal
+            visibility={editVisibility}
+            setVisibility={setEditVisibility}
+            data={employee}
+            id= {userPayRateId}
+          />
     </>
   );
 };

@@ -6,7 +6,6 @@ import NotPriority from '../../assets/images/not-priority.svg'
 import Priority from '../../assets/images/priority.svg'
 
 import { authVar } from '../../App/link'
-import EmployeeCard from '../../components/EmployeeCard'
 import { useState } from 'react'
 import TaskDetail from '../../components/TaskDetail'
 import AssignedUserAvatar from '../../components/AssignedUserAvatar'
@@ -15,6 +14,7 @@ import styles from './style.module.scss'
 import NoContent from '../../components/NoContent/index';
 import { GraphQLResponse } from '../../interfaces/graphql.interface'
 import RouteLoader from '../../components/Skeleton/RouteLoader/index';
+import TitleCard from '../../components/TitleCard/index';
 
 export const TASK = gql`
   query Task($input: TaskQueryInput!) {
@@ -91,7 +91,7 @@ const Tasks = () => {
 
   const columns = [
     {
-      title: "",
+      title: "Task Name (Client:Project)",
       render: (task: Task) => {
         return (
           <>
@@ -136,29 +136,27 @@ const Tasks = () => {
 
   return (
     <>
-      <EmployeeCard user={authData?.user?.id} />
+      <TitleCard title='Task Schedule' />
       {taskLoading ? <RouteLoader />
-        :
-        Object.keys(taskGroups)?.length !== 0 ?
+      :
+        Object.keys(taskGroups) &&  !taskLoading ?
           <div className={styles['task-div']}>
             <Space
               direction="vertical"
               size="middle"
               style={{ display: "flex", marginTop: "1.5rem" }}
             >
-              {taskGroups?.UnScheduled?.length && (
-                <Collapse accordion>
-                  <Panel header="UnScheduled" key="1">
-                    <Table
-                      loading={taskLoading}
-                      dataSource={taskGroups?.UnScheduled}
-                      columns={columns}
-                      rowKey={(task) => task?.id}
-                      pagination={false}
-                    />
-                  </Panel>
-                </Collapse>
-              )}
+              <Collapse accordion defaultActiveKey={['2']}>
+                <Panel header="Scheduled" key="2">
+                  <Table
+                    loading={taskLoading}
+                    dataSource={taskGroups?.Scheduled}
+                    columns={columns}
+                    rowKey={(task) => task?.id}
+                    pagination={false}
+                  />
+                </Panel>
+              </Collapse>
             </Space>
 
             <Space
@@ -166,29 +164,8 @@ const Tasks = () => {
               size="middle"
               style={{ display: "flex", marginTop: "1.5rem" }}
             >
-              {taskGroups?.Scheduled?.length && (
                 <Collapse accordion>
-                  <Panel header="Scheduled" key="2">
-                    <Table
-                      loading={taskLoading}
-                      dataSource={taskGroups?.Scheduled}
-                      columns={columns}
-                      rowKey={(task) => task?.id}
-                      pagination={false}
-                    />
-                  </Panel>
-                </Collapse>
-              )}
-            </Space>
-
-            <Space
-              direction="vertical"
-              size="middle"
-              style={{ display: "flex", marginTop: "1.5rem" }}
-            >
-              {taskGroups?.InProgress?.length && (
-                <Collapse accordion>
-                  <Panel header="InProgress" key="3">
+                  <Panel header="Inprogress" key="3">
                     <Table
                       loading={taskLoading}
                       dataSource={taskGroups?.InProgress}
@@ -198,7 +175,6 @@ const Tasks = () => {
                     />
                   </Panel>
                 </Collapse>
-              )}
             </Space>
 
             <Space
@@ -206,8 +182,7 @@ const Tasks = () => {
               size="middle"
               style={{ display: "flex", marginTop: "1.5rem" }}
             >
-              {taskGroups?.Completed?.length && (
-                <Collapse accordion>
+                <Collapse accordion >
                   <Panel header="Completed" key="4">
                     <Table
                       loading={taskLoading}
@@ -218,7 +193,25 @@ const Tasks = () => {
                     />
                   </Panel>
                 </Collapse>
-              )}
+            </Space>
+
+            <Space
+              direction="vertical"
+              size="middle"
+              style={{ display: "flex", marginTop: "1.5rem" }}
+            >
+
+              <Collapse accordion>
+                <Panel header="Unscheduled" key="1">
+                    <Table
+                      loading={taskLoading}
+                      dataSource={taskGroups?.UnScheduled}
+                      columns={columns}
+                      rowKey={(task) => task?.id}
+                      pagination={false}
+                    />
+                </Panel>
+              </Collapse>
             </Space>
           </div>
           :
