@@ -226,6 +226,13 @@ const DetailEmployee = () => {
           </Row>
 
           <Row justify="end" className={styles["footer-btn"]}>
+          <Col>
+          <Button  type="default" style={{marginRight:'1rem'}}>
+                  <Link to={routes.changePassword.path(params?.eid ?? "1")}>
+                    Change Password
+                  </Link> 
+              </Button>
+              </Col>
             <Col>
               <Button type="primary">
                 {profile ?
