@@ -17,81 +17,24 @@
   }
 }
 
-
 .task-div {
   :global {
     .ant-table .ant-table-thead > tr > th {
       background-color: var(--white);
-      color:var(--gray-secondary)
+      color: var(--gray-secondary);
     }
-  }
-}
-
-.main-div {
-  padding: 2rem 0 2rem 0;
-
-  .task-name {
-    font-weight: 600;
-    font-size: 18px;
-    line-height: 22px;
-  }
-
-  .task-header {
-    padding: 1rem 0 1rem 1rem;
-    margin: 1rem 1.5rem 1rem 0;
-    background-color: var(--gray-2);
-    display: flex;
-
-    .task-status {
-      width: 80%;
+    .ant-collapse > .ant-collapse-item > .ant-collapse-header {
+      color: var(--primary-purple);
       font-weight: 600;
       font-size: 18px;
       line-height: 22px;
     }
-
-    .count {
-      font-weight: 600;
-      font-size: 18px;
-      line-height: 22px;
-      width: 20%;
-      text-align: right;
-      padding-right: 1rem;
-      color: var(--primary-color);
-    }
-  }
-
-  .gridStyle {
-    width: 100%;
-  }
-
-  .gridStyle70 {
-    width: 70%;
-  }
-
-  .gridStyle30 {
-    width: 30%;
-  }
-
-  .task-card {
-    cursor: pointer;
-    background: var(--white);
-    margin: 1.5rem 1.5rem 1rem 0;
-    border: 1px solid #BDBDBD;
-    box-sizing: border-box;
-    box-shadow: 0 7px 4px rgba(231, 231, 231, 0.25);
-  }
-
-  .form-col {
-    padding: 1.5rem 0 0.9rem 0;
-
-    h1 {
-      font-weight: 600;
-      font-size: 24px;
-      line-height: 29px;
-    }
   }
 }
 
+.task-div{
+  margin-bottom: 2rem;;
+}
 .modal-footer {
   justify-items: left;
   align-items: flex-start;
@@ -140,7 +83,7 @@
   font-size: 14px;
   line-height: 17px;
 
-  div  {
+  div {
     margin-bottom: 0.3rem;
   }
 }
@@ -155,18 +98,19 @@
   padding: 1rem;
 }
 
-
 .task-name {
   font-weight: 600;
   font-size: 14px;
   line-height: 17px;
   cursor: pointer;
+  text-transform: capitalize;
 }
 
-.clientProjectName{
-  background-color:  rgba(149, 35, 156, 0.2);
-  color:var(--primary-purple);
-  padding:0.5rem;
+.clientProjectName {
+  background-color: rgba(149, 35, 156, 0.2);
+  color: var(--primary-purple);
+  padding: 0.5rem;
   margin-left: 1.5rem;
   margin-right: 10rem;
 }
+

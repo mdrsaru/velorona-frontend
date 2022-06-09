@@ -20,6 +20,7 @@ import Priority from "../../assets/images/priority.svg";
 
 import Status from "../Status";
 import styles from "./styles.module.scss";
+import { TASK } from "../../pages/Tasks";
 
 interface IProps {
   visibility: boolean;
@@ -50,6 +51,24 @@ const TaskDetail = (props: IProps) => {
   });
 
   const [taskUpdate] = useMutation(TASK_UPDATE, {
+    refetchQueries: [
+      {
+        query: TASK,
+        variables: {
+          input: {
+            query: {
+              company_id: loggedInUser?.company?.id,
+              user_id: loggedInUser?.user?.id,
+            },
+            paging: {
+              order: ["updatedAt:DESC"],
+            },
+          },
+        },
+      },
+
+      'Task'
+    ],
     onCompleted() {
       message.success({
         content: `Task is updated successfully!`,
@@ -79,6 +98,7 @@ const TaskDetail = (props: IProps) => {
         },
       },
     });
+    setVisibility(false)
   };
 
   const handleDatePickerChange = (date: any) => {
@@ -151,8 +171,13 @@ const TaskDetail = (props: IProps) => {
       <div className={styles["modal-body"]}>
         <div>
           <Row>
-            <Col lg={6}>
-              <span className={styles["task-title"]}>Task Detail</span>
+            <Col lg={15}>
+              <div>
+                <span className={styles["task-title"]}>{data?.name} </span>
+                <span className={styles.clientProjectName}>
+                  {data?.project?.client?.name}:{data?.project?.name}
+                </span>
+              </div>
             </Col>
             {props?.employee ? (
               <Col lg={6}>
@@ -179,13 +204,6 @@ const TaskDetail = (props: IProps) => {
         <br />
         <div style={{ marginBottom: "1rem" }}>
           <Row style={{ marginTop: "1rem" }}>
-            {props?.employee && (
-              <Col lg={6} md={5} sm={24}>
-                <p className={styles["user-name"]}>
-                  {userData?.User?.data?.[0]?.fullName}
-                </p>
-              </Col>
-            )}
             <Col lg={5} md={3} sm={12} className={styles["headings"]}>
               <p>Assigned To</p>
               <AssignedUserAvatar users={data?.users} />
@@ -272,11 +290,7 @@ const TaskDetail = (props: IProps) => {
             </Col>
           </Row>
         </div>
-        <div style={{ marginTop: "3rem" }}>
-          <span className={styles["task-title"]}>{data?.name} </span>
-          <span className={styles.clientProjectName}>
-            {data?.project?.client?.name}:{data?.project?.name}
-          </span>
+        <div>
           <div className={styles["task-body"]}>
             {data?.description ? parse(data?.description) : ""}
           </div>
