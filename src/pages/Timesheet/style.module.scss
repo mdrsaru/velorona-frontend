@@ -552,4 +552,6 @@
   color: var(--black);
   padding: 1rem 2rem 1rem 1rem;
   width: 100%;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
