@@ -15,7 +15,7 @@ import moment from "moment";
 import type { UploadProps } from "antd";
 
 import constants from '../../../config/constants'
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import {  useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery } from '@apollo/client'
 import { notifyGraphqlError } from '../../../utils/error'
 import { IRole } from '../../../interfaces/IRole'
@@ -28,7 +28,6 @@ import { useState } from 'react'
 import styles from '../style.module.scss'
 import { authVar } from '../../../App/link'
 import RouteLoader from '../../../components/Skeleton/RouteLoader'
-import routes from '../../../config/routes'
 import { MutationChangeProfilePictureArgs, MutationUserUpdateArgs, User } from "../../../interfaces/generated";
 import { GraphQLResponse } from "../../../interfaces/graphql.interface";
 
@@ -43,12 +42,12 @@ const profileFile = (e: any) => {
 const EditEmployee = () => {
   let params = useParams();
   const authData = authVar();
-  const location = useLocation();
   const navigate = useNavigate();
   const [fileData, setFile] = useState({
     id: "",
     name: "",
   });
+
   const [userUpdate] = useMutation<
     GraphQLResponse<'UserUpdate', User>,
     MutationUserUpdateArgs
@@ -195,7 +194,7 @@ const EditEmployee = () => {
                 <ArrowLeftOutlined
                   onClick={() => navigate(-1)} />
                 &nbsp;
-                Edit {location.pathname.includes(routes.editProfile?.key) ? "Profile" : " Employee"}
+                Edit {authData?.user?.id === params.eid ? "Profile" : " Employee"}
               </h1>
             </Col>
           </Row>
@@ -399,7 +398,7 @@ const EditEmployee = () => {
                     },
                   ]}
                 >
-                  <Select placeholder="Employee" disabled={location.pathname.includes(routes.editProfile?.key) ? true :false }>
+                  <Select placeholder="Employee" disabled={authData?.user?.id === params.eid ? true : false}>
                     {roles &&
                       roles?.Role?.data.map((role: IRole, index: number) => (
                         <Option value={role?.id} key={index}>
@@ -419,7 +418,7 @@ const EditEmployee = () => {
                     },
                   ]}
                 >
-                  <Select placeholder="Select status"  disabled={location.pathname.includes(routes.editProfile?.key) ? true :false }>
+                  <Select placeholder="Select status" disabled={authData?.user?.id === params.eid ? true : false}>
                     <Option value="Active">Active</Option>
                     <Option value="Inactive">InActive</Option>
                   </Select>
@@ -464,7 +463,7 @@ const EditEmployee = () => {
                     <Button
                       type="primary"
                       htmlType="submit">
-                      Update {location.pathname.includes(routes.editProfile?.key) ? "Profile" : " Employee"}
+                      Update {authData?.user?.id === params.eid ? "Profile" : " Employee"}
                     </Button>
                   </Space>
                 </Form.Item >

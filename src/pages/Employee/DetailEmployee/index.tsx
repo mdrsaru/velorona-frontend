@@ -126,7 +126,7 @@ const DetailEmployee = () => {
               <div className={styles["avatar-image"]}>
                 {isImageLoading && loading ?
                   <Loader />
-                  :
+                  : (
                   <Avatar
                     src={userData?.User?.data[0]?.avatar?.url ?? image}
                     size={{
@@ -139,6 +139,7 @@ const DetailEmployee = () => {
                     }}
                   // icon={<AntDesignOutlined />}
                   />
+                  )
                 }
                 {profile ? (
                   <div className={styles["camera-div"]}>
