@@ -153,6 +153,7 @@ query Timesheet($input: TimesheetQueryInput!) {
       duration
       status
       durationFormat
+      invoicedDurationFormat
       user {
         id
         email
@@ -271,12 +272,15 @@ const Timesheet = () => {
         </div>
     },
     {
+      title: 'Invoiced Time',
+      dataIndex: 'invoicedDurationFormat',
+    },
+    {
       title: 'Total Expense',
-      key: 'totalExpense',
-      render: (record: any) =>
-        <div>
-          {record?.totalExpense}
-        </div>
+      dataIndex: 'totalExpense',
+      render: (totalExpense: number) => {
+        return `$${totalExpense}`
+      }
     },
     {
       title: 'Actions',
