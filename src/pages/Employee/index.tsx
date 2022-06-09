@@ -76,6 +76,7 @@ export const USER_UPDATE = gql`
       id
       firstName
       lastName
+      fullName
       email
       phone
       status
@@ -181,7 +182,7 @@ const Employee = () => {
       </div>
     );
   };
-const role = Object.values(RoleName)
+  const role = Object.values(RoleName)
   const { loading: employeeLoading, data: employeeData } = useQuery<
     GraphQLResponse<'User', UserPagingResult>,
     QueryUserArgs
@@ -330,6 +331,11 @@ const role = Object.values(RoleName)
       title: "Name",
       key: "fullName",
       dataIndex: "fullName",
+      render: (fullName: any) => {
+        return <span style={{ cursor: 'pointer' }} >
+          {fullName}
+        </span>
+      },
       onCell: (record: any) => {
         return {
           onClick: () => {
@@ -342,6 +348,11 @@ const role = Object.values(RoleName)
           },
         };
       },
+    },
+    {
+      title: "Email",
+      key: "email",
+      dataIndex: "email",
     },
     {
       title: "Pay Rate",

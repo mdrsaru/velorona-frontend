@@ -54,7 +54,11 @@ const EditEmployee = () => {
     MutationUserUpdateArgs
   >(USER_UPDATE, {
 
-    onCompleted: () => {
+    onCompleted: (response) => {
+      authVar({
+        ...authData,
+        fullName: response?.UserUpdate?.fullName as string
+      })
       if (fileData?.id) {
         changeProfilePictureInput({
           variables: {
@@ -69,6 +73,13 @@ const EditEmployee = () => {
               return notifyGraphqlError(response.errors);
             } else if (response?.data) {
               successMessage();
+              authVar({
+                ...authData,
+                avatar: {
+                  id: response?.data?.ChangeProfilePicture?.avatar?.id as string,
+                  url: response?.data?.ChangeProfilePicture?.avatar?.url as string
+                }
+              })
             }
           })
           .catch(notifyGraphqlError);

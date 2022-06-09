@@ -4,10 +4,9 @@ import { CloseOutlined } from "@ant-design/icons"
 import { gql, useMutation, useQuery } from "@apollo/client"
 import { PROJECT } from "../../pages/Project"
 import { authVar } from "../../App/link"
-import { MutationUserPayRateCreateArgs, UserPayRate } from "../../interfaces/generated"
-import { notifyGraphqlError } from "../../utils/error"
+import { MutationUserPayRateUpdateArgs, UserPayRate } from "../../interfaces/generated"
 
-import styles from "./styles.module.scss"
+import styles from "../UserPayRate/styles.module.scss"
 import { USER_PAY_RATE } from "../ViewUserPayRate"
 import { GraphQLResponse, UserPayRatePagingData } from "../../interfaces/graphql.interface"
 
@@ -15,18 +14,29 @@ interface IProps {
   visibility: boolean;
   setVisibility: any;
   data: any;
+  id?: string
 }
 
 
-export const USER_PAYRATE_CREATE = gql`
-  mutation UserPayRateCreate($input: UserPayRateCreateInput!) {
-    UserPayRateCreate(input: $input) {
+export const USER_PAYRATE_UPDATE = gql`
+  mutation UserPayRateUpdate($input: UserPayRateUpdateInput!) {
+    UserPayRateUpdate(input: $input) {
       id
+      project{
+      id
+      name
+      client{
+      id 
+      name
+      }
+      }
+      amount
+      
     }
   }
 `;
 
-const UserPayRateModal = (props: IProps) => {
+const EditUserPayRateModal = (props: IProps) => {
   const loggedInUser = authVar();
   const [form] = Form.useForm();
   const user = props.data;
@@ -46,19 +56,32 @@ const UserPayRateModal = (props: IProps) => {
     },
   });
 
-  const project_ids: any = [];
 
-  projectData?.Project?.data?.forEach((project: any, index: number) => {
-    project_ids.push({ id: project?.id, name: project?.name })
+
+  const [userPayRateUpdate] = useMutation<
+    GraphQLResponse<'UserPayRateUpdate', UserPayRate>, MutationUserPayRateUpdateArgs
+  >(USER_PAYRATE_UPDATE, {
+
+    onCompleted() {
+      message.success({
+        content: `User pay rate updated successfully!`,
+        className: "custom-message",
+      });
+      props.setVisibility(false)
+    },
+    onError(err) {
+      return message.error('You can not add pay rate to already existing project')
+
+    }
   })
 
-  const { data: userPayRate } = useQuery<UserPayRatePagingData>(USER_PAY_RATE, {
+  const { data: userPayRateData } = useQuery<UserPayRatePagingData>(USER_PAY_RATE, {
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
     variables: {
       input: {
         query: {
-          user_id: user?.id,
+          id: props?.id
         },
         paging: {
           order: ["updatedAt:DESC"],
@@ -66,60 +89,14 @@ const UserPayRateModal = (props: IProps) => {
       },
     },
   });
-  const ids: any = []
-
-  userPayRate?.UserPayRate?.data?.forEach((userPayRate, index: number) => {
-    ids.push({ id: userPayRate?.project?.id, name: userPayRate?.project?.name })
-  })
-
-  let projectList = project_ids.filter(function (objOne: any) {
-    return !ids.some(function (objTwo: any) {
-      return objOne.id === objTwo.id;
-    });
-  });
-
-  const [userPayRateCreate] = useMutation<
-  GraphQLResponse<'UserPayRateCreate',UserPayRate>,MutationUserPayRateCreateArgs
-  >(USER_PAYRATE_CREATE, {
-    refetchQueries: [
-      {
-        query: USER_PAY_RATE,
-        variables: {
-          input: {
-            query: {
-              user_id: user?.id,
-            },
-            paging: {
-              order: ["updatedAt:DESC"],
-            },
-          },
-        },
-      },
-
-      'UserPayRate'
-    ],
-    onCompleted() {
-      message.success({
-        content: `User pay rate added successfully!`,
-        className: "custom-message",
-      });
-      props.setVisibility(false)
-    },
-    onError(err) {
-      return notifyGraphqlError(err);
-
-    }
-  })
-
   const onSubmitForm = (values: any) => {
-    form.resetFields()
-    userPayRateCreate({
+
+    userPayRateUpdate({
       variables: {
         input: {
-          user_id: user.id,
+          id: props?.id as string,
           project_id: values.project_id,
-          amount: values.payRate,
-          company_id: loggedInUser.company?.id as string
+          amount: values.amount,
         }
       }
     })
@@ -127,6 +104,10 @@ const UserPayRateModal = (props: IProps) => {
 
   const onCancel = () => {
     props.setVisibility(!props.visibility)
+  }
+
+  if (!userPayRateData?.UserPayRate?.data) {
+    return null
   }
   return (
     <Modal
@@ -145,7 +126,7 @@ const UserPayRateModal = (props: IProps) => {
       <div className={styles["modal-body"]}>
         <div>
           <span className={styles["title"]}>
-            Add Payrate
+            Edit PayRate
           </span>
         </div>
 
@@ -157,7 +138,12 @@ const UserPayRateModal = (props: IProps) => {
         <Form
           form={form}
           layout="vertical"
-          onFinish={onSubmitForm}>
+          onFinish={onSubmitForm}
+          initialValues={{
+            project_id: userPayRateData?.UserPayRate?.data?.[0]?.project?.id,
+            amount: userPayRateData?.UserPayRate?.data?.[0]?.amount
+          }}
+        >
           <Row gutter={[24, 0]}>
             <Col
               xs={24}
@@ -166,9 +152,14 @@ const UserPayRateModal = (props: IProps) => {
               lg={24}>
               <Form.Item
                 label="Project Name"
-                name="project_id">
-                <Select placeholder="Select Project">
-                  {projectList?.map((project: any, index: number) => (
+                name="project_id"
+
+              >
+                <Select
+                  placeholder="Select Project"
+                  defaultValue={userPayRateData?.UserPayRate?.data?.[0]?.project?.name}
+                >
+                  {projectData?.Project?.data?.map((project: any, index: number) => (
                     <Select.Option value={project?.id} key={index}>
                       {project?.name}
                     </Select.Option>
@@ -183,7 +174,7 @@ const UserPayRateModal = (props: IProps) => {
               lg={24}>
               <Form.Item
                 label="Payrate"
-                name="payRate">
+                name="amount">
                 <InputNumber
                   addonBefore="$ "
                   addonAfter="Hr"
@@ -221,4 +212,4 @@ const UserPayRateModal = (props: IProps) => {
   )
 };
 
-export default UserPayRateModal;
+export default EditUserPayRateModal;

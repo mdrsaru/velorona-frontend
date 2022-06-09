@@ -20,7 +20,6 @@ import Priority from "../../assets/images/priority.svg";
 
 import Status from "../Status";
 import styles from "./styles.module.scss";
-import { useState } from "react";
 import { TASK } from "../../pages/Tasks";
 
 interface IProps {
@@ -29,11 +28,12 @@ interface IProps {
   data: any;
   employee?: boolean;
   userId?: any;
+  onUpdateAction?: any;
+
 }
 
 const TaskDetail = (props: IProps) => {
-  const { visibility, setVisibility, data,  userId  } = props;
-  const [refresh,setRefresh] = useState(false)
+  const { visibility, setVisibility, data, userId } = props;
   const loggedInUser = authVar();
   const { data: userData } = useQuery<UserData>(USER, {
     fetchPolicy: "network-only",
@@ -51,10 +51,10 @@ const TaskDetail = (props: IProps) => {
   });
 
   const [taskUpdate] = useMutation(TASK_UPDATE, {
-    
-      refetchQueries: [
-        {query: TASK,
-          variables: {
+    refetchQueries: [
+      {
+        query: TASK,
+        variables: {
           input: {
             query: {
               company_id: loggedInUser?.company?.id,
@@ -63,16 +63,17 @@ const TaskDetail = (props: IProps) => {
             paging: {
               order: ["updatedAt:DESC"],
             },
-          },}, },
-        
-        'Task'
-      ],
+          },
+        },
+      },
+
+      'Task'
+    ],
     onCompleted() {
       message.success({
         content: `Task is updated successfully!`,
         className: "custom-message",
       });
-      setRefresh(!refresh)
     },
     onError(err) {
       notifyGraphqlError(err);
@@ -97,10 +98,13 @@ const TaskDetail = (props: IProps) => {
         },
       },
     });
+    setVisibility(false)
   };
 
-  const handleDatePickerChange = (date: any, dateString: any) => {
+  const handleDatePickerChange = (date: any) => {
     let deadline = moment(new Date(date)).format("YYYY-MM-DD");
+    props?.onUpdateAction({ title: "deadline", value: deadline })
+
     taskUpdate({
       variables: {
         input: {
@@ -113,6 +117,8 @@ const TaskDetail = (props: IProps) => {
   };
 
   const handlePriorityChange = () => {
+    props?.onUpdateAction({ title: "priority", value: !data.priority })
+
     taskUpdate({
       variables: {
         input: {
@@ -165,8 +171,13 @@ const TaskDetail = (props: IProps) => {
       <div className={styles["modal-body"]}>
         <div>
           <Row>
-            <Col lg={6}>
-              <span className={styles["task-title"]}>Task Detail</span>
+            <Col lg={15}>
+              <div>
+                <span className={styles["task-title"]}>{data?.name} </span>
+                <span className={styles.clientProjectName}>
+                  {data?.project?.client?.name}:{data?.project?.name}
+                </span>
+              </div>
             </Col>
             {props?.employee ? (
               <Col lg={6}>
@@ -193,13 +204,6 @@ const TaskDetail = (props: IProps) => {
         <br />
         <div style={{ marginBottom: "1rem" }}>
           <Row style={{ marginTop: "1rem" }}>
-            {props?.employee && (
-              <Col lg={6} md={5} sm={24}>
-                <p className={styles["user-name"]}>
-                  {userData?.User?.data?.[0]?.fullName}
-                </p>
-              </Col>
-            )}
             <Col lg={5} md={3} sm={12} className={styles["headings"]}>
               <p>Assigned To</p>
               <AssignedUserAvatar users={data?.users} />
@@ -257,8 +261,8 @@ const TaskDetail = (props: IProps) => {
                           {`${data?.deadline?.split("T")?.[0]}`}{" "}
                         </span>
                       }
-                      onChange={(date, dateString) =>
-                        handleDatePickerChange(date, dateString)
+                      onChange={(date) =>
+                        handleDatePickerChange(date)
                       }
                       style={{
                         width: 90,
@@ -274,8 +278,8 @@ const TaskDetail = (props: IProps) => {
                   format="MMM Do, YYYY"
                   allowClear={false}
                   className={styles["custom-picker"]}
-                  onChange={(date, dateString) =>
-                    handleDatePickerChange(date, dateString)
+                  onChange={(date) =>
+                    handleDatePickerChange(date)
                   }
                   style={{
                     width: 30,
@@ -286,11 +290,7 @@ const TaskDetail = (props: IProps) => {
             </Col>
           </Row>
         </div>
-        <div style={{ marginTop: "3rem" }}>
-          <span className={styles["task-title"]}>{data?.name} </span>
-          <span className={styles.clientProjectName}>
-            {data?.project?.client?.name}:{data?.project?.name}
-          </span>
+        <div>
           <div className={styles["task-body"]}>
             {data?.description ? parse(data?.description) : ""}
           </div>
