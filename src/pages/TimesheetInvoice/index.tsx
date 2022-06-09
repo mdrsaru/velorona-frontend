@@ -13,6 +13,7 @@ import { TimesheetQueryInput } from '../../interfaces/generated';
 import PageHeader from '../../components/PageHeader';
 import InvoiceClientDetail from '../../components/InvoiceClientDetail';
 import InvoiceForm from '../../components/InvoiceForm';
+import Loader from '../../components/Loader';
 
 import styles from './style.module.scss';
 
@@ -58,6 +59,7 @@ const TimesheetInvoice = () => {
 
   const {
     data: timesheetData,
+    loading: timesheetLoading,
   } = useQuery<TimesheetPagingData, { input: TimesheetQueryInput }>(
     TIMESHEET, {
       fetchPolicy: 'cache-first',
@@ -125,6 +127,10 @@ const TimesheetInvoice = () => {
             </>
           }
         />
+
+        {
+          timesheetLoading && <Loader />
+        }
 
         {
           !!timesheet?.client && (

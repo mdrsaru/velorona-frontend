@@ -23,6 +23,7 @@ const EMPLOYEE_TIMESHEET = gql`
       data {
         id
         durationFormat
+        invoicedDurationFormat
         totalExpense
         lastApprovedAt
         status
@@ -154,8 +155,12 @@ const EmployeeTimesheet = () => {
       dataIndex: ['client', 'name'],
     },
     {
-      title: 'Total Quantity',
+      title: 'Total Time',
       dataIndex: 'durationFormat',
+    },
+    {
+      title: 'Invoiced Time',
+      dataIndex: 'invoicedDurationFormat',
     },
     {
       title: 'Last Approved',
@@ -167,6 +172,9 @@ const EmployeeTimesheet = () => {
     {
       title: 'Expense',
       dataIndex: 'totalExpense',
+      render: (totalExpense: number) => {
+        return `$${totalExpense}`
+      }
     },
     {
       title: 'Status',
