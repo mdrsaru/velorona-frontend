@@ -59,12 +59,20 @@
 }
 
 .form-col {
-  padding: 1.5rem 0 0.9rem 0;
-
   h1 {
     font-weight: 600;
     font-size: 24px;
     line-height: 29px;
+  }
+}
+
+.modal-body {
+  .assigned-details {
+    Col {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
   }
 }
 

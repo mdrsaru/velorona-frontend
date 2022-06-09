@@ -193,9 +193,6 @@ const Employee = () => {
       nextFetchPolicy: "cache-first",
       variables: {
         input: {
-          query: {
-            role: role[2],
-          },
           paging: {
             order: ["updatedAt:DESC"],
           },
@@ -353,6 +350,13 @@ const Employee = () => {
       title: "Email",
       key: "email",
       dataIndex: "email",
+    },
+    {
+      title: "Role",
+      key: "role",
+      render: (user: any) => {
+        return <span>{user?.roles[0]?.name}</span>;
+      },
     },
     {
       title: "Pay Rate",

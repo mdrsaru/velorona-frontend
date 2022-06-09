@@ -96,7 +96,7 @@ const Tasks = () => {
         return (
           <>
             <span className={styles['task-name']}>{task?.name}</span>
-            <span className={styles.clientProjectName}>
+            <span className={styles['client-project-name']}>
               {task?.project?.client?.name}:{task?.project?.name}
             </span>
           </>

@@ -6,6 +6,16 @@
     }
   }
 
+  .ant-modal-body {
+    padding: 18px 0 0 0;
+  }
+
+  :local(.modal-footer) {
+    .ant-modal-footer {
+      text-align: left;
+    }
+  }
+
   :local(.task-card) {
     .ant-avatar {
       float: right;
@@ -26,22 +36,38 @@
 
 .modal-body {
   :global {
+
     .ant-picker,
     .ant-picker.ant-picker-borderless,
     .ant-input {
       background-color: var(--white) !important;
     }
   }
+
+  .assigned-details {
+    :global {
+      .ant-col {
+        text-align: center;
+        padding-top: 1rem;
+        border: 1px solid var(--gray-2);
+      }
+    }
+  }
 }
+
 .modal-footer {
-  justify-items: left;
-  align-items: flex-start;
+  justify-items: center;
+  align-items: center;
   display: flex;
   font-weight: 600;
   font-size: 18px;
   line-height: 22px;
-  padding: 1rem 0.5rem 1rem 0.5rem;
+  padding: 1rem;
   box-sizing: border-box;
+
+  Button {
+    float: right;
+  }
 }
 
 .file-attach {
@@ -65,7 +91,9 @@
 }
 
 .task-body {
-  padding: 1rem 0;
+  padding: 1rem;
+  min-height: 300px;
+  width: 100%;
 }
 
 .task-subtitle {
@@ -95,6 +123,10 @@
   padding: 1rem;
 }
 
+.task-header {
+  padding-left: 1rem;
+}
+
 .status-div {
   background: var(--gray-2);
   padding: 1rem;
@@ -122,7 +154,7 @@
   line-height: 17px;
 }
 
-.clientProjectName {
+.client-project-name {
   background-color: rgba(149, 35, 156, 0.2);
   color: var(--primary-purple);
   padding: 0.5rem;

@@ -69,6 +69,7 @@
 .task-body {
   padding: 2rem 1rem 2rem 1rem;
   min-height: 300px;
+  width: 100%;
 }
 
 .task-subtitle {
@@ -106,7 +107,7 @@
   text-transform: capitalize;
 }
 
-.clientProjectName {
+.client-project-name {
   background-color: rgba(149, 35, 156, 0.2);
   color: var(--primary-purple);
   padding: 0.5rem;

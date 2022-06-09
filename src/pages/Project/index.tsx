@@ -238,8 +238,7 @@ const ProjectPage = () => {
     {
       title: "Project Name",
       key: "name",
-      dataIndex:"name",
-
+      render: (record: Project) => <div style={{cursor: 'pointer'}}>{record?.name}</div>,
       onCell: (record: Project) => {
         return {
           onClick: () => {
@@ -308,11 +307,11 @@ const ProjectPage = () => {
 
     <div className={styles["project-main-div"]}>
       <Card bordered={false}>
-        <Row>
+        <Row gutter={[32, 12]}>
           <Col span={12} className={styles["form-col"]}>
             <h1>Projects</h1>
           </Col>
-          <Col span={12} className={styles["form-col"]}>
+          <Col span={12}>
             <div className={styles["add-new"]}>
               <Link
                 to={routes.addProject.path(

@@ -2,7 +2,7 @@
 import moment from "moment";
 import { CloseOutlined, LinkOutlined } from "@ant-design/icons";
 import { useMutation, useQuery } from "@apollo/client";
-import { Col, DatePicker, message, Modal, Row, Select } from "antd";
+import { Col, DatePicker, message, Modal, Row, Select, Button } from "antd";
 import parse from "html-react-parser";
 
 import { authVar } from "../../App/link";
@@ -41,7 +41,7 @@ const TaskDetail = (props: IProps) => {
     variables: {
       input: {
         query: {
-          id:userId,
+          id: userId,
         },
         paging: {
           order: ["updatedAt:DESC"],
@@ -83,7 +83,7 @@ const TaskDetail = (props: IProps) => {
       cache.evict({ id: normalizedId });
       cache.gc();
     },
-   
+
   });
 
   const status = Object.values(TaskStatus);
@@ -141,160 +141,166 @@ const TaskDetail = (props: IProps) => {
           </span>
         </div>,
       ]}
-      footer={[
-        <div className={styles["modal-footer"]} key={2}>
-          {data?.attachments?.length ? (
-            <>
-              <span>Attachments</span> &nbsp; &nbsp;
-              {data?.attachments?.map((attachment: any, index: number) => (
-                <div key={index}>
-                  <span className={styles["file-attach"]}>
-                    <LinkOutlined />
-                  </span>{" "}
-                  &nbsp;
-                  <span className={styles["file-name"]}>
-                    <a href={attachment.url} target="_blank" rel="noreferrer">
-                      {attachment?.name}
-                    </a>
-                  </span>{" "}
-                  &nbsp; &nbsp;
-                </div>
-              ))}
-            </>
-          ) : (
-            ""
-          )}
-        </div>,
-      ]}
+      footer={null}
       width={869}
     >
       <div className={styles["modal-body"]}>
-        <div>
-          <Row>
-            <Col lg={15}>
-              <div>
-                <span className={styles["task-title"]}>{data?.name} </span>
-                <span className={styles.clientProjectName}>
-                  {data?.project?.client?.name}:{data?.project?.name}
-                </span>
-              </div>
+        <Row gutter={[32, 24]} className={styles["task-header"]}>
+          <Col span={8}>
+            <div>
+              <span className={styles["task-title"]}>{data?.name} </span>
+            </div>
+          </Col>
+          {props?.employee ? (
+            <Col span={4}>
+              <Select
+                placeholder="Select State"
+                onChange={onStatusChange}
+                defaultValue={data?.status}
+              >
+                {status?.map((status, index) => (
+                  <Select.Option value={status} key={index}>
+                    {status}
+                  </Select.Option>
+                ))}
+              </Select>
             </Col>
-            {props?.employee ? (
-              <Col lg={6}>
-                <Select
-                  placeholder="Select State"
-                  onChange={onStatusChange}
-                  defaultValue={data?.status}
-                >
-                  {status?.map((status, index) => (
-                    <Select.Option value={status} key={index}>
-                      {status}
-                    </Select.Option>
-                  ))}
-                </Select>
-              </Col>
+          ) : (
+            <Col span={4} className={styles["status-div"]}>
+              <Status status={data?.active ? "Active" : "Inactive"} />
+            </Col>
+          )}
+        </Row>
+        <br />
+        <br />
+        <Row gutter={[32, 12]} className={styles['assigned-details']}>
+          <Col span={6}>
+            <p>Assigned to</p>
+            <AssignedUserAvatar users={data?.users} />
+          </Col>
+          <Col span={6}>
+            <p>Priority</p>
+            {props.employee ? (
+              <img
+                src={data?.priority ? Priority : NotPriority}
+                width="15px"
+                alt="Priority Flag"
+              />
             ) : (
-              <div className={styles["status-div"]}>
-                <Status status={data?.active ? "Active" : "Inactive"} />
-              </div>
+              <img
+                src={data?.priority ? Priority : NotPriority}
+                width="15px"
+                alt="Priority Flag"
+                onClick={handlePriorityChange}
+              />
             )}
-          </Row>
-        </div>
-        <br />
-        <br />
-        <div style={{ marginBottom: "1rem" }}>
-          <Row style={{ marginTop: "1rem" }}>
-            <Col lg={5} md={3} sm={12} className={styles["headings"]}>
-              <p>Assigned To</p>
-              <AssignedUserAvatar users={data?.users} />
-            </Col>
-            <Col lg={4} md={5} sm={12}>
-              <p>Priority</p>
-              {props.employee ? (
-                <img
-                  src={data?.priority ? Priority : NotPriority}
-                  width="15px"
-                  alt="Priority Flag"
-                />
-              ) : (
-                <img
-                  src={data?.priority ? Priority : NotPriority}
-                  width="15px"
-                  alt="Priority Flag"
-                  onClick={handlePriorityChange}
-                />
-              )}
-            </Col>
+          </Col>
 
-            <Col lg={6} md={3} sm={12}>
-              <p>CreatedAt</p>
-              <p className={styles["createdAt"]}>{createdAt}</p>
-            </Col>
+          <Col span={6}>
+            <p>CreatedAt</p>
+            <p className={styles["createdAt"]}>{createdAt}</p>
+          </Col>
 
-            <Col lg={3} md={3} sm={12}>
-              <p>Deadline</p>
+          <Col span={6}>
+            <p>Deadline</p>
 
-              {props.employee ? (
-                <span>
-                  {" "}
-                  {data?.deadline ? (
-                    <p className={styles.deadline}>
-                      {" "}
-                      {data?.deadline?.split("T")?.[0]}
-                    </p>
-                  ) : (
-                    "-"
-                  )}{" "}
-                </span>
-              ) : data?.deadline ? (
-                <Row>
-                  <Col>
-                    <DatePicker
-                      bordered={false}
-                      format="MMM Do, YYYY"
-                      allowClear={false}
-                      className={styles["custom-picker"]}
-                      // defaultValue={task?.deadline}
-                      suffixIcon={
-                        <span>
-                          {" "}
-                          {`${data?.deadline?.split("T")?.[0]}`}{" "}
-                        </span>
-                      }
-                      onChange={(date) =>
-                        handleDatePickerChange(date)
-                      }
-                      style={{
-                        width: 90,
-                        boxSizing: "revert",
-                        padding:0,
-                      }}
-                    />
-                  </Col>
-                </Row>
-              ) : (
-                <DatePicker
-                  bordered={false}
-                  format="MMM Do, YYYY"
-                  allowClear={false}
-                  className={styles["custom-picker"]}
-                  onChange={(date) =>
-                    handleDatePickerChange(date)
-                  }
-                  style={{
-                    width: 30,
-                    padding:0,
-                  }}
-                />
-              )}
-            </Col>
-          </Row>
-        </div>
-        <div>
-          <div className={styles["task-body"]}>
-            {data?.description ? parse(data?.description) : ""}
-          </div>
-        </div>
+            {props.employee ? (
+              <span>
+                {" "}
+                {data?.deadline ? (
+                  <p className={styles.deadline}>
+                    {" "}
+                    {data?.deadline?.split("T")?.[0]}
+                  </p>
+                ) : (
+                  "-"
+                )}{" "}
+              </span>
+            ) : data?.deadline ? (
+              <Row>
+                <Col>
+                  <DatePicker
+                    bordered={false}
+                    format="MMM Do, YYYY"
+                    allowClear={false}
+                    className={styles["custom-picker"]}
+                    // defaultValue={task?.deadline}
+                    suffixIcon={
+                      <span>
+                        {" "}
+                        {`${data?.deadline?.split("T")?.[0]}`}{" "}
+                      </span>
+                    }
+                    onChange={(date) =>
+                      handleDatePickerChange(date)
+                    }
+                    style={{
+                      width: 90,
+                      boxSizing: "revert",
+                      padding: 0,
+                    }}
+                  />
+                </Col>
+              </Row>
+            ) : (
+              <DatePicker
+                bordered={false}
+                format="MMM Do, YYYY"
+                allowClear={false}
+                className={styles["custom-picker"]}
+                onChange={(date) =>
+                  handleDatePickerChange(date)
+                }
+                style={{
+                  width: 30,
+                  padding: 0,
+                }}
+              />
+            )}
+          </Col>
+        </Row>
+        <Row>
+          <Col className={styles["task-body"]}>
+            <div>
+              {data?.description ? <span className={styles["task-subtitle"]}>Task Description</span> : ''}
+              <span className={styles['client-project-name']}>
+                {data?.project?.client?.name}:{data?.project?.name}
+              </span>
+            </div>
+            <br />
+            <div>
+              {data?.description ? parse(data?.description) : ""}
+            </div>
+          </Col>
+        </Row>
+        <Row className={styles["modal-footer"]} key={2}>
+          <Col span={12}>
+            {data?.attachments?.length ? (
+              <div>
+                <span>Attachments</span> &nbsp; &nbsp;
+                {data?.attachments?.map((attachment: any, index: number) => (
+                  <div key={index}>
+                    <span className={styles["file-attach"]}>
+                      <LinkOutlined />
+                    </span>{" "}
+                    &nbsp;
+                    <span className={styles["file-name"]}>
+                      <a href={attachment.url} target="_blank" rel="noreferrer">
+                        {attachment?.name}
+                      </a>
+                    </span>{" "}
+                    &nbsp; &nbsp;
+                  </div>
+                ))}
+              </div>
+            ) : (
+              ""
+            )}
+          </Col>
+          <Col span={12}>
+            <Button type="primary">Start Timer</Button>
+          </Col>
+        </Row>
       </div>
     </Modal>
   );
