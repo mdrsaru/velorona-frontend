@@ -109,7 +109,7 @@ const NewEmployee = () => {
       navigate(routes.attachClient.path(authData?.company?.code ?? "", user ?? "")) :
       navigate(routes.employee.path(authData?.company?.code ?? ''));
     message.success({
-      content: `New Employee is created successfully!`,
+      content: `New User is created successfully!`,
       className: 'custom-message'
     });
   }
@@ -229,7 +229,7 @@ const NewEmployee = () => {
             className={styles['employee-col']}>
             <h1>
               <ArrowLeftOutlined onClick={() => navigate(-1)} />
-              &nbsp; Add New Employee
+              &nbsp; Add New User
             </h1>
           </Col>
         </Row>
@@ -438,7 +438,7 @@ const NewEmployee = () => {
               lg={12}>
               <Form.Item
                 name="status"
-                label="Employee Status"
+                label="User Status"
                 rules={[{
                   required: true,
                   message: 'Please select the status'

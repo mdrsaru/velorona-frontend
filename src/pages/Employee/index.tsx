@@ -176,7 +176,7 @@ const Employee = () => {
           <strong> {employee.fullName}? </strong>
         </p>
         <p className={styles["archive-text"]}>
-          Employee will {employee?.archived ? "" : "not"} be able to login to
+          User will {employee?.archived ? "" : "not"} be able to login to
           the system.
         </p>
       </div>
@@ -207,7 +207,7 @@ const Employee = () => {
   const archiveUser = () => {
     let key = "archive";
     message.loading({
-      content: "Archiving employee in progress..",
+      content: "Archiving user in progress..",
       key,
       className: "custom-message",
     });
@@ -225,7 +225,7 @@ const Employee = () => {
           return notifyGraphqlError(response.errors);
         }
         message.success({
-          content: `Employee is archived successfully!`,
+          content: `User is archived successfully!`,
           key,
           className: "custom-message",
         });
@@ -254,7 +254,7 @@ const Employee = () => {
           return notifyGraphqlError(response.errors);
         }
         message.success({
-          content: `Employee is updated successfully!`,
+          content: `User is updated successfully!`,
           key,
           className: "custom-message",
         });
@@ -307,7 +307,7 @@ const Employee = () => {
               data?.id ?? "1"
             )}
           >
-            Edit Employee
+            Edit User
           </Link>
         </div>
       </Menu.Item>
@@ -320,7 +320,7 @@ const Employee = () => {
             setArchiveVisibility(true);
           }}
         >
-          {data?.archived ? "Unarchive Employee" : "Archive Employee"}
+          {data?.archived ? "Unarchive User" : "Archive User"}
         </div>
       </Menu.Item>
     </Menu>
@@ -423,7 +423,7 @@ const Employee = () => {
           <Card bordered={false}>
             <Row>
               <Col span={12} className={styles["employee-col"]}>
-                <h1>Employee</h1>
+                <h1>User</h1>
               </Col>
               <Col span={12} className={styles["employee-col"]}>
                 <div className={styles["add-new-employee"]}>
@@ -434,7 +434,7 @@ const Employee = () => {
                         : ""
                     )}
                   >
-                    Add New Employee
+                    Add New User
                   </Link>
                 </div>
               </Col>

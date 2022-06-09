@@ -236,7 +236,7 @@ const DetailEmployee = () => {
                     loggedInUser?.company?.code ?? "1",
                     params?.eid ?? "1"
                   )}>
-                    Edit Employee
+                    Edit User
                   </Link>}
               </Button>
             </Col>

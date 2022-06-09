@@ -178,10 +178,10 @@ const TimeEntryDetails = (props: IProps) => {
               <tr
                 key={index}
               >
-                <td>
+                <td className={styles['detail-name']}>
                   {group?.project}
                 </td>
-                <td>
+                <td className={styles['detail-name']}>
                   {group?.name}
                 </td>
 
