@@ -22,6 +22,10 @@ export const USER_PAY_RATE = gql`
         project {
           id
           name
+          client{
+          id
+          name
+          }
         }
         user {
           id
@@ -60,13 +64,13 @@ const ViewUserPayRate = (props: IProps) => {
     {
       title: "Client Name",
       render: (payRate: any) => {
-        return <p>{payRate?.user?.fullName}</p>;
+        return <p>{payRate?.project?.client?.name}</p>;
       },
     },
     {
-      title: "Project Name",
+      title: "Payrate(per hour)",
       render: (payRate: any) => {
-        return <p>{payRate?.amount}</p>;
+        return <p>${payRate?.amount}</p>;
       },
     },
   ];

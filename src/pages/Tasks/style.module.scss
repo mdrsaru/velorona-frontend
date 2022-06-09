@@ -18,6 +18,15 @@
 }
 
 
+.task-div {
+  :global {
+    .ant-table .ant-table-thead > tr > th {
+      background-color: var(--white);
+      color:var(--gray-secondary)
+    }
+  }
+}
+
 .main-div {
   padding: 2rem 0 2rem 0;
 
