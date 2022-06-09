@@ -232,7 +232,7 @@ const Timesheet = () => {
   let navigate = useNavigate();
   const [form] = Form.useForm()
   const [timeEntryForm] = Form.useForm()
-  const stopwatchOffset = new Date();
+  let stopwatchOffset = new Date();
   const [visible, setVisible] = useState(false);
   const [showDetailTimeEntry, setDetailVisible] = useState<boolean>(false);
   const [pagingInput, setPagingInput] = useState<{
@@ -616,6 +616,7 @@ const Timesheet = () => {
   }
 
   const createTimeEntries = (values: any) => {
+    stopwatchOffset = new Date()
     createTimeEntry({
       variables: {
         input: {
@@ -653,6 +654,7 @@ const Timesheet = () => {
   }
 
   const clickPlayButton = (entry: string) => {
+    form.resetFields()
     const timesheet = filterData()[entry][0];
     !isRunning ? createTimeEntries({ task: entry, project: timesheet?.project?.id }) : submitStopTimer();
   }
