@@ -229,7 +229,6 @@ const Client = () => {
       title: "Client Name",
       dataIndex: "name",
       key: "name",
-   
       onCell: (data: any) => {
         return {
           onClick: () => {
@@ -238,6 +237,7 @@ const Client = () => {
           },
         };
       },
+      className: styles["client-name"]
     },
     {
       title: "Email Address",
@@ -333,7 +333,7 @@ const Client = () => {
         imgSrc={archiveImg}
         okText={client?.archived ? "Unarchive" : "Archive"}
         modalBody={
-          <ArchiveBody 
+          <ArchiveBody
             title={
               <>
                 Are you sure you want to{" "}
@@ -341,7 +341,7 @@ const Client = () => {
                 <strong> {client?.name}?</strong>
               </>
             }
-            subText={`Client will ${client?.archived ? "" : "not" } be able to login to the system` }
+            subText={`Client will ${client?.archived ? "" : "not"} be able to login to the system`}
           />
         }
         onOkClick={archiveClient}

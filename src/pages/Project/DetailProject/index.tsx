@@ -70,7 +70,7 @@ const DetailProject = () => {
   const navigate = useNavigate();
   const loggedInUser = authVar();
 
-  const [taskUpdate, { loading: updateLoading }] = useMutation<GraphQLResponse<'TaskUpdate',Task>,MutationTaskUpdateArgs>(TASK_UPDATE, {
+  const [taskUpdate, { loading: updateLoading }] = useMutation<GraphQLResponse<'TaskUpdate', Task>, MutationTaskUpdateArgs>(TASK_UPDATE, {
     onCompleted() {
       message.success({
         content: `Task is updated successfully!`,
@@ -88,7 +88,7 @@ const DetailProject = () => {
       cache.gc();
     },
   });
-  const [taskDelete, { loading }] = useMutation<GraphQLResponse<'TaskDelete',Task>,MutationTaskDeleteArgs>(TASK_DELETE, {
+  const [taskDelete, { loading }] = useMutation<GraphQLResponse<'TaskDelete', Task>, MutationTaskDeleteArgs>(TASK_DELETE, {
     onCompleted() {
       message.success({
         content: `Task is deleted successfully!`,
@@ -257,11 +257,11 @@ const DetailProject = () => {
       <p className={styles.employeeTitle}>
         Employee List ({record.users.length}){" "}
       </p>
-      {record.users?.map((user: any) => (
-        <>
-          <Menu.Item className={styles.list}>{user.fullName}</Menu.Item>
+      {record.users?.map((user: any, index: number) => (
+        <div key={index}>
+          <Menu.Item className={styles.list}>{user?.fullName}</Menu.Item>
           <Menu.Divider />
-        </>
+        </div>
       ))}
     </Menu>
   );
@@ -276,14 +276,12 @@ const DetailProject = () => {
           </div>
         );
       },
-      onCell: (task: any) => {
-        return {
-          onClick: () => {
-            setDetailVisibility(!detailVisibility);
-            setTask(task);
-          },
-        };
-      },
+      onCell: (record: any) => ({
+        onClick: () => {
+          setDetailVisibility(!detailVisibility);
+          setTask(record);
+        }
+      }),
     },
     {
       title: "Task Manager",
@@ -345,7 +343,7 @@ const DetailProject = () => {
     },
   ];
 
-  const { data: projectData } = useQuery<GraphQLResponse<'Project',ProjectPagingResult>,QueryProjectArgs>(PROJECT, {
+  const { data: projectData } = useQuery<GraphQLResponse<'Project', ProjectPagingResult>, QueryProjectArgs>(PROJECT, {
     variables: {
       input: {
         query: {
@@ -366,7 +364,7 @@ const DetailProject = () => {
   }
 
 
-  const { data: taskData, loading: taskLoading } = useQuery<GraphQLResponse<'Task', TaskPagingResult>,QueryTaskArgs>(TASK, {
+  const { data: taskData, loading: taskLoading } = useQuery<GraphQLResponse<'Task', TaskPagingResult>, QueryTaskArgs>(TASK, {
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
     variables: {

@@ -47,7 +47,7 @@ const routes = {
     childPath: 'role',
     path: '/role',
     component: lazy(() => import('../pages/Role')),
-    name: 'Role',
+    name: 'Roles',
     key: 'role'
   },
   companyDashboard: {
@@ -79,18 +79,18 @@ const routes = {
     key: 'company'
   },
   employee: {
-    childPath: 'users',
-    path: (id: string) => `/${id}/users`,
+    childPath: 'employees',
+    path: (id: string) => `/${id}/employees`,
     component: lazy(() => import('../pages/Employee')),
-    name: 'Users',
-    key: 'users'
+    name: 'Employee',
+    key: 'employees'
   },
   user: {
     childPath: 'users',
     path: (id: string) => `/${id}/users`,
     component: lazy(() => import('../pages/Employee')),
     name: 'Users',
-    key: 'user'
+    key: 'users'
   },
   editEmployee: {
     childPath: ':eid',
@@ -166,7 +166,7 @@ const routes = {
     childPath: 'projects',
     path: (id: string) => `/${id}/projects`,
     component: lazy(() => import('../pages/Project')),
-    name: 'Project',
+    name: 'Projects',
     key: 'projects'
   },
   addProject: {
@@ -208,7 +208,7 @@ const routes = {
     childPath: 'invoices',
     path: (id: string) => `/${id}/invoices`,
     component: lazy(() => import('../pages/Invoice')),
-    name: 'Invoice',
+    name: 'Invoices',
     key: 'invoices'
   },
   addInvoice: {
@@ -229,7 +229,7 @@ const routes = {
     childPath: 'clients',
     path: (id: string) => `/${id}/clients`,
     component: lazy(() => import('../pages/Client')),
-    name: 'Client',
+    name: 'Clients',
     key: 'clients'
   },
   addClient: {

@@ -96,6 +96,7 @@ const _Routes = () => {
                 <CheckRoles
                   allowedRoles={[
                     constants.roles.CompanyAdmin,
+                    constants.roles.SuperAdmin,
                     constants.roles.Employee,
                     constants.roles.TaskManager,
                   ]}
@@ -308,13 +309,15 @@ const _Routes = () => {
               />
             </Route>
 
-            <Route path={routes.employee.childPath}>
+            <Route path={routes.user.childPath}>
               <Route
                 index
                 element={
-                  <Suspense fallback={<RouteLoader />}>
-                    <routes.employee.component />
-                  </Suspense>
+                  <CheckRoles allowedRoles={[constants.roles.CompanyAdmin]}>
+                    <Suspense fallback={<RouteLoader />}>
+                      <routes.user.component />
+                    </Suspense>
+                  </CheckRoles>
                 }
               />
 
