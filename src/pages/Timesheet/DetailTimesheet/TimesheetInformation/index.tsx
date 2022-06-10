@@ -1,14 +1,11 @@
 import moment from 'moment';
 import isNil from 'lodash/isNil';
 import { Card, Col, Row } from 'antd';
-import {
-  ArrowLeftOutlined
-} from '@ant-design/icons';
-import { Link } from 'react-router-dom';
+import { ArrowLeftOutlined } from '@ant-design/icons';
+import { useNavigate } from 'react-router-dom';
 
-import routes from '../../../../config/routes';
-import { authVar } from '../../../../App/link';
-import { RoleName, Timesheet } from '../../../../interfaces/generated';
+import { Timesheet } from '../../../../interfaces/generated';
+
 
 import PageHeader from '../../../../components/PageHeader';
 
@@ -17,6 +14,7 @@ import styles from './style.module.scss';
 const statusMap = {
   'Approved': 'Approved',
   'Pending': 'Pending',
+  'Rejected': 'Rejected',
   'PartiallyApproved': 'Partially Approved',
 };
 
@@ -25,9 +23,7 @@ interface IProps {
 }
 
 const TimesheetInformation = (props: IProps) => {
-
-  const authData = authVar();
-  const companyCode = authData?.company?.code as string;
+  const navigate = useNavigate();
   const timesheet = props.timesheet;
 
   return (
@@ -38,18 +34,9 @@ const TimesheetInformation = (props: IProps) => {
       <PageHeader
         title={
           <>
-            {authData?.user?.roles.includes(RoleName.Employee) ?
-              <Link to={
-                routes.timesheet.path(companyCode)}
-              >
-                <ArrowLeftOutlined />
-              </Link>
-              :
-              <Link to={
-                routes.employeeTimesheet.path(companyCode)}>
-                <ArrowLeftOutlined />
-              </Link>
-            }
+            <span onClick={() => navigate(-1)} style={{ cursor: 'pointer' }}>
+              <ArrowLeftOutlined />
+            </span>
             &nbsp; My Timesheet
           </>
         }

@@ -77,10 +77,10 @@ const Sidebar = (props: any) => {
       accessRoles: [constants.roles.SuperAdmin]
     },
     {
-      key: routes.employee.key,
-      name: routes.employee.name,
+      key: routes.user.key,
+      name: routes.user.name,
       icon: <UsergroupAddOutlined />,
-      route: routes.employee.path(loggedInUser?.company?.code ?? ''),
+      route: routes.user.path(loggedInUser?.company?.code ?? ''),
       accessRoles: [constants.roles.CompanyAdmin]
     },
     {

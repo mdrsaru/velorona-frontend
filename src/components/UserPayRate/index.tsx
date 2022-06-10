@@ -9,12 +9,13 @@ import { notifyGraphqlError } from "../../utils/error"
 
 import styles from "./styles.module.scss"
 import { USER_PAY_RATE } from "../ViewUserPayRate"
-import { GraphQLResponse, UserPayRatePagingData } from "../../interfaces/graphql.interface"
+import { GraphQLResponse } from "../../interfaces/graphql.interface"
 
 interface IProps {
   visibility: boolean;
   setVisibility: any;
   data: any;
+  userPayRate?: any;
 }
 
 
@@ -30,7 +31,7 @@ const UserPayRateModal = (props: IProps) => {
   const loggedInUser = authVar();
   const [form] = Form.useForm();
   const user = props.data;
-
+  const { userPayRate } = props;
   const { data: projectData } = useQuery(PROJECT, {
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
@@ -51,24 +52,10 @@ const UserPayRateModal = (props: IProps) => {
   projectData?.Project?.data?.forEach((project: any, index: number) => {
     project_ids.push({ id: project?.id, name: project?.name })
   })
-
-  const { data: userPayRate } = useQuery<UserPayRatePagingData>(USER_PAY_RATE, {
-    fetchPolicy: "network-only",
-    nextFetchPolicy: "cache-first",
-    variables: {
-      input: {
-        query: {
-          user_id: user?.id,
-        },
-        paging: {
-          order: ["updatedAt:DESC"],
-        },
-      },
-    },
-  });
+  
   const ids: any = []
 
-  userPayRate?.UserPayRate?.data?.forEach((userPayRate, index: number) => {
+  userPayRate?.UserPayRate?.data?.forEach((userPayRate:any, index: number) => {
     ids.push({ id: userPayRate?.project?.id, name: userPayRate?.project?.name })
   })
 
@@ -79,7 +66,7 @@ const UserPayRateModal = (props: IProps) => {
   });
 
   const [userPayRateCreate] = useMutation<
-  GraphQLResponse<'UserPayRateCreate',UserPayRate>,MutationUserPayRateCreateArgs
+    GraphQLResponse<'UserPayRateCreate', UserPayRate>, MutationUserPayRateCreateArgs
   >(USER_PAYRATE_CREATE, {
     refetchQueries: [
       {
