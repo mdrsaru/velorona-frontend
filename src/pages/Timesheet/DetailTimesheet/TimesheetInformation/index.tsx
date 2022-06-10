@@ -2,14 +2,17 @@ import moment from 'moment';
 import isNil from 'lodash/isNil';
 import { Card, Col, Row } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 import { Timesheet } from '../../../../interfaces/generated';
 
 
 import PageHeader from '../../../../components/PageHeader';
+import constants from '../../../../config/constants';
 
 import styles from './style.module.scss';
+import { authVar } from '../../../../App/link';
+import routes from '../../../../config/routes';
 
 const statusMap = {
   'Approved': 'Approved',
@@ -23,7 +26,8 @@ interface IProps {
 }
 
 const TimesheetInformation = (props: IProps) => {
-  const navigate = useNavigate();
+  const authData = authVar();
+  const companyCode = authData?.company?.code as string;
   const timesheet = props.timesheet;
 
   return (
@@ -34,9 +38,14 @@ const TimesheetInformation = (props: IProps) => {
       <PageHeader
         title={
           <>
-            <span onClick={() => navigate(-1)} style={{ cursor: 'pointer' }}>
-              <ArrowLeftOutlined />
-            </span>
+            {authData?.user?.roles[0] === constants.roles.Employee ?
+              <Link to={routes.timesheet.path(companyCode)}>
+                <ArrowLeftOutlined />
+              </Link> :
+              <Link to={routes.employeeTimesheet.path(companyCode)}>
+                <ArrowLeftOutlined />
+              </Link>
+            }
             &nbsp; My Timesheet
           </>
         }
@@ -66,7 +75,7 @@ const TimesheetInformation = (props: IProps) => {
             </div>
 
             <div>
-              { !isNil(timesheet?.totalExpense) ? `$${timesheet.totalExpense}` : 'N/A' }
+              {!isNil(timesheet?.totalExpense) ? `$${timesheet.totalExpense}` : 'N/A'}
             </div>
           </div>
 
@@ -75,7 +84,7 @@ const TimesheetInformation = (props: IProps) => {
               Status
             </div>
             <div>
-              { statusMap[timesheet.status] || 'N/A' }
+              {statusMap[timesheet.status] || 'N/A'}
             </div>
           </div>
         </Col>
@@ -95,7 +104,7 @@ const TimesheetInformation = (props: IProps) => {
             </div>
 
             <div>
-              { timesheet.lastSubmittedAt ? moment(timesheet.lastSubmittedAt).format('LLL') : 'N/A' }
+              {timesheet.lastSubmittedAt ? moment(timesheet.lastSubmittedAt).format('LLL') : 'N/A'}
             </div>
           </div>
 
@@ -105,7 +114,7 @@ const TimesheetInformation = (props: IProps) => {
             </div>
 
             <div>
-              { timesheet.lastApprovedAt ? moment(timesheet.lastApprovedAt).format('LLL') : 'N/A' }
+              {timesheet.lastApprovedAt ? moment(timesheet.lastApprovedAt).format('LLL') : 'N/A'}
             </div>
           </div>
           <div className={styles['detail-row']}>
