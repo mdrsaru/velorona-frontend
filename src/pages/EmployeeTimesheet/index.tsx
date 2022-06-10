@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { gql, useLazyQuery, useQuery } from '@apollo/client';
-import { Card, Table, Row, Col, Button } from 'antd';
+import { Card, Table, Button } from 'antd';
 
 import { authVar } from '../../App/link';
 import constants from '../../config/constants';

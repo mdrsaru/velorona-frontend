@@ -287,7 +287,7 @@ const Client = () => {
       <Card bordered={false}>
         <Row>
           <Col span={12} className={styles["client-col"]}>
-            <h1>Client</h1>
+            <h1>Clients</h1>
           </Col>
           <Col span={12} className={styles["client-col"]}>
             <div className={styles["add-new-client"]}>

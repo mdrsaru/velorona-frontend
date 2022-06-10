@@ -1,13 +1,11 @@
 
 import moment from "moment";
 import { CloseOutlined, LinkOutlined } from "@ant-design/icons";
-import { useMutation, useQuery } from "@apollo/client";
+import { useMutation } from "@apollo/client";
 import { Col, DatePicker, message, Modal, Row, Select, Button } from "antd";
 import parse from "html-react-parser";
 
 import { authVar } from "../../App/link";
-import { UserData } from "../../pages/Client";
-import { USER } from "../../pages/Employee";
 import { TASK_UPDATE } from "../../pages/Project/DetailProject";
 import AssignedUserAvatar from "../AssignedUserAvatar";
 
@@ -33,22 +31,8 @@ interface IProps {
 }
 
 const TaskDetail = (props: IProps) => {
-  const { visibility, setVisibility, data, userId } = props;
-  const loggedInUser = authVar();
-  const { data: userData } = useQuery<UserData>(USER, {
-    fetchPolicy: "network-only",
-    nextFetchPolicy: "cache-first",
-    variables: {
-      input: {
-        query: {
-          id: userId,
-        },
-        paging: {
-          order: ["updatedAt:DESC"],
-        },
-      },
-    },
-  });
+  const { visibility, setVisibility, data } = props
+  const loggedInUser = authVar()
 
   const [taskUpdate] = useMutation(TASK_UPDATE, {
     refetchQueries: [
