@@ -12,7 +12,7 @@ const TitleCard = (props: IProps) => {
             <span className={styles.title}>
                 {props?.title}
             </span>
-            </div>
+        </div>
     );
 };
 

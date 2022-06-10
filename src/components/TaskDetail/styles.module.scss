@@ -6,10 +6,6 @@
     }
   }
 
-  .ant-modal-body {
-    padding: 18px 0 0 0;
-  }
-
   :local(.modal-footer) {
     .ant-modal-footer {
       text-align: left;
@@ -51,6 +47,14 @@
         padding-top: 1rem;
         border: 1px solid var(--gray-2);
       }
+    }
+  }
+}
+
+.task-detail-modal {
+  :global {
+    .ant-modal-body {
+      padding: 18px 0 0 0;
     }
   }
 }
@@ -165,4 +169,16 @@
   font-size: 14px;
   line-height: 17px;
   color: var(--black);
+}
+
+.start-timer {
+  float: right;
+
+  :global {
+    .ant-form {
+      font-weight: 600;
+      font-size: 16px;
+      line-height: 17px;
+    }
+  }
 }

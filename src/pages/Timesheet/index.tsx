@@ -8,7 +8,6 @@ import {
   Table,
   Form,
   Select,
-  Button,
   message,
   Collapse
 } from 'antd'
@@ -32,12 +31,13 @@ import { notifyGraphqlError } from "../../utils/error"
 import { PROJECT } from '../Project'
 import { CLIENT } from '../Client'
 import { TASK } from '../Tasks'
+
 import TimeSheetLoader from '../../components/Skeleton/TimeSheetLoader'
 import TimeEntry from './TimeEntry'
 import NoContent from '../../components/NoContent'
-
-import styles from './style.module.scss'
 import { getTotalTimeForADay } from './DetailTimesheet'
+import TimerCard from '../../components/TimerCard'
+import styles from './style.module.scss'
 
 export const CREATE_TIME_ENTRY = gql`
     mutation TimeEntryCreate($input: TimeEntryCreateInput!) {
@@ -626,6 +626,7 @@ const Timesheet = () => {
   }
 
   const submitStopTimer = () => {
+    stopwatchOffset = new Date()
     updateTimeEntry({
       variables: {
         input: {
@@ -782,29 +783,7 @@ const Timesheet = () => {
                   lg={12}
                   xl={8}
                   className={styles['time-start-col']}>
-                  <div className={styles['timer-div']}>
-                    <div>
-                      <span>
-                        {(hours > 9 ? hours : '0' + hours) + ':' +
-                          (minutes > 9 ? minutes : '0' + minutes) + ':'
-                          + (seconds > 9 ? seconds : '0' + seconds)}
-                      </span>
-                    </div>
-                    <div>
-                      {isRunning ?
-                        <Button
-                          type="primary"
-                          htmlType="submit"
-                          danger>
-                          Stop
-                        </Button> :
-                        <Button
-                          type="primary"
-                          htmlType="submit">
-                          Start
-                        </Button>}
-                    </div>
-                  </div>
+                  <TimerCard hours={hours} minutes={minutes} seconds={seconds} isRunning={isRunning} />
                 </Col>
               </Row>
             </Form>
