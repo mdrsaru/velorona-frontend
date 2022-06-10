@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 
 import routes from '../../../../config/routes';
 import { authVar } from '../../../../App/link';
-import { Timesheet } from '../../../../interfaces/generated';
+import { RoleName, Timesheet } from '../../../../interfaces/generated';
 
 import PageHeader from '../../../../components/PageHeader';
 
@@ -31,9 +31,18 @@ const TimesheetInformation = (props: IProps) => {
       <PageHeader
         title={
           <>
-            <Link to={routes.timesheet.path(companyCode)}>
-              <ArrowLeftOutlined />
-            </Link>
+            {authData?.user?.roles.includes(RoleName.Employee) ?
+              <Link to={
+                routes.timesheet.path(companyCode)}
+              >
+                <ArrowLeftOutlined />
+              </Link>
+              :
+              <Link to={
+                routes.employeeTimesheet.path(companyCode)}>
+                <ArrowLeftOutlined />
+              </Link>
+            }
             &nbsp; My Timesheet
           </>
         }
