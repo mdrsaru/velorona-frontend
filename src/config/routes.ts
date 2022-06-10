@@ -120,6 +120,15 @@ const routes = {
     name: 'Profile',
     key: 'profile'
   },
+
+  changePassword: {
+    childPath: 'profile/:eid/change-password',
+    path: (eid: string) => `/profile/${eid}/change-password`,
+    component: lazy(() => import('../pages/ChangePassword')),
+    name: 'Profile',
+    key: 'profile'
+  },
+
   addEmployee: {
     childPath: 'add',
     path: (id: string) => `/${id}/user/add`,
