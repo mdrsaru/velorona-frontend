@@ -369,6 +369,15 @@ const _Routes = () => {
           />
 
           <Route
+            path={routes.changePassword.childPath}
+            element={
+              <Suspense fallback={<RouteLoader />}>
+                <routes.changePassword.component />
+              </Suspense>
+            }
+          />
+
+          <Route
             path={routes.dashboard.path}
             element={
               <CheckRoles allowedRoles={[constants.roles.SuperAdmin]}>

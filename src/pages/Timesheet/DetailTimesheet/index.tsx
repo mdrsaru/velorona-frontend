@@ -8,7 +8,7 @@ import {
 } from 'react-router-dom';
 import groupBy from 'lodash/groupBy';
 import find from 'lodash/find';
-import { Card, Col, Row, Button, Space, message, Modal, Form, Select, Spin } from 'antd';
+import { Card, Col, Row, Button, Space, message, Modal, Form, Select, Spin, Popconfirm } from 'antd';
 import {
   CloseOutlined
 } from '@ant-design/icons';
@@ -60,7 +60,9 @@ export const TIME_SHEET = gql`
         totalExpense
         duration
         durationFormat
-        
+        lastApprovedAt
+        lastSubmittedAt
+        status
         user {
           id
           email
@@ -72,6 +74,9 @@ export const TIME_SHEET = gql`
         company {
           id
           name
+        }
+        approver {
+          fullName
         }
         projectItems {
           project_id
@@ -160,12 +165,13 @@ export const getTotalTimeForADay = (entries: any) => {
 const DetailTimesheet = () => {
   let params = useParams()
   let navigate = useNavigate();
+  const timesheet_id = params?.id as string;
   const { Option } = Select
   const authData = authVar()
   const roles = authData?.user?.roles ?? []
   const [form] = Form.useForm()
   const [filteredTasks, setTasks] = useState([])
-  const [submitTimesheet] = useMutation(TIMESHEET_SUBMIT)
+  const [submitTimesheet, { loading: submittingTimesheet }] = useMutation(TIMESHEET_SUBMIT)
 
   const [invoiceViewer, setInvoiceViewer] = useState<{
     isVisible: boolean,
@@ -399,6 +405,7 @@ const DetailTimesheet = () => {
           ids,
           approvalStatus: 'Approved',
           company_id: authData?.company?.id as string,
+          timesheet_id,
         },
       },
     })
@@ -490,6 +497,7 @@ const DetailTimesheet = () => {
                       status='Pending'
                       deleteAction={deletePendingGroups}
                       needAction
+                      timesheet_id={timesheet_id}
                     />
 
                     {
@@ -542,6 +550,7 @@ const DetailTimesheet = () => {
                         client_id={timesheetDetail?.client?.id as string}
                         refetch={refetchTimeSheet}
                         status='Invoiced'
+                        timesheet_id={timesheet_id}
                       />
                     </div>
                   ))
@@ -581,6 +590,7 @@ const DetailTimesheet = () => {
                       refetch={refetchTimeSheet}
                       status='Approved'
                       needAction
+                      timesheet_id={timesheet_id}
                     />
                   </div>
                 }
@@ -599,6 +609,7 @@ const DetailTimesheet = () => {
                       status='Rejected'
                       refetch={refetchTimeSheet}
                       needAction
+                      timesheet_id={timesheet_id}
                     />
                   </div>
                 }
@@ -618,12 +629,29 @@ const DetailTimesheet = () => {
                       >
                         Exit
                       </Button>
-                      <Button
-                        type="default"
-                        htmlType="button"
-                        onClick={onSubmitTimesheet}>
-                        Submit
-                      </Button>
+
+                      {
+                        checkRoles({
+                          expectedRoles: [constants.roles.Employee],
+                          userRoles: roles,
+                        }) && (
+                          <Popconfirm 
+                            placement="top"
+                            title="Submit timesheet?"
+                            onConfirm={onSubmitTimesheet}
+                            okText="Yes" cancelText="No"
+                          >
+                            <Button
+                              type="default"
+                              htmlType="button"
+                              loading={submittingTimesheet}
+                            >
+                              Submit
+                            </Button>
+                          </Popconfirm>
+
+                        )
+                      }
                     </Space>
                   </Col>
                 </Row>}

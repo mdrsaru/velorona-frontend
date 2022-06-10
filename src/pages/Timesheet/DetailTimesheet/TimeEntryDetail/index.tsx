@@ -45,6 +45,7 @@ interface IProps {
   deleteAction?: (a: string) => void;
   client_id: string;
   refetch: any;
+  timesheet_id: string;
 }
 
 const TimeEntryDetails = (props: IProps) => {
@@ -93,6 +94,7 @@ const TimeEntryDetails = (props: IProps) => {
           ids,
           approvalStatus: status,
           company_id,
+          timesheet_id: props?.timesheet_id, 
         },
       },
     })
