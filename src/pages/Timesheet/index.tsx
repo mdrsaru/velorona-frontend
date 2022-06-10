@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState } from 'react'
 import {
   Card,
   Col,
@@ -8,47 +8,36 @@ import {
   Table,
   Form,
   Select,
-  Button,
   message,
   Collapse
-} from 'antd';
+} from 'antd'
 import {
   CloseOutlined,
   // LeftOutlined,
   // RightOutlined
-} from '@ant-design/icons';
+} from '@ant-design/icons'
 
-import moment from 'moment';
-import _ from 'lodash';
-import { authVar } from '../../App/link';
-import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client';
-import { useStopwatch } from 'react-timer-hook';
-import constants from '../../config/constants';
+import moment from 'moment'
+import _ from 'lodash'
+import { authVar } from '../../App/link'
+import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client'
+import { useStopwatch } from 'react-timer-hook'
+import constants from '../../config/constants'
 
-import routes from "../../config/routes";
-import { useNavigate } from 'react-router-dom';
-import { notifyGraphqlError } from "../../utils/error";
+import routes from "../../config/routes"
+import { useNavigate } from 'react-router-dom'
+import { notifyGraphqlError } from "../../utils/error"
 
-import { PROJECT } from '../Project';
-import { CLIENT } from '../Client';
-import { TASK } from '../Tasks';
-import TimeSheetLoader from '../../components/Skeleton/TimeSheetLoader';
-import TimeEntry from './TimeEntry';
-import NoContent from '../../components/NoContent';
+import { PROJECT } from '../Project'
+import { CLIENT } from '../Client'
+import { TASK } from '../Tasks'
 
-import styles from './style.module.scss';
-import { getTotalTimeForADay } from './DetailTimesheet';
-
-export const STOP_TIMER = gql`
-  mutation TimeEntryStop($input: TimeEntryStopInput!) {
-    TimeEntryStop(input: $input) {
-      id
-      startTime
-      endTime
-      duration
-    }
-  }
-`
+import TimeSheetLoader from '../../components/Skeleton/TimeSheetLoader'
+import TimeEntry from './TimeEntry'
+import NoContent from '../../components/NoContent'
+import { getTotalTimeForADay } from './DetailTimesheet'
+import TimerCard from '../../components/TimerCard'
+import styles from './style.module.scss'
 
 export const CREATE_TIME_ENTRY = gql`
     mutation TimeEntryCreate($input: TimeEntryCreateInput!) {
@@ -203,22 +192,22 @@ const UPDATE_TIME_ENTRY = gql`
 const { Panel } = Collapse;
 
 const computeDiff = (date: Date) => {
-  const currentDate = new Date();
-  const pastDate = new Date(date);
-  return (currentDate.getTime() - pastDate.getTime()) / 1000;
+  const currentDate = new Date()
+  const pastDate = new Date(date)
+  return (currentDate.getTime() - pastDate.getTime()) / 1000
 };
 
 export const getTimeFormat = (seconds: any) => {
-  let second = parseInt(seconds, 10);
-  let sec_num = Math.abs(second);
-  let hours: any = Math.floor(sec_num / 3600);
-  let minutes: any = Math.floor((sec_num - (hours * 3600)) / 60);
-  let secs: any = sec_num - (hours * 3600) - (minutes * 60);
+  let second = parseInt(seconds, 10)
+  let sec_num = Math.abs(second)
+  let hours: any = Math.floor(sec_num / 3600)
+  let minutes: any = Math.floor((sec_num - (hours * 3600)) / 60)
+  let secs: any = sec_num - (hours * 3600) - (minutes * 60)
 
   if (hours < 10) { hours = "0" + hours; }
   if (minutes < 10) { minutes = "0" + minutes; }
   if (secs < 10) { secs = "0" + secs; }
-  return hours + ':' + minutes + ':' + secs;
+  return hours + ':' + minutes + ':' + secs
 };
 
 // const getHours = (seconds: any) => {
@@ -228,14 +217,14 @@ export const getTimeFormat = (seconds: any) => {
 // }
 
 const Timesheet = () => {
-  const { Option } = Select;
-  const authData = authVar();
-  let navigate = useNavigate();
+  const { Option } = Select
+  const authData = authVar()
+  let navigate = useNavigate()
   const [form] = Form.useForm()
   const [timeEntryForm] = Form.useForm()
-  let stopwatchOffset = new Date();
-  const [visible, setVisible] = useState(false);
-  const [showDetailTimeEntry, setDetailVisible] = useState<boolean>(false);
+  let stopwatchOffset = new Date()
+  const [visible, setVisible] = useState(false)
+  const [showDetailTimeEntry, setDetailVisible] = useState<boolean>(false)
   const [pagingInput, setPagingInput] = useState<{
     skip: number,
     currentPage: number,
@@ -252,7 +241,7 @@ const Timesheet = () => {
       key: 'week',
       render: (record: any) =>
         <div>
-          {record?.weekStartDate} - {record?.weekEndDate}
+          {moment(record?.weekStartDate).format('LL')} - {moment(record?.weekEndDate).format('LL')}
         </div>
     },
     {
@@ -292,17 +281,17 @@ const Timesheet = () => {
             navigate(routes.detailTimesheet.path(authData?.company?.code ?? '', record?.id))
           }}>
           <span>View Details</span>
-        </div>,
-    },
-  ];
+        </div>
+    }
+  ]
 
   const changePage = (page: number) => {
-    const newSkip = (page - 1) * constants.paging.perPage;
+    const newSkip = (page - 1) * constants.paging.perPage
     setPagingInput({
       ...pagingInput,
       skip: newSkip,
       currentPage: page,
-    });
+    })
   };
 
   const {
@@ -553,7 +542,7 @@ const Timesheet = () => {
         task: response?.TimeEntryCreate?.task?.name,
         client: response?.TimeEntryCreate?.project?.client?.name
       });
-      setDetailVisible(true);
+      setDetailVisible(true)
     }
   });
 
@@ -561,16 +550,15 @@ const Timesheet = () => {
     const vals: any = [];
     for (const item of (timeEntryData?.TimeEntry?.data ?? [])) {
       if (!vals.includes(item?.task?.id)) {
-        vals.push(item?.task?.id);
+        vals.push(item?.task?.id)
       }
     };
     return vals
   }
 
   const filterData = () => {
-    const tasks = _.groupBy(timeEntryData?.TimeEntry?.data, 'task_id');
-    console.log(tasks);
-    return tasks;
+    const tasks = _.groupBy(timeEntryData?.TimeEntry?.data, 'task_id')
+    return tasks
   }
 
   /* eslint-disable no-template-curly-in-string */
@@ -638,6 +626,7 @@ const Timesheet = () => {
   }
 
   const submitStopTimer = () => {
+    stopwatchOffset = new Date()
     updateTimeEntry({
       variables: {
         input: {
@@ -794,29 +783,7 @@ const Timesheet = () => {
                   lg={12}
                   xl={8}
                   className={styles['time-start-col']}>
-                  <div className={styles['timer-div']}>
-                    <div>
-                      <span>
-                        {(hours > 9 ? hours : '0' + hours) + ':' +
-                          (minutes > 9 ? minutes : '0' + minutes) + ':'
-                          + (seconds > 9 ? seconds : '0' + seconds)}
-                      </span>
-                    </div>
-                    <div>
-                      {isRunning ?
-                        <Button
-                          type="primary"
-                          htmlType="submit"
-                          danger>
-                          Stop
-                        </Button> :
-                        <Button
-                          type="primary"
-                          htmlType="submit">
-                          Start
-                        </Button>}
-                    </div>
-                  </div>
+                  <TimerCard hours={hours} minutes={minutes} seconds={seconds} isRunning={isRunning} />
                 </Col>
               </Row>
             </Form>

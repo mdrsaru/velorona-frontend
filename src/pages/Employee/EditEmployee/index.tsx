@@ -194,7 +194,7 @@ const EditEmployee = () => {
                 <ArrowLeftOutlined
                   onClick={() => navigate(-1)} />
                 &nbsp;
-                Edit {authData?.user?.id === params.eid ? "Profile" : " Employee"}
+                Edit {authData?.user?.id === params.eid ? "Profile" : " User"}
               </h1>
             </Col>
           </Row>
@@ -232,7 +232,7 @@ const EditEmployee = () => {
           >
             <Row gutter={[24, 0]}>
               <Col className={styles["form-header"]}>
-                <p>Employee Information</p>
+                <p>User Information</p>
               </Col>
               <Col xs={24} sm={24} md={8} lg={8}>
                 <Form.Item
@@ -386,7 +386,7 @@ const EditEmployee = () => {
                 </Form.Item>
               </Col>
               <Col className={styles["form-header"]}>
-                <p>Employee Roles</p>
+                <p>User Roles</p>
               </Col>
               <Col xs={24} sm={24} md={12} lg={12}>
                 <Form.Item

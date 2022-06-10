@@ -7,8 +7,7 @@ import { authVar } from "../../App/link"
 import { MutationUserPayRateUpdateArgs, UserPayRate } from "../../interfaces/generated"
 
 import styles from "../UserPayRate/styles.module.scss"
-import { USER_PAY_RATE } from "../ViewUserPayRate"
-import { GraphQLResponse, UserPayRatePagingData } from "../../interfaces/graphql.interface"
+import { GraphQLResponse } from "../../interfaces/graphql.interface"
 
 interface IProps {
   visibility: boolean;

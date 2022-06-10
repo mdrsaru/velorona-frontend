@@ -1,26 +1,31 @@
-import { Card, Row, Col, Table, Dropdown, Menu, message } from "antd";
-import { MoreOutlined } from "@ant-design/icons";
+import { Card, Row, Col, Table, Dropdown, Menu, message } from "antd"
+import { MoreOutlined } from "@ant-design/icons"
 
-import { Link, useNavigate } from "react-router-dom";
-import routes from "../../config/routes";
+import { Link, useNavigate } from "react-router-dom"
+import routes from "../../config/routes"
 
 import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import { authVar } from "../../App/link";
 import { useState } from "react";
 
-import ModalConfirm from "../../components/Modal";
-import { notifyGraphqlError } from "../../utils/error";
 
-import deleteImg from "../../assets/images/delete_btn.svg";
-import archiveImg from "../../assets/images/archive_btn.svg";
-import constants from "../../config/constants";
+import ModalConfirm from "../../components/Modal"
+import { notifyGraphqlError } from "../../utils/error"
+
+import deleteImg from "../../assets/images/delete_btn.svg"
+import archiveImg from "../../assets/images/archive_btn.svg"
+import constants from "../../config/constants"
 
 import RouteLoader from "../../components/Skeleton/RouteLoader";
 import UserPayRateModal from "../../components/UserPayRate";
-import styles from "./style.module.scss";
 import ViewUserPayRate, { USER_PAY_RATE } from "../../components/ViewUserPayRate";
 import { GraphQLResponse, UserPayRatePagingData } from "../../interfaces/graphql.interface";
-import { QueryUserArgs, RoleName, UserPagingResult } from "../../interfaces/generated";
+import { 
+  QueryUserArgs, 
+  // RoleName, 
+  UserPagingResult 
+} from "../../interfaces/generated";
+import styles from "./style.module.scss";
 
 const { SubMenu } = Menu;
 
@@ -184,7 +189,7 @@ const Employee = () => {
       </div>
     );
   };
-  const role = Object.values(RoleName)
+  // const role = Object.values(RoleName)
   const { loading: employeeLoading, data: employeeData } = useQuery<
     GraphQLResponse<'User', UserPagingResult>,
     QueryUserArgs
@@ -344,7 +349,7 @@ const Employee = () => {
       <Menu.Divider />
 
       {
-        data?.id !== loggedInUser?.user?.id  && (
+        data?.id !== loggedInUser?.user?.id && (
           <Menu.Item key="archive">
             <div
               onClick={() => {
@@ -464,7 +469,7 @@ const Employee = () => {
           <Card bordered={false}>
             <Row>
               <Col span={12} className={styles["employee-col"]}>
-                <h1>User</h1>
+                <h1>Users</h1>
               </Col>
               <Col span={12} className={styles["employee-col"]}>
                 <div className={styles["add-new-employee"]}>
@@ -518,13 +523,13 @@ const Employee = () => {
             visibility={showUserPayRate}
             setVisibility={setUserPayRateVisibility}
             data={employee}
-            userPayRate = {userPayRate}
+            userPayRate={userPayRate}
           />
           <ViewUserPayRate
             visibility={showViewUserPayRate}
             setVisibility={setViewUserPayRateVisibility}
             data={employee}
-            userPayRate = {userPayRate}
+            userPayRate={userPayRate}
           />
         </div>
       )}

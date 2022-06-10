@@ -30,7 +30,7 @@ const TopHeader = (props: any) => {
   const client = useApolloClient();
   const navigate = useNavigate();
   //const loggedInUser = authVar();
-  const { loading, data: loginData } = useQuery(AUTH)
+  const { data: loginData } = useQuery(AUTH)
   const loggedInUser = loginData?.AuthUser;
   /* Uncomment it to make sidebar toggle
   const { data: sidebarData } = useQuery(SIDEBAR);
