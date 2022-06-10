@@ -1,4 +1,5 @@
 import moment from 'moment';
+import isNil from 'lodash/isNil';
 import { Card, Col, Row } from 'antd';
 import {
   ArrowLeftOutlined
@@ -12,6 +13,12 @@ import { RoleName, Timesheet } from '../../../../interfaces/generated';
 import PageHeader from '../../../../components/PageHeader';
 
 import styles from './style.module.scss';
+
+const statusMap = {
+  'Approved': 'Approved',
+  'Pending': 'Pending',
+  'PartiallyApproved': 'Partially Approved',
+};
 
 interface IProps {
   timesheet: Timesheet;
@@ -71,14 +78,18 @@ const TimesheetInformation = (props: IProps) => {
               Total Expense
             </div>
 
-            <div>{timesheet?.totalExpense ?? 'N/A'}</div>
+            <div>
+              { !isNil(timesheet?.totalExpense) ? `$${timesheet.totalExpense}` : 'N/A' }
+            </div>
           </div>
 
           <div className={styles['detail-row']}>
             <div className={styles['header']}>
               Status
             </div>
-            <div>{timesheet?.status ?? 'N/A'}</div>
+            <div>
+              { statusMap[timesheet.status] || 'N/A' }
+            </div>
           </div>
         </Col>
 

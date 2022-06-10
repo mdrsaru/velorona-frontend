@@ -60,7 +60,8 @@ export const TIME_SHEET = gql`
         totalExpense
         duration
         durationFormat
-        
+        lastApprovedAt
+        status
         user {
           id
           email
@@ -72,6 +73,9 @@ export const TIME_SHEET = gql`
         company {
           id
           name
+        }
+        approver {
+          fullName
         }
         projectItems {
           project_id
@@ -160,6 +164,7 @@ export const getTotalTimeForADay = (entries: any) => {
 const DetailTimesheet = () => {
   let params = useParams()
   let navigate = useNavigate();
+  const timesheet_id = params?.id as string;
   const { Option } = Select
   const authData = authVar()
   const roles = authData?.user?.roles ?? []
@@ -399,6 +404,7 @@ const DetailTimesheet = () => {
           ids,
           approvalStatus: 'Approved',
           company_id: authData?.company?.id as string,
+          timesheet_id,
         },
       },
     })
@@ -490,6 +496,7 @@ const DetailTimesheet = () => {
                       status='Pending'
                       deleteAction={deletePendingGroups}
                       needAction
+                      timesheet_id={timesheet_id}
                     />
 
                     {
@@ -542,6 +549,7 @@ const DetailTimesheet = () => {
                         client_id={timesheetDetail?.client?.id as string}
                         refetch={refetchTimeSheet}
                         status='Invoiced'
+                        timesheet_id={timesheet_id}
                       />
                     </div>
                   ))
@@ -581,6 +589,7 @@ const DetailTimesheet = () => {
                       refetch={refetchTimeSheet}
                       status='Approved'
                       needAction
+                      timesheet_id={timesheet_id}
                     />
                   </div>
                 }
@@ -599,6 +608,7 @@ const DetailTimesheet = () => {
                       status='Rejected'
                       refetch={refetchTimeSheet}
                       needAction
+                      timesheet_id={timesheet_id}
                     />
                   </div>
                 }
