@@ -11,7 +11,7 @@ import {
 } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 
-import { useMutation, useQuery } from "@apollo/client";
+import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import routes from "../../../config/routes";
 import { authVar } from "../../../App/link";
@@ -21,11 +21,11 @@ import camera from "../../../assets/images/camera.svg";
 import { USER } from "../index";
 
 import styles from "../style.module.scss";
-import ViewUserPayRate from "../../../components/ViewUserPayRate";
+import ViewUserPayRate, { USER_PAY_RATE } from "../../../components/ViewUserPayRate";
 import constants from "../../../config/constants";
 import { CHANGE_PROFILE_IMAGE } from "../NewEmployee";
 import { notifyGraphqlError } from "../../../utils/error";
-import { GraphQLResponse } from "../../../interfaces/graphql.interface";
+import { GraphQLResponse, UserPayRatePagingData } from "../../../interfaces/graphql.interface";
 import { MutationChangeProfilePictureArgs, QueryUserArgs, User, UserPagingResult } from "../../../interfaces/generated";
 import Loader from "../../../components/Loader";
 
@@ -42,6 +42,18 @@ const DetailEmployee = () => {
 
   const [isImageLoading, setIsImageLoading] = useState<boolean>(false);
 
+  const [getUserPayRate, { data: userPayRate }] = useLazyQuery<UserPayRatePagingData>(USER_PAY_RATE,
+    {
+      fetchPolicy: "network-only",
+      nextFetchPolicy:'cache-first',
+      variables: {
+        input: {
+          query: {
+            user_id: params?.eid,
+          }
+        }
+      }
+    })
 
   const [changeProfilePictureInput, loading] = useMutation<
     GraphQLResponse<'ChangeProfilePicture', User>,
@@ -104,6 +116,18 @@ const DetailEmployee = () => {
   };
 
   const handleViewPayRate = () => {
+    getUserPayRate({
+      variables: {
+        input: {
+          query: {
+            user_id: params?.eid,
+          },
+          paging: {
+            order: ["updatedAt:DESC"],
+          },
+        },
+      }
+    })
     setViewUserPayRateVisibility(!showViewUserPayRate);
   };
 
@@ -126,18 +150,18 @@ const DetailEmployee = () => {
                 {isImageLoading && loading ?
                   <Loader />
                   : (
-                  <Avatar
-                    src={userData?.User?.data[0]?.avatar?.url ?? image}
-                    size={{
-                      xs: 100,
-                      sm: 100,
-                      md: 100,
-                      lg: 100,
-                      xl: 100,
-                      xxl: 100,
-                    }}
-                  // icon={<AntDesignOutlined />}
-                  />
+                    <Avatar
+                      src={userData?.User?.data[0]?.avatar?.url ?? image}
+                      size={{
+                        xs: 100,
+                        sm: 100,
+                        md: 100,
+                        lg: 100,
+                        xl: 100,
+                        xxl: 100,
+                      }}
+                    // icon={<AntDesignOutlined />}
+                    />
                   )
                 }
                 {profile ? (
@@ -231,13 +255,13 @@ const DetailEmployee = () => {
           </Row>
 
           <Row justify="end" className={styles["footer-btn"]}>
-          <Col>
-          <Button  type="default" style={{marginRight:'1rem'}}>
-                  <Link to={routes.changePassword.path(params?.eid ?? "1")}>
-                    Change Password
-                  </Link> 
+            <Col>
+              <Button type="default" style={{ marginRight: '1rem' }}>
+                <Link to={routes.changePassword.path(params?.eid ?? "1")}>
+                  Change Password
+                </Link>
               </Button>
-              </Col>
+            </Col>
             <Col>
               <Button type="primary">
                 {profile ?
@@ -259,6 +283,7 @@ const DetailEmployee = () => {
         visibility={showViewUserPayRate}
         setVisibility={setViewUserPayRateVisibility}
         data={userData?.User?.data[0]}
+        userPayRate={userPayRate}
       />
     </div>
   );
