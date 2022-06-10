@@ -297,30 +297,35 @@ const Employee = () => {
   }
   const menu = (data: any) => (
     <Menu>
-      <SubMenu title="Change status" key="mainMenu">
-        <Menu.Item
-          key="active"
-          onClick={() => {
-            if (data?.status === "Inactive") {
-              changeStatus("Active", data?.id);
-            }
-          }}
-        >
-          Active
-        </Menu.Item>
-        <Menu.Divider />
+      {
+        data?.id !== loggedInUser?.user?.id && (
+          <SubMenu title="Change status" key="mainMenu">
+            <Menu.Item
+              key="active"
+              onClick={() => {
+                if (data?.status === "Inactive") {
+                  changeStatus("Active", data?.id);
+                }
+              }}
+            >
+              Active
+            </Menu.Item>
+            <Menu.Divider />
 
-        <Menu.Item
-          key="inactive"
-          onClick={() => {
-            if (data?.status === "Active") {
-              changeStatus("Inactive", data?.id);
-            }
-          }}
-        >
-          Inactive
-        </Menu.Item>
-      </SubMenu>
+            <Menu.Item
+              key="inactive"
+              onClick={() => {
+                if (data?.status === "Active") {
+                  changeStatus("Inactive", data?.id);
+                }
+              }}
+            >
+              Inactive
+            </Menu.Item>
+          </SubMenu>
+        )
+      }
+
       <Menu.Divider />
 
       <Menu.Item key="edit">
@@ -335,18 +340,23 @@ const Employee = () => {
           </Link>
         </div>
       </Menu.Item>
+
       <Menu.Divider />
 
-      <Menu.Item key="archive">
-        <div
-          onClick={() => {
-            setEmployee(data);
-            setArchiveVisibility(true);
-          }}
-        >
-          {data?.archived ? "Unarchive User" : "Archive User"}
-        </div>
-      </Menu.Item>
+      {
+        data?.id !== loggedInUser?.user?.id  && (
+          <Menu.Item key="archive">
+            <div
+              onClick={() => {
+                setEmployee(data);
+                setArchiveVisibility(true);
+              }}
+            >
+              {data?.archived ? "Unarchive User" : "Archive User"}
+            </div>
+          </Menu.Item>
+        )
+      }
     </Menu>
   );
 

@@ -1,4 +1,5 @@
 import moment from 'moment';
+import isNil from 'lodash/isNil';
 import { Card, Col, Row } from 'antd';
 import {
   ArrowLeftOutlined
@@ -7,11 +8,17 @@ import { Link } from 'react-router-dom';
 
 import routes from '../../../../config/routes';
 import { authVar } from '../../../../App/link';
-import { Timesheet } from '../../../../interfaces/generated';
+import { RoleName, Timesheet } from '../../../../interfaces/generated';
 
 import PageHeader from '../../../../components/PageHeader';
 
 import styles from './style.module.scss';
+
+const statusMap = {
+  'Approved': 'Approved',
+  'Pending': 'Pending',
+  'PartiallyApproved': 'Partially Approved',
+};
 
 interface IProps {
   timesheet: Timesheet;
@@ -31,9 +38,18 @@ const TimesheetInformation = (props: IProps) => {
       <PageHeader
         title={
           <>
-            <Link to={routes.timesheet.path(companyCode)}>
-              <ArrowLeftOutlined />
-            </Link>
+            {authData?.user?.roles.includes(RoleName.Employee) ?
+              <Link to={
+                routes.timesheet.path(companyCode)}
+              >
+                <ArrowLeftOutlined />
+              </Link>
+              :
+              <Link to={
+                routes.employeeTimesheet.path(companyCode)}>
+                <ArrowLeftOutlined />
+              </Link>
+            }
             &nbsp; My Timesheet
           </>
         }
@@ -62,14 +78,18 @@ const TimesheetInformation = (props: IProps) => {
               Total Expense
             </div>
 
-            <div>{timesheet?.totalExpense ?? 'N/A'}</div>
+            <div>
+              { !isNil(timesheet?.totalExpense) ? `$${timesheet.totalExpense}` : 'N/A' }
+            </div>
           </div>
 
           <div className={styles['detail-row']}>
             <div className={styles['header']}>
               Status
             </div>
-            <div>{timesheet?.status ?? 'N/A'}</div>
+            <div>
+              { statusMap[timesheet.status] || 'N/A' }
+            </div>
           </div>
         </Col>
 
@@ -87,7 +107,9 @@ const TimesheetInformation = (props: IProps) => {
               Last Submitted
             </div>
 
-            <div>{moment(timesheet?.weekEndDate).format('L')}</div>
+            <div>
+              { timesheet.lastSubmittedAt ? moment(timesheet.lastSubmittedAt).format('LLL') : 'N/A' }
+            </div>
           </div>
 
           <div className={styles['detail-row']}>
@@ -95,7 +117,9 @@ const TimesheetInformation = (props: IProps) => {
               Last Approved
             </div>
 
-            <div>{timesheet?.lastApprovedAt ?? 'N/A'}</div>
+            <div>
+              { timesheet.lastApprovedAt ? moment(timesheet.lastApprovedAt).format('LLL') : 'N/A' }
+            </div>
           </div>
           <div className={styles['detail-row']}>
             <div className={styles['header']}>
