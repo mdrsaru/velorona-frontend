@@ -15,6 +15,7 @@ interface IProps {
   setVisibility: any;
   data: any;
   id?: string
+  userPayRateData:any;
 }
 
 
@@ -40,6 +41,7 @@ const EditUserPayRateModal = (props: IProps) => {
   const loggedInUser = authVar();
   const [form] = Form.useForm();
   const user = props.data;
+  const {userPayRateData} = props;
 
   const { data: projectData } = useQuery(PROJECT, {
     fetchPolicy: "network-only",
@@ -75,20 +77,6 @@ const EditUserPayRateModal = (props: IProps) => {
     }
   })
 
-  const { data: userPayRateData } = useQuery<UserPayRatePagingData>(USER_PAY_RATE, {
-    fetchPolicy: "network-only",
-    nextFetchPolicy: "cache-first",
-    variables: {
-      input: {
-        query: {
-          id: props?.id
-        },
-        paging: {
-          order: ["updatedAt:DESC"],
-        },
-      },
-    },
-  });
   const onSubmitForm = (values: any) => {
 
     userPayRateUpdate({
