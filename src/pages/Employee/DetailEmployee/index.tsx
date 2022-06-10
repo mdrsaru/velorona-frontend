@@ -115,7 +115,7 @@ const DetailEmployee = () => {
             <Col span={12} className={styles["employee-col"]}>
               <h1>
                 <ArrowLeftOutlined onClick={() => navigate(-1)} /> &nbsp;
-                {profile ? "My Profile" : "Employee"}
+                {profile ? "My Profile" : "User"}
               </h1>
             </Col>
           </Row>
@@ -150,7 +150,7 @@ const DetailEmployee = () => {
                   </div>
                 ) : (
                   <div className={styles["name-tag"]}>
-                    <span>Employee</span>
+                    <span>User</span>
                   </div>
                 )}
               </div>

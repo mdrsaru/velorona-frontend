@@ -45,6 +45,10 @@
 
 .dynamic-form {
   padding: 2rem 0 1rem 0;
+  max-height: 60vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  width: 100%
 }
 
 .subtitle {

@@ -94,7 +94,7 @@ const TimeEntryDetails = (props: IProps) => {
           ids,
           approvalStatus: status,
           company_id,
-          timesheet_id: props.timesheet_id,
+          timesheet_id: props?.timesheet_id, 
         },
       },
     })
