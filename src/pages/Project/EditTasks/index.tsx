@@ -9,6 +9,7 @@ import {
   Space,
   Upload,
   message,
+  DatePicker,
 } from "antd";
 import { ArrowLeftOutlined, UploadOutlined } from "@ant-design/icons";
 import { useState } from "react";
@@ -22,12 +23,14 @@ import routes from "../../../config/routes";
 import { UserData } from "../../Client";
 import constants from "../../../config/constants";
 import type { UploadProps } from 'antd';
-import { MutationTaskUpdateArgs, Task, TaskStatus } from "../../../interfaces/generated";
+import { MutationTaskUpdateArgs, ProjectPagingResult, QueryProjectArgs, Task, TaskStatus } from "../../../interfaces/generated";
 import { TASK } from "../../Tasks";
 
 import styles from "../style.module.scss";
 import { ITasks, ITaskUsers } from "../../../interfaces/ITasks";
 import { GraphQLResponse } from "../../../interfaces/graphql.interface";
+import moment from "moment";
+import { PROJECT } from "..";
 
 const USER = gql`
   query User($input: UserQueryInput!) {
@@ -50,6 +53,7 @@ const TASK_UPDATE = gql`
     TaskUpdate(input: $input) {
       id
       name
+      deadline
     }
   }
 `;
@@ -65,7 +69,7 @@ const EditTasks = () => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
 
-  const [updateTask] = useMutation<GraphQLResponse<'TaskUpdate',Task>,MutationTaskUpdateArgs>(TASK_UPDATE, {
+  const [updateTask] = useMutation<GraphQLResponse<'TaskUpdate', Task>, MutationTaskUpdateArgs>(TASK_UPDATE, {
     onCompleted() {
       message.success({
         content: `Task is updated successfully!`,
@@ -96,6 +100,16 @@ const EditTasks = () => {
         },
         paging: {
           order: ["updatedAt:DESC"],
+        },
+      },
+    },
+  });
+  const { data: projectData } = useQuery<GraphQLResponse<'Project', ProjectPagingResult>, QueryProjectArgs>(PROJECT, {
+    variables: {
+      input: {
+        query: {
+          company_id: loggedInUser?.company?.id as string,
+          id: params?.pid,
         },
       },
     },
@@ -173,20 +187,30 @@ const EditTasks = () => {
           project_id: params?.pid,
           attachment_ids: fileData?.ids,
           user_ids: values?.assignee,
+          deadline: values?.deadline?.toISOString(),
         },
       },
     });
   };
-
+  
   return (
     <div className={styles["main-div"]}>
       {loading && <></>}
       <Card bordered={false}>
+        <Col span={24} className={styles["project-col"]}>
+          <h1>
+            <ArrowLeftOutlined onClick={() => navigate((routes.projects.path(loggedInUser?.company?.id as string)))} />
+            &nbsp; Project :&nbsp;
+            <span>{projectData?.Project?.data[0]?.name ?? ""}</span>
+          </h1>
+        </Col>
+      </Card>
+      <br />
+      <Card bordered={false}>
         <Row>
           <Col span={12} className={styles["project-col"]}>
             <h1>
-              <ArrowLeftOutlined onClick={() => navigate(-1)} />
-              &nbsp; Edit Task
+              Edit Task
             </h1>
           </Col>
         </Row>
@@ -200,7 +224,8 @@ const EditTasks = () => {
             assignee: task?.users?.map((user: ITaskUsers) => { return user?.id }) ?? "",
             taskManager: task?.manager?.id ?? "",
             status: task?.status ?? "",
-            file: task?.attachments
+            file: task?.attachments,
+            deadline: task?.deadline && moment(task?.deadline),
           }}>
           <Row
             className={styles["add-task-row"]}
@@ -295,6 +320,14 @@ const EditTasks = () => {
                     </Option>
                   ))}
                 </Select>
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={24} md={12} lg={12}>
+              <Form.Item
+                name="deadline"
+                label="Deadline"
+              >
+                <DatePicker />
               </Form.Item>
             </Col>
           </Row>

@@ -164,7 +164,7 @@ const Tasks = () => {
               size="middle"
               style={{ display: "flex", marginTop: "1.5rem" }}
             >
-                <Collapse accordion>
+                <Collapse accordion  defaultActiveKey={['3']}>
                   <Panel header="In Progress" key="3">
                     <Table
                       loading={taskLoading}
@@ -182,7 +182,7 @@ const Tasks = () => {
               size="middle"
               style={{ display: "flex", marginTop: "1.5rem" }}
             >
-                <Collapse accordion >
+                <Collapse accordion  defaultActiveKey={['4']}>
                   <Panel header="Completed" key="4">
                     <Table
                       loading={taskLoading}
@@ -201,7 +201,7 @@ const Tasks = () => {
               style={{ display: "flex", marginTop: "1.5rem" }}
             >
 
-              <Collapse accordion>
+              <Collapse accordion  defaultActiveKey={['1']}>
                 <Panel header="Unscheduled" key="1">
                     <Table
                       loading={taskLoading}
