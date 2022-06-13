@@ -188,32 +188,41 @@ const TimeEntryDetails = (props: IProps) => {
                 </td>
 
                 {
-                  weekDays.map((day: any, timeIndex: number) => (
-                    <td
-                      key={timeIndex}
-                    >
-                      {
-                        (['Approved', 'Rejected'].includes(props.status) || canApproveReject) ? (
-                          <div>
-                            {getTimeFormat(getTotalTimeForADay(group?.entries[moment(day).format('ddd, MMM D')]))}
-                          </div>
-                        ) : (
-                          <Input
-                            type="text"
-                            disabled={props?.status !== 'Pending'}
-                            onClick={() => showEditTimesheet(moment(day).format('YYYY-MM-DD'), group, getTotalTimeForADay(group?.entries[moment(day).format('ddd, MMM D')]))}
-                            value={
-                              getTimeFormat(getTotalTimeForADay(group?.entries[moment(day).format('ddd, MMM D')]))
-                            }
-                          />
-                        )
-                      }
-                    </td>
-                  ))
+                  weekDays.map((day: any, timeIndex: number) => {
+                    const entryKey = moment(day).format('ddd, MMM D');
+                    const duration = getTotalTimeForADay(group?.entries[entryKey]);
+
+                    return (
+                      <td
+                        key={timeIndex}
+                      >
+                        {
+                          (['Approved', 'Rejected'].includes(props.status) || canApproveReject) ? (
+                            <div className={styles['entry-duration']}>
+                              {
+                                group?.entries[entryKey] 
+                                 ? getTimeFormat(duration)
+                                 : '-'
+                              }
+                            </div>
+                          ) : (
+                            <Input
+                              type="text"
+                              disabled={props?.status !== 'Pending'}
+                              onClick={() => showEditTimesheet(moment(day).format('YYYY-MM-DD'), group, duration)}
+                              value={
+                                group?.entries[entryKey] ? getTimeFormat(duration) : '-'
+                              }
+                            />
+                          )
+                        }
+                      </td>
+                    )
+                  })
                 }
 
                 <td>
-                  <span>
+                  <span className={styles['entry-duration']}>
                     {getTotalTimeByTask(group?.entries)}
                   </span>
                 </td>
@@ -268,11 +277,18 @@ const TimeEntryDetails = (props: IProps) => {
             <td>Total</td>
             <td></td>
             {
-              weekDays.map((day: any, index: number) => (
-                <td key={index}>
-                  {getTimeFormat(props?.durationMap?.[moment(day).format('YYYY-MM-DD')])}
-                </td>
-              ))
+              weekDays.map((day: any, index: number) => {
+                const formattedDay = moment(day).format('YYYY-MM-DD');
+                return (
+                  <td key={index}>
+                    {
+                      props?.durationMap?.[formattedDay] 
+                        ?  getTimeFormat(props?.durationMap?.[formattedDay])
+                        : '-'
+                    }
+                  </td>
+                )
+              })
             }
             <td>
               {getTotalTimeFromDurationMap(props?.durationMap ?? {})}

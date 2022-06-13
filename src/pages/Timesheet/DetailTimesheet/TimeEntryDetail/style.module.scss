@@ -93,7 +93,7 @@
 
 .table-body-cell {
   display: flex;
-  align-items: center;
+  //align-items: center;
   font-weight: 400;
   font-size: 14px;
   line-height: 17px;
@@ -147,7 +147,7 @@
   td {
     padding: 8px;
     white-space: nowrap;
-    text-align: center;
+    //text-align: center;
     font-weight: 600;
     font-size: 14px;
     line-height: 22px;
@@ -185,6 +185,10 @@
     font-size: 14px;
     line-height: 17px;
     text-align: left;
-    padding: 1rem 0rem 1rem 1.5rem;
+    padding: 16px 0 16px 24px;
   }
+}
+
+.entry-duration {
+  padding-left: 16px;
 }
