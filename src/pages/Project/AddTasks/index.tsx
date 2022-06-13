@@ -9,6 +9,7 @@ import {
   Space,
   Upload,
   message,
+  DatePicker,
 } from "antd";
 import type { UploadProps } from 'antd';
 import { ArrowLeftOutlined, UploadOutlined } from "@ant-design/icons";
@@ -22,11 +23,12 @@ import { notifyGraphqlError } from "../../../utils/error";
 import routes from "../../../config/routes";
 import { UserData } from "../../Client";
 import constants from "../../../config/constants";
-import { MutationTaskCreateArgs, Task, TaskStatus } from "../../../interfaces/generated";
+import { MutationTaskCreateArgs, ProjectPagingResult, QueryProjectArgs, Task, TaskStatus } from "../../../interfaces/generated";
 import { ITasks } from "../../../interfaces/ITasks";
 
 import styles from "../style.module.scss";
 import { GraphQLResponse } from "../../../interfaces/graphql.interface";
+import { PROJECT } from "..";
 
 const USER = gql`
   query User($input: UserQueryInput!) {
@@ -134,6 +136,17 @@ const AddTasks = () => {
     },
   });
 
+  const { data: projectData } = useQuery<GraphQLResponse<'Project', ProjectPagingResult>, QueryProjectArgs>(PROJECT, {
+    variables: {
+      input: {
+        query: {
+          company_id: loggedInUser?.company?.id as string,
+          id: params?.pid,
+        },
+      },
+    },
+  });
+
   const selectProps = {
     placeholder: "Select Employees",
     mode: "multiple" as const,
@@ -152,6 +165,7 @@ const AddTasks = () => {
           manager_id: values?.taskManager,
           project_id: params?.pid as string,
           user_ids: values?.assignee,
+          deadline: values?.deadline?.toISOString(),
         },
       },
     });
@@ -161,13 +175,23 @@ const AddTasks = () => {
   return (
     <div className={styles["main-div"]}>
       <Card bordered={false}>
+        <Col span={24} className={styles["project-col"]}>
+          <h1>
+            <ArrowLeftOutlined onClick={() => navigate((routes.projects.path(loggedInUser?.company?.id as string)))} />
+            &nbsp; Project :&nbsp;
+            <span>{projectData?.Project?.data[0]?.name ?? ""}</span>
+          </h1>
+        </Col>
+      </Card>
+      <br/>
+      <Card bordered={false}>
         <Row>
+
           <Col
             span={12}
             className={styles["project-col"]}>
             <h1>
-              <ArrowLeftOutlined onClick={() => navigate(-1)} />
-              &nbsp; Add New Task
+              Add New Task
             </h1>
           </Col>
         </Row>
@@ -286,6 +310,15 @@ const AddTasks = () => {
                 </Select>
               </Form.Item>
             </Col>
+
+            <Col xs={24} sm={24} md={12} lg={12}>
+              <Form.Item
+                name="deadline"
+                label="Deadline"
+              >
+                <DatePicker />
+              </Form.Item>
+            </Col>
           </Row>
           <br />
           <br />
@@ -295,7 +328,7 @@ const AddTasks = () => {
                 <Space>
                   <Button
                     type="default"
-                    htmlType="button" onClick={()=>navigate(routes.projects.path(loggedInUser?.company?.id as string))}>
+                    htmlType="button" onClick={() => navigate(routes.projects.path(loggedInUser?.company?.id as string))}>
                     Cancel
                   </Button>
                   <Button

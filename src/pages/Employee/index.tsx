@@ -95,8 +95,8 @@ export const USER_UPDATE = gql`
 `;
 
 export const USER_ARCHIVE = gql`
-  mutation UserArchive($input: UserArchiveInput!) {
-    UserArchive(input: $input) {
+  mutation UserArchiveOrUnArchive($input: UserArchiveOrUnArchiveInput!) {
+    UserArchiveOrUnArchive(input: $input) {
       id
       firstName
       lastName
