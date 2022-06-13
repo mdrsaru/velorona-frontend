@@ -210,13 +210,14 @@ const TaskDetail = (props: IProps) => {
     >
       <div className={styles["modal-body"]}>
         <Row gutter={[32, 24]} className={styles["task-header"]}>
-          <Col span={8}>
-            <div>
+            <div className={styles['header']}>
               <span className={styles["task-title"]}>{data?.name} </span>
+              <span className={styles['client-project-name']}>
+                {data?.project?.client?.name} : {data?.project?.name}
+              </span>
             </div>
-          </Col>
           {props?.employee ? (
-            <Col span={8}>
+            <div className={styles["task-status-div"]}>
               <Select
                 placeholder="Select State"
                 onChange={onStatusChange}
@@ -228,11 +229,11 @@ const TaskDetail = (props: IProps) => {
                   </Select.Option>
                 ))}
               </Select>
-            </Col>
+              </div>
           ) : (
-            <Col span={8} className={styles["status-div"]}>
+            <div className={styles["status-div"]}>
               <Status status={data?.active ? "Active" : "Inactive"} />
-            </Col>
+            </div>
           )}
         </Row>
         <br />
@@ -325,12 +326,6 @@ const TaskDetail = (props: IProps) => {
         </Row>
         <Row>
           <Col className={styles["task-body"]}>
-            <div>
-              {data?.description ? <span className={styles["task-subtitle"]}>Task Description</span> : ''}
-              <span className={styles['client-project-name']}>
-                {data?.project?.client?.name} : {data?.project?.name}
-              </span>
-            </div>
             <br />
             <div>
               {data?.description ? parse(data?.description) : ""}
