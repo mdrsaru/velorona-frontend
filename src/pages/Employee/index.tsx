@@ -1,4 +1,4 @@
-import { Card, Row, Col, Table, Dropdown, Menu, message, Input, Button, Select } from "antd"
+import { Card, Row, Col, Table, Dropdown, Menu, message, Input, Button, Select, Form } from "antd"
 import { MoreOutlined, SearchOutlined } from "@ant-design/icons"
 
 import { Link, useNavigate } from "react-router-dom"
@@ -6,7 +6,7 @@ import routes from "../../config/routes"
 
 import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import { authVar } from "../../App/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 
 import ModalConfirm from "../../components/Modal"
@@ -27,6 +27,7 @@ import {
   UserPagingResult
 } from "../../interfaces/generated";
 import styles from "./style.module.scss";
+import { debounce } from "lodash";
 
 const { SubMenu } = Menu;
 const { Option } = Select;
@@ -111,6 +112,7 @@ export const USER_ARCHIVE = gql`
 const Employee = () => {
   const loggedInUser = authVar();
   const navigate = useNavigate();
+  const [form] = Form.useForm();
   const [employeeUpdate] = useMutation(USER_UPDATE);
   const [employeeArchive] = useMutation(USER_ARCHIVE, {
     update(cache) {
@@ -142,9 +144,6 @@ const Employee = () => {
   const [employee, setEmployee] = useState<any>("");
   const [filterProperty, setFilterProperty] = useState<any>({
     filter: false,
-    role: '',
-    status: 'Active',
-    archived: false
   });
   const [visibility, setVisibility] = useState<boolean>(false);
   const [showArchive, setArchiveModal] = useState<boolean>(false);
@@ -317,15 +316,14 @@ const Employee = () => {
         }
       })
     }
+    form.resetFields()
     setFilterProperty({
-      status: '',
-      role: '',
-      archived: false,
       filter: !filterProperty?.filter
     })
   }
 
-  const refetchEmployees = (value: string) => {
+  const refetchEmployees = () => {
+    let values = form.getFieldsValue(['search', 'role', 'status'])
     let input: {
       paging: any,
       query?: any
@@ -337,16 +335,24 @@ const Employee = () => {
     let query: {
       status?: string,
       archived?: boolean,
-      role?: string
+      role?: string,
+      search?: string
     } = {}
-    let roles = roles_user.map((role) => role?.value)
-    if (value === 'Active' || value === 'Inactive') {
-      query['status'] = value
-    } else if (value === 'Archived' || value === 'UnArchived') {
-      query['archived'] = value === 'Archived' ? true : false
+
+    if (values.status) {
+      if (values.status === 'Active' || values.status === 'Inactive') {
+        query['status'] = values.status
+      } else {
+        query['archived'] = values.status === 'Archived' ? true : false
+      }
     }
-    if (filterProperty?.role || roles.includes(value)) {
-      query['role'] = roles.includes(value) ? value : filterProperty?.role
+
+    if (values.role) {
+      query['role'] = values?.role
+    }
+
+    if (values.search) {
+      query['search'] = values?.search
     }
 
     if (query) {
@@ -357,19 +363,17 @@ const Employee = () => {
     })
   }
 
-  const onChangeStatus = (event: any) => {
-    if (event === 'Active' || event === 'InActive') {
-      setFilterProperty({ ...filterProperty, status: event })
-    } else {
-      setFilterProperty({ ...filterProperty, archived: event === 'Archived' ? true : false })
-    }
-    refetchEmployees(event)
+  const onChangeFilter = () => {
+    refetchEmployees()
   }
 
-  const onChangeRole = (event: any) => {
-    setFilterProperty({ ...filterProperty, role: event })
-    refetchEmployees(event)
-  }
+  const debouncedResults = debounce(() => { onChangeFilter() }, 600);
+
+  useEffect(() => {
+    return () => {
+      debouncedResults.cancel();
+    };
+  });
 
   const menu = (data: any) => (
     <Menu>
@@ -560,50 +564,64 @@ const Employee = () => {
                 </div>
               </Col>
             </Row>
-            <Row gutter={[32, 0]}>
-              <Col xs={24} sm={12} md={16} lg={20} xl={21} className={styles["employee-col"]}>
-                <Input prefix={<SearchOutlined className="site-form-item-icon" />} placeholder="Search" />
-              </Col>
-              <Col xs={24} sm={12} md={8} lg={4} xl={3} className={styles["employee-col"]}>
-                <div className={styles['filter-col']}>
-                  <Button
-                    type="text"
-                    onClick={openFilterRow}
-                    icon={<img
-                      src={filterImg}
-                      alt="filter"
-                      className={styles['filter-image']} />}>
-                    &nbsp; &nbsp;
-                    {filterProperty?.filter ? 'Reset' : 'Filter'}
-                  </Button>
-                </div>
-              </Col>
-            </Row>
-            {filterProperty?.filter &&
-              <Row gutter={[32, 0]} className={styles["role-status-col"]}>
-                <Col span={4}>
-                  <Select
-                    placeholder="Role"
-                    onChange={onChangeRole}>
-                    {roles_user?.map((role: any) =>
-                      <Option value={role?.value} key={role?.name}>
-                        {role?.name}
-                      </Option>
-                    )}
-                  </Select>
+            <Form
+              form={form}
+              name="filter-form">
+              <Row gutter={[32, 0]}>
+                <Col xs={24} sm={12} md={16} lg={20} xl={21} className={styles["employee-col"]}>
+                  <Form.Item name="search" label="">
+                    <Input
+                      prefix={<SearchOutlined className="site-form-item-icon" />}
+                      placeholder="Search by User name"
+                      onChange={debouncedResults}
+                    />
+                  </Form.Item>
                 </Col>
-                <Col span={4}>
-                  <Select
-                    placeholder="Select status"
-                    onChange={onChangeStatus}
-                  >
-                    {user_status?.map((status: any) =>
-                      <Option value={status?.value} key={status?.name}>
-                        {status?.name}
-                      </Option>)}
-                  </Select>
+                <Col xs={24} sm={12} md={8} lg={4} xl={3} className={styles["employee-col"]}>
+                  <div className={styles['filter-col']}>
+                    <Button
+                      type="text"
+                      onClick={openFilterRow}
+                      icon={<img
+                        src={filterImg}
+                        alt="filter"
+                        className={styles['filter-image']} />}>
+                      &nbsp; &nbsp;
+                      {filterProperty?.filter ? 'Reset' : 'Filter'}
+                    </Button>
+                  </div>
                 </Col>
-              </Row>}
+              </Row>
+              {filterProperty?.filter &&
+                <Row gutter={[32, 0]} className={styles["role-status-col"]}>
+                  <Col span={4}>
+                    <Form.Item name="role" label="">
+                      <Select
+                        placeholder="Role"
+                        onChange={onChangeFilter}>
+                        {roles_user?.map((role: any) =>
+                          <Option value={role?.value} key={role?.name}>
+                            {role?.name}
+                          </Option>
+                        )}
+                      </Select>
+                    </Form.Item>
+                  </Col>
+                  <Col span={4}>
+                    <Form.Item name="status" label="">
+                      <Select
+                        placeholder="Select status"
+                        onChange={onChangeFilter}
+                      >
+                        {user_status?.map((status: any) =>
+                          <Option value={status?.value} key={status?.name}>
+                            {status?.name}
+                          </Option>)}
+                      </Select>
+                    </Form.Item>
+                  </Col>
+                </Row>}
+            </Form>
             <Row className='container-row'>
               <Col span={24}>
                 <Table
