@@ -1,30 +1,30 @@
-import moment from "moment";
-import { CloseOutlined, LinkOutlined } from "@ant-design/icons";
-import { useMutation } from "@apollo/client";
-import { Col, DatePicker, message, Modal, Row, Select, Form } from "antd";
-import parse from "html-react-parser";
+import moment from "moment"
+import { CloseOutlined, LinkOutlined } from "@ant-design/icons"
+import { useMutation } from "@apollo/client"
+import { Col, DatePicker, message, Modal, Row, Select, Form } from "antd"
+import parse from "html-react-parser"
 import { useStopwatch } from 'react-timer-hook'
 
-import { authVar } from "../../App/link";
-import { TASK_UPDATE } from "../../pages/Project/DetailProject";
-import AssignedUserAvatar from "../AssignedUserAvatar";
+import { authVar } from "../../App/link"
+import { TASK_UPDATE } from "../../pages/Project/DetailProject"
+import AssignedUserAvatar from "../AssignedUserAvatar"
 
-import { notifyGraphqlError } from "../../utils/error";
+import { notifyGraphqlError } from "../../utils/error"
 
-import { TaskStatus } from "../../interfaces/generated";
+import { TaskStatus } from "../../interfaces/generated"
 
-import NotPriority from "../../assets/images/not-priority.svg";
-import Priority from "../../assets/images/priority.svg";
+import NotPriority from "../../assets/images/not-priority.svg"
+import Priority from "../../assets/images/priority.svg"
 
-import Status from "../Status";
-import { TASK } from "../../pages/Tasks";
-import { useState } from "react";
-import TimerCard from "../TimerCard";
+import Status from "../Status"
+import { TASK } from "../../pages/Tasks"
+import { useState } from "react"
+import TimerCard from "../TimerCard"
 
-import constants from "../../config/constants";
-import { CREATE_TIME_ENTRY } from "../../pages/Timesheet";
-import { UPDATE_TIME_ENTRY } from "../../pages/Timesheet/EditTimesheet";
-import styles from "./styles.module.scss";
+import constants from "../../config/constants"
+import { CREATE_TIME_ENTRY } from "../../pages/Timesheet"
+import { UPDATE_TIME_ENTRY } from "../../pages/Timesheet/EditTimesheet"
+import styles from "./styles.module.scss"
 
 interface IProps {
   visibility: boolean;
