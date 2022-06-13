@@ -1,3 +1,4 @@
+import moment from 'moment';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { gql, useLazyQuery, useQuery } from '@apollo/client';
@@ -166,7 +167,7 @@ const EmployeeTimesheet = () => {
       title: 'Last Approved',
       dataIndex: 'lastApprovedAt',
       render: (lastApprovedAt: any) => {
-        return <span>{lastApprovedAt ? lastApprovedAt : 'N/A'}</span>
+        return <span>{lastApprovedAt ? moment(lastApprovedAt).format('LL') : 'N/A'}</span>
       }
     },
     {
