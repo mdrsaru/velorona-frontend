@@ -1,22 +1,23 @@
 import moment from 'moment';
 import isNil from 'lodash/isNil';
 import { Card, Col, Row } from 'antd';
-import {
-  ArrowLeftOutlined
-} from '@ant-design/icons';
+import { ArrowLeftOutlined } from '@ant-design/icons';
 import { Link } from 'react-router-dom';
 
-import routes from '../../../../config/routes';
-import { authVar } from '../../../../App/link';
-import { RoleName, Timesheet } from '../../../../interfaces/generated';
+import { Timesheet } from '../../../../interfaces/generated';
+
 
 import PageHeader from '../../../../components/PageHeader';
+import constants from '../../../../config/constants';
 
 import styles from './style.module.scss';
+import { authVar } from '../../../../App/link';
+import routes from '../../../../config/routes';
 
 const statusMap = {
   'Approved': 'Approved',
   'Pending': 'Pending',
+  'Rejected': 'Rejected',
   'PartiallyApproved': 'Partially Approved',
 };
 
@@ -25,7 +26,6 @@ interface IProps {
 }
 
 const TimesheetInformation = (props: IProps) => {
-
   const authData = authVar();
   const companyCode = authData?.company?.code as string;
   const timesheet = props.timesheet;
@@ -38,15 +38,11 @@ const TimesheetInformation = (props: IProps) => {
       <PageHeader
         title={
           <>
-            {authData?.user?.roles.includes(RoleName.Employee) ?
-              <Link to={
-                routes.timesheet.path(companyCode)}
-              >
+            {authData?.user?.roles[0] === constants.roles.Employee ?
+              <Link to={routes.timesheet.path(companyCode)}>
                 <ArrowLeftOutlined />
-              </Link>
-              :
-              <Link to={
-                routes.employeeTimesheet.path(companyCode)}>
+              </Link> :
+              <Link to={routes.employeeTimesheet.path(companyCode)}>
                 <ArrowLeftOutlined />
               </Link>
             }
@@ -79,7 +75,7 @@ const TimesheetInformation = (props: IProps) => {
             </div>
 
             <div>
-              { !isNil(timesheet?.totalExpense) ? `$${timesheet.totalExpense}` : 'N/A' }
+              {!isNil(timesheet?.totalExpense) ? `$${timesheet.totalExpense}` : 'N/A'}
             </div>
           </div>
 
@@ -88,7 +84,7 @@ const TimesheetInformation = (props: IProps) => {
               Status
             </div>
             <div>
-              { statusMap[timesheet.status] || 'N/A' }
+              {statusMap[timesheet.status] || 'N/A'}
             </div>
           </div>
         </Col>
@@ -108,7 +104,7 @@ const TimesheetInformation = (props: IProps) => {
             </div>
 
             <div>
-              { timesheet.lastSubmittedAt ? moment(timesheet.lastSubmittedAt).format('LLL') : 'N/A' }
+              {timesheet.lastSubmittedAt ? moment(timesheet.lastSubmittedAt).format('LLL') : 'N/A'}
             </div>
           </div>
 
@@ -118,7 +114,7 @@ const TimesheetInformation = (props: IProps) => {
             </div>
 
             <div>
-              { timesheet.lastApprovedAt ? moment(timesheet.lastApprovedAt).format('LLL') : 'N/A' }
+              {timesheet.lastApprovedAt ? moment(timesheet.lastApprovedAt).format('LLL') : 'N/A'}
             </div>
           </div>
           <div className={styles['detail-row']}>

@@ -67,6 +67,7 @@ const InvoiceForm = (props: IProps) => {
   const [isSendInvoiceClicked, setIsSendInvoiceClicked] = useState(false);
 
   const company_id = loggedInUser?.company?.id as string
+  const disabled = !!props.timesheet_id; 
 
   const [createInvoice, { loading: creatingInvoice }] = useMutation<
     GraphQLResponse<'InvoiceCreate', Invoice>,
@@ -381,7 +382,7 @@ const InvoiceForm = (props: IProps) => {
                               }]}
                               {...restField}
                             >
-                              <Select placeholder="Select Project" loading={projectLoading}>
+                              <Select placeholder="Select Project" loading={projectLoading} disabled={disabled}>
                                 {
                                   projectData?.Project?.data?.map((project) => (
                                     <Select.Option key={project.id} value={project.id}>{project.name}</Select.Option>
@@ -397,7 +398,7 @@ const InvoiceForm = (props: IProps) => {
                               name={[name, 'description']}
                               {...restField}
                             >
-                              <Input />
+                              <Input disabled={disabled} />
                             </Form.Item>
                           </td>
 
@@ -411,7 +412,7 @@ const InvoiceForm = (props: IProps) => {
                               }]}
                               {...restField}
                             >
-                              <InputNumber min={0} autoComplete="off" onChange={() => onHourRateChange(name)} />
+                              <InputNumber min={0} autoComplete="off" disabled={disabled} onChange={() => onHourRateChange(name)} />
                             </Form.Item>
                           </td>
 
@@ -425,7 +426,7 @@ const InvoiceForm = (props: IProps) => {
                                 message: 'Please enter rate'
                               }]}
                             >
-                              <Input type="number" prefix="$" min={0} autoComplete="off" onChange={() => onHourRateChange(name)} />
+                              <Input type="number" prefix="$" min={0} autoComplete="off" disabled={disabled} onChange={() => onHourRateChange(name)} />
                             </Form.Item>
                           </td>
 

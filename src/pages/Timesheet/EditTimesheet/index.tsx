@@ -1,17 +1,17 @@
-import { useEffect, useState } from 'react';
-import { Modal, Row, Col, Button, TimePicker } from 'antd';
-import { CloseOutlined } from "@ant-design/icons";
-import { Form, Input } from 'antd';
-import moment, { Moment } from 'moment';
+import { useEffect, useState } from 'react'
+import { Modal, Row, Col, Button, TimePicker } from 'antd'
+import { CloseOutlined } from "@ant-design/icons"
+import { Form, Input } from 'antd'
+import moment, { Moment } from 'moment'
 
-import { gql, useMutation } from '@apollo/client';
-import { CREATE_TIME_ENTRY, getTimeFormat } from '..';
-import { notifyGraphqlError } from '../../../utils/error';
-import { authVar } from '../../../App/link';
-import { TimeEntry } from '../../../interfaces/generated';
-import { getTotalTimeForADay } from '../DetailTimesheet';
+import { gql, useMutation } from '@apollo/client'
+import { CREATE_TIME_ENTRY, getTimeFormat } from '..'
+import { notifyGraphqlError } from '../../../utils/error'
+import { authVar } from '../../../App/link'
+import { TimeEntry } from '../../../interfaces/generated'
+import { getTotalTimeForADay } from '../DetailTimesheet'
 
-import styles from "./style.module.scss";
+import styles from "./style.module.scss"
 
 
 export const UPDATE_TIME_ENTRY = gql`
@@ -121,7 +121,10 @@ const EditTimeSheet = (props: IProps) => {
   }
 
   const resetForm = () => {
-    props?.refetch()
+    const values = form.getFieldsValue(true, (meta) => meta.touched);
+    if (Object.keys(values).length !== 0) {
+      props?.refetch()
+    }
     form.resetFields()
     setTotalDuration(0)
     props?.setVisibility()
@@ -131,6 +134,7 @@ const EditTimeSheet = (props: IProps) => {
     <Modal
       centered
       visible={props?.visible}
+      className={styles['edit-timesheet']}
       closeIcon={[
         <div
           onClick={resetForm}
@@ -142,7 +146,7 @@ const EditTimeSheet = (props: IProps) => {
       ]}
       destroyOnClose
       footer={null}
-      width={869}>
+      width={1000}>
       <div className={styles['modal-body']}>
         <div>
           <span className={styles['edit-title']}>
@@ -174,16 +178,15 @@ const EditTimeSheet = (props: IProps) => {
             </div>
           </Col>
         </Row>
-
-        <Row>
-          <Col
-            span={24}
-            className={styles['dynamic-form']}>
-            <Form
-              form={form}
-              layout="vertical"
-              onFinish={resetForm}
-              name="timesheet-form">
+        <Form
+          form={form}
+          layout="vertical"
+          onFinish={resetForm}
+          name="timesheet-form">
+          <Row>
+            <Col
+              span={24}
+              className={styles['dynamic-form']}>
               {newEntries ?
                 newEntries?.map((entry: TimeEntry, index: number) => (
                   <Row
@@ -210,7 +213,7 @@ const EditTimeSheet = (props: IProps) => {
                           use12Hours
                           format="h:mm:ss A"
                           onChange={(event: any) => onChangeTime(event, entry?.id, 'start')}
-                          defaultValue={moment.utc(entry?.startTime)} 
+                          defaultValue={moment.utc(entry?.startTime)}
                         />
                       </Form.Item>
                     </Col>
@@ -254,13 +257,7 @@ const EditTimeSheet = (props: IProps) => {
                   <Col span={6}>
                     <Form.Item
                       name={'start-time'}
-                      label={'Start Time'}
-                      rules={[
-                        {
-                          required: true,
-                          message: 'Enter Start Time!'
-                        },
-                      ]}>
+                      label={'Start Time'}>
                       <TimePicker
                         use12Hours
                         format='h:mm:ss A'
@@ -271,13 +268,7 @@ const EditTimeSheet = (props: IProps) => {
                   <Col span={6}>
                     <Form.Item
                       name={'end-time'}
-                      label={'End Time'}
-                      rules={[
-                        {
-                          required: true,
-                          message: 'Enter End Time!'
-                        }
-                      ]}>
+                      label={'End Time'}>
                       <TimePicker
                         use12Hours
                         onChange={(event: any) =>
@@ -299,15 +290,19 @@ const EditTimeSheet = (props: IProps) => {
                     </div>
                   </Col>
                 </Row>}
-              <br /> <br />
+            </Col>
+          </Row>
+          <br /> <br />
+          <Row>
+            <Col span={24}>
               <Form.Item style={{ float: 'right' }}>
                 <Button type="primary" htmlType='submit'>
                   Exit
                 </Button>
               </Form.Item>
-            </Form>
-          </Col>
-        </Row>
+            </Col>
+          </Row>
+        </Form>
       </div>
     </Modal>
   )

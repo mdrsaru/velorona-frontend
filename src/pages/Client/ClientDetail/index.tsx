@@ -16,7 +16,7 @@ const ClientDetail = (props: IProps) => {
         centered
         visible={props.visible}
         closeIcon={[
-          <div onClick={() => props.setVisible(false)}>
+          <div onClick={() => props.setVisible(false)} key={1}>
             <span className={styles["close-icon-div"]}>
               <CloseOutlined />
             </span>

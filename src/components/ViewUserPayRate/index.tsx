@@ -1,6 +1,6 @@
 import CloseOutlined from "@ant-design/icons/lib/icons/CloseOutlined";
 import EditOutlined from "@ant-design/icons/lib/icons/EditOutlined";
-import { gql, useQuery } from "@apollo/client";
+import { gql, useLazyQuery } from "@apollo/client";
 import { Modal } from "antd";
 import { Table } from "antd";
 import { useState } from "react";
@@ -13,6 +13,7 @@ interface IProps {
   visibility: boolean;
   setVisibility: any;
   data: any;
+  userPayRate?: any;
 }
 
 export const USER_PAY_RATE = gql`
@@ -39,27 +40,27 @@ export const USER_PAY_RATE = gql`
 `;
 
 const ViewUserPayRate = (props: IProps) => {
-  const { visibility, data:employee, setVisibility } = props;
+  const { visibility, data: employee, setVisibility, userPayRate } = props;
   const [editVisibility, setEditVisibility] = useState(false);
-  const [userPayRateId,setUserPayRateId] = useState('')
-  const { data: userPayRate, loading } = useQuery<UserPayRatePagingData>(USER_PAY_RATE, {
-    fetchPolicy: "network-only",
-    nextFetchPolicy: "cache-first",
-    variables: {
-      input: {
-        query: {
-          user_id: employee?.id,
-        },
-        paging: {
-          order: ["updatedAt:DESC"],
-        },
-      },
-    },
-  });
+  const [userPayRateId, setUserPayRateId] = useState('')
+  const [getUserPayRate, { data: userPayRateData }] = useLazyQuery<UserPayRatePagingData>(USER_PAY_RATE)
 
-  const handleEdit = (id: any) => {
+
+  const handleEdit = (id: any, userId: string) => {
     setUserPayRateId(id)
-    setVisibility(false)
+    setVisibility(false);
+    getUserPayRate({
+      variables: {
+        input: {
+          query: {
+            user_id: userId,
+          },
+          paging: {
+            order: ["updatedAt:DESC"],
+          },
+        },
+      }
+    })
     setEditVisibility(!editVisibility)
   }
   const columns = [
@@ -83,7 +84,7 @@ const ViewUserPayRate = (props: IProps) => {
     },
     {
       title: "Action",
-      render: (payRate: any) => <EditOutlined onClick={() => handleEdit(payRate?.id)} />
+      render: (payRate: any) => <EditOutlined onClick={() => handleEdit(payRate?.id, payRate?.user?.id)} />
     }
   ];
 
@@ -113,7 +114,6 @@ const ViewUserPayRate = (props: IProps) => {
           </p>
 
           <Table
-            loading={loading}
             dataSource={userPayRate?.UserPayRate?.data}
             columns={columns}
             pagination={false}
@@ -122,11 +122,12 @@ const ViewUserPayRate = (props: IProps) => {
       </Modal>
 
       <EditUserPayRateModal
-            visibility={editVisibility}
-            setVisibility={setEditVisibility}
-            data={employee}
-            id= {userPayRateId}
-          />
+        visibility={editVisibility}
+        setVisibility={setEditVisibility}
+        data={employee}
+        id={userPayRateId}
+        userPayRateData={userPayRateData}
+      />
     </>
   );
 };

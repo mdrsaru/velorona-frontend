@@ -239,7 +239,7 @@ const NewEmployee = () => {
           onFinish={onSubmitForm}>
           <Row gutter={[32, 0]}>
             <Col className={styles['form-header']}>
-              <p>Employee Information</p>
+              <p>User Information</p>
             </Col>
             <Col
               xs={24}
@@ -408,7 +408,7 @@ const NewEmployee = () => {
               </Form.Item>
             </Col>
             <Col className={styles['form-header']}>
-              <p>Employee Roles</p>
+              <p>User Roles</p>
             </Col>
             <Col
               xs={24}

@@ -229,7 +229,6 @@ const Client = () => {
       title: "Client Name",
       dataIndex: "name",
       key: "name",
-   
       onCell: (data: any) => {
         return {
           onClick: () => {
@@ -238,6 +237,7 @@ const Client = () => {
           },
         };
       },
+      className: styles["client-name"]
     },
     {
       title: "Email Address",
@@ -287,7 +287,7 @@ const Client = () => {
       <Card bordered={false}>
         <Row>
           <Col span={12} className={styles["client-col"]}>
-            <h1>Client</h1>
+            <h1>Clients</h1>
           </Col>
           <Col span={12} className={styles["client-col"]}>
             <div className={styles["add-new-client"]}>
@@ -333,7 +333,7 @@ const Client = () => {
         imgSrc={archiveImg}
         okText={client?.archived ? "Unarchive" : "Archive"}
         modalBody={
-          <ArchiveBody 
+          <ArchiveBody
             title={
               <>
                 Are you sure you want to{" "}
@@ -341,7 +341,7 @@ const Client = () => {
                 <strong> {client?.name}?</strong>
               </>
             }
-            subText={`Client will ${client?.archived ? "" : "not" } be able to login to the system` }
+            subText={`Client will ${client?.archived ? "" : "not"} be able to login to the system`}
           />
         }
         onOkClick={archiveClient}
