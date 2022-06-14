@@ -27,6 +27,7 @@ import constants from '../../config/constants'
 import routes from "../../config/routes"
 import { useNavigate } from 'react-router-dom'
 import { notifyGraphqlError } from "../../utils/error"
+import { Timesheet as ITimesheet } from '../../interfaces/generated';
 
 import { PROJECT } from '../Project'
 import { CLIENT } from '../Client'
@@ -37,6 +38,7 @@ import TimeEntry from './TimeEntry'
 import NoContent from '../../components/NoContent'
 import { getTotalTimeForADay } from './DetailTimesheet'
 import TimerCard from '../../components/TimerCard'
+
 import styles from './style.module.scss'
 
 export const CREATE_TIME_ENTRY = gql`
@@ -142,6 +144,7 @@ query Timesheet($input: TimesheetQueryInput!) {
       duration
       status
       durationFormat
+      invoicedDuration
       invoicedDurationFormat
       user {
         id
@@ -262,7 +265,13 @@ const Timesheet = () => {
     },
     {
       title: 'Invoiced Time',
-      dataIndex: 'invoicedDurationFormat',
+      render: (timesheet: ITimesheet) => {
+        if(timesheet.invoicedDuration) {
+          return timesheet.invoicedDurationFormat;
+        }
+
+        return '-';
+      }
     },
     {
       title: 'Total Expense',

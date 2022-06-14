@@ -283,8 +283,8 @@ const Tasks = () => {
                   />
                 </Panel>
               </Collapse>
-
-              <Collapse accordion>
+              
+              <Collapse accordion defaultActiveKey={['3']}>
                 <Panel header="In Progress" key="3">
                   <Table
                     loading={taskLoading}
@@ -296,7 +296,7 @@ const Tasks = () => {
                 </Panel>
               </Collapse>
 
-              <Collapse accordion >
+              <Collapse accordion defaultActiveKey={['4']}>
                 <Panel header="Completed" key="4">
                   <Table
                     loading={taskLoading}
@@ -308,7 +308,7 @@ const Tasks = () => {
                 </Panel>
               </Collapse>
 
-              <Collapse accordion>
+              <Collapse accordion defaultActiveKey={['1']}>
                 <Panel header="Unscheduled" key="1">
                   <Table
                     loading={taskLoading}

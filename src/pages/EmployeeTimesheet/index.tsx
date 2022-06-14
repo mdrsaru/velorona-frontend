@@ -1,3 +1,4 @@
+import moment from 'moment';
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { gql, useLazyQuery, useQuery } from '@apollo/client';
@@ -23,6 +24,7 @@ const EMPLOYEE_TIMESHEET = gql`
       data {
         id
         durationFormat
+        invoicedDuration
         invoicedDurationFormat
         totalExpense
         lastApprovedAt
@@ -160,13 +162,19 @@ const EmployeeTimesheet = () => {
     },
     {
       title: 'Invoiced Time',
-      dataIndex: 'invoicedDurationFormat',
+      render: (timesheet: Timesheet) => {
+        if(timesheet.invoicedDuration) {
+          return timesheet.invoicedDurationFormat;
+        }
+
+        return '-';
+      }
     },
     {
       title: 'Last Approved',
       dataIndex: 'lastApprovedAt',
       render: (lastApprovedAt: any) => {
-        return <span>{lastApprovedAt ? lastApprovedAt : 'N/A'}</span>
+        return <span>{lastApprovedAt ? moment(lastApprovedAt).format('LL') : 'N/A'}</span>
       }
     },
     {
