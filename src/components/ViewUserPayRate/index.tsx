@@ -54,6 +54,7 @@ const ViewUserPayRate = (props: IProps) => {
         input: {
           query: {
             user_id: userId,
+            id:id,
           },
           paging: {
             order: ["updatedAt:DESC"],
@@ -103,7 +104,6 @@ const ViewUserPayRate = (props: IProps) => {
         ]}
         width={869}
         okText="Close"
-        cancelButtonProps={{ style: { display: "none" } }}
         onOk={() => setVisibility(false)}
       >
         <div className={styles["modal-body"]}>
@@ -116,6 +116,7 @@ const ViewUserPayRate = (props: IProps) => {
           <Table
             dataSource={userPayRate?.UserPayRate?.data}
             columns={columns}
+            rowKey={(record) => record?.id}
             pagination={false}
           />
         </div>

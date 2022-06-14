@@ -18,6 +18,36 @@ const config = {
   }
 };
 
-export const roles_user = ['CompanyAdmin', 'Employee', 'TaskManager']
+export const roles_user = [{
+  value: 'CompanyAdmin',
+  name: 'Company Admin'
+},
+{
+  value: 'Employee',
+  name: 'Employee'
+},
+{
+  value: 'TaskManager',
+  name: 'Task Manager'
+}
+]
+
+export const user_status = [{
+  value: 'Active',
+  name: 'Active'
+},
+{
+  value: 'Inactive',
+  name: 'In Active'
+},
+{
+  value: 'Archived',
+  name: 'Archived'
+},
+{
+  value: 'Unarchived',
+  name: 'UnArchived'
+}
+]
 
 export default config;

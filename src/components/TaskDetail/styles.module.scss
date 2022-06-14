@@ -45,7 +45,7 @@
       .ant-col {
         text-align: center;
         padding-top: 1rem;
-        border: 1px solid var(--gray-2);
+        // border: 1px solid var(--gray-2);
       }
     }
   }
@@ -127,14 +127,27 @@
 }
 
 .task-header {
+  margin-top: 20px;
   padding-left: 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  padding:3%;
 }
-
+.header{
+  margin-right: 10px;
+  display: flex;
+  flex-wrap: wrap;
+}
 .status-div {
   background: var(--gray-2);
-  padding: 1rem;
+  padding: 0.5rem 1rem;
+  width: 14%;
+  font-size: 17px;
 }
 
+.task-status-div{
+  width: 40%;
+}
 .custom-picker input {
   visibility: hidden;
 }

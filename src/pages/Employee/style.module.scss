@@ -77,7 +77,7 @@
       font-size: 21px;
     }
 
-    .ant-input-affix-wrapper > input.ant-input {
+    .ant-input-affix-wrapper>input.ant-input {
       padding-left: 1.5rem;
     }
 
@@ -368,4 +368,35 @@ h1 {
   color: var(--primary-blue);
   margin: 1rem 0 2rem 0;
   cursor: pointer;
+}
+
+.filter-col {
+  display: flex;
+  justify-content: flex-end;
+
+  @media screen and (max-width:767px) {
+    padding-bottom: 1rem;
+  }
+
+  :global {
+    .ant-btn-text {
+      color: var(--gray-secondary)
+    }
+
+    .ant-btn {
+      border-radius: 0;
+      height: 50px;
+      border-color: var(--gray-2);
+      background: var(--gray-2);
+      &:focus {
+        border-color: var(--primary-blue);
+        color: var(--black-1);
+      }
+    }
+  }
+}
+
+.role-status-col {
+  padding-top: 0.3rem;
+  padding-bottom: 1.3rem;
 }

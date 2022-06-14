@@ -33,8 +33,15 @@
 }
 
 .task-div{
-  margin-bottom: 2rem;;
+  margin-bottom: 2rem;
+
+  :global {
+    .ant-collapse-content-box {
+      overflow-y: auto;
+    }
+  }
 }
+
 .modal-footer {
   justify-items: left;
   align-items: flex-start;
@@ -102,7 +109,7 @@
 .task-name {
   font-weight: 600;
   font-size: 14px;
-  line-height: 17px;
+  line-height: 30px;
   cursor: pointer;
   text-transform: capitalize;
 }
