@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { gql, useMutation, useQuery } from '@apollo/client'
 
 import { Card, Col, Dropdown, Menu, message, Row, Table } from 'antd'
@@ -20,6 +20,7 @@ import SubMenu from 'antd/lib/menu/SubMenu';
 import { MutationProjectUpdateArgs, Project, ProjectPagingResult, ProjectStatus, QueryProjectArgs } from '../../interfaces/generated';
 import { GraphQLResponse } from '../../interfaces/graphql.interface';
 import styles from './style.module.scss';
+import PageHeader from '../../components/PageHeader'
 
 export const PROJECT = gql`
   query Project($input: ProjectQueryInput!) {
@@ -110,7 +111,7 @@ const ProjectPage = () => {
   const setArchiveVisibility = (value: boolean) => {
     setArchiveModal(value);
   };
-  const { data: projectData } = useQuery<GraphQLResponse<'Project',ProjectPagingResult>,QueryProjectArgs>(PROJECT, {
+  const { data: projectData } = useQuery<GraphQLResponse<'Project', ProjectPagingResult>, QueryProjectArgs>(PROJECT, {
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
     variables: {
@@ -125,7 +126,7 @@ const ProjectPage = () => {
     },
   });
 
-  const [projectUpdate, { loading: updateLoading }] = useMutation<GraphQLResponse<'ProjectUpdate',Project>,MutationProjectUpdateArgs>(
+  const [projectUpdate, { loading: updateLoading }] = useMutation<GraphQLResponse<'ProjectUpdate', Project>, MutationProjectUpdateArgs>(
     PROJECT_UPDATE, {
     onCompleted() {
       message.success({
@@ -238,7 +239,7 @@ const ProjectPage = () => {
     {
       title: "Project Name",
       key: "name",
-      render: (record: Project) => <div style={{cursor: 'pointer'}}>{record?.name}</div>,
+      render: (record: Project) => <div style={{ cursor: 'pointer' }}>{record?.name}</div>,
       onCell: (record: Project) => {
         return {
           onClick: () => {
@@ -307,11 +308,9 @@ const ProjectPage = () => {
 
     <div className={styles["project-main-div"]}>
       <Card bordered={false}>
-        <Row gutter={[32, 12]}>
-          <Col span={12} className={styles["form-col"]}>
-            <h1>Projects</h1>
-          </Col>
-          <Col span={12}>
+        <PageHeader
+          title="Projects"
+          extra={[
             <div className={styles["add-new"]}>
               <Link
                 to={routes.addProject.path(
@@ -323,8 +322,8 @@ const ProjectPage = () => {
                 Add new project
               </Link>
             </div>
-          </Col>
-        </Row>
+          ]}
+        />
         <Row className='container-row'>
           <Col span={24}>
             <Table
@@ -366,7 +365,7 @@ const ProjectPage = () => {
                 <strong> {project?.name}</strong>
               </>
             }
-            subText={`Project will ${project?.archived ? "" : "not" } be able to assigned to any employee`}
+            subText={`Project will ${project?.archived ? "" : "not"} be able to assigned to any employee`}
           />
         }
         onOkClick={archiveProject}

@@ -9,25 +9,21 @@
 }
 
 .client-name {
-  cursor: pointer;  
-} 
+  cursor: pointer;
+}
 
-.client-col {
-  padding: 1.5rem 0 0.9rem 0;
+h1 {
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 29px;
+}
 
-  h1 {
-    font-weight: 600;
-    font-size: 24px;
-    line-height: 29px;
-  }
-
-  .add-new-client {
-    float: right;
-    font-weight: 600;
-    font-size: 18px;
-    line-height: 22px;
-    color: var(--primary-blue);
-  }
+.add-new-client {
+  float: right;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 22px;
+  color: var(--primary-blue);
 }
 
 .client-name {

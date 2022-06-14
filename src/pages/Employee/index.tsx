@@ -28,6 +28,7 @@ import {
 } from "../../interfaces/generated";
 import styles from "./style.module.scss";
 import { debounce } from "lodash";
+import PageHeader from "../../components/PageHeader";
 
 const { SubMenu } = Menu;
 const { Option } = Select;
@@ -546,11 +547,9 @@ const Employee = () => {
       ) : (
         <div className={styles["main-div"]}>
           <Card bordered={false}>
-            <Row gutter={[32, 0]} className={styles['employee-col']}>
-              <Col xs={24} sm={24} md={12} lg={12} xl={12}>
-                <h1>Users</h1>
-              </Col>
-              <Col xs={24} sm={24} md={12} lg={12} xl={12}>
+            <PageHeader
+              title="Users"
+              extra={[
                 <div className={styles["add-new-employee"]}>
                   <Link
                     to={routes.addEmployee.path(
@@ -562,12 +561,12 @@ const Employee = () => {
                     Add New User
                   </Link>
                 </div>
-              </Col>
-            </Row>
+              ]}
+            />
             <Form
               form={filterForm}
               layout="vertical"
-              onFinish={() => {}}
+              onFinish={() => { }}
               autoComplete="off"
               name="filter-form">
               <Row gutter={[32, 0]}>

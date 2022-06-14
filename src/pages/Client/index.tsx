@@ -22,6 +22,7 @@ import { Client as IClient, ClientPagingResult, ClientStatus, MutationClientUpda
 import styles from "./style.module.scss";
 import ArchiveBody from "../../components/Archive";
 import { GraphQLResponse } from "../../interfaces/graphql.interface";
+import PageHeader from "../../components/PageHeader";
 
 export interface UserData {
   User: {
@@ -285,22 +286,22 @@ const Client = () => {
   return (
     <div className={styles["main-div"]}>
       <Card bordered={false}>
-        <Row>
-          <Col span={12} className={styles["client-col"]}>
-            <h1>Clients</h1>
-          </Col>
-          <Col span={12} className={styles["client-col"]}>
+        <PageHeader
+          title="Clients"
+          extra={[
             <div className={styles["add-new-client"]}>
               <Link
-                to={routes.addClient.path(
-                  loggedInUser?.company?.code ? loggedInUser?.company?.code : ""
+                to={routes.addEmployee.path(
+                  loggedInUser?.company?.code
+                    ? loggedInUser?.company?.code
+                    : ""
                 )}
               >
-                Add New Client
+                Add New User
               </Link>
             </div>
-          </Col>
-        </Row>
+          ]}
+        />
         <Row className='container-row'>
           <Col span={24}>
             <Table
