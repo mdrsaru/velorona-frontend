@@ -289,7 +289,7 @@ const Client = () => {
         <PageHeader
           title="Clients"
           extra={[
-            <div className={styles["add-new-client"]}>
+            <div className={styles["add-new-client"]} key="new-client">
               <Link
                 to={routes.addEmployee.path(
                   loggedInUser?.company?.code

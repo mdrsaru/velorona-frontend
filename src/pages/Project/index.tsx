@@ -1,10 +1,10 @@
 import { useState } from 'react'
-import { gql, useMutation, useQuery } from '@apollo/client'
+import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client'
 
-import { Card, Col, Dropdown, Menu, message, Row, Table } from 'antd'
+import { Button, Card, Col, Dropdown, Menu, message, Row, Table } from 'antd'
 import { Link, useNavigate } from 'react-router-dom'
 import routes from '../../config/routes'
-import { MoreOutlined, PlusCircleOutlined } from '@ant-design/icons'
+import { MoreOutlined, PlusCircleOutlined, DownloadOutlined } from '@ant-design/icons'
 
 import { authVar } from '../../App/link';
 import ModalConfirm from '../../components/Modal';
@@ -21,6 +21,7 @@ import { MutationProjectUpdateArgs, Project, ProjectPagingResult, ProjectStatus,
 import { GraphQLResponse } from '../../interfaces/graphql.interface';
 import styles from './style.module.scss';
 import PageHeader from '../../components/PageHeader'
+import { downloadCSV } from '../../utils/common'
 
 export const PROJECT = gql`
   query Project($input: ProjectQueryInput!) {
@@ -82,6 +83,14 @@ const DeleteBody = () => {
   );
 };
 
+const csvHeader: Array<{ label: string, key: string, subKey?: string }> = [
+  { label: "Project Name", key: "name" },
+  { label: "Client", key: "client", subKey: "name" },
+  { label: "Client Email", key: "client", subKey: "email" },
+  { label: "Status", key: "status" },
+  { label: "Company", key: "company", subKey: "name" }
+]
+
 const ProjectPage = () => {
   const loggedInUser = authVar();
   const navigate = useNavigate();
@@ -126,6 +135,24 @@ const ProjectPage = () => {
     },
   });
 
+  const [fetchDownloadData, { data: projectDownloadData }] = useLazyQuery<GraphQLResponse<'Project', ProjectPagingResult>, QueryProjectArgs>(PROJECT, {
+    fetchPolicy: "network-only",
+    nextFetchPolicy: "cache-first",
+    variables: {
+      input: {
+        query: {
+          company_id: loggedInUser?.company?.id ?? '',
+        },
+        paging: {
+          order: ["updatedAt:DESC"],
+        },
+      },
+    },
+    onCompleted: () => {
+      downloadCSV(projectDownloadData?.Project?.data, csvHeader, 'Projects.csv')
+    }
+  });
+
   const [projectUpdate, { loading: updateLoading }] = useMutation<GraphQLResponse<'ProjectUpdate', Project>, MutationProjectUpdateArgs>(
     PROJECT_UPDATE, {
     onCompleted() {
@@ -146,6 +173,21 @@ const ProjectPage = () => {
     },
   }
   );
+
+  const downloadReport = () => {
+    fetchDownloadData({
+      variables: {
+        input: {
+          query: {
+            company_id: loggedInUser?.company?.id ?? '',
+          },
+          paging: {
+            order: ["updatedAt:DESC"],
+          },
+        },
+      }
+    })
+  };
 
   const archiveProject = () => {
     projectUpdate({
@@ -311,7 +353,7 @@ const ProjectPage = () => {
         <PageHeader
           title="Projects"
           extra={[
-            <div className={styles["add-new"]}>
+            <div className={styles["add-new"]} key="new-project">
               <Link
                 to={routes.addProject.path(
                   loggedInUser?.company?.code
@@ -339,6 +381,22 @@ const ProjectPage = () => {
               }}
             />
           </Col>
+        </Row>
+        <Row>
+          <Col span={24}>
+          {
+            !!projectData?.Project?.data?.length && (
+              <div className={styles['download-report']}>
+                <Button
+                  type="link"
+                  onClick={downloadReport}
+                  icon={<DownloadOutlined />}
+                >
+                  Download Report
+                </Button>
+              </div>
+            )
+          }</Col>
         </Row>
       </Card>
 

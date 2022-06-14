@@ -2,15 +2,15 @@ import moment from 'moment';
 
 export const round = (value: number, decimals: number): number => {
   const temp = parseFloat(value + `e+${decimals}`);
-  const result = Math.round(temp)  + `e-${decimals}`;
+  const result = Math.round(temp) + `e-${decimals}`;
   return parseFloat(result);
-}   
+}
 
 export const getWeekDays = (date: string | Date): string[] => {
   const dates: string[] = [];
   const current = moment(date);
 
-  for(let i = 0; i < 7; i++) {
+  for (let i = 0; i < 7; i++) {
     dates.push(current.format('YYYY-MM-DD'));
     current.add(1, 'days');
   }
@@ -48,3 +48,32 @@ export const checkRoles = (args: CheckRoleArgs) => {
   return expectedRoles.some((role) => userRoles.includes(role));
 };
 
+const arrayToCsv = (jsonData: any, csvHeader: any) => {
+  let csvRows = [];
+  let data = jsonData ?? []
+
+  const headerValues = csvHeader.map((header: any) => header.label);
+  csvRows.push(headerValues.join(','));
+  data.forEach((row: any) => {
+    const rowValues = csvHeader.map((header: { key: string, label: string, subKey?: string }) => {
+      const escaped = header?.subKey ? ('' + row[header.key][header?.subKey] ?? '').replace(/"/g, '\\"') :
+        ('' + row[header.key] ?? '').replace(/"/g, '\\"')
+      return `"${escaped}"`;
+    });
+    csvRows.push(rowValues.join(','));
+  })
+  return csvRows.join('\n');
+}
+
+export const downloadCSV = (jsonData: any, csvHeader: any, fileName: string) => {
+  const csvData = arrayToCsv(jsonData, csvHeader)
+  const blob = new Blob([csvData], { type: 'text/csv' });
+  const url = window.URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.setAttribute('hidden', '');
+  a.setAttribute('href', url);
+  a.setAttribute('download', fileName);
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+}

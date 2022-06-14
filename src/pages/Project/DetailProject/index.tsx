@@ -1,10 +1,10 @@
-import { Card, Col, Dropdown, Menu, Row, Table, message } from 'antd';
+import { Card, Col, Dropdown, Menu, Row, Table, message, Button } from 'antd';
 import { ArrowLeftOutlined, MoreOutlined } from '@ant-design/icons';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
 
 import { authVar } from '../../../App/link';
-import { gql, useMutation, useQuery } from '@apollo/client';
+import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client';
 import { notifyGraphqlError } from '../../../utils/error';
 
 import { PROJECT } from '../index';
@@ -22,6 +22,7 @@ import TaskDetail from '../../../components/TaskDetail';
 import Status from '../../../components/Status';
 
 import InfoCircleOutlined from '@ant-design/icons/lib/icons/InfoCircleOutlined';
+import DownloadOutlined from '@ant-design/icons/lib/icons/DownloadOutlined';
 import { GraphQLResponse } from '../../../interfaces/graphql.interface';
 import styles from '../style.module.scss';
 import {
@@ -34,6 +35,7 @@ import {
   Task,
   TaskPagingResult,
 } from '../../../interfaces/generated';
+import { downloadCSV } from '../../../utils/common';
 
 const { SubMenu } = Menu;
 
@@ -170,6 +172,13 @@ const DetailProject = () => {
       },
     });
   };
+
+  const csvHeader: Array<{ label: string, key: string, subKey?: string }> = [
+    { label: "Task Name", key: "name"},
+    { label: "Task Manager", key: "manager", subKey: "fullName" },
+    { label: "Project", key: "project", subKey: "name" },
+    { label: "Status", key: "status" }  
+  ]
 
   const [detailVisibility, setDetailVisibility] = useState(false);
   const menu = (data: any) => (
@@ -380,6 +389,42 @@ const DetailProject = () => {
     },
   });
 
+  const [fetchDownloadData, { data: taskDownloadData }] = useLazyQuery<GraphQLResponse<'Task', TaskPagingResult>, QueryTaskArgs>(TASK, {
+    fetchPolicy: "network-only",
+    nextFetchPolicy: "cache-first",
+    variables: {
+      input: {
+        query: {
+          company_id: loggedInUser?.company?.id as string,
+          project_id: params?.pid,
+        },
+        paging: {
+          order: ["updatedAt:DESC"],
+        },
+      },
+    },
+    onCompleted: () => {
+      console.log(taskDownloadData?.Task?.data)
+      downloadCSV(taskDownloadData?.Task?.data, csvHeader, 'Tasks.csv')
+    }
+  });
+
+  const downloadReport = () => {
+    fetchDownloadData({
+      variables: {
+        input: {
+          query: {
+            company_id: loggedInUser?.company?.id as string,
+            project_id: params?.pid,
+          },
+          paging: {
+            order: ["updatedAt:DESC"],
+          },
+        },
+      }
+    })
+  }
+
   return (
     <div className={styles["main-div"]}>
       <Card bordered={false}>
@@ -429,6 +474,23 @@ const DetailProject = () => {
                 pageSize: constants.paging.perPage
               }}
             />
+          </Col>
+        </Row>
+        <Row>
+          <Col>
+            {
+              !!taskData?.Task?.data?.length && (
+                <div className={styles['download-report']}>
+                  <Button
+                    type="link"
+                    onClick={downloadReport}
+                    icon={<DownloadOutlined />}
+                  >
+                    Download Report
+                  </Button>
+                </div>
+              )
+            }
           </Col>
         </Row>
       </Card>

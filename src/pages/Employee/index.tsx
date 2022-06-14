@@ -1,5 +1,5 @@
 import { Card, Row, Col, Table, Dropdown, Menu, message, Input, Button, Select, Form } from "antd"
-import { MoreOutlined, SearchOutlined } from "@ant-design/icons"
+import { MoreOutlined, SearchOutlined, DownloadOutlined } from "@ant-design/icons"
 
 import { Link, useNavigate } from "react-router-dom"
 import routes from "../../config/routes"
@@ -29,6 +29,7 @@ import {
 import styles from "./style.module.scss";
 import { debounce } from "lodash";
 import PageHeader from "../../components/PageHeader";
+import { downloadCSV } from "../../utils/common";
 
 const { SubMenu } = Menu;
 const { Option } = Select;
@@ -110,6 +111,14 @@ export const USER_ARCHIVE = gql`
   }
 `;
 
+const csvHeader: Array<{ label: string, key: string, subKey?: string }> = [
+  { label: "FullName", key: "fullName"},
+  { label: "Email", key: "email" },
+  { label: "Address", key: "address", subKey: "streetAddress" },
+  { label: "Phone", key: "phone" },
+  { label: "Status", key: "status" }
+]
+
 const Employee = () => {
   const [filterForm] = Form.useForm();
   const loggedInUser = authVar();
@@ -134,6 +143,28 @@ const Employee = () => {
     skip: 0,
     currentPage: 1,
   });
+
+  const [fetchDownloadData, { data: employeeDownloadData }] = useLazyQuery<
+    GraphQLResponse<'User', UserPagingResult>,
+    QueryUserArgs
+  >(
+    USER,
+    {
+      fetchPolicy: "network-only",
+      nextFetchPolicy: "cache-first",
+      variables: {
+        input: {
+          paging: {
+            order: ["updatedAt:DESC"],
+          },
+        },
+      },
+      onCompleted: () => {
+        downloadCSV(employeeDownloadData?.User?.data, csvHeader, 'Users.csv')
+      }
+    }
+  );
+
 
   const changePage = (page: number) => {
     const newSkip = (page - 1) * constants.paging.perPage;
@@ -320,6 +351,18 @@ const Employee = () => {
     filterForm.resetFields()
     setFilterProperty({
       filter: !filterProperty?.filter
+    })
+  }
+
+  const downloadReport = () => {
+    fetchDownloadData({
+      variables: {
+        input: {
+          paging: {
+            order: ["updatedAt:DESC"],
+          }
+        }
+      }
     })
   }
 
@@ -550,7 +593,7 @@ const Employee = () => {
             <PageHeader
               title="Users"
               extra={[
-                <div className={styles["add-new-employee"]}>
+                <div className={styles["add-new-employee"]} key="new-employee">
                   <Link
                     to={routes.addEmployee.path(
                       loggedInUser?.company?.code
@@ -638,6 +681,23 @@ const Employee = () => {
                     pageSize: constants.paging.perPage,
                   }}
                 />
+              </Col>
+            </Row>
+            <Row>
+              <Col>
+                {
+                  !!employeeData?.User?.data?.length && (
+                    <div className={styles['download-report']}>
+                      <Button
+                        type="link"
+                        onClick={downloadReport}
+                        icon={<DownloadOutlined />}
+                      >
+                        Download Report
+                      </Button>
+                    </div>
+                  )
+                }
               </Col>
             </Row>
           </Card>

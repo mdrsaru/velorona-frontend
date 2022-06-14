@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { gql, useLazyQuery, useQuery } from '@apollo/client';
 import { Card, Table, Button } from 'antd';
+import { DownloadOutlined } from '@ant-design/icons';
 
 import { authVar } from '../../App/link';
 import constants from '../../config/constants';
@@ -14,6 +15,7 @@ import PageHeader from '../../components/PageHeader';
 import Status from '../../components/Status';
 
 import styles from './style.module.scss';
+import { downloadCSV } from '../../utils/common';
 
 const EMPLOYEE_TIMESHEET = gql`
   query EmployeeTimesheet($input: TimesheetQueryInput!) {
@@ -93,16 +95,7 @@ const EmployeeTimesheet = () => {
         nextFetchPolicy: 'cache-first',
         onError: notifyGraphqlError,
         onCompleted: () => {
-          const csvData = arrayToCsv()
-          const blob = new Blob([csvData], { type: 'text/csv' });
-          const url = window.URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.setAttribute('hidden', '');
-          a.setAttribute('href', url);
-          a.setAttribute('download', 'Employee_timesheet.csv');
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
+          downloadCSV(timesheetDownloadData?.Timesheet?.data, csvHeader, 'EmployeeTimesheet.csv')
         }
       },
     );
@@ -113,25 +106,8 @@ const EmployeeTimesheet = () => {
       ...pagingInput,
       skip: newSkip,
       currentPage: page,
-    });
-  };
-
-  const arrayToCsv = () => {
-    let csvRows = [];
-    let data = timesheetDownloadData?.Timesheet?.data ?? []
-
-    const headerValues = csvHeader.map(header => header.label);
-    csvRows.push(headerValues.join(','));
-    data.forEach((row: any) => {
-      const rowValues = csvHeader.map((header: { key: string, label: string, subKey?: string }) => {
-        const escaped = header?.subKey ? ('' + row[header.key][header?.subKey] ?? '').replace(/"/g, '\\"') :
-          ('' + row[header.key] ?? '').replace(/"/g, '\\"')
-        return `"${escaped}"`;
-      });
-      csvRows.push(rowValues.join(','));
     })
-    return csvRows.join('\n');
-  }
+  };
 
   const downloadReport = () => {
     fetchDownloadData({
@@ -163,7 +139,7 @@ const EmployeeTimesheet = () => {
     {
       title: 'Invoiced Time',
       render: (timesheet: Timesheet) => {
-        if(timesheet.invoicedDuration) {
+        if (timesheet.invoicedDuration) {
           return timesheet.invoicedDurationFormat;
         }
 
@@ -225,7 +201,11 @@ const EmployeeTimesheet = () => {
           {
             !!dataSource?.length && (
               <div className={styles['download-report']}>
-                <Button type="primary" onClick={downloadReport}>
+                <Button
+                  type="link"
+                  onClick={downloadReport}
+                  icon={<DownloadOutlined />}
+                >
                   Download Report
                 </Button>
               </div>
