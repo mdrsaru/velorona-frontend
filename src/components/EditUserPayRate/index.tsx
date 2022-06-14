@@ -8,6 +8,7 @@ import { MutationUserPayRateUpdateArgs, UserPayRate } from "../../interfaces/gen
 
 import styles from "../UserPayRate/styles.module.scss"
 import { GraphQLResponse } from "../../interfaces/graphql.interface"
+import { useEffect } from 'react';
 
 interface IProps {
   visibility: boolean;
@@ -57,7 +58,12 @@ const EditUserPayRateModal = (props: IProps) => {
     },
   });
 
-
+useEffect(()=>{
+    form.setFieldsValue({
+      project_id: userPayRateData?.UserPayRate?.data?.[0]?.project?.id,
+      amount: userPayRateData?.UserPayRate?.data?.[0]?.amount,
+    })
+   }, [form, userPayRateData])
 
   const [userPayRateUpdate] = useMutation<
     GraphQLResponse<'UserPayRateUpdate', UserPayRate>, MutationUserPayRateUpdateArgs
@@ -96,6 +102,7 @@ const EditUserPayRateModal = (props: IProps) => {
   if (!userPayRateData?.UserPayRate?.data) {
     return null
   }
+
   return (
     <Modal
       centered

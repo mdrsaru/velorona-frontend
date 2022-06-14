@@ -54,6 +54,7 @@ const ViewUserPayRate = (props: IProps) => {
         input: {
           query: {
             user_id: userId,
+            id:id,
           },
           paging: {
             order: ["updatedAt:DESC"],
