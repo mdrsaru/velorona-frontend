@@ -110,9 +110,10 @@ export const USER_ARCHIVE = gql`
 `;
 
 const Employee = () => {
+  const [filterForm] = Form.useForm();
   const loggedInUser = authVar();
   const navigate = useNavigate();
-  const [form] = Form.useForm();
+
   const [employeeUpdate] = useMutation(USER_UPDATE);
   const [employeeArchive] = useMutation(USER_ARCHIVE, {
     update(cache) {
@@ -272,7 +273,6 @@ const Employee = () => {
   };
 
   const handleUserPayRate = (user: any) => {
-    setEmployee(user);
     setEmployee(user)
     getUserPayRate({
       variables: {
@@ -316,14 +316,14 @@ const Employee = () => {
         }
       })
     }
-    form.resetFields()
+    filterForm.resetFields()
     setFilterProperty({
       filter: !filterProperty?.filter
     })
   }
 
   const refetchEmployees = () => {
-    let values = form.getFieldsValue(['search', 'role', 'status'])
+    let values = filterForm.getFieldsValue(['search', 'role', 'status'])
     let input: {
       paging: any,
       query?: any
@@ -565,7 +565,10 @@ const Employee = () => {
               </Col>
             </Row>
             <Form
-              form={form}
+              form={filterForm}
+              layout="vertical"
+              onFinish={() => {}}
+              autoComplete="off"
               name="filter-form">
               <Row gutter={[32, 0]}>
                 <Col xs={24} sm={24} md={16} lg={17} xl={20}>

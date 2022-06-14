@@ -5,17 +5,15 @@ import { gql, useMutation, useQuery } from "@apollo/client"
 import { PROJECT } from "../../pages/Project"
 import { authVar } from "../../App/link"
 import { MutationUserPayRateUpdateArgs, UserPayRate } from "../../interfaces/generated"
-
-import styles from "../UserPayRate/styles.module.scss"
 import { GraphQLResponse } from "../../interfaces/graphql.interface"
-import { useEffect } from 'react';
+import styles from "../UserPayRate/styles.module.scss"
 
 interface IProps {
   visibility: boolean;
   setVisibility: any;
   data: any;
   id?: string
-  userPayRateData:any;
+  userPayRateData: any;
 }
 
 
@@ -38,10 +36,9 @@ export const USER_PAYRATE_UPDATE = gql`
 `;
 
 const EditUserPayRateModal = (props: IProps) => {
-  const loggedInUser = authVar();
-  const [form] = Form.useForm();
-  const user = props.data;
-  const {userPayRateData} = props;
+  const loggedInUser = authVar()
+  const user = props.data
+  const { userPayRateData } = props;
 
   const { data: projectData } = useQuery(PROJECT, {
     fetchPolicy: "network-only",
@@ -58,12 +55,7 @@ const EditUserPayRateModal = (props: IProps) => {
     },
   });
 
-useEffect(()=>{
-    form.setFieldsValue({
-      project_id: userPayRateData?.UserPayRate?.data?.[0]?.project?.id,
-      amount: userPayRateData?.UserPayRate?.data?.[0]?.amount,
-    })
-   }, [form, userPayRateData])
+  const [form] = Form.useForm();
 
   const [userPayRateUpdate] = useMutation<
     GraphQLResponse<'UserPayRateUpdate', UserPayRate>, MutationUserPayRateUpdateArgs
@@ -109,7 +101,7 @@ useEffect(()=>{
       visible={props?.visibility}
       className={styles['user-pay-rate']}
       closeIcon={[
-        <div onClick={() => props?.setVisibility(false)} key={1}>
+        <div onClick={() => props?.setVisibility(false)} key={2}>
           <span className={styles["close-icon-div"]}>
             <CloseOutlined />
           </span>
@@ -132,6 +124,7 @@ useEffect(()=>{
         <Form
           form={form}
           layout="vertical"
+          name="user-payrate-form"
           onFinish={onSubmitForm}
           initialValues={{
             project_id: userPayRateData?.UserPayRate?.data?.[0]?.project?.id,
@@ -146,13 +139,8 @@ useEffect(()=>{
               lg={24}>
               <Form.Item
                 label="Project Name"
-                name="project_id"
-
-              >
-                <Select
-                  placeholder="Select Project"
-                  defaultValue={userPayRateData?.UserPayRate?.data?.[0]?.project?.name}
-                >
+                name="project_id">
+                <Select placeholder="Select Project">
                   {projectData?.Project?.data?.map((project: any, index: number) => (
                     <Select.Option value={project?.id} key={index}>
                       {project?.name}
@@ -183,7 +171,7 @@ useEffect(()=>{
           </Row>
           <Row justify="end">
             <Col style={{ padding: '0 1rem 1rem 0' }}>
-              <Form.Item>
+              <Form.Item name="action-btn">
                 <Space>
                   <Button
                     type="default"
