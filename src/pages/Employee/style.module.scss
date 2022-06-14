@@ -372,8 +372,11 @@ h1 {
 
 .filter-col {
   display: flex;
-  justify-content: center;
-  align-content: center;
+  justify-content: flex-end;
+
+  @media screen and (max-width:767px) {
+    padding-bottom: 1rem;
+  }
 
   :global {
     .ant-btn-text {
