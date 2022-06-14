@@ -423,9 +423,9 @@ const NewEmployee = () => {
                   message: 'Please enter role!'
                 }]}>
                 <Select placeholder="Employee">
-                  {roles_user?.map((role: string, index: number) => (
-                    <Option value={role} key={index}>
-                      {role}
+                  {roles_user?.map((role: any, index: number) => (
+                    <Option value={role?.value} key={index}>
+                      {role?.name}
                     </Option>
                   ))}
                 </Select>

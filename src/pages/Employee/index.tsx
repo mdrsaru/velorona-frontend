@@ -1,12 +1,12 @@
-import { Card, Row, Col, Table, Dropdown, Menu, message } from "antd"
-import { MoreOutlined } from "@ant-design/icons"
+import { Card, Row, Col, Table, Dropdown, Menu, message, Input, Button, Select, Form } from "antd"
+import { MoreOutlined, SearchOutlined } from "@ant-design/icons"
 
 import { Link, useNavigate } from "react-router-dom"
 import routes from "../../config/routes"
 
 import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import { authVar } from "../../App/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 
 import ModalConfirm from "../../components/Modal"
@@ -14,20 +14,23 @@ import { notifyGraphqlError } from "../../utils/error"
 
 import deleteImg from "../../assets/images/delete_btn.svg"
 import archiveImg from "../../assets/images/archive_btn.svg"
-import constants from "../../config/constants"
+import filterImg from "../../assets/images/filter.svg"
+import constants, { roles_user, user_status } from "../../config/constants"
 
 import RouteLoader from "../../components/Skeleton/RouteLoader";
 import UserPayRateModal from "../../components/UserPayRate";
 import ViewUserPayRate, { USER_PAY_RATE } from "../../components/ViewUserPayRate";
 import { GraphQLResponse, UserPayRatePagingData } from "../../interfaces/graphql.interface";
-import { 
-  QueryUserArgs, 
+import {
+  QueryUserArgs,
   // RoleName, 
-  UserPagingResult 
+  UserPagingResult
 } from "../../interfaces/generated";
 import styles from "./style.module.scss";
+import { debounce } from "lodash";
 
 const { SubMenu } = Menu;
+const { Option } = Select;
 
 export const USER = gql`
   query User($input: UserQueryInput!) {
@@ -109,6 +112,7 @@ export const USER_ARCHIVE = gql`
 const Employee = () => {
   const loggedInUser = authVar();
   const navigate = useNavigate();
+  const [form] = Form.useForm();
   const [employeeUpdate] = useMutation(USER_UPDATE);
   const [employeeArchive] = useMutation(USER_ARCHIVE, {
     update(cache) {
@@ -138,6 +142,9 @@ const Employee = () => {
     });
   };
   const [employee, setEmployee] = useState<any>("");
+  const [filterProperty, setFilterProperty] = useState<any>({
+    filter: false,
+  });
   const [visibility, setVisibility] = useState<boolean>(false);
   const [showArchive, setArchiveModal] = useState<boolean>(false);
   const [showUserPayRate, setUserPayRateVisibility] = useState<boolean>(false);
@@ -190,7 +197,7 @@ const Employee = () => {
     );
   };
   // const role = Object.values(RoleName)
-  const { loading: employeeLoading, data: employeeData } = useQuery<
+  const { loading: employeeLoading, data: employeeData, refetch: refetchEmployee } = useQuery<
     GraphQLResponse<'User', UserPagingResult>,
     QueryUserArgs
   >(
@@ -223,18 +230,17 @@ const Employee = () => {
           company_id: loggedInUser?.company?.id,
         },
       },
+    }).then((response) => {
+      if (response.errors) {
+        return notifyGraphqlError(response.errors);
+      }
+      message.success({
+        content: `User is archived successfully!`,
+        key,
+        className: "custom-message",
+      });
+      setArchiveVisibility(false);
     })
-      .then((response) => {
-        if (response.errors) {
-          return notifyGraphqlError(response.errors);
-        }
-        message.success({
-          content: `User is archived successfully!`,
-          key,
-          className: "custom-message",
-        });
-        setArchiveVisibility(false);
-      })
       .catch(notifyGraphqlError);
   };
 
@@ -252,17 +258,16 @@ const Employee = () => {
           id: id,
         },
       },
+    }).then((response) => {
+      if (response.errors) {
+        return notifyGraphqlError(response.errors);
+      }
+      message.success({
+        content: `User is updated successfully!`,
+        key,
+        className: "custom-message",
+      });
     })
-      .then((response) => {
-        if (response.errors) {
-          return notifyGraphqlError(response.errors);
-        }
-        message.success({
-          content: `User is updated successfully!`,
-          key,
-          className: "custom-message",
-        });
-      })
       .catch(notifyGraphqlError);
   };
 
@@ -300,6 +305,76 @@ const Employee = () => {
     })
     setViewUserPayRateVisibility(!showViewUserPayRate)
   }
+
+  const openFilterRow = () => {
+    if (filterProperty?.filter) {
+      refetchEmployee({
+        input: {
+          paging: {
+            order: ["updatedAt:DESC"],
+          }
+        }
+      })
+    }
+    form.resetFields()
+    setFilterProperty({
+      filter: !filterProperty?.filter
+    })
+  }
+
+  const refetchEmployees = () => {
+    let values = form.getFieldsValue(['search', 'role', 'status'])
+    let input: {
+      paging: any,
+      query?: any
+    } = {
+      paging: {
+        order: ["updatedAt:DESC"],
+      }
+    }
+    let query: {
+      status?: string,
+      archived?: boolean,
+      role?: string,
+      search?: string
+    } = {}
+
+    if (values.status) {
+      if (values.status === 'Active' || values.status === 'Inactive') {
+        query['status'] = values.status
+      } else {
+        query['archived'] = values.status === 'Archived' ? true : false
+      }
+    }
+
+    if (values.role) {
+      query['role'] = values?.role
+    }
+
+    if (values.search) {
+      query['search'] = values?.search
+    }
+
+    if (query) {
+      input['query'] = query
+    }
+    refetchEmployee({
+      input: input
+    })
+  }
+
+  const onChangeFilter = () => {
+    refetchEmployees()
+  }
+
+  const debouncedResults = debounce(() => { onChangeFilter() }, 600);
+
+  useEffect(() => {
+    return () => {
+      debouncedResults.cancel();
+    };
+  });
+
   const menu = (data: any) => (
     <Menu>
       {
@@ -403,7 +478,11 @@ const Employee = () => {
     {
       title: "Pay Rate",
       render: (user: any) => {
-        return <div onClick={() => handleViewPayRate(user)} className={styles["add-pay-rate"]}>View PayRate</div>;
+        return <div
+          onClick={() => handleViewPayRate(user)}
+          className={styles["add-pay-rate"]}>
+          View PayRate
+        </div>;
       },
     },
     {
@@ -485,6 +564,64 @@ const Employee = () => {
                 </div>
               </Col>
             </Row>
+            <Form
+              form={form}
+              name="filter-form">
+              <Row gutter={[32, 0]}>
+                <Col xs={24} sm={12} md={16} lg={20} xl={21} className={styles["employee-col"]}>
+                  <Form.Item name="search" label="">
+                    <Input
+                      prefix={<SearchOutlined className="site-form-item-icon" />}
+                      placeholder="Search by User name"
+                      onChange={debouncedResults}
+                    />
+                  </Form.Item>
+                </Col>
+                <Col xs={24} sm={12} md={8} lg={4} xl={3} className={styles["employee-col"]}>
+                  <div className={styles['filter-col']}>
+                    <Button
+                      type="text"
+                      onClick={openFilterRow}
+                      icon={<img
+                        src={filterImg}
+                        alt="filter"
+                        className={styles['filter-image']} />}>
+                      &nbsp; &nbsp;
+                      {filterProperty?.filter ? 'Reset' : 'Filter'}
+                    </Button>
+                  </div>
+                </Col>
+              </Row>
+              {filterProperty?.filter &&
+                <Row gutter={[32, 0]} className={styles["role-status-col"]}>
+                  <Col span={4}>
+                    <Form.Item name="role" label="">
+                      <Select
+                        placeholder="Role"
+                        onChange={onChangeFilter}>
+                        {roles_user?.map((role: any) =>
+                          <Option value={role?.value} key={role?.name}>
+                            {role?.name}
+                          </Option>
+                        )}
+                      </Select>
+                    </Form.Item>
+                  </Col>
+                  <Col span={4}>
+                    <Form.Item name="status" label="">
+                      <Select
+                        placeholder="Select status"
+                        onChange={onChangeFilter}
+                      >
+                        {user_status?.map((status: any) =>
+                          <Option value={status?.value} key={status?.name}>
+                            {status?.name}
+                          </Option>)}
+                      </Select>
+                    </Form.Item>
+                  </Col>
+                </Row>}
+            </Form>
             <Row className='container-row'>
               <Col span={24}>
                 <Table

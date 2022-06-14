@@ -194,7 +194,7 @@ const UPDATE_TIME_ENTRY = gql`
 
 const { Panel } = Collapse;
 
-const computeDiff = (date: Date) => {
+export const computeDiff = (date: Date) => {
   const currentDate = new Date()
   const pastDate = new Date(date)
   return (currentDate.getTime() - pastDate.getTime()) / 1000
