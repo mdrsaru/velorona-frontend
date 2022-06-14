@@ -9,12 +9,15 @@ import {
   Form,
   Select,
   message,
-  Collapse
+  Collapse,
+  Space,
+  Typography
 } from 'antd'
 import {
   CloseOutlined,
   // LeftOutlined,
-  // RightOutlined
+  // RightOutlined,
+  PlusCircleFilled
 } from '@ant-design/icons'
 
 import moment from 'moment'
@@ -40,6 +43,7 @@ import { getTotalTimeForADay } from './DetailTimesheet'
 import TimerCard from '../../components/TimerCard'
 
 import styles from './style.module.scss'
+import TaskCreate from '../../components/TaskCreate'
 
 export const CREATE_TIME_ENTRY = gql`
     mutation TimeEntryCreate($input: TimeEntryCreateInput!) {
@@ -228,6 +232,7 @@ const Timesheet = () => {
   let stopwatchOffset = new Date()
   const [visible, setVisible] = useState(false)
   const [showDetailTimeEntry, setDetailVisible] = useState<boolean>(false)
+  const [showAddTaskVisibility, setAddTaskVisbility] = useState<boolean>(false)
   const [pagingInput, setPagingInput] = useState<{
     skip: number,
     currentPage: number,
@@ -266,7 +271,7 @@ const Timesheet = () => {
     {
       title: 'Invoiced Time',
       render: (timesheet: ITimesheet) => {
-        if(timesheet.invoicedDuration) {
+        if (timesheet.invoicedDuration) {
           return timesheet.invoicedDurationFormat;
         }
 
@@ -519,6 +524,7 @@ const Timesheet = () => {
       input: {
         query: {
           company_id: authData?.company?.id,
+          created_by:authData?.user?.id as string,
           project_id: ''
         },
         paging: {
@@ -598,15 +604,18 @@ const Timesheet = () => {
       }
     });
   }
+const [projectId,setProjectId] = useState('')
 
   const onChangeProjectSelect = (value: string) => {
     form.resetFields(['task']);
+    setProjectId(value)
     getTask({
       variables: {
         input: {
           query: {
             company_id: authData?.company?.id,
-            project_id: value
+            project_id: value,
+            created_by:authData?.user?.id as string,
           },
           paging: {
             order: ['updatedAt:DESC']
@@ -671,6 +680,9 @@ const Timesheet = () => {
     return _.max(maxEndDate)
   }
 
+  const handleAddTask = () => {
+    setAddTaskVisbility(!showAddTaskVisibility)
+  }
   return (
     <>
       {loading ? <TimeSheetLoader /> :
@@ -768,13 +780,23 @@ const Timesheet = () => {
                     label="Task"
                     rules={[{
                       required: !showDetailTimeEntry,
-                      message: 'Choose the task'
+                      // message: 'Choose the task'
                     }]}>
                     {showDetailTimeEntry ?
                       <div className={styles['timesheet-task']}>
                         {newTimeEntry?.task}
                       </div> :
-                      <Select placeholder="Select Task">
+                      <Select placeholder="Select Task"   dropdownRender={menu => (
+                        <>
+                          
+                          <Space align="center" style={{ padding: '0 8px 4px' }}>
+                            <Typography.Link onClick={handleAddTask} className={styles['add-task-option']} style={{ whiteSpace: 'nowrap' ,fontSize:'16px',fontWeight:'600px',margin:'10px'}}>
+                              <PlusCircleFilled /> <span className={styles['add-task-text']}>Add item</span>
+                            </Typography.Link>
+                          </Space>
+                          {menu}
+                        </>
+                      )}>
                         {taskData && taskData?.Task?.data.map((task: any, index: number) => (
                           <Option
                             value={task?.id}
@@ -1059,6 +1081,12 @@ const Timesheet = () => {
             </div>
           </Modal>
         </div>}
+      <TaskCreate
+        visibility={showAddTaskVisibility}
+        setVisibility={setAddTaskVisbility}
+        projectId = {projectId}
+        getTask={getTask}
+      />
     </>
   )
 }
