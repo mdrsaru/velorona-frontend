@@ -546,11 +546,11 @@ const Employee = () => {
       ) : (
         <div className={styles["main-div"]}>
           <Card bordered={false}>
-            <Row>
-              <Col span={12} className={styles["employee-col"]}>
+            <Row gutter={[32, 0]} className={styles['employee-col']}>
+              <Col xs={24} sm={24} md={12} lg={12} xl={12}>
                 <h1>Users</h1>
               </Col>
-              <Col span={12} className={styles["employee-col"]}>
+              <Col xs={24} sm={24} md={12} lg={12} xl={12}>
                 <div className={styles["add-new-employee"]}>
                   <Link
                     to={routes.addEmployee.path(
@@ -568,7 +568,7 @@ const Employee = () => {
               form={form}
               name="filter-form">
               <Row gutter={[32, 0]}>
-                <Col xs={24} sm={12} md={16} lg={20} xl={21} className={styles["employee-col"]}>
+                <Col xs={24} sm={24} md={16} lg={17} xl={20}>
                   <Form.Item name="search" label="">
                     <Input
                       prefix={<SearchOutlined className="site-form-item-icon" />}
@@ -577,7 +577,7 @@ const Employee = () => {
                     />
                   </Form.Item>
                 </Col>
-                <Col xs={24} sm={12} md={8} lg={4} xl={3} className={styles["employee-col"]}>
+                <Col xs={24} sm={24} md={8} lg={7} xl={4}>
                   <div className={styles['filter-col']}>
                     <Button
                       type="text"
