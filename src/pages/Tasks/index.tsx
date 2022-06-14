@@ -75,31 +75,27 @@ export const TASK = gql`
 `;
 
 const Tasks = () => {
-  const authData = authVar();
-  let stopwatchOffset = new Date()
-  const { Panel } = Collapse;
-  const [form] = Form.useForm()
-  const [visibility, setVisibility] = useState<boolean>(false);
-  const [showDetailTimeEntry, setDetailVisible] = useState<boolean>(false)
-  const [task, setTask] = useState<Task>();
-  const [timeEntryID, setTimeEntryID] = useState('')
+  const authData = authVar()
+  const { Panel } = Collapse
+  const [form] = Form.useForm();
 
+  let stopwatchOffset = new Date();
+
+  const [visibility, setVisibility] = useState<boolean>(false)
+  const [task, setTask] = useState<Task>()
+  const [activeTask, setActiveTask] = useState({
+    entry_id: '',
+    task_id: '',
+    autostart: false
+  })
   const [createTimeEntry] = useMutation(CREATE_TIME_ENTRY, {
     onCompleted: (response: any) => {
-      taskRefetch({
-        input: {
-          query: {
-            company_id: authData?.company?.id as string,
-            user_id: authData?.user?.id,
-          },
-          paging: {
-            order: ["updatedAt:DESC"],
-          },
-        },
-      })
-      start()
-      setTimeEntryID(response?.TimeEntryCreate?.id)
-      setDetailVisible(true)
+      start();
+      setActiveTask({
+        entry_id: response?.TimeEntryCreate?.id,
+        task_id: response?.TimeEntryCreate?.task_id,
+        autostart: true
+      });
     }
   });
 
@@ -111,11 +107,11 @@ const Tasks = () => {
     start,
     reset
   } = useStopwatch({
-    autoStart: showDetailTimeEntry,
+    autoStart: activeTask?.autostart,
     offsetTimestamp: new Date()
   })
 
-  const { data: taskData, loading: taskLoading, refetch: taskRefetch } = useQuery<
+  const { data: taskData, loading: taskLoading } = useQuery<
     GraphQLResponse<'Task', TaskPagingResult>,
     QueryTaskArgs
   >(TASK, {
@@ -133,10 +129,13 @@ const Tasks = () => {
       },
     },
     onCompleted: (response: any) => {
-      console.log(response?.Task);
+
       if (response?.Task?.activeTimeEntry) {
-        setDetailVisible(true)
-        setTimeEntryID(response?.Task?.activeTimeEntry?.id)
+        setActiveTask({
+          entry_id: response?.Task?.activeTimeEntry?.id,
+          task_id: response?.Task?.activeTimeEntry?.task_id,
+          autostart: true
+        })
         stopwatchOffset.setSeconds(stopwatchOffset.getSeconds() + computeDiff(response?.Task?.activeTimeEntry?.startTime))
         reset(stopwatchOffset)
       }
@@ -216,7 +215,7 @@ const Tasks = () => {
   const [updateTimeEntry] = useMutation(UPDATE_TIME_ENTRY, {
     onCompleted: () => {
       reset(undefined, false)
-      setDetailVisible(false);
+      setActiveTask({ ...activeTask, autostart: false })
       message.success({
         content: `Time Entry is updated successfully!`,
         className: 'custom-message'
@@ -229,7 +228,7 @@ const Tasks = () => {
     updateTimeEntry({
       variables: {
         input: {
-          id: timeEntryID,
+          id: activeTask?.entry_id,
           endTime: moment(stopwatchOffset, "YYYY-MM-DD HH:mm:ss"),
           company_id: authData?.company?.id
         }
@@ -284,13 +283,7 @@ const Tasks = () => {
                   />
                 </Panel>
               </Collapse>
-            </Space>
 
-            <Space
-              direction="vertical"
-              size="middle"
-              style={{ display: "flex", marginTop: "1.5rem" }}
-            >
               <Collapse accordion>
                 <Panel header="In Progress" key="3">
                   <Table
@@ -302,13 +295,7 @@ const Tasks = () => {
                   />
                 </Panel>
               </Collapse>
-            </Space>
 
-            <Space
-              direction="vertical"
-              size="middle"
-              style={{ display: "flex", marginTop: "1.5rem" }}
-            >
               <Collapse accordion >
                 <Panel header="Completed" key="4">
                   <Table
@@ -320,13 +307,6 @@ const Tasks = () => {
                   />
                 </Panel>
               </Collapse>
-            </Space>
-
-            <Space
-              direction="vertical"
-              size="middle"
-              style={{ display: "flex", marginTop: "1.5rem" }}
-            >
 
               <Collapse accordion>
                 <Panel header="Unscheduled" key="1">
@@ -342,14 +322,17 @@ const Tasks = () => {
             </Space>
           </div>
           :
-          <NoContent title='Task scheduled not added' subtitle='There are no task assigned to you at the moment' />
+          <NoContent
+            title='Task scheduled not added'
+            subtitle='There are no task assigned to you at the moment' />
       }
+
       <TaskDetail
         visibility={visibility}
         setVisibility={setVisibility}
         data={task}
         employee={true}
-        timerBody={(!isRunning || task?.id === taskData?.Task?.activeTimeEntry?.task_id) ? <TaskTimer />: ''}
+        timerBody={(!isRunning || task?.id === activeTask?.task_id) ? <TaskTimer /> : ''}
         userId={authData?.user?.id}
       />
     </>
