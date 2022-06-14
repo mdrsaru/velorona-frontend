@@ -1,30 +1,22 @@
 import moment from "moment"
 import { CloseOutlined, LinkOutlined } from "@ant-design/icons"
 import { useMutation } from "@apollo/client"
-import { Col, DatePicker, message, Modal, Row, Select, Form } from "antd"
-import parse from "html-react-parser"
-import { useStopwatch } from 'react-timer-hook'
+import { Col, DatePicker, message, Modal, Row, Select } from "antd"
+import parse from "html-react-parser";
 
 import { authVar } from "../../App/link"
 import { TASK_UPDATE } from "../../pages/Project/DetailProject"
 import AssignedUserAvatar from "../AssignedUserAvatar"
-
-import { notifyGraphqlError } from "../../utils/error"
-
+import { notifyGraphqlError } from "../../utils/error";
 import { TaskStatus } from "../../interfaces/generated"
 
 import NotPriority from "../../assets/images/not-priority.svg"
 import Priority from "../../assets/images/priority.svg"
-
-import Status from "../Status"
-import { TASK } from "../../pages/Tasks"
-import { useState } from "react"
-import TimerCard from "../TimerCard"
-
+import Status from "../Status";
 import constants from "../../config/constants"
-import { CREATE_TIME_ENTRY } from "../../pages/Timesheet"
-import { UPDATE_TIME_ENTRY } from "../../pages/Timesheet/EditTimesheet"
+
 import styles from "./styles.module.scss"
+import { ReactNode } from "react"
 
 interface IProps {
   visibility: boolean;
@@ -32,55 +24,17 @@ interface IProps {
   data: any;
   employee?: boolean;
   userId?: any;
-  onUpdateAction?: any;
-
+  timerBody?: ReactNode;
+  refetchTasks?: any;
+  onUpdateAction?: any
 }
 
+
 const TaskDetail = (props: IProps) => {
-  const [form] = Form.useForm()
-  let stopwatchOffset = new Date()
   const { visibility, setVisibility, data } = props
-  const [timeEntryID, setTimeEntryID] = useState('')
-  const [showDetailTimeEntry, setDetailVisible] = useState<boolean>(false)
   const loggedInUser = authVar()
-  const [createTimeEntry] = useMutation(CREATE_TIME_ENTRY, {
-    onCompleted: (response: any) => {
-      start()
-      setTimeEntryID(response?.TimeEntryCreate?.id)
-      setDetailVisible(true)
-    }
-  });
-  const {
-    seconds,
-    minutes,
-    hours,
-    isRunning,
-    start,
-    reset
-  } = useStopwatch({
-    autoStart: showDetailTimeEntry,
-    offsetTimestamp: new Date()
-  });
 
   const [taskUpdate] = useMutation(TASK_UPDATE, {
-    refetchQueries: [
-      {
-        query: TASK,
-        variables: {
-          input: {
-            query: {
-              company_id: loggedInUser?.company?.id,
-              user_id: loggedInUser?.user?.id,
-            },
-            paging: {
-              order: ["updatedAt:DESC"],
-            },
-          },
-        },
-      },
-
-      'Task'
-    ],
     onCompleted() {
       message.success({
         content: `Task is updated successfully!`,
@@ -97,6 +51,7 @@ const TaskDetail = (props: IProps) => {
     },
 
   });
+
 
   const status = Object.values(TaskStatus);
 
@@ -143,54 +98,8 @@ const TaskDetail = (props: IProps) => {
   };
   const createdAt = data?.createdAt?.split("T")?.[0];
 
-  const onFinish = () => {
-    !isRunning ? createTaskEntry() : stopTimer();
-  };
-
-  const createTaskEntry = () => {
-    stopwatchOffset = new Date()
-    createTimeEntry({
-      variables: {
-        input: {
-          startTime: moment(stopwatchOffset, "YYYY-MM-DD HH:mm:ss"),
-          task_id: data?.id,
-          project_id: data.project?.id,
-          company_id: loggedInUser?.company?.id,
-        }
-      }
-    }).then((response) => {
-      if (response.errors) {
-        return notifyGraphqlError((response.errors))
-      }
-    }).catch(notifyGraphqlError)
-  }
-
-  const [updateTimeEntry] = useMutation(UPDATE_TIME_ENTRY, {
-    onCompleted: () => {
-      reset(undefined, false)
-      setDetailVisible(false);
-      message.success({
-        content: `Time Entry is updated successfully!`,
-        className: 'custom-message'
-      });
-    }
-  });
-
-  const stopTimer = () => {
-    stopwatchOffset = new Date()
-    updateTimeEntry({
-      variables: {
-        input: {
-          id: timeEntryID,
-          endTime: moment(stopwatchOffset, "YYYY-MM-DD HH:mm:ss"),
-          company_id: loggedInUser?.company?.id
-        }
-      }
-    }).then((response) => {
-      if (response.errors) {
-        return notifyGraphqlError((response.errors))
-      }
-    }).catch(notifyGraphqlError)
+  const onCloseModal = () => {
+    setVisibility(false)
   }
 
   return (
@@ -198,7 +107,7 @@ const TaskDetail = (props: IProps) => {
       centered
       visible={visibility}
       closeIcon={[
-        <div onClick={() => setVisibility(false)} key={1}>
+        <div onClick={onCloseModal} key={1}>
           <span className={styles["close-icon-div"]}>
             <CloseOutlined />
           </span>
@@ -338,7 +247,7 @@ const TaskDetail = (props: IProps) => {
           </Col>
         </Row>
         <Row className={styles["modal-footer"]} key={2}>
-          <Col span={14}>
+          <Col span={16}>
             {data?.attachments?.length ? (
               <div>
                 <span>Attachments</span> &nbsp; &nbsp;
@@ -362,20 +271,10 @@ const TaskDetail = (props: IProps) => {
             )}
           </Col>
           <Col span={8} className={styles['start-timer']}>
-            {loggedInUser?.user?.roles[0] === constants.roles?.Employee ?
-              <Form
-                form={form}
-                layout="vertical"
-                onFinish={onFinish}
-                autoComplete="off"
-              >
-                <TimerCard
-                  hours={hours}
-                  minutes={minutes}
-                  seconds={seconds}
-                  isRunning={isRunning}
-                  title={' timer'} />
-              </Form> : ''}
+            {loggedInUser?.user?.roles[0] === constants.roles?.Employee  ?
+              <span>
+                {props.timerBody}
+              </span> : ''}
           </Col>
         </Row>
       </div>
