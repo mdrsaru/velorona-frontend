@@ -7,9 +7,9 @@ import { authVar } from "../../App/link"
 import { MutationUserPayRateCreateArgs, UserPayRate } from "../../interfaces/generated"
 import { notifyGraphqlError } from "../../utils/error"
 
-import styles from "./styles.module.scss"
 import { USER_PAY_RATE } from "../ViewUserPayRate"
 import { GraphQLResponse } from "../../interfaces/graphql.interface"
+import styles from "./styles.module.scss"
 
 interface IProps {
   visibility: boolean;
@@ -28,9 +28,8 @@ export const USER_PAYRATE_CREATE = gql`
 `;
 
 const UserPayRateModal = (props: IProps) => {
-  const loggedInUser = authVar();
-  const [form] = Form.useForm();
-  const user = props.data;
+  const loggedInUser = authVar()
+  const user = props.data
   const { userPayRate } = props;
   const { data: projectData } = useQuery(PROJECT, {
     fetchPolicy: "network-only",
@@ -52,10 +51,10 @@ const UserPayRateModal = (props: IProps) => {
   projectData?.Project?.data?.forEach((project: any, index: number) => {
     project_ids.push({ id: project?.id, name: project?.name })
   })
-  
+
   const ids: any = []
 
-  userPayRate?.UserPayRate?.data?.forEach((userPayRate:any, index: number) => {
+  userPayRate?.UserPayRate?.data?.forEach((userPayRate: any, index: number) => {
     ids.push({ id: userPayRate?.project?.id, name: userPayRate?.project?.name })
   })
 
@@ -97,6 +96,7 @@ const UserPayRateModal = (props: IProps) => {
 
     }
   })
+  const [form] = Form.useForm();
 
   const onSubmitForm = (values: any) => {
     form.resetFields()
@@ -144,6 +144,7 @@ const UserPayRateModal = (props: IProps) => {
         <Form
           form={form}
           layout="vertical"
+          name="payrate-form"
           onFinish={onSubmitForm}>
           <Row gutter={[24, 0]}>
             <Col
@@ -185,7 +186,7 @@ const UserPayRateModal = (props: IProps) => {
           </Row>
           <Row justify="end">
             <Col style={{ padding: '0 1rem 1rem 0' }}>
-              <Form.Item>
+              <Form.Item name="action-button">
                 <Space>
                   <Button
                     type="default"

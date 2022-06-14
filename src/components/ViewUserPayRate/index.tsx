@@ -104,7 +104,6 @@ const ViewUserPayRate = (props: IProps) => {
         ]}
         width={869}
         okText="Close"
-        cancelButtonProps={{ style: { display: "none" } }}
         onOk={() => setVisibility(false)}
       >
         <div className={styles["modal-body"]}>
@@ -117,6 +116,7 @@ const ViewUserPayRate = (props: IProps) => {
           <Table
             dataSource={userPayRate?.UserPayRate?.data}
             columns={columns}
+            rowKey={(record) => record?.id}
             pagination={false}
           />
         </div>
