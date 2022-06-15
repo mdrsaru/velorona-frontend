@@ -1,5 +1,4 @@
 .project-main-div {
-
   :global {
     .ant-modal-footer {
       border: none;
@@ -295,5 +294,31 @@
     font-weight: 600;
     font-size: 24px;
     line-height: 29px;
+  }
+}
+
+.filter-col {
+  display: flex;
+  justify-content: flex-end;
+  margin-left: 1.5rem;
+  @media screen and (max-width: 767px) {
+    padding-bottom: 1rem;
+  }
+
+  :global {
+    .ant-btn-text {
+      color: var(--gray-secondary);
+    }
+
+    .ant-btn {
+      border-radius: 0;
+      height: 50px;
+      border-color: var(--gray-2);
+      background: var(--gray-2);
+      &:focus {
+        border-color: var(--primary-blue);
+        color: var(--black-1);
+      }
+    }
   }
 }
