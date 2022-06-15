@@ -1,8 +1,8 @@
 import React, { useState } from "react";
-import { Card, Col, Dropdown, Menu, message, Row, Table } from "antd";
+import { Button, Card, Col, Dropdown, Form, Input, Menu, message, Row, Select, Table } from "antd";
 import { Link } from "react-router-dom";
 import { gql, useMutation, useQuery } from "@apollo/client";
-import { MoreOutlined } from "@ant-design/icons";
+import { MoreOutlined, SearchOutlined } from "@ant-design/icons";
 import SubMenu from "antd/lib/menu/SubMenu";
 
 import routes from "../../config/routes";
@@ -11,9 +11,10 @@ import ClientDetail from "./ClientDetail";
 
 import Status from "../../components/Status";
 import ModalConfirm from "../../components/Modal";
-import constants from '../../config/constants';
+import constants, { status } from '../../config/constants';
 
 import archiveImg from "../../assets/images/archive_btn.svg";
+import filterImg from "../../assets/images/filter.svg"
 
 import { notifyGraphqlError } from "../../utils/error";
 
@@ -23,6 +24,7 @@ import styles from "./style.module.scss";
 import ArchiveBody from "../../components/Archive";
 import { GraphQLResponse } from "../../interfaces/graphql.interface";
 import PageHeader from "../../components/PageHeader";
+import { debounce } from "lodash";
 
 export interface UserData {
   User: {
@@ -42,6 +44,7 @@ export const CLIENT = gql`
         email
         invoicingEmail
         status
+        archived
         address {
           streetAddress
           state
@@ -83,6 +86,8 @@ const Client = () => {
     currentPage: 1,
   });
 
+  const [filterForm] = Form.useForm();
+
   const changePage = (page: number) => {
     const newSkip = (page - 1) * constants.paging.perPage;
     setPagingInput({
@@ -96,7 +101,7 @@ const Client = () => {
     setArchiveModal(value);
   };
 
-  const { data: clientData } = useQuery<
+  const { data: clientData, refetch: refetchClient } = useQuery<
     GraphQLResponse<'Client', ClientPagingResult>,
     QueryClientArgs
   >(CLIENT, {
@@ -124,6 +129,7 @@ const Client = () => {
         message.success({
           content: `Client is updated successfully!`,
           className: "custom-message",
+          type: 'success',
         });
         setArchiveVisibility(false);
       },
@@ -143,7 +149,52 @@ const Client = () => {
       },
     }
   );
+  const refetchClients = () => {
+    let values = filterForm.getFieldsValue(['search', 'role', 'status'])
+    let input: {
+      paging?: any,
+      query: any
+    } = {
+      paging: {
+        order: ["updatedAt:DESC"],
+      },
+      query: {
+        company_id: loggedInUser?.company?.id
+      }
+    }
+    let query: {
+      status?: string,
+      archived?: boolean,
+      company_id: string;
+      search?: string;
+    } = {
+      company_id: loggedInUser?.company?.id as string
 
+    }
+    if (values.search) {
+      query['search'] = values?.search
+    }
+    if (values.status) {
+      if (values.status === 'Active' || values.status === 'Inactive') {
+        query['status'] = values.status;
+      } else {
+        query['archived'] = values.status === 'Archived' ? true : false;
+
+      }
+    }
+
+    input['query'] = query
+
+    refetchClient({
+      input: input
+    })
+  }
+
+  const debouncedResults = debounce(() => { onChangeFilter() }, 600);
+
+  const onChangeFilter = () => {
+    refetchClients()
+  }
   const changeStatus = (value: string, id: string) => {
     clientUpdate({
       variables: {
@@ -154,7 +205,24 @@ const Client = () => {
         },
       },
     });
+    refetchClient()
   };
+
+
+  const openFilterRow = () => {
+    filterForm.resetFields()
+
+    refetchClient({
+      input: {
+        query: {
+          company_id: loggedInUser?.company?.id as string,
+        },
+        paging: {
+          order: ["updatedAt:DESC"],
+        },
+      },
+    })
+  }
 
   const archiveClient = () => {
     clientUpdate({
@@ -297,11 +365,64 @@ const Client = () => {
                     : ""
                 )}
               >
-                Add New User
+                Add New Client
               </Link>
             </div>
           ]}
         />
+
+        <Form
+          form={filterForm}
+          layout="vertical"
+          onFinish={() => { }}
+          autoComplete="off"
+          name="filter-form">
+          <Row >
+            <Col xs={24} sm={24} md={16} lg={17} xl={20}>
+              <Form.Item name="search" label="">
+                <Input
+                  prefix={<SearchOutlined className="site-form-item-icon" />}
+                  placeholder="Search by Client name"
+                  onChange={debouncedResults}
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={24} md={8} lg={7} xl={4}>
+              <div className={styles['filter-col']}>
+                <Button
+                  type="text"
+                  onClick={openFilterRow}
+                  icon={<img
+                    src={filterImg}
+                    alt="filter"
+                    className={styles['filter-image']} />}>
+                  &nbsp; &nbsp;
+                  {'Reset'}
+                </Button>
+              </div>
+            </Col>
+          </Row>
+          <Row>
+            <Col span={6}>
+
+
+              <Form.Item name="status" label="">
+                <Select
+                  placeholder="Select status"
+                  onChange={onChangeFilter}
+                >
+                  {status?.map((status: any) => (
+                    <option value={status?.value} key={status?.name}>
+                      {status?.name}
+                    </option>
+                  ))}
+                </Select>
+              </Form.Item>
+
+
+            </Col>
+          </Row>
+        </Form>
         <Row className='container-row'>
           <Col span={24}>
             <Table

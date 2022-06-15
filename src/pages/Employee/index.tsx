@@ -15,7 +15,7 @@ import { notifyGraphqlError } from "../../utils/error"
 import deleteImg from "../../assets/images/delete_btn.svg"
 import archiveImg from "../../assets/images/archive_btn.svg"
 import filterImg from "../../assets/images/filter.svg"
-import constants, { roles_user, user_status } from "../../config/constants"
+import constants, { roles_user, status } from "../../config/constants"
 
 import RouteLoader from "../../components/Skeleton/RouteLoader";
 import UserPayRateModal from "../../components/UserPayRate";
@@ -639,7 +639,7 @@ const Employee = () => {
               </Row>
               {filterProperty?.filter &&
                 <Row gutter={[32, 0]} className={styles["role-status-col"]}>
-                  <Col span={4}>
+                  <Col span={5}>
                     <Form.Item name="role" label="">
                       <Select
                         placeholder="Role"
@@ -652,13 +652,13 @@ const Employee = () => {
                       </Select>
                     </Form.Item>
                   </Col>
-                  <Col span={4}>
+                  <Col span={5}>
                     <Form.Item name="status" label="">
                       <Select
                         placeholder="Select status"
                         onChange={onChangeFilter}
                       >
-                        {user_status?.map((status: any) =>
+                        {status?.map((status: any) =>
                           <Option value={status?.value} key={status?.name}>
                             {status?.name}
                           </Option>)}
