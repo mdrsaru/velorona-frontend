@@ -32,7 +32,7 @@ export const roles_user = [{
 }
 ]
 
-export const user_status = [{
+export const status = [{
   value: 'Active',
   name: 'Active'
 },

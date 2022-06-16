@@ -1,4 +1,4 @@
-import { Card, Col, Dropdown, Menu, Row, Table, message, Button } from 'antd';
+import { Card, Col, Dropdown, Menu, Row, Table, message, Button, Form, Select } from 'antd';
 import { ArrowLeftOutlined, MoreOutlined } from '@ant-design/icons';
 import { useState } from 'react';
 import { Link, useNavigate, useParams } from 'react-router-dom';
@@ -10,10 +10,11 @@ import { notifyGraphqlError } from '../../../utils/error';
 import { PROJECT } from '../index';
 import { TASK } from '../../Tasks';
 import routes from '../../../config/routes';
-import constants from '../../../config/constants';
+import constants, { status } from '../../../config/constants';
 
 import deleteImg from '../../../assets/images/delete_btn.svg';
 import archiveImg from '../../../assets/images/archive_btn.svg';
+import filterImg from "../../../assets/images/filter.svg"
 
 import ModalConfirm from '../../../components/Modal';
 import ArchiveBody from '../../../components/Archive';
@@ -71,6 +72,8 @@ const DetailProject = () => {
   let params = useParams();
   const navigate = useNavigate();
   const loggedInUser = authVar();
+
+  const [filterForm] = Form.useForm();
 
   const [taskUpdate, { loading: updateLoading }] = useMutation<GraphQLResponse<'TaskUpdate', Task>, MutationTaskUpdateArgs>(TASK_UPDATE, {
     onCompleted() {
@@ -174,10 +177,10 @@ const DetailProject = () => {
   };
 
   const csvHeader: Array<{ label: string, key: string, subKey?: string }> = [
-    { label: "Task Name", key: "name"},
+    { label: "Task Name", key: "name" },
     { label: "Task Manager", key: "manager", subKey: "fullName" },
     { label: "Project", key: "project", subKey: "name" },
-    { label: "Status", key: "status" }  
+    { label: "Status", key: "status" }
   ]
 
   const [detailVisibility, setDetailVisibility] = useState(false);
@@ -373,7 +376,7 @@ const DetailProject = () => {
   }
 
 
-  const { data: taskData, loading: taskLoading } = useQuery<GraphQLResponse<'Task', TaskPagingResult>, QueryTaskArgs>(TASK, {
+  const { data: taskData, loading: taskLoading, refetch: refetchTask } = useQuery<GraphQLResponse<'Task', TaskPagingResult>, QueryTaskArgs>(TASK, {
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
     variables: {
@@ -404,7 +407,6 @@ const DetailProject = () => {
       },
     },
     onCompleted: () => {
-      console.log(taskDownloadData?.Task?.data)
       downloadCSV(taskDownloadData?.Task?.data, csvHeader, 'Tasks.csv')
     }
   });
@@ -422,6 +424,68 @@ const DetailProject = () => {
           },
         },
       }
+    })
+  }
+
+  const refetchTasks = () => {
+
+    let values = filterForm.getFieldsValue(['search', 'role', 'status'])
+
+    let input: {
+      paging?: any,
+      query: any
+    } = {
+      paging: {
+        order: ["updatedAt:DESC"],
+      },
+
+      query: {
+        company_id: loggedInUser?.company?.id,
+        project_id: params?.pid,
+      }
+
+    }
+
+    let query: {
+      active?: boolean,
+      archived?: boolean,
+      company_id: string;
+      project_id: string;
+    } = {
+      company_id: loggedInUser?.company?.id as string,
+      project_id: params?.pid as string,
+    }
+
+
+    if (values.status === 'Active' || values.status === 'Inactive') {
+      query['active'] = values.status === 'Active' ? true : false;
+    } else {
+      query['archived'] = values.status === 'Archived' ? true : false;
+    }
+
+    input['query'] = query
+
+    refetchTask({
+      input: input
+    })
+  }
+
+  const onChangeFilter = () => {
+    refetchTasks()
+  }
+
+  const openFilterRow = () => {
+    filterForm.resetFields()
+    refetchTask({
+      input: {
+        query: {
+          company_id: loggedInUser?.company?.id as string,
+          project_id: params?.pid,
+        },
+        paging: {
+          order: ["updatedAt:DESC"],
+        },
+      },
     })
   }
 
@@ -460,6 +524,44 @@ const DetailProject = () => {
           </Col>
         </Row>
         <br />
+        <Row >
+          <Col span={6} >
+            <Form
+              form={filterForm}
+              layout="vertical"
+              onFinish={() => { }}
+              autoComplete="off"
+              name="filter-form">
+              <Form.Item name="status" label="">
+                <Select
+                  placeholder="Select status"
+                  onChange={onChangeFilter}
+                >
+                  {status?.map((status: any) =>
+                    <option value={status?.value} key={status?.name}>
+                      {status?.name}
+                    </option>)}
+                </Select>
+              </Form.Item>
+            </Form>
+
+          </Col>
+          <Col>
+            <div className={styles['filter-col']}>
+              <Button
+                type="text"
+                onClick={openFilterRow}
+                icon={<img
+                  src={filterImg}
+                  alt="filter"
+                  className={styles['filter-image']} />}>
+                &nbsp; &nbsp;
+                {'Reset'}
+              </Button>
+            </div>
+          </Col>
+
+        </Row>
         <Row>
           <Col span={24}>
             <Table

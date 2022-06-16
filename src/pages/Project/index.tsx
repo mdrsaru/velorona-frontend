@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client'
 
-import { Button, Card, Col, Dropdown, Menu, message, Row, Table } from 'antd'
+import { Button, Card, Col, Dropdown, Form, Menu, message, Row, Select, Table } from 'antd'
 import { Link, useNavigate } from 'react-router-dom'
 import routes from '../../config/routes'
 import { MoreOutlined, PlusCircleOutlined, DownloadOutlined } from '@ant-design/icons'
@@ -9,8 +9,9 @@ import { MoreOutlined, PlusCircleOutlined, DownloadOutlined } from '@ant-design/
 import { authVar } from '../../App/link';
 import ModalConfirm from '../../components/Modal';
 
-import constants from '../../config/constants';
+import constants, { status } from '../../config/constants';
 import deleteImg from '../../assets/images/delete_btn.svg';
+import filterImg from "../../assets/images/filter.svg"
 import archiveImg from '../../assets/images/archive_btn.svg';
 
 import ArchiveBody from '../../components/Archive';
@@ -97,6 +98,8 @@ const ProjectPage = () => {
   const [visibility, setVisibility] = useState<boolean>(false);
   const [showArchive, setArchiveModal] = useState<boolean>(false);
   const [project, setProject] = useState<Project>();
+
+  const [filterForm] = Form.useForm();
   const [pagingInput, setPagingInput] = useState<{
     skip: number,
     currentPage: number,
@@ -120,7 +123,7 @@ const ProjectPage = () => {
   const setArchiveVisibility = (value: boolean) => {
     setArchiveModal(value);
   };
-  const { data: projectData } = useQuery<GraphQLResponse<'Project', ProjectPagingResult>, QueryProjectArgs>(PROJECT, {
+  const { data: projectData, refetch: refetchProject } = useQuery<GraphQLResponse<'Project', ProjectPagingResult>, QueryProjectArgs>(PROJECT, {
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
     variables: {
@@ -188,6 +191,64 @@ const ProjectPage = () => {
       }
     })
   };
+
+  const refetchProjects = () => {
+
+    let values = filterForm.getFieldsValue(['search', 'role', 'status'])
+
+    let input: {
+      paging?: any,
+      query: any
+    } = {
+      paging: {
+        order: ["updatedAt:DESC"],
+      },
+
+      query: {
+        company_id: loggedInUser?.company?.id
+      }
+
+    }
+
+    let query: {
+      status?: string,
+      archived?: boolean,
+      company_id: string;
+    } = {
+      company_id: loggedInUser?.company?.id as string
+    }
+
+
+    if (values.status === 'Active' || values.status === 'Inactive') {
+      query['status'] = values.status;
+    } else {
+      query['archived'] = values.status === 'Archived' ? true : false;
+    }
+
+    input['query'] = query
+
+    refetchProject({
+      input: input
+    })
+  }
+
+  const onChangeFilter = () => {
+    refetchProjects()
+  }
+
+  const openFilterRow = () => {
+    filterForm.resetFields()
+    refetchProject({
+      input: {
+        query: {
+          company_id: loggedInUser?.company?.id as string,
+        },
+        paging: {
+          order: ["updatedAt:DESC"],
+        },
+      },
+    })
+  }
 
   const archiveProject = () => {
     projectUpdate({
@@ -366,6 +427,44 @@ const ProjectPage = () => {
             </div>
           ]}
         />
+
+        <Row >
+          <Col span={6} >
+            <Form
+              form={filterForm}
+              layout="vertical"
+              onFinish={() => { }}
+              autoComplete="off"
+              name="filter-form">
+              <Form.Item name="status" label="">
+                <Select
+                  placeholder="Select status"
+                  onChange={onChangeFilter}
+                >
+                  {status?.map((status: any) =>
+                    <option value={status?.value} key={status?.name}>
+                      {status?.name}
+                    </option>)}
+                </Select>
+              </Form.Item>
+            </Form>
+          </Col>
+          <Col>
+            <div className={styles['filter-col']}>
+              <Button
+                type="text"
+                onClick={openFilterRow}
+                icon={<img
+                  src={filterImg}
+                  alt="filter"
+                  className={styles['filter-image']} />}>
+                &nbsp; &nbsp;
+                {'Reset'}
+              </Button>
+            </div>
+          </Col>
+
+        </Row>
         <Row className='container-row'>
           <Col span={24}>
             <Table

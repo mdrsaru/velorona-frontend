@@ -15,7 +15,7 @@ import { notifyGraphqlError } from "../../utils/error"
 import deleteImg from "../../assets/images/delete_btn.svg"
 import archiveImg from "../../assets/images/archive_btn.svg"
 import filterImg from "../../assets/images/filter.svg"
-import constants, { roles_user, user_status } from "../../config/constants"
+import constants, { roles_user, status } from "../../config/constants"
 
 import RouteLoader from "../../components/Skeleton/RouteLoader";
 import UserPayRateModal from "../../components/UserPayRate";
@@ -658,7 +658,7 @@ const Employee = () => {
                         placeholder="Select status"
                         onChange={onChangeFilter}
                       >
-                        {user_status?.map((status: any) =>
+                        {status?.map((status: any) =>
                           <Option value={status?.value} key={status?.name}>
                             {status?.name}
                           </Option>)}
