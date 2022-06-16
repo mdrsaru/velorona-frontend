@@ -46,11 +46,15 @@ const USER = gql`
   }
 `;
 
-const TASK_CREATE = gql`
+export const TASK_CREATE = gql`
   mutation TaskCreate($input: TaskCreateInput!) {
     TaskCreate(input: $input) {
       id
       name
+      project{
+      id
+      name
+      }
     }
   }
 `;
@@ -236,7 +240,7 @@ const AddTasks = () => {
                       <Option
                         value={employee?.id}
                         key={index}>
-                        {employee?.fullName}
+                        {employee?.fullName} / {employee?.email}
                       </Option>
                     ))}
                 </Select>
