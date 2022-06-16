@@ -2,7 +2,9 @@
   padding: 2rem 0 2rem 0;
 
   :global {
-    .ant-select:not(.ant-select-customize-input) .ant-select-selector .ant-select-selection-search-input {
+    .ant-select:not(.ant-select-customize-input)
+      .ant-select-selector
+      .ant-select-selection-search-input {
       height: 54px;
     }
   }
@@ -42,5 +44,32 @@ h1 {
     font-weight: 600;
     font-size: 24px;
     line-height: 29px;
+  }
+}
+
+.filter-col {
+  display: flex;
+  justify-content: flex-end;
+  margin-left: 3rem;
+
+  @media screen and (max-width: 767px) {
+    padding-bottom: 1rem;
+  }
+
+  :global {
+    .ant-btn-text {
+      color: var(--gray-secondary);
+    }
+
+    .ant-btn {
+      border-radius: 0;
+      height: 50px;
+      border-color: var(--gray-2);
+      background: var(--gray-2);
+      &:focus {
+        border-color: var(--primary-blue);
+        color: var(--black-1);
+      }
+    }
   }
 }

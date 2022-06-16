@@ -639,7 +639,7 @@ const Employee = () => {
               </Row>
               {filterProperty?.filter &&
                 <Row gutter={[32, 0]} className={styles["role-status-col"]}>
-                  <Col span={4}>
+                  <Col span={5}>
                     <Form.Item name="role" label="">
                       <Select
                         placeholder="Role"
@@ -652,7 +652,7 @@ const Employee = () => {
                       </Select>
                     </Form.Item>
                   </Col>
-                  <Col span={4}>
+                  <Col span={5}>
                     <Form.Item name="status" label="">
                       <Select
                         placeholder="Select status"
