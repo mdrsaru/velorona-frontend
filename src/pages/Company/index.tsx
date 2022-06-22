@@ -16,7 +16,7 @@ import { notifyGraphqlError } from '../../utils/error';
 import moment from 'moment';
 import styles from './style.module.scss';
 import { GraphQLResponse } from '../../interfaces/graphql.interface';
-import { Company as ICompany,CompanyPagingResult, CompanyStatus, MutationCompanyUpdateArgs, QueryCompanyArgs } from '../../interfaces/generated';
+import { Company as ICompany, CompanyPagingResult, CompanyStatus, MutationCompanyUpdateArgs, QueryCompanyArgs } from '../../interfaces/generated';
 
 const { SubMenu } = Menu;
 export const COMPANY = gql`
@@ -30,6 +30,11 @@ export const COMPANY = gql`
         name
         status
         createdAt 
+        logo{
+        id
+        name
+        url 
+        }
       }
     }
   }

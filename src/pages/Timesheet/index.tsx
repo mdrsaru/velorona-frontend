@@ -44,6 +44,7 @@ import TimerCard from '../../components/TimerCard'
 
 import styles from './style.module.scss'
 import TaskCreate from '../../components/TaskCreate'
+import TimeDuration from '../../components/TimeDuration'
 
 export const CREATE_TIME_ENTRY = gql`
     mutation TimeEntryCreate($input: TimeEntryCreateInput!) {
@@ -261,12 +262,10 @@ const Timesheet = () => {
         </div>
     },
     {
-      title: 'Total Time',
+      title: 'Total Hours',
       key: 'duration',
       render: (record: any) =>
-        <div>
-          {record?.durationFormat}
-        </div>
+        <TimeDuration duration = {record.duration}/>
     },
     {
       title: 'Invoiced Time',

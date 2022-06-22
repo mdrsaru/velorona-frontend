@@ -16,6 +16,7 @@ import Status from '../../components/Status';
 
 import styles from './style.module.scss';
 import { downloadCSV } from '../../utils/common';
+import TimeDuration from '../../components/TimeDuration';
 
 const EMPLOYEE_TIMESHEET = gql`
   query EmployeeTimesheet($input: TimesheetQueryInput!) {
@@ -26,6 +27,7 @@ const EMPLOYEE_TIMESHEET = gql`
       data {
         id
         durationFormat
+        duration
         invoicedDuration
         invoicedDurationFormat
         totalExpense
@@ -122,7 +124,6 @@ const EmployeeTimesheet = () => {
   };
 
   const dataSource = timesheetData?.Timesheet?.data ?? [];
-
   const columns = [
     {
       title: 'Employee Name',
@@ -133,8 +134,10 @@ const EmployeeTimesheet = () => {
       dataIndex: ['client', 'name'],
     },
     {
-      title: 'Total Time',
-      dataIndex: 'durationFormat',
+      title: 'Total Hours',
+      key: 'duration',
+      render: (record: any) =>
+        <TimeDuration duration = {record.duration} />
     },
     {
       title: 'Invoiced Time',

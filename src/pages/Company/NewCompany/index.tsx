@@ -26,6 +26,7 @@ import constants from "../../../config/constants";
 import { authVar } from "../../../App/link";
 import { GraphQLResponse } from "../../../interfaces/graphql.interface";
 import { Company, CompanyCreateInput, MutationCompanyCreateArgs } from "../../../interfaces/generated";
+import routes from "../../../config/routes";
 
 const { Option } = Select;
 
@@ -103,7 +104,7 @@ const NewCompany = () => {
       },
 
     }
-    if(fileData?.id) {
+    if (fileData?.id) {
       input.logo_id = fileData.id;
     }
     createCompany({
@@ -119,7 +120,7 @@ const NewCompany = () => {
             .success(
               `Company admin ${response?.data?.CompanyCreate?.name} is created successfully!`
             )
-            .then((r) => {});
+            .then((r) => { });
           navigate(-1);
         }
       })
@@ -180,7 +181,16 @@ const NewCompany = () => {
           </Row>
           <Row gutter={[24, 0]}>
             <Col xs={24} sm={24} md={8}>
-              <Form.Item label="First Name" name="firstName">
+              <Form.Item
+                label="First Name"
+                name="firstName"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input your first name!",
+                  },
+                ]}
+              >
                 <Input placeholder="Enter firstname" autoComplete="off" />
               </Form.Item>
             </Col>
@@ -190,7 +200,15 @@ const NewCompany = () => {
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={8}>
-              <Form.Item label="Last Name" name="lastName">
+              <Form.Item
+                label="Last Name"
+                name="lastName"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input your last name!",
+                  },
+                ]}>
                 <Input placeholder="Enter lastname" autoComplete="off" />
               </Form.Item>
             </Col>
@@ -307,7 +325,7 @@ const NewCompany = () => {
             <Col>
               <Form.Item>
                 <Space size={"large"}>
-                  <Button type="default" htmlType="button">
+                  <Button type="default" htmlType="button" onClick={() => navigate(routes.companyAdmin.path)}>
                     Cancel
                   </Button>
                   <Button type="primary" htmlType="submit">
