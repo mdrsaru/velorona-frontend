@@ -52,8 +52,15 @@ const routes = {
   },
   companyDashboard: {
     childPath: ':dashboard',
-    path: (company: string | undefined) => `/${company}/dashboard`,
+    path: (company: string | undefined) => `/${company}`,
     component: lazy(() => import('../pages/CompanyDashboard')),
+    name: 'Dashboard',
+    key: 'dashboard'
+  },
+  employeeDashboard: {
+    childPath: ':dashboard',
+    path: (company: string | undefined) => `/${company}`,
+    component: lazy(() => import('../pages/EmployeeDashboard')),
     name: 'Dashboard',
     key: 'dashboard'
   },

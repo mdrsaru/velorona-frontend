@@ -26,10 +26,11 @@ ChartJS.register(
 interface IProps {
   averageHoursData: IBarChart[];
   caption: string;
+  title : string;
 }
 
 const Index = (props: IProps) => {
-  const { averageHoursData, caption } = props;
+  const { averageHoursData, caption,title } = props;
   const options: ChartOptions<any> = {
     indexAxis: 'y' as const,
     scales: {
@@ -97,10 +98,10 @@ const Index = (props: IProps) => {
     <>
       <div className={styles['average-hours']}>
         <div className={styles['hours-title']}>
-          <Typography.Title level={3}>Average Hours Tracked</Typography.Title>
-          <Typography.Title level={4} keyboard className={styles['no-margin']}>
+          <Typography.Title level={3}>{title}</Typography.Title>
+          {/* <Typography.Title level={4} keyboard className={styles['no-margin']}>
             {caption}
-          </Typography.Title>
+          </Typography.Title> */}
         </div>
         <div className={
           averageHoursData?.length > 8 ?

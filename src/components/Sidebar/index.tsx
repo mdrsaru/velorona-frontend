@@ -63,6 +63,13 @@ const Sidebar = (props: any) => {
       accessRoles: [constants.roles.CompanyAdmin]
     },
     {
+      key: routes.employeeDashboard.key,
+      name: routes.employeeDashboard.name,
+      icon: <DashboardOutlined />,
+      route: routes.employeeDashboard.path(loggedInUser?.company?.code ?? ''),
+      accessRoles: [constants.roles.Employee]
+    },
+    {
       key: routes.role.key,
       name: routes.role.name,
       icon: <UserSwitchOutlined />,
