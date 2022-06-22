@@ -1,0 +1,16 @@
+.chart {
+  background-color: var(--white);
+  padding: 5% 7%;
+  margin: 2% 3%;
+}
+
+.activities {
+  padding-bottom: 5px;
+  display: flex;
+  gap:10px;
+  border-bottom: 1px var(--gray-2);
+}
+
+.date{
+  color: var(--gray-secondary);
+}

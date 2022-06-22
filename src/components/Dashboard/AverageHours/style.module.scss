@@ -1,0 +1,23 @@
+.no-margin {
+  margin: 0 !important;
+}
+
+.average-hours {
+  background-color: var(--white);
+  padding: 5% 7%;
+  margin: 2% 3%;
+}
+
+.hours-title {
+  display: flex;
+  justify-content: space-between;
+}
+
+.chart-container-more {
+  position: relative;
+  height: 100vh !important;
+}
+.chart-container-less {
+  position: relative;
+  height: 50vh !important;
+}

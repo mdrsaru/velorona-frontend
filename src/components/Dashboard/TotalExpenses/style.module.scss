@@ -1,0 +1,14 @@
+.no-margin {
+  margin: 0 !important;
+}
+
+.chart {
+  background-color: var(--white);
+  padding: 5% 7%;
+  margin: 2% 3%;
+}
+
+.chart-title {
+  display: flex;
+  justify-content: space-between;
+}

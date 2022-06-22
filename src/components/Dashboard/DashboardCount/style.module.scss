@@ -1,0 +1,13 @@
+.dashboard-count {
+  margin: 4%;
+  border: 1px solid var(--gray-2);
+  background-color: var(--white);
+  box-shadow: 0 7px 4px 0 var(--gray-4);
+  padding: 5% 7%;
+  display: flex;
+  justify-content: space-between;
+}
+
+.no-margin {
+  margin: 0 !important;
+}

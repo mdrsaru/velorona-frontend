@@ -59,7 +59,7 @@ const Sidebar = (props: any) => {
       key: routes.companyDashboard.key,
       name: routes.companyDashboard.name,
       icon: <DashboardOutlined />,
-      route: routes.company.path(loggedInUser?.company?.code ?? ''),
+      route: routes.companyDashboard.path(loggedInUser?.company?.code ?? ''),
       accessRoles: [constants.roles.CompanyAdmin]
     },
     {
