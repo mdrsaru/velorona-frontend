@@ -50,4 +50,43 @@ export const status = [{
 }
 ]
 
+export const invoice_status = [{
+  value: 'Sent',
+  name: 'Sent'
+},
+{
+  value: 'Pending',
+  name: 'Pending'
+},
+{
+  value: 'Received',
+  name: 'Received'
+},
+]
+
+export const employee_timesheet_status = [{
+  value: 'Approved',
+  name: 'Approved'
+},
+{
+  value: 'Pending',
+  name: 'Pending'
+},
+{
+  value: 'Rejected',
+  name: 'Rejected'
+},
+]
+
+export const company_status = [{
+  value: 'Active',
+  name: 'Active'
+},
+{
+  value: 'Inactive',
+  name: 'In Active'
+}
+]
+
+
 export default config;

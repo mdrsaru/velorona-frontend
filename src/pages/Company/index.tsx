@@ -1,8 +1,8 @@
 import { useQuery, gql, useMutation } from '@apollo/client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-import { Card, Row, Col, Table, Menu, Dropdown } from 'antd';
-import { MoreOutlined } from '@ant-design/icons';
+import { Card, Row, Col, Table, Menu, Dropdown, Form, Select, Button, Input } from 'antd';
+import { MoreOutlined,SearchOutlined} from '@ant-design/icons';
 
 import { Link, useNavigate } from 'react-router-dom';
 import routes from '../../config/routes';
@@ -10,18 +10,22 @@ import routes from '../../config/routes';
 import deleteImg from './../../assets/images/delete_btn.svg';
 import archiveImg from './../../assets/images/archive_btn.svg';
 import ModalConfirm from '../../components/Modal';
-import constants from '../../config/constants';
+import constants, { company_status } from '../../config/constants';
 
 import { notifyGraphqlError } from '../../utils/error';
 import moment from 'moment';
 import styles from './style.module.scss';
 import { GraphQLResponse } from '../../interfaces/graphql.interface';
 import { Company as ICompany,CompanyPagingResult, CompanyStatus, MutationCompanyUpdateArgs, QueryCompanyArgs } from '../../interfaces/generated';
+import { debounce } from 'lodash';
+
+
+import filterImg from "../../assets/images/filter.svg"
 
 const { SubMenu } = Menu;
 export const COMPANY = gql`
-  query Company {
-    Company {
+  query Company($input:CompanyQueryInput) {
+    Company(input:$input) {
       paging {
         total
       }
@@ -79,16 +83,19 @@ const ArchiveBody = () => {
   )
 }
 
-
+const {Option} = Select;
 const Company = () => {
   const navigate = useNavigate();
-  const { data: companyData, loading: dataLoading } = useQuery<
+  const [filterForm] = Form.useForm();
+
+  const { data: companyData, loading: dataLoading, refetch:refetchCompany } = useQuery<
     GraphQLResponse<'Company', CompanyPagingResult>,
     QueryCompanyArgs
   >(COMPANY, {
     fetchPolicy: 'network-only',
     nextFetchPolicy: 'cache-only'
   });
+  
   const [pagingInput, setPagingInput] = useState<{
     skip: number,
     currentPage: number,
@@ -96,6 +103,12 @@ const Company = () => {
     skip: 0,
     currentPage: 1,
   });
+  
+  const [filterProperty, setFilterProperty] = useState<any>({
+    filter: false,
+  });
+
+
   const [updateCompany] = useMutation<
   GraphQLResponse<'CompanyUpdate', ICompany>,
     MutationCompanyUpdateArgs
@@ -134,6 +147,73 @@ const Company = () => {
     });
   };
 
+  const refetchCompanies = () => {
+
+    let values = filterForm.getFieldsValue(['search', 'role', 'status'])
+
+    let input: {
+      paging?: any,
+      query: any
+    } = {
+      paging: {
+        order: ["updatedAt:DESC"],
+      },
+
+      query: {}
+
+    }
+
+    let query: {
+      status?: string,
+      search?:boolean,
+    } = {
+    }
+
+
+    if (values.status) {
+      query['status'] = values.status;
+    } 
+
+    if (values.search) {
+      query['search'] = values?.search
+    }
+
+    input['query'] = query
+
+    refetchCompany({
+      input: input
+    })
+  }
+
+  const onChangeFilter = () => {
+    refetchCompanies()
+  }
+
+  const openFilterRow = () => {
+    if (filterProperty?.filter) {
+      refetchCompany({
+        input: {
+          paging: {
+            order: ["updatedAt:DESC"],
+          },
+          query: { }
+        }
+      })
+    }
+    filterForm.resetFields()
+    setFilterProperty({
+      filter: !filterProperty?.filter
+    })
+  }
+
+
+  const debouncedResults = debounce(() => { onChangeFilter() }, 600);
+
+  useEffect(() => {
+    return () => {
+      debouncedResults.cancel();
+    };
+  });
 
   const menu = (data: any) => (
     <Menu>
@@ -238,6 +318,55 @@ const Company = () => {
             </div>
           </Col>
         </Row>
+        <Form
+          form={filterForm}
+          layout="vertical"
+          onFinish={() => { }}
+          autoComplete="off"
+          name="filter-form">
+          <Row gutter={[32, 0]}>
+            <Col xs={24} sm={24} md={16} lg={17} xl={20}>
+              <Form.Item name="search" label="">
+                <Input
+                  prefix={<SearchOutlined className="site-form-item-icon" />}
+                  placeholder="Search by company name"
+                  onChange={debouncedResults}
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={24} md={8} lg={7} xl={4}>
+              <div className={styles['filter-col']}>
+                <Button
+                  type="text"
+                  onClick={openFilterRow}
+                  icon={<img
+                    src={filterImg}
+                    alt="filter"
+                    className={styles['filter-image']} />}>
+                  &nbsp; &nbsp;
+                  {filterProperty?.filter ? 'Reset' : 'Filter'}
+                </Button>
+              </div>
+            </Col>
+          </Row>
+          {filterProperty?.filter &&
+            <Row gutter={[32, 0]} className={styles["role-status-col"]}>
+
+              <Col span={5}>
+                <Form.Item name="status" label="">
+                  <Select
+                    placeholder="Select status"
+                    onChange={onChangeFilter}
+                  >
+                    {company_status?.map((status: any) =>
+                      <Option value={status?.value} key={status?.name}>
+                        {status?.name}
+                      </Option>)}
+                  </Select>
+                </Form.Item>
+              </Col>
+            </Row>}
+        </Form>
         <Row className='container-row'>
           <Col span={24}>
             <Table
