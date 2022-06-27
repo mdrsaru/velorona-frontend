@@ -110,11 +110,11 @@ const CompanyDashboard = () => {
       <DashboardCount data={dashboardCount}/>
       <Row>
         <Col xs={24} lg={12}>
-          <AverageHours averageHoursData={averageHoursData} caption={'Jan 2022'}/>
+          <AverageHours averageHoursData={averageHoursData} title = {'Average Hours Tracked'}caption={'Jan 2022'}/>
           <TotalExpenses totalExpensesData={totalExpensesData} caption={'Jan 2022'}/>
         </Col>
         <Col xs={24} lg={12}>
-          <ActivityLog />
+          <ActivityLog title='Activity Log'/>
         </Col>
       </Row>
     </div>

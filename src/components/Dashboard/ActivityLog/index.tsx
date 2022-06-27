@@ -12,6 +12,7 @@ import styles from "./style.module.scss";
 import { TimesheetStatus } from "../../../interfaces/generated";
 import moment from "moment";
 
+
 export const ACTIVITY_LOG = gql`
 query ActivityLog($input: ActivityLogQueryInput!) {
   ActivityLog(input: $input) {
@@ -34,17 +35,26 @@ query ActivityLog($input: ActivityLogQueryInput!) {
   }
 }`;
 
-const ActivityLog = () => {
+interface IProps{
+  user_id?:string,
+  mananger_id?:string
+  title:string;
+}
+const ActivityLog = (props:IProps) => {
   const authData = authVar()
+  let query:any= {
+    company_id :authData?.company?.id
+  }
+  if(props?.user_id){
+    query.user_id = props?.user_id;
+  }
   const {
     data: activityLogData } = useQuery(ACTIVITY_LOG, {
       fetchPolicy: "network-only",
       nextFetchPolicy: "cache-first",
       variables: {
         input: {
-          query: {
-            company_id: authData?.company?.id
-          },
+          query: query,
           paging: {
             order: ["updatedAt:DESC"],
           }
@@ -56,7 +66,7 @@ const ActivityLog = () => {
 
   return (
     <div className={styles['chart']}>
-      <Typography.Title level={3}>Activity Log</Typography.Title>
+      <Typography.Title level={3}>{props?.title}</Typography.Title>
       <br />
       {logs && logs.map((log: { createdAt: string, message: string, type: string, user: any }, index: number) => {
 
