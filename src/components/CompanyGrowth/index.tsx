@@ -11,8 +11,8 @@ import {
 import { Bar } from 'react-chartjs-2';
 import {Typography} from "antd";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
-import styles from "./style.module.scss";
-import {IBarChart} from "../../../interfaces/IDashboard";
+import {IBarChart} from "../../interfaces/IDashboard";
+import styles from "../Dashboard/TotalExpenses/style.module.scss";
 
 ChartJS.register(
   CategoryScale,
@@ -24,25 +24,23 @@ ChartJS.register(
 );
 
 interface IProps {
-  averageHoursData: IBarChart[];
+  totalExpensesData: IBarChart[];
   caption: string;
-  title : string;
 }
 
-const Index = (props: IProps) => {
-  const { averageHoursData, caption,title } = props;
+const CompanyGrowth = (props: IProps) => {
+  const {totalExpensesData, caption} = props;
   const options: ChartOptions<any> = {
-    indexAxis: 'y' as const,
     scales: {
-      x: {
+      y: {
         display: false,
         grid: {
           display: false,
         },
         suggestedMin: 0,
-        suggestedMax: 60,
+        suggestedMax: 600,
       },
-      y: {
+      x: {
         grid: {
           display: false,
         },
@@ -55,39 +53,38 @@ const Index = (props: IProps) => {
       },
     },
     responsive: true,
-    maintainAspectRatio: false,
     plugins: {
       legend: {
+        display: false,
+      },
+      title: {
         display: false,
       },
       tooltip: {
         enabled: false,
       },
-      title: {
-        display: false,
-      },
       datalabels: {
         anchor: 'end',
-        align: 'right',
+        align: 'top',
         color: 'black',
         font: {
           size: 15,
         },
         padding: {
-          left: 15,
+          bottom: 15,
         },
         formatter: function (value: any, context: any) {
-          return value + ' hrs'
+          return + value
         },
-      }
+      },
     },
   };
 
   const data = {
-    labels: averageHoursData.map((avgHr: IBarChart) => (avgHr.label)),
+    labels: totalExpensesData.map((avgHr: IBarChart) => (avgHr.label)),
     datasets: [
       {
-        data: averageHoursData.map((avgHr: IBarChart) => (avgHr.value)),
+        data: totalExpensesData.map((avgHr: IBarChart) => (avgHr.value)),
         backgroundColor: '#3A43AF',
         barThickness: 30,
         borderRadius: 20,
@@ -96,23 +93,18 @@ const Index = (props: IProps) => {
   }
   return (
     <>
-      <div className={styles['average-hours']}>
-        <div className={styles['hours-title']}>
-          <Typography.Title level={3}>{title}</Typography.Title>
+      <div className={styles['chart']}>
+        <div className={styles['chart-title']}>
+          <Typography.Title level={3}>Total Expenses Per Week</Typography.Title>
           {/* <Typography.Title level={4} keyboard className={styles['no-margin']}>
             {caption}
           </Typography.Title> */}
         </div>
-        <div className={
-          averageHoursData?.length > 8 ?
-            styles['chart-container-more']:
-            styles['chart-container-less']}>
-          <Bar options={options} data={data} plugins={[ChartDataLabels]}/>
-        </div>
+        <Bar options={options} data={data} plugins={[ChartDataLabels]}/>
       </div>
 
     </>
   )
 }
 
-export default Index;
+export default CompanyGrowth;

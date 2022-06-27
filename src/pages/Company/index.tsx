@@ -34,6 +34,11 @@ export const COMPANY = gql`
         name
         status
         createdAt 
+        logo{
+        id
+        name
+        url 
+        }
       }
     }
   }

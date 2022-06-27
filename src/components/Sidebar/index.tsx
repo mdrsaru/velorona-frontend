@@ -63,6 +63,13 @@ const Sidebar = (props: any) => {
       accessRoles: [constants.roles.CompanyAdmin]
     },
     {
+      key: routes.employeeDashboard.key,
+      name: routes.employeeDashboard.name,
+      icon: <DashboardOutlined />,
+      route: routes.employeeDashboard.path(loggedInUser?.company?.code ?? ''),
+      accessRoles: [constants.roles.Employee]
+    },
+    {
       key: routes.role.key,
       name: routes.role.name,
       icon: <UserSwitchOutlined />,
@@ -104,13 +111,13 @@ const Sidebar = (props: any) => {
       route: routes.timesheet.path(loggedInUser?.company?.code ?? ''),
       accessRoles: [constants.roles.Employee]
     },
-    {
-      key: routes.schedule.key,
-      name: routes.schedule.name,
-      icon: <ScheduleOutlined />,
-      route: routes.schedule.path(loggedInUser?.company?.code ?? ''),
-      accessRoles: [constants.roles.Employee]
-    },
+    // {
+    //   key: routes.schedule.key,
+    //   name: routes.schedule.name,
+    //   icon: <ScheduleOutlined />,
+    //   route: routes.schedule.path(loggedInUser?.company?.code ?? ''),
+    //   accessRoles: [constants.roles.Employee]
+    // },
     {
       key: routes.projects.key,
       name: routes.projects.name,

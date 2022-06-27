@@ -104,9 +104,15 @@ const _Routes = () => {
                   <Suspense fallback={<RouteLoader />}>
                     {roles.includes(constants.roles.CompanyAdmin) ? (
                       <routes.companyDashboard.component />
-                    ) : (
-                      <routes.home.component />
-                    )}
+                    ) :
+                      roles.includes(constants.roles.Employee) ? (
+                        <routes.employeeDashboard.component />
+                      )
+                        :
+                        (
+                          <routes.home.component />
+                        )
+                    }
                   </Suspense>
                 </CheckRoles>
               }
