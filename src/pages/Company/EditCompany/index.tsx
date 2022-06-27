@@ -24,7 +24,8 @@ import { useState } from "react";
 import constants from "../../../config/constants";
 import { authVar } from "../../../App/link";
 import { GraphQLResponse } from "../../../interfaces/graphql.interface";
-import { Company, CompanyPagingResult, MutationCompanyUpdateArgs, QueryCompanyArgs } from "../../../interfaces/generated";
+import { Company, CompanyPagingResult, CompanyUpdateInput, MutationCompanyUpdateArgs, QueryCompanyArgs } from "../../../interfaces/generated";
+import routes from "../../../config/routes";
 
 const { Option } = Select;
 
@@ -125,14 +126,17 @@ const EditCompany = () => {
   });
 
   const onSubmitForm = (values: any) => {
+    const input: CompanyUpdateInput = {
+      id: params?.id as string,
+      name: values.name,
+      status: values.status,
+    }
+    if(fileData?.id) {
+      input.logo_id = fileData.id;
+    }
     updateCompany({
       variables: {
-        input: {
-          id: params?.id as string,
-          name: values.name,
-          status: values.status,
-          logo_id: fileData?.id,
-        },
+        input: input
       },
     })
       .then((response) => {
@@ -255,11 +259,11 @@ const EditCompany = () => {
               <Col>
                 <Form.Item>
                   <Space size={"large"}>
-                    <Button type="default" htmlType="button">
+                    <Button type="default" htmlType="button" onClick={()=>navigate(routes.companyAdmin.path)}>
                       Cancel
                     </Button>
                     <Button type="primary" htmlType="submit">
-                      Edit Company
+                      Save
                     </Button>
                   </Space>
                 </Form.Item>

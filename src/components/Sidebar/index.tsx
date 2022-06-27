@@ -111,13 +111,13 @@ const Sidebar = (props: any) => {
       route: routes.timesheet.path(loggedInUser?.company?.code ?? ''),
       accessRoles: [constants.roles.Employee]
     },
-    {
-      key: routes.schedule.key,
-      name: routes.schedule.name,
-      icon: <ScheduleOutlined />,
-      route: routes.schedule.path(loggedInUser?.company?.code ?? ''),
-      accessRoles: [constants.roles.Employee]
-    },
+    // {
+    //   key: routes.schedule.key,
+    //   name: routes.schedule.name,
+    //   icon: <ScheduleOutlined />,
+    //   route: routes.schedule.path(loggedInUser?.company?.code ?? ''),
+    //   accessRoles: [constants.roles.Employee]
+    // },
     {
       key: routes.projects.key,
       name: routes.projects.name,
