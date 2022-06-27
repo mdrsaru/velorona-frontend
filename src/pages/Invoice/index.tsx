@@ -1,12 +1,14 @@
 import moment from 'moment';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { gql, useQuery, useMutation } from '@apollo/client';
-import { MoreOutlined } from '@ant-design/icons';
-import { Card, Col, Dropdown, Menu, Row, Table, message, Modal } from 'antd';
+import { MoreOutlined,SearchOutlined } from '@ant-design/icons';
+import { Card, Col, Dropdown, Menu, Row, Table, message, Modal, Form, Select, Button, Input } from 'antd';
+
+import filterImg from "../../assets/images/filter.svg"
 
 import { authVar } from '../../App/link';
-import constants from '../../config/constants';
+import constants,{invoice_status} from '../../config/constants';
 import routes from '../../config/routes';
 import { notifyGraphqlError } from '../../utils/error';
 
@@ -24,6 +26,7 @@ import PageHeader from '../../components/PageHeader';
 import Status from '../../components/Status';
 import InvoiceViewer from '../../components/InvoiceViewer';
 import styles from './style.module.scss';
+import { debounce } from 'lodash';
 
 const INVOICE = gql`
   query Invoice($input: InvoiceQueryInput!) {
@@ -54,9 +57,12 @@ const INVOICE_STATUS_UPDATE = gql`
     }
   }
 `;
-
+const {Option} = Select;
 const Invoice = () => {
   const loggedInUser = authVar();
+
+  const [filterForm] = Form.useForm();
+
   const [pagingInput, setPagingInput] = useState<{
     skip: number,
     currentPage: number,
@@ -64,6 +70,7 @@ const Invoice = () => {
     skip: 0,
     currentPage: 1,
   });
+
   const [invoiceViewer, setInvoiceViewer] = useState<{
     isVisible: boolean,
     invoice_id: string | undefined;
@@ -71,6 +78,11 @@ const Invoice = () => {
     isVisible: false,
     invoice_id: undefined,
   })
+
+  const [filterProperty, setFilterProperty] = useState<any>({
+    filter: false,
+  });
+
 
   const [updateStatus, { loading: updateLoading }] = useMutation<
     GraphQLResponse<'InvoiceUpdate', IInvoice>,
@@ -95,7 +107,7 @@ const Invoice = () => {
     },
   };
 
-  const { data: invoiceData, loading } = useQuery<
+  const { data: invoiceData, loading , refetch:refetchInvoice } = useQuery<
     GraphQLResponse<'Invoice', InvoicePagingResult>,
     QueryInvoiceArgs
   >(INVOICE, {
@@ -141,6 +153,81 @@ const Invoice = () => {
     });
   }
 
+  const refetchInvoices = () => {
+
+    let values = filterForm.getFieldsValue(['search', 'role', 'status'])
+
+    let input: {
+      paging?: any,
+      query: any
+    } = {
+      paging: {
+        order: ["updatedAt:DESC"],
+      },
+
+      query: {
+        company_id: loggedInUser?.company?.id
+      }
+
+    }
+
+    let query: {
+      status?: string,
+      archived?: boolean,
+      search?:boolean,
+      company_id: string;
+    } = {
+      company_id: loggedInUser?.company?.id as string
+    }
+
+
+    if (values.status) {
+      query['status'] = values.status;
+    }
+
+    if (values.search) {
+      query['search'] = values?.search
+    }
+
+    input['query'] = query
+
+    refetchInvoice({
+      input: input
+    })
+  }
+
+  const onChangeFilter = () => {
+    refetchInvoices()
+  }
+
+  const openFilterRow = () => {
+    if (filterProperty?.filter) {
+      refetchInvoice({
+        input: {
+          paging: {
+            order: ["updatedAt:DESC"],
+          },
+          query: {
+            company_id: loggedInUser?.company?.id as string,
+          }
+        }
+      })
+    }
+    filterForm.resetFields()
+    setFilterProperty({
+      filter: !filterProperty?.filter
+    })
+  }
+
+
+  const debouncedResults = debounce(() => { onChangeFilter() }, 600);
+
+  useEffect(() => {
+    return () => {
+      debouncedResults.cancel();
+    };
+  });
+  
   const dataSource = invoiceData?.Invoice?.data ?? [];
 
   const columns = [
@@ -266,7 +353,55 @@ const Invoice = () => {
             </div>
           ]}
         />
+        <Form
+          form={filterForm}
+          layout="vertical"
+          onFinish={() => { }}
+          autoComplete="off"
+          name="filter-form">
+          <Row gutter={[32, 0]}>
+            <Col xs={24} sm={24} md={16} lg={17} xl={20}>
+              <Form.Item name="search" label="">
+                <Input
+                  prefix={<SearchOutlined className="site-form-item-icon" />}
+                  placeholder="Search by Client name or email"
+                  onChange={debouncedResults}
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={24} md={8} lg={7} xl={4}>
+              <div className={styles['filter-col']}>
+                <Button
+                  type="text"
+                  onClick={openFilterRow}
+                  icon={<img
+                    src={filterImg}
+                    alt="filter"
+                    className={styles['filter-image']} />}>
+                  &nbsp; &nbsp;
+                  {filterProperty?.filter ? 'Reset' : 'Filter'}
+                </Button>
+              </div>
+            </Col>
+          </Row>
+          {filterProperty?.filter &&
+            <Row gutter={[32, 0]} className={styles["role-status-col"]}>
 
+              <Col span={5}>
+                <Form.Item name="status" label="">
+                  <Select
+                    placeholder="Select status"
+                    onChange={onChangeFilter}
+                  >
+                    {invoice_status?.map((status: any) =>
+                      <Option value={status?.value} key={status?.name}>
+                        {status?.name}
+                      </Option>)}
+                  </Select>
+                </Form.Item>
+              </Col>
+            </Row>}
+        </Form>
         <Row className='container-row'>
           <Col span={24}>
             <Table

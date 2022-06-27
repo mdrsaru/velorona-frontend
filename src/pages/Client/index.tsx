@@ -73,6 +73,7 @@ export const CLIENT_UPDATE = gql`
   }
 `;
 
+const {Option} = Select;
 const Client = () => {
   const loggedInUser = authVar();
   const [showModal, setShowModal] = useState(false);
@@ -84,6 +85,9 @@ const Client = () => {
   }>({
     skip: 0,
     currentPage: 1,
+  });
+  const [filterProperty, setFilterProperty] = useState<any>({
+    filter: false,
   });
 
   const [filterForm] = Form.useForm();
@@ -210,17 +214,21 @@ const Client = () => {
 
 
   const openFilterRow = () => {
+    if (filterProperty?.filter) {
+      refetchClient({
+        input: {
+          paging: {
+            order: ["updatedAt:DESC"],
+          },
+          query: {
+            company_id: loggedInUser?.company?.id as string,
+          }
+        }
+      })
+    }
     filterForm.resetFields()
-
-    refetchClient({
-      input: {
-        query: {
-          company_id: loggedInUser?.company?.id as string,
-        },
-        paging: {
-          order: ["updatedAt:DESC"],
-        },
-      },
+    setFilterProperty({
+      filter: !filterProperty?.filter
     })
   }
 
@@ -377,12 +385,12 @@ const Client = () => {
           onFinish={() => { }}
           autoComplete="off"
           name="filter-form">
-          <Row >
+          <Row gutter={[32, 0]}>
             <Col xs={24} sm={24} md={16} lg={17} xl={20}>
               <Form.Item name="search" label="">
                 <Input
                   prefix={<SearchOutlined className="site-form-item-icon" />}
-                  placeholder="Search by Client name"
+                  placeholder="Search by Project name"
                   onChange={debouncedResults}
                 />
               </Form.Item>
@@ -397,31 +405,28 @@ const Client = () => {
                     alt="filter"
                     className={styles['filter-image']} />}>
                   &nbsp; &nbsp;
-                  {'Reset'}
+                  {filterProperty?.filter ? 'Reset' : 'Filter'}
                 </Button>
               </div>
             </Col>
           </Row>
-          <Row>
-            <Col span={6}>
+          {filterProperty?.filter &&
+            <Row gutter={[32, 0]} className={styles["role-status-col"]}>
 
-
-              <Form.Item name="status" label="">
-                <Select
-                  placeholder="Select status"
-                  onChange={onChangeFilter}
-                >
-                  {status?.map((status: any) => (
-                    <option value={status?.value} key={status?.name}>
-                      {status?.name}
-                    </option>
-                  ))}
-                </Select>
-              </Form.Item>
-
-
-            </Col>
-          </Row>
+              <Col span={5}>
+                <Form.Item name="status" label="">
+                  <Select
+                    placeholder="Select status"
+                    onChange={onChangeFilter}
+                  >
+                    {status?.map((status: any) =>
+                      <Option value={status?.value} key={status?.name}>
+                        {status?.name}
+                      </Option>)}
+                  </Select>
+                </Form.Item>
+              </Col>
+            </Row>}
         </Form>
         <Row className='container-row'>
           <Col span={24}>

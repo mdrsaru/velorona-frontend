@@ -1,10 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client'
 
-import { Button, Card, Col, Dropdown, Form, Menu, message, Row, Select, Table } from 'antd'
+import { Button, Card, Col, Dropdown, Form, Input, Menu, message, Row, Select, Table } from 'antd'
 import { Link, useNavigate } from 'react-router-dom'
 import routes from '../../config/routes'
-import { MoreOutlined, PlusCircleOutlined, DownloadOutlined } from '@ant-design/icons'
+import { MoreOutlined, PlusCircleOutlined, DownloadOutlined, SearchOutlined } from '@ant-design/icons'
 
 import { authVar } from '../../App/link';
 import ModalConfirm from '../../components/Modal';
@@ -23,6 +23,7 @@ import { GraphQLResponse } from '../../interfaces/graphql.interface';
 import styles from './style.module.scss';
 import PageHeader from '../../components/PageHeader'
 import { downloadCSV } from '../../utils/common'
+import { debounce } from 'lodash'
 
 export const PROJECT = gql`
   query Project($input: ProjectQueryInput!) {
@@ -92,6 +93,9 @@ const csvHeader: Array<{ label: string, key: string, subKey?: string }> = [
   { label: "Company", key: "company", subKey: "name" }
 ]
 
+
+const { Option } = Select;
+
 const ProjectPage = () => {
   const loggedInUser = authVar();
   const navigate = useNavigate();
@@ -106,6 +110,10 @@ const ProjectPage = () => {
   }>({
     skip: 0,
     currentPage: 1,
+  });
+
+  const [filterProperty, setFilterProperty] = useState<any>({
+    filter: false,
   });
 
   const changePage = (page: number) => {
@@ -213,6 +221,7 @@ const ProjectPage = () => {
     let query: {
       status?: string,
       archived?: boolean,
+      search?:boolean,
       company_id: string;
     } = {
       company_id: loggedInUser?.company?.id as string
@@ -223,6 +232,10 @@ const ProjectPage = () => {
       query['status'] = values.status;
     } else {
       query['archived'] = values.status === 'Archived' ? true : false;
+    }
+
+    if (values.search) {
+      query['search'] = values?.search
     }
 
     input['query'] = query
@@ -237,19 +250,32 @@ const ProjectPage = () => {
   }
 
   const openFilterRow = () => {
+    if (filterProperty?.filter) {
+      refetchProject({
+        input: {
+          paging: {
+            order: ["updatedAt:DESC"],
+          },
+          query: {
+            company_id: loggedInUser?.company?.id as string,
+          }
+        }
+      })
+    }
     filterForm.resetFields()
-    refetchProject({
-      input: {
-        query: {
-          company_id: loggedInUser?.company?.id as string,
-        },
-        paging: {
-          order: ["updatedAt:DESC"],
-        },
-      },
+    setFilterProperty({
+      filter: !filterProperty?.filter
     })
   }
 
+
+  const debouncedResults = debounce(() => { onChangeFilter() }, 600);
+
+  useEffect(() => {
+    return () => {
+      debouncedResults.cancel();
+    };
+  });
   const archiveProject = () => {
     projectUpdate({
       variables: {
@@ -428,43 +454,55 @@ const ProjectPage = () => {
           ]}
         />
 
-        <Row >
-          <Col span={6} >
-            <Form
-              form={filterForm}
-              layout="vertical"
-              onFinish={() => { }}
-              autoComplete="off"
-              name="filter-form">
-              <Form.Item name="status" label="">
-                <Select
-                  placeholder="Select status"
-                  onChange={onChangeFilter}
-                >
-                  {status?.map((status: any) =>
-                    <option value={status?.value} key={status?.name}>
-                      {status?.name}
-                    </option>)}
-                </Select>
+        <Form
+          form={filterForm}
+          layout="vertical"
+          onFinish={() => { }}
+          autoComplete="off"
+          name="filter-form">
+          <Row gutter={[32, 0]}>
+            <Col xs={24} sm={24} md={16} lg={17} xl={20}>
+              <Form.Item name="search" label="">
+                <Input
+                  prefix={<SearchOutlined className="site-form-item-icon" />}
+                  placeholder="Search by Project name"
+                  onChange={debouncedResults}
+                />
               </Form.Item>
-            </Form>
-          </Col>
-          <Col>
-            <div className={styles['filter-col']}>
-              <Button
-                type="text"
-                onClick={openFilterRow}
-                icon={<img
-                  src={filterImg}
-                  alt="filter"
-                  className={styles['filter-image']} />}>
-                &nbsp; &nbsp;
-                {'Reset'}
-              </Button>
-            </div>
-          </Col>
+            </Col>
+            <Col xs={24} sm={24} md={8} lg={7} xl={4}>
+              <div className={styles['filter-col']}>
+                <Button
+                  type="text"
+                  onClick={openFilterRow}
+                  icon={<img
+                    src={filterImg}
+                    alt="filter"
+                    className={styles['filter-image']} />}>
+                  &nbsp; &nbsp;
+                  {filterProperty?.filter ? 'Reset' : 'Filter'}
+                </Button>
+              </div>
+            </Col>
+          </Row>
+          {filterProperty?.filter &&
+            <Row gutter={[32, 0]} className={styles["role-status-col"]}>
 
-        </Row>
+              <Col span={5}>
+                <Form.Item name="status" label="">
+                  <Select
+                    placeholder="Select status"
+                    onChange={onChangeFilter}
+                  >
+                    {status?.map((status: any) =>
+                      <Option value={status?.value} key={status?.name}>
+                        {status?.name}
+                      </Option>)}
+                  </Select>
+                </Form.Item>
+              </Col>
+            </Row>}
+        </Form>
         <Row className='container-row'>
           <Col span={24}>
             <Table
@@ -483,19 +521,19 @@ const ProjectPage = () => {
         </Row>
         <Row>
           <Col span={24}>
-          {
-            !!projectData?.Project?.data?.length && (
-              <div className={styles['download-report']}>
-                <Button
-                  type="link"
-                  onClick={downloadReport}
-                  icon={<DownloadOutlined />}
-                >
-                  Download Report
-                </Button>
-              </div>
-            )
-          }</Col>
+            {
+              !!projectData?.Project?.data?.length && (
+                <div className={styles['download-report']}>
+                  <Button
+                    type="link"
+                    onClick={downloadReport}
+                    icon={<DownloadOutlined />}
+                  >
+                    Download Report
+                  </Button>
+                </div>
+              )
+            }</Col>
         </Row>
       </Card>
 
