@@ -2,16 +2,9 @@ import React from "react";
 import { Col, Row } from "antd";
 import employeesImg from "../../assets/images/employees.svg";
 import clientsImg from "../../assets/images/clients.svg";
-import projectsImg from "../../assets/images/projects.svg";
 import DashboardCount from "../../components/Dashboard/DashboardCount";
 import { IDashboardCount } from "../../interfaces/IDashboard";
-import AverageHours from "../../components/Dashboard/AverageHours";
-import TotalExpenses from "../../components/Dashboard/TotalExpenses";
-import ActivityLog from "../../components/Dashboard/ActivityLog";
 import { gql, useQuery } from "@apollo/client";
-import { authVar } from "../../App/link";
-import { TIME_WEEKLY } from "../Timesheet";
-import moment from "moment";
 import CompanyGrowth from '../../components/CompanyGrowth/index';
 
 
@@ -61,7 +54,7 @@ const SuperAdminDashboard = () => {
 
   companyGrowthData?.CompanyGrowth?.map((companyGrowth: any, index: number) => {
     const month = new Date(companyGrowth?.createdAt).toLocaleString('en-us', { month: 'short' })
-    companyGrowthList.push({ label: month, value: companyGrowth?.count })
+    return companyGrowthList.push({ label: month, value: companyGrowth?.count })
 
   })
   const dashboardCount: IDashboardCount[] = [
