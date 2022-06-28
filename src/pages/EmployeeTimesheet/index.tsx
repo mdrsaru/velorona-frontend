@@ -20,11 +20,9 @@ import filterImg from "../../assets/images/filter.svg"
 import styles from './style.module.scss';
 import { downloadCSV } from '../../utils/common';
 import { debounce } from 'lodash';
-
-const {Option} = Select;
-
 import TimeDuration from '../../components/TimeDuration';
 
+const {Option} = Select;
 const EMPLOYEE_TIMESHEET = gql`
   query EmployeeTimesheet($input: TimesheetQueryInput!) {
     Timesheet(input: $input) {
