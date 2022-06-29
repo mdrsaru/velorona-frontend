@@ -340,10 +340,6 @@ const InvoiceForm = (props: IProps) => {
           <Form.Item
             label="PO Number"
             name='poNumber'
-            rules={[{
-              required: true,
-              message: 'Please enter PO Number'
-            }]}
           >
             <Input placeholder="Enter PO Number" autoComplete="off" />
           </Form.Item>
