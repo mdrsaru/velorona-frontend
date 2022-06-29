@@ -18,15 +18,18 @@
       padding: 0;
     }
 
-    .ant-collapse>.ant-collapse-item>.ant-collapse-header {
+    .ant-collapse > .ant-collapse-item > .ant-collapse-header {
       padding: 0;
     }
 
-    .ant-collapse-ghost>.ant-collapse-item>.ant-collapse-content>.ant-collapse-content-box {
+    .ant-collapse-ghost
+      > .ant-collapse-item
+      > .ant-collapse-content
+      > .ant-collapse-content-box {
       padding: 0;
     }
 
-    .ant-collapse-content>.ant-collapse-content-box {
+    .ant-collapse-content > .ant-collapse-content-box {
       padding: 0;
     }
 
@@ -91,13 +94,13 @@
     padding-left: 1.5rem;
     padding-right: 1.5rem;
 
-  .add-entry {
-    font-weight: 600;
-    font-size: 18px;
-    line-height: 22px;
-    cursor: pointer;
-    color: var(--primary-blue);
-  }
+    .add-entry {
+      font-weight: 600;
+      font-size: 18px;
+      line-height: 22px;
+      cursor: pointer;
+      color: var(--primary-blue);
+    }
   }
 
   .timesheet {
@@ -175,7 +178,6 @@
   }
 }
 
-
 .timesheet-section {
   margin-bottom: 48px;
   .timesheet-status {
@@ -207,7 +209,7 @@
   font-weight: 600;
   font-size: 14px;
   line-height: 17px;
-  color: var(--white)
+  color: var(--white);
 }
 
 .resp-table-body {
@@ -298,4 +300,29 @@
 
 .weekly-timesheet-card {
   padding: 2rem 1rem 2rem 1rem;
+}
+
+.attachApprovedTitle {
+  font-weight: 600;
+  font-size: 24px;
+  padding: 1.5rem;
+}
+
+.attach-approved-timesheet {
+  :global {
+    .ant-collapse {
+      background-color: var(--white);
+    }
+    .ant-collapse-content {
+      border-top: 0px;
+    }
+  }
+}
+
+.attach-new-timesheet {
+  font-weight: 600;
+  color: var(--primary-blue);
+  font-size: 16px;
+  padding-left: 1rem;
+  cursor: pointer;
 }
