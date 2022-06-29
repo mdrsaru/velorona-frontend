@@ -9,10 +9,11 @@ import {
   Legend, ChartOptions,
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
-import {Typography} from "antd";
+import { Empty, Typography } from "antd";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import styles from "./style.module.scss";
-import {IBarChart} from "../../../interfaces/IDashboard";
+import { IBarChart } from "../../../interfaces/IDashboard";
+import NoContent from "../../NoContent";
 
 ChartJS.register(
   CategoryScale,
@@ -26,11 +27,11 @@ ChartJS.register(
 interface IProps {
   averageHoursData: IBarChart[];
   caption: string;
-  title : string;
+  title: string;
 }
 
 const Index = (props: IProps) => {
-  const { averageHoursData, caption,title } = props;
+  const { averageHoursData, caption, title } = props;
   const options: ChartOptions<any> = {
     indexAxis: 'y' as const,
     scales: {
@@ -94,6 +95,7 @@ const Index = (props: IProps) => {
       }
     ],
   }
+  
   return (
     <>
       <div className={styles['average-hours']}>
@@ -103,12 +105,18 @@ const Index = (props: IProps) => {
             {caption}
           </Typography.Title> */}
         </div>
-        <div className={
-          averageHoursData?.length > 8 ?
-            styles['chart-container-more']:
-            styles['chart-container-less']}>
-          <Bar options={options} data={data} plugins={[ChartDataLabels]}/>
-        </div>
+        {data?.labels?.length ?
+          <div className={
+            averageHoursData?.length > 8 ?
+              styles['chart-container-more'] :
+              styles['chart-container-less']}>
+            <Bar options={options} data={data} plugins={[ChartDataLabels]} />
+          </div>
+          :
+          <div style={{ marginTop: '1.5rem' }}>
+            <Empty description={'Nothing Tracked yet'} />
+          </div>
+        }
       </div>
 
     </>
