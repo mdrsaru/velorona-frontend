@@ -139,7 +139,7 @@ const NewProject = () => {
               <Form.Item>
                 <Space>
                   <Button type="default" htmlType="button" onClick={()=>navigate(-1)}>Cancel</Button>
-                  <Button type="primary" htmlType="submit">Add Project</Button>
+                  <Button type="primary" htmlType="submit">Create Project</Button>
                 </Space>
               </Form.Item>
             </Col>
