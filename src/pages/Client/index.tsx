@@ -367,7 +367,7 @@ const Client = () => {
           extra={[
             <div className={styles["add-new-client"]} key="new-client">
               <Link
-                to={routes.addEmployee.path(
+                to={routes.addClient.path(
                   loggedInUser?.company?.code
                     ? loggedInUser?.company?.code
                     : ""

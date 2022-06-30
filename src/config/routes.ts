@@ -145,7 +145,7 @@ const routes = {
   },
   attachClient: {
     childPath: ':eid/add-client',
-    path: (id: string, eid: string) => `/${id}/user/${eid}/add-client`,
+    path: (id: string, eid: string) => `/${id}/users/${eid}/add-client`,
     component: lazy(() => import('../pages/Employee/EditEmployee/AttachClient')),
     name: 'Add Client',
     key: 'employee'

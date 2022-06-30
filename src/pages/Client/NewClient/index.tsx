@@ -78,7 +78,7 @@ const NewClient = () => {
         </Row>
         <ClientForm
           onSubmitForm={onSubmitForm}
-          btnText={'Create Client'}
+          btnText={'Add Client'}
           form={form}
           cancelAddClient={cancelAddClient} />
       </Card>
