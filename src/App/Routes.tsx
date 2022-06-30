@@ -18,7 +18,6 @@ const _Routes = () => {
   const loginData = authVar();
   const roles = loginData?.user?.roles;
   const getRoute = () => {
-    console.log(constants.roles)
     if (roles.includes(constants.roles.SuperAdmin)) {
       return routes.dashboard.path;
     } else if (roles.includes(constants.roles.CompanyAdmin)) {

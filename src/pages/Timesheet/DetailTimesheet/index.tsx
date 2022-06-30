@@ -520,7 +520,10 @@ const DetailTimesheet = () => {
                 }
 
                 {
-                  invoicedTimeEntries.map((invoiced) => (
+                  checkRoles({
+                    expectedRoles: [constants.roles.CompanyAdmin],
+                    userRoles: roles,
+                  }) && invoicedTimeEntries.map((invoiced) => (
                     <div key={invoiced.invoice_id} className={styles['timesheet-section']}>
                       <div
                         className={

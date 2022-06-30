@@ -91,7 +91,6 @@ const TotalExpenses = (props: IProps) => {
       }
     ],
   }
-  console.log(data)
   return (
     <>
       <div className={styles['chart']}>
