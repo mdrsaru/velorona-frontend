@@ -9,7 +9,7 @@ import {
   Legend, ChartOptions,
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
-import {Typography} from "antd";
+import {Empty, Typography} from "antd";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import {IBarChart} from "../../../interfaces/IDashboard";
 import styles from "./style.module.scss";
@@ -91,16 +91,21 @@ const TotalExpenses = (props: IProps) => {
       }
     ],
   }
+  console.log(data)
   return (
     <>
       <div className={styles['chart']}>
         <div className={styles['chart-title']}>
           <Typography.Title level={3}>Total Expenses Per Week</Typography.Title>
-          <Typography.Title level={4} keyboard className={styles['no-margin']}>
+          {/* <Typography.Title level={4} keyboard className={styles['no-margin']}>
             {caption}
-          </Typography.Title>
+          </Typography.Title> */}
         </div>
+        {data?.labels?.length ?
         <Bar options={options} data={data} plugins={[ChartDataLabels]}/>
+        :
+<Empty description='No Expense at the moment'/>
+}
       </div>
 
     </>
