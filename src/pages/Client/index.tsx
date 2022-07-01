@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import { Button, Card, Col, Dropdown, Form, Input, Menu, message, Row, Select, Table } from "antd";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { MoreOutlined, SearchOutlined } from "@ant-design/icons";
 import SubMenu from "antd/lib/menu/SubMenu";
 
 import routes from "../../config/routes";
 import { authVar } from "../../App/link";
-import ClientDetail from "./ClientDetail";
 
 import Status from "../../components/Status";
 import ModalConfirm from "../../components/Modal";
@@ -45,7 +44,9 @@ export const CLIENT = gql`
         invoicingEmail
         status
         archived
+        phone
         address {
+          country
           streetAddress
           state
           zipcode
@@ -76,7 +77,7 @@ export const CLIENT_UPDATE = gql`
 const {Option} = Select;
 const Client = () => {
   const loggedInUser = authVar();
-  const [showModal, setShowModal] = useState(false);
+  const navigate = useNavigate();
   const [client, setClient] = useState<any>();
   const [showArchive, setArchiveModal] = useState<boolean>(false);
   const [pagingInput, setPagingInput] = useState<{
@@ -309,8 +310,10 @@ const Client = () => {
       onCell: (data: any) => {
         return {
           onClick: () => {
-            setClient(data);
-            setShowModal(!showModal);
+            navigate(routes.viewClient.path(
+              loggedInUser?.company?.code ?? "1",
+              data?.id ?? "1"
+            ))
           },
         };
       },
@@ -390,7 +393,7 @@ const Client = () => {
               <Form.Item name="search" label="">
                 <Input
                   prefix={<SearchOutlined className="site-form-item-icon" />}
-                  placeholder="Search by Project name"
+                  placeholder="Search by Client name"
                   onChange={debouncedResults}
                 />
               </Form.Item>
@@ -445,14 +448,6 @@ const Client = () => {
           </Col>
         </Row>
       </Card>
-
-      {showModal && (
-        <ClientDetail
-          visible={showModal}
-          client={client}
-          setVisible={setShowModal}
-        />
-      )}
 
       <ModalConfirm
         visibility={showArchive}

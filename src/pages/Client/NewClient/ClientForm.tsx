@@ -87,20 +87,17 @@ const ClientForm = (props: any) => {
             lg={12}
             className={styles.formCol}>
             <Form.Item
-              label="Street Address"
-              name='streetAddress'
+              name="country"
+              label="Country"
               rules={[{
                 required: true,
-                message: 'Please enter address!'
+                message: 'Please enter country!'
               }]}>
               <Input
-                placeholder="Enter the address of the client"
-                name='address'
+                placeholder="Enter the country"
                 autoComplete="off" />
             </Form.Item>
           </Col>
-        </Row>
-        <Row>
           <Col
             xs={24}
             sm={24}
@@ -114,7 +111,7 @@ const ClientForm = (props: any) => {
                 required: true,
                 message: 'Please enter state!'
               }]}>
-              <Select
+              {/* <Select
                 showSearch
                 placeholder={'Select the state'}
                 onChange={setState}
@@ -124,9 +121,15 @@ const ClientForm = (props: any) => {
                     {state?.name}
                   </Select.Option>
                 )}
-              </Select>
+              </Select> */}
+
+              <Input
+                placeholder="Enter the state"
+                name='state'
+                autoComplete="off" />
             </Form.Item>
           </Col>
+
           <Col
             xs={24}
             sm={24}
@@ -140,7 +143,7 @@ const ClientForm = (props: any) => {
                 required: true,
                 message: 'Please enter city!'
               }]}>
-              <Select
+              {/* <Select
                 showSearch
                 placeholder={'Select the city'}>
                 {cities?.map((city: string, index: number) =>
@@ -148,11 +151,33 @@ const ClientForm = (props: any) => {
                     {city}
                   </Select.Option>
                 )}
-              </Select>
+              </Select> */}
+              <Input
+                placeholder="Enter the city "
+                name='city'
+                autoComplete="off" />
             </Form.Item>
           </Col>
-        </Row>
-        <Row>
+          <Col
+            xs={24}
+            sm={24}
+            md={12}
+            lg={12}
+            className={styles.formCol}>
+            <Form.Item
+              label="Street Address"
+              name='streetAddress'
+              rules={[{
+                required: true,
+                message: 'Please enter address!'
+              }]}>
+              <Input
+                placeholder="Enter the address of the client"
+                name='address'
+                autoComplete="off" />
+            </Form.Item>
+          </Col>
+
           <Col
             xs={24}
             sm={24}
@@ -168,6 +193,27 @@ const ClientForm = (props: any) => {
               }]}>
               <Input
                 placeholder="Enter the zipcode"
+                autoComplete="off" />
+            </Form.Item>
+          </Col>
+
+          <Col
+            xs={24}
+            sm={24}
+            md={12}
+            lg={12}
+            className={styles.formCol}>
+            <Form.Item
+              label="Contact Number"
+              name='phone'
+
+              rules={[{
+                required: true,
+                message: 'Please enter contact Number!'
+              }]}>
+              <Input
+                type='number'
+                placeholder="Enter the contact number"
                 autoComplete="off" />
             </Form.Item>
           </Col>

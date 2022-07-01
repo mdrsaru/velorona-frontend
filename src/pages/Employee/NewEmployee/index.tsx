@@ -189,7 +189,7 @@ const NewEmployee = () => {
     }
   })
   const onSubmitForm = (values: any) => {
-   
+
     userCreate({
       variables: {
         input: {
@@ -201,8 +201,9 @@ const NewEmployee = () => {
           status: values.status,
           company_id: authData?.company?.id as string,
           roles: [values?.roles],
-          type:values?.type,
+          type: values?.type,
           address: {
+            country: values.country,
             streetAddress: values.streetAddress,
             state: values.state,
             city: values.city,
@@ -323,6 +324,24 @@ const NewEmployee = () => {
               xs={24}
               sm={24}
               md={8}
+              lg={8}
+              className={styles.formCol}>
+              <Form.Item
+                name="country"
+                label="Country"
+                rules={[{
+                  required: true,
+                  message: 'Please enter country!'
+                }]}>
+                <Input
+                  placeholder="Enter the country"
+                  autoComplete="off" />
+              </Form.Item>
+            </Col>
+            <Col
+              xs={24}
+              sm={24}
+              md={8}
               lg={8}>
               <Form.Item
                 label="State"
@@ -331,15 +350,10 @@ const NewEmployee = () => {
                   required: true,
                   message: 'Please enter your state!'
                 }]}>
-                <Select
-                  showSearch
-                  placeholder={'Select the state'} onChange={setState}>
-                  {USA_STATES?.map((state: any, index: number) =>
-                    <Select.Option value={state?.name} key={index}>
-                      {state?.name}
-                    </Select.Option>
-                  )}
-                </Select>
+                <Input
+                  placeholder="Enter the state"
+                  name='state'
+                  autoComplete="off" />
               </Form.Item>
             </Col>
             <Col
@@ -354,15 +368,10 @@ const NewEmployee = () => {
                   required: true,
                   message: 'Please enter your city!'
                 }]}>
-                <Select
-                  showSearch
-                  placeholder={'Select the city'}>
-                  {cities?.map((city: string, index: number) =>
-                    <Select.Option value={city} key={index}>
-                      {city}
-                    </Select.Option>
-                  )}
-                </Select>
+                <Input
+                  placeholder="Enter the city "
+                  name='city'
+                  autoComplete="off" />
               </Form.Item>
             </Col>
             <Col
@@ -383,7 +392,7 @@ const NewEmployee = () => {
                   autoComplete="off" />
               </Form.Item>
             </Col>
-            <Col xs={24} sm={24} md={12} lg={12}>
+            <Col xs={24} sm={24} md={8} lg={8}>
               <Form.Item
                 label="Apartment/Suite"
                 name='apartment'>
@@ -393,7 +402,7 @@ const NewEmployee = () => {
                   autoComplete="off" />
               </Form.Item>
             </Col>
-            <Col xs={24} sm={24} md={12} lg={12}>
+            <Col xs={24} sm={24} md={8} lg={8}>
               <Form.Item
                 label="Zip Code"
                 name='zipcode'
@@ -419,7 +428,7 @@ const NewEmployee = () => {
                   required: true,
                   message: 'Please enter role!'
                 }]}>
-                <Select placeholder="Employee">
+                <Select placeholder="Select Role">
                   {roles_user?.map((role: any, index: number) => (
                     <Option value={role?.value} key={index}>
                       {role?.name}
@@ -428,7 +437,7 @@ const NewEmployee = () => {
                 </Select>
               </Form.Item>
             </Col>
-           
+
             <Col
               xs={24}
               sm={24}
@@ -444,7 +453,7 @@ const NewEmployee = () => {
                 <Select placeholder="Select status">
                   <Option value="Active">Active</Option>
                   <Option value="Inactive">In Active</Option>
-                 
+
                 </Select>
               </Form.Item>
             </Col>

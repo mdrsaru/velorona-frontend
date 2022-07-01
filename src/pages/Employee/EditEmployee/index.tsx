@@ -15,7 +15,7 @@ import moment from "moment";
 import type { UploadProps } from "antd";
 
 import constants from '../../../config/constants'
-import {  useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery } from '@apollo/client'
 import { notifyGraphqlError } from '../../../utils/error'
 import { IRole } from '../../../interfaces/IRole'
@@ -126,7 +126,7 @@ const EditEmployee = () => {
     name: "file",
     action: `${constants.apiUrl}/v1/media/upload`,
     maxCount: 1,
-    accept:'image/*',
+    accept: 'image/*',
     headers: {
       authorization: authData?.token ? `Bearer ${authData?.token}` : "",
     },
@@ -149,6 +149,7 @@ const EditEmployee = () => {
       let address: any = {};
       for (let data in values) {
         if (
+          data === "country" ||
           data === "streetAddress" ||
           data === "state" ||
           data === "city" ||
@@ -210,6 +211,8 @@ const EditEmployee = () => {
               phone: userData?.User?.data[0]?.phone ?? "",
               roles: userData?.User?.data[0]?.roles[0]?.id ?? "",
               status: userData?.User?.data[0]?.status ?? "",
+              country:
+              userData?.User?.data[0]?.address?.country ?? "",
               streetAddress:
                 userData?.User?.data[0]?.address?.streetAddress ?? "",
               startDate: moment(
@@ -311,6 +314,20 @@ const EditEmployee = () => {
               <Col className={styles["form-header"]}>
                 <p>Address</p>
               </Col>
+              <Col
+                xs={24}
+                sm={24}
+                md={8}
+                lg={8}
+                className={styles.formCol}>
+                <Form.Item
+                  name="country"
+                  label="Country">
+                  <Input
+                    placeholder="Enter the country"
+                    autoComplete="off" />
+                </Form.Item>
+              </Col>
               <Col xs={24} sm={24} md={8} lg={8}>
                 <Form.Item
                   label="State"
@@ -322,17 +339,10 @@ const EditEmployee = () => {
                     },
                   ]}
                 >
-                  <Select
-                    showSearch
-                    placeholder={"Select the state"}
-                    onChange={setState}
-                  >
-                    {USA_STATES?.map((state: any, index: number) => (
-                      <Select.Option value={state?.name} key={index}>
-                        {state?.name}
-                      </Select.Option>
-                    ))}
-                  </Select>
+                  <Input
+                    placeholder="Enter the state"
+                    name='state'
+                    autoComplete="off" />
                 </Form.Item>
               </Col>
               <Col xs={24} sm={24} md={8} lg={8}>
@@ -346,13 +356,10 @@ const EditEmployee = () => {
                     },
                   ]}
                 >
-                  <Select showSearch placeholder={"Select the city"}>
-                    {cities?.map((city: string, index: number) => (
-                      <Select.Option value={city} key={index}>
-                        {city}
-                      </Select.Option>
-                    ))}
-                  </Select>
+                    <Input
+                  placeholder="Enter the city "
+                  name='city'
+                  autoComplete="off" />
                 </Form.Item>
               </Col>
               <Col xs={24} sm={24} md={8} lg={8}>
@@ -372,7 +379,7 @@ const EditEmployee = () => {
                   />
                 </Form.Item>
               </Col>
-              <Col xs={24} sm={24} md={12} lg={12}>
+              <Col xs={24} sm={24} md={8} lg={8}>
                 <Form.Item label="Apartment/Suite" name="aptOrSuite">
                   <Input
                     placeholder="Enter your apartment no"
@@ -380,7 +387,7 @@ const EditEmployee = () => {
                   />
                 </Form.Item>
               </Col>
-              <Col xs={24} sm={24} md={12} lg={12}>
+              <Col xs={24} sm={24} md={8} lg={8}>
                 <Form.Item label="Zip Code" name="zipcode">
                   <Input placeholder="Enter the zipcode" autoComplete="off" />
                 </Form.Item>

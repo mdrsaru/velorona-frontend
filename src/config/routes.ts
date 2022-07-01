@@ -256,10 +256,17 @@ const routes = {
     key: 'clients'
   },
   editClient: {
-    childPath: ':cid',
-    path: (id: string, cid: string) => `/${id}/clients/${cid}`,
+    childPath: ':cid/edit',
+    path: (id: string, cid: string) => `/${id}/clients/${cid}/edit`,
     component: lazy(() => import('../pages/Client/EditClient')),
     name: 'Edit Client',
+    key: 'clients'
+  },
+  viewClient: {
+    childPath: ':cid',
+    path: (id: string, cid: string) => `/${id}/clients/${cid}`,
+    component: lazy(() => import('../pages/Client/ClientDetail')),
+    name: 'View Client',
     key: 'clients'
   },
   newTimesheet: {

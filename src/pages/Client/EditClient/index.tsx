@@ -12,6 +12,8 @@ import { CLIENT } from "../index";
 import styles from "../style.module.scss";
 import { STATE_CITIES, USA_STATES } from "../../../utils/cities";
 import { GraphQLResponse } from "../../../interfaces/graphql.interface";
+// import { debounce } from "lodash";
+// import { data } from "../../../utils/dummyData";
 
 
 export const CLIENT_UPDATE = gql`
@@ -61,18 +63,15 @@ const EditClient = () => {
 
   const onSubmitForm = (values: any) => {
     let key = 'message';
-    message.loading({
-      content: "Client updating in progress..",
-      key,
-      className: 'custom-message'
-    });
     clientUpdate({
       variables: {
         input: {
           id: params?.cid as string,
           name: values.name,
           company_id: authData?.company?.id as string,
+          phone: values?.phone,
           address: {
+            country: values?.country,
             streetAddress: values.streetAddress,
             state: values.state,
             city: values.city,
@@ -122,10 +121,12 @@ const EditClient = () => {
               initialValues={{
                 email: userData?.Client?.data[0]?.email ?? '',
                 name: userData?.Client?.data[0]?.name ?? '',
+                country: userData?.Client?.data[0]?.address?.country ?? '',
                 streetAddress: userData?.Client?.data[0]?.address?.streetAddress ?? '',
                 state: userData?.Client?.data[0]?.address?.state ?? '',
                 city: userData?.Client?.data[0]?.address?.city ?? '',
                 zipcode: userData?.Client?.data[0]?.address?.zipcode ?? '',
+                phone: userData?.Client?.data[0]?.phone ?? '',
                 invoiceEmail: userData?.Client?.data[0]?.invoicingEmail ?? ''
               }}>
               <Row>
@@ -169,8 +170,6 @@ const EditClient = () => {
                       disabled />
                   </Form.Item>
                 </Col>
-              </Row>
-              <Row>
                 <Col
                   xs={24}
                   sm={24}
@@ -200,6 +199,24 @@ const EditClient = () => {
                   lg={12}
                   className={styles.formCol}>
                   <Form.Item
+                    name="country"
+                    label="Country"
+                    rules={[{
+                      required: true,
+                      message: 'Please enter country!'
+                    }]}>
+                    <Input
+                      placeholder="Enter the country"
+                      autoComplete="off" />
+                  </Form.Item>
+                </Col>
+                <Col
+                  xs={24}
+                  sm={24}
+                  md={12}
+                  lg={12}
+                  className={styles.formCol}>
+                  <Form.Item
                     label="Street Address"
                     name='streetAddress'
                     rules={[{
@@ -212,8 +229,7 @@ const EditClient = () => {
                       autoComplete="off" />
                   </Form.Item>
                 </Col>
-              </Row>
-              <Row>
+
                 <Col
                   xs={24}
                   sm={24}
@@ -227,15 +243,19 @@ const EditClient = () => {
                       required: true,
                       message: 'Please enter state!'
                     }]}>
-                    <Select
+                    {/* <Select
                       showSearch
                       placeholder={'Select the state'} onChange={setState}>
                       {USA_STATES?.map((state: any, index: number) =>
                         <Select.Option value={state?.name} key={index}>
                           {state?.name}
                         </Select.Option>
-                      )}
-                    </Select>
+                      )} 
+                    </Select> */}
+                    <Input
+                      placeholder="Enter the state "
+                      name='city'
+                      autoComplete="off" />
                   </Form.Item>
                 </Col>
                 <Col
@@ -251,7 +271,7 @@ const EditClient = () => {
                       required: true,
                       message: 'Please enter city!'
                     }]}>
-                    <Select
+                    {/* <Select
                       showSearch
                       placeholder={'Select the city'}>
                       {cities?.map((city: string, index: number) =>
@@ -259,11 +279,14 @@ const EditClient = () => {
                           {city}
                         </Select.Option>
                       )}
-                    </Select>
+                    </Select> */}
+                    <Input
+                      placeholder="Enter the city "
+                      name='city'
+                      autoComplete="off" />
                   </Form.Item>
                 </Col>
-              </Row>
-              <Row>
+
                 <Col
                   xs={24}
                   sm={24}
@@ -279,6 +302,23 @@ const EditClient = () => {
                     }]}>
                     <Input
                       placeholder="Enter the zipcode"
+                      autoComplete="off" />
+                  </Form.Item>
+                </Col>
+
+                <Col
+                  xs={24}
+                  sm={24}
+                  md={12}
+                  lg={12}
+                  className={styles.formCol}>
+                  <Form.Item
+                    label="Contact Number"
+                    name='phone'
+                  >
+                    <Input
+                      type='number'
+                      placeholder="Enter the contact number"
                       autoComplete="off" />
                   </Form.Item>
                 </Col>

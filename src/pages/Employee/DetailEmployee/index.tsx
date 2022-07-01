@@ -45,7 +45,7 @@ const DetailEmployee = () => {
   const [getUserPayRate, { data: userPayRate }] = useLazyQuery<UserPayRatePagingData>(USER_PAY_RATE,
     {
       fetchPolicy: "network-only",
-      nextFetchPolicy:'cache-first',
+      nextFetchPolicy: 'cache-first',
       variables: {
         input: {
           query: {
@@ -130,7 +130,7 @@ const DetailEmployee = () => {
     })
     setViewUserPayRateVisibility(!showViewUserPayRate);
   };
-
+  console.log(userData)
   return (
     <div className={styles["main-div"]}>
       {userData?.User?.data[0] && (
@@ -174,7 +174,7 @@ const DetailEmployee = () => {
                   </div>
                 ) : (
                   <div className={styles["name-tag"]}>
-                    <span>User</span>
+                    <span>{userData?.User?.data[0]?.roles?.[0].name}</span>
                   </div>
                 )}
               </div>
@@ -202,16 +202,87 @@ const DetailEmployee = () => {
                   {userData?.User?.data[0]?.email ?? "N/A"}
                 </span>
               </div>
+            </Col>
+            <Col xs={24} sm={24} md={12} lg={12}>
               <div>
-                <div>Address</div>
+                <div>Phone Number</div>
                 <span className={styles.detailValue}>
-                  {userData?.User?.data[0]?.address?.streetAddress ?? "N/A"}
-                  {userData?.User?.data[0]?.address?.city
-                    ? " ," + userData?.User?.data[0]?.address?.city
-                    : ""}
+                  {userData?.User?.data[0]?.phone ?? "N/A"}
                 </span>
               </div>
-              {/* <div>
+            </Col>
+            <Col xs={24} sm={24} md={12} lg={8}>
+              <div>
+                <div>Country</div>
+                <span className={styles.detailValue}>
+                  {userData?.User?.data[0]?.address?.country ?? "N/A"}
+                </span>
+              </div>
+            </Col>
+            <Col xs={24} sm={24} md={12} lg={8}>
+              <div>
+                <div>State</div>
+                <span className={styles.detailValue}>
+                  {userData?.User?.data[0]?.address?.state ?? "N/A"}
+                </span>
+              </div>
+            </Col>
+            <Col xs={24} sm={24} md={12} lg={8}>
+              <div>
+                <div>City</div>
+                <span className={styles.detailValue}>
+                  {userData?.User?.data[0]?.address?.city ?? "N/A"}
+                </span>
+              </div>
+            </Col>
+
+            <Col xs={24} sm={24} md={12} lg={8}>
+              <div>
+                <div>Street Address</div>
+                <span className={styles.detailValue}>
+                  {userData?.User?.data[0]?.address?.streetAddress ?? "N/A"}
+                </span>
+              </div>
+            </Col>
+            <Col xs={24} sm={24} md={12} lg={8}>
+              <div>
+                <div>Apartment/Suite</div>
+                <span className={styles.detailValue}>
+                  {userData?.User?.data[0]?.address?.aptOrSuite ?? "N/A"}
+                </span>
+              </div>
+            </Col>
+            <Col xs={24} sm={24} md={12} lg={8}>
+              <div>
+                <div>Zip Code</div>
+                <span className={styles.detailValue}>
+                  {userData?.User?.data[0]?.address?.zipcode ?? "N/A"}
+                </span>
+              </div>
+            </Col>
+
+            <Col xs={24} sm={24} md={12} lg={12}>
+
+              <div>
+                <div>Status</div>
+                <span className={styles.detailValue}>
+                  {userData?.User?.data[0]?.status}
+                </span>
+              </div>
+
+            </Col>
+
+            <Col xs={24} sm={24} md={12} lg={12}>
+
+              <div>
+                <div>Type</div>
+                <span className={styles.detailValue}>
+                  {userData?.User?.data[0]?.type ?? 'N/A'}
+                </span>
+              </div>
+
+            </Col>
+            {/* <div>
                 <div>Employee Start Date</div>
                 <span className={styles.detailValue}>
                   {userData?.User?.data[0]?.record?.startDate ? moment(userData?.User?.data[0]?.record?.startDate).format('L') : 'N/A'}
@@ -223,28 +294,8 @@ const DetailEmployee = () => {
                   {userData?.User?.data[0]?.record?.payRate ?? 0}
                 </span>
               </div> */}
-            </Col>
-            <Col xs={24} sm={24} md={12} lg={12}>
-              <div>
-                <div>Phone Number</div>
-                <span className={styles.detailValue}>
-                  {userData?.User?.data[0]?.phone ?? "N/A"}
-                </span>
-              </div>
-              <div>
-                <div>Status</div>
-                <span className={styles.detailValue}>
-                  {userData?.User?.data[0]?.status}
-                </span>
-              </div>
-              {/* <div>
-                <div>Employee End Date</div>
-                <span className={styles.detailValue}>
-                  {userData?.User?.data[0]?.record?.endDate ? moment(userData?.User?.data[0]?.record?.endDate).format('L') : 'N/A'}
-                </span>
-              </div> */}
-            </Col>
-            <Col xs={24} sm={24} md={12} lg={12}>
+
+            <Col xs={24} sm={24} md={24} lg={24}>
               <p
                 className={styles["view-pay-rate"]}
                 onClick={handleViewPayRate}
