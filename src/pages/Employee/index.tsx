@@ -51,6 +51,7 @@ export const USER = gql`
         status
         archived
         avatar_id
+        type
         avatar {
           id
           url
@@ -61,6 +62,7 @@ export const USER = gql`
           name
         }
         address {
+          country
           city
           streetAddress
           zipcode
@@ -112,7 +114,7 @@ export const USER_ARCHIVE = gql`
 `;
 
 const csvHeader: Array<{ label: string, key: string, subKey?: string }> = [
-  { label: "FullName", key: "fullName"},
+  { label: "FullName", key: "fullName" },
   { label: "Email", key: "email" },
   { label: "Address", key: "address", subKey: "streetAddress" },
   { label: "Phone", key: "phone" },

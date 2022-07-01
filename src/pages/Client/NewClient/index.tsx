@@ -48,7 +48,9 @@ const NewClient = () => {
           email: values.email,
           invoicingEmail: values.invoiceEmail,
           company_id: authData?.company?.id as string,
+          phone:values?.phone,
           address: {
+            country:values.country,
             streetAddress: values.streetAddress,
             state: values.state,
             city: values.city,

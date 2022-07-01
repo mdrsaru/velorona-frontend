@@ -102,6 +102,7 @@ const ViewUserPayRate = (props: IProps) => {
             </div>
           </div>,
         ]}
+        cancelButtonProps={{ style: { display: 'none' } }}
         width={869}
         okText="Close"
         onOk={() => setVisibility(false)}

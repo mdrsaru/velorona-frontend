@@ -315,6 +315,15 @@ const _Routes = () => {
                   </Suspense>
                 }
               />
+
+              <Route
+                path={routes.viewClient.childPath}
+                element={
+                  <Suspense fallback={<RouteLoader />}>
+                    <routes.viewClient.component />
+                  </Suspense>
+                }
+              />
             </Route>
 
             <Route path={routes.user.childPath}>

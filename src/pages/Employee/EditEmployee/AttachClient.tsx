@@ -126,7 +126,9 @@ const AttachClient = () => {
           email: values.email,
           invoicingEmail: values.invoiceEmail,
           company_id: authData?.company?.id as string,
+          phone:values.phone,
           address: {
+            country : values.country,
             streetAddress: values.streetAddress,
             state: values.state,
             city: values.city,
@@ -138,14 +140,15 @@ const AttachClient = () => {
       if (response.errors) {
         return notifyGraphqlError((response.errors))
       } else if (response?.data?.ClientCreate) {
-        navigate(routes.employee.path(authData?.company?.code ? authData?.company?.code : ''));
+        console.log('elseif')
+        navigate(routes.user.path(authData?.company?.code ? authData?.company?.code : ''));
         message.success({ content: `Client updated to new employee successfully!`, key, className: 'custom-message' });
       }
     }).catch(notifyGraphqlError)
   }
 
   const cancelAddClient = () => {
-    navigate(routes.employee.path(authData?.company?.code ? authData?.company?.code : ''))
+    navigate(routes.user.path(authData?.company?.code ? authData?.company?.code : ''))
   }
 
   const onChangeClient = (event: any) => {
