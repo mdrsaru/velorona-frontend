@@ -163,7 +163,7 @@ const TimeEntryDetails = (props: IProps) => {
               {
                 weekDays.map((day: any, index: number) => (
                   <th key={index}>
-                    {moment(day).format('ddd, MMM D')}
+                    {moment(day).format('dd, MMM D')}
                   </th>
                 ))
               }
