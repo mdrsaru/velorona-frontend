@@ -66,7 +66,9 @@ const TimesheetInformation = (props: IProps) => {
               Time Period
             </div>
 
-            <div>Mon-Sun</div>
+            <div>
+              {moment(timesheet?.weekStartDate).format('YYYY/MM/DD')} - {moment(timesheet?.weekEndDate).format('YYYY/MM/DD')}
+              </div>
           </div>
 
           <div className={styles['detail-row']}>
