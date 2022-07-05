@@ -15,7 +15,7 @@ const config = {
   userType: {
     SystemAdmin: 'SystemAdmin',
     Company: 'Company'
-  }
+  },
 };
 
 export const roles_user = [{

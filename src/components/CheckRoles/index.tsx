@@ -12,7 +12,7 @@ interface IProps extends RouteProps {
 }
 
 const CheckRoles = (props: IProps) => {
-  const {data: authData} = useQuery(AUTH);
+  const {data: authData } = useQuery(AUTH);
   const location = useLocation();
 
   const isLoggedIn = authData?.isLoggedIn;

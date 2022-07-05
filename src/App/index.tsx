@@ -63,6 +63,7 @@ function App() {
             user: {
               id: response?.data?._id ?? null,
               roles: response?.data?.roles?.map((role: any) => role.name),
+              type: response?.data?.type,
             },
             company: {
               id: response?.data?.company?.id ?? null,
@@ -72,7 +73,7 @@ function App() {
             avatar:{
               id: response?.data?.avatar?.id ?? null,
               url: response?.data?.avatar?.url ?? null,
-            }
+            },
           })}
       })
       .finally(() => {

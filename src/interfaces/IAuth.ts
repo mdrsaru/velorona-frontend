@@ -26,6 +26,7 @@ export interface IToken {
 export interface IAuthUser {
   id: string | null;
   roles: string[];
+  type?: string | null;
 }
 
 export interface ICompanyUser {
@@ -37,6 +38,7 @@ export interface IAvatarUser {
   id: string | null;
   url: string | null;
 }
+
 export interface IAuth {
   token: string | null;
   user: IAuthUser;

@@ -159,7 +159,6 @@ const TimeEntryDetails = (props: IProps) => {
           <thead>
             <tr className={styles['table-header']}>
               <th>Project</th>
-              <th>Task</th>
               {
                 weekDays.map((day: any, index: number) => (
                   <th key={index}>
@@ -177,6 +176,7 @@ const TimeEntryDetails = (props: IProps) => {
               }
             </tr>
           </thead>
+
           <tbody>
             {
               groupedTimeEntries && groupedTimeEntries?.map((group: IGroupedTimeEntries, index: number) => (
@@ -185,9 +185,6 @@ const TimeEntryDetails = (props: IProps) => {
                 >
                   <td className={styles['detail-name']}>
                     {group?.project}
-                  </td>
-                  <td className={styles['detail-name']}>
-                    {group?.name}
                   </td>
 
                   {
@@ -278,7 +275,6 @@ const TimeEntryDetails = (props: IProps) => {
             }
             <tr className={styles['table-total']}>
               <td>Total</td>
-              <td></td>
               {
                 weekDays.map((day: any, index: number) => {
                   const formattedDay = moment(day).format('YYYY-MM-DD');

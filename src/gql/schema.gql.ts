@@ -6,9 +6,24 @@ export const typeDefs = gql`
     token: String
     isLoggedIn: Boolean
     user: User
+    company: Company
+    avatar: Avatar
+    fullName: String
   }
 
   type User {
+    id: String
+    roles: [String]
+    type: String
+  }
+
+  type Avatar {
+    id: String
+    url: String
+  }
+
+  type Company {
+    code: String
     id: String
   }
 
