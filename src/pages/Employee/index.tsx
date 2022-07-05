@@ -52,6 +52,9 @@ export const USER = gql`
         archived
         avatar_id
         type
+        startDate
+        endDate
+        timesheet_attachment
         avatar {
           id
           url
@@ -93,6 +96,7 @@ export const USER_UPDATE = gql`
       phone
       status
       archived
+      timesheet_attachment
       avatar{
         url
         id

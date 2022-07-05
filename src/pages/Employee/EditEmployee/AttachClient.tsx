@@ -140,7 +140,6 @@ const AttachClient = () => {
       if (response.errors) {
         return notifyGraphqlError((response.errors))
       } else if (response?.data?.ClientCreate) {
-        console.log('elseif')
         navigate(routes.user.path(authData?.company?.code ? authData?.company?.code : ''));
         message.success({ content: `Client updated to new employee successfully!`, key, className: 'custom-message' });
       }

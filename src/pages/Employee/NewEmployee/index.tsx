@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { Button, Card, Col, Form, Input, message, Row, Select, Space, Upload } from "antd";
+import { Button, Card, Col, DatePicker, Form, Input, message, Row, Select, Space, Upload } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import constants, { roles_user } from "../../../config/constants";
 
@@ -202,6 +202,9 @@ const NewEmployee = () => {
           company_id: authData?.company?.id as string,
           roles: [values?.roles],
           type: values?.type,
+          startDate: values?.startDate,
+          endDate: values?.endDate,
+          timesheet_attachment: values?.timesheet_attachment,
           address: {
             country: values.country,
             streetAddress: values.streetAddress,
@@ -457,6 +460,46 @@ const NewEmployee = () => {
                 </Select>
               </Form.Item>
             </Col>
+            <Col xs={24} sm={24} md={12} lg={12}>
+              <Form.Item
+                label="Start Date"
+                name='startDate'
+                rules={[{
+                  required: true,
+                  message: 'Please select the start date'
+                }]}>
+                <DatePicker placeholder='Select start date' />
+              </Form.Item>
+            </Col>
+
+            <Col xs={24} sm={24} md={12} lg={12}>
+              <Form.Item
+                label="End Date"
+                name='endDate'
+              >
+                <DatePicker placeholder='Select end date' />
+              </Form.Item>
+            </Col>
+
+            <Col
+              xs={24}
+              sm={24}
+              md={12}
+              lg={12}>
+              <Form.Item
+                name="timesheet_attachment"
+                label="Timesheet Attachment type"
+                rules={[{
+                  required: true,
+                  message: 'Please select timesheet attachment type'
+                }]}>
+                <Select placeholder="Select status">
+                  <Option value={true}>Mandatory</Option>
+                  <Option value={false}>Optional</Option>
+                </Select>
+              </Form.Item>
+            </Col>
+
             <Col
               xs={24}
               sm={24}

@@ -28,6 +28,7 @@ import { notifyGraphqlError } from "../../../utils/error";
 import { GraphQLResponse, UserPayRatePagingData } from "../../../interfaces/graphql.interface";
 import { MutationChangeProfilePictureArgs, QueryUserArgs, User, UserPagingResult } from "../../../interfaces/generated";
 import Loader from "../../../components/Loader";
+import moment from "moment";
 
 const DetailEmployee = () => {
   const navigate = useNavigate();
@@ -130,7 +131,6 @@ const DetailEmployee = () => {
     })
     setViewUserPayRateVisibility(!showViewUserPayRate);
   };
-  console.log(userData)
   return (
     <div className={styles["main-div"]}>
       {userData?.User?.data[0] && (
@@ -261,7 +261,7 @@ const DetailEmployee = () => {
               </div>
             </Col>
 
-            <Col xs={24} sm={24} md={12} lg={12}>
+            <Col xs={24} sm={24} md={12} lg={8}>
 
               <div>
                 <div>Status</div>
@@ -272,7 +272,7 @@ const DetailEmployee = () => {
 
             </Col>
 
-            <Col xs={24} sm={24} md={12} lg={12}>
+            <Col xs={24} sm={24} md={12} lg={8}>
 
               <div>
                 <div>Type</div>
@@ -282,19 +282,32 @@ const DetailEmployee = () => {
               </div>
 
             </Col>
-            {/* <div>
-                <div>Employee Start Date</div>
+            <Col xs={24} sm={24} md={12} lg={8}>
+
+              <div>
+                <div>Timesheet Attachment Type</div>
                 <span className={styles.detailValue}>
-                  {userData?.User?.data[0]?.record?.startDate ? moment(userData?.User?.data[0]?.record?.startDate).format('L') : 'N/A'}
+                  {userData?.User?.data[0]?.timesheet_attachment ? 'Mandatory' : 'Optional'}
                 </span>
               </div>
-              <div>
-                <div>PayRate</div>
-                <span className={styles.detailValue}>
-                  {userData?.User?.data[0]?.record?.payRate ?? 0}
-                </span>
-              </div> */}
 
+            </Col>
+            <Col xs={24} sm={24} md={12} lg={12}>
+              <div>
+                <div>Employee Start Date</div>
+                <span className={styles.detailValue}>
+                  {userData?.User?.data[0]?.startDate ? moment(userData?.User?.data[0]?.startDate).format('L') : 'N/A'}
+                </span>
+              </div>
+            </Col>
+            <Col xs={24} sm={24} md={12} lg={12}>
+              <div>
+                <div>Employee End Date</div>
+                <span className={styles.detailValue}>
+                  {userData?.User?.data[0]?.startDate ? moment(userData?.User?.data[0]?.startDate).format('L') : 'N/A'}
+                </span>
+              </div>
+            </Col>
             <Col xs={24} sm={24} md={24} lg={24}>
               <p
                 className={styles["view-pay-rate"]}

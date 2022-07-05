@@ -46,7 +46,6 @@ const EditAttachedTimesheet = (props: IProps) => {
         id: null,
         name: "",
     });
-    console.log(props?.data)
     const [getAttachedTimesheet] = useLazyQuery(ATTACHED_TIMESHEET, {
         fetchPolicy: "network-only",
         nextFetchPolicy: "cache-first",
