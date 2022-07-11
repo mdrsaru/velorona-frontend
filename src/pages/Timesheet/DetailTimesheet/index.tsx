@@ -125,16 +125,11 @@ export const TIME_SHEET = gql`
     timesheet {
       id
     }
-    task {
-      id
-      name
-    }
+    project_id
     project {
       id
       name
     }
-    task_id
-
   }
 
 `
@@ -429,7 +424,7 @@ const DetailTimesheet = () => {
       byInvoice.forEach((byInv) => {
         const _invoiced: InvoicedTimeEntries = {
           invoice_id: byInv.invoice_id,
-          group: groupEntriesByTask(byInv.entries),
+          group: groupEntriesByProject(byInv.entries),
         };
 
         invoiced.push(_invoiced);
@@ -443,9 +438,9 @@ const DetailTimesheet = () => {
 
       setInvoicedTimeEntries(invoiced);
       setEntriesByStatus({
-        approved: groupEntriesByTask(approvedTimeEntries),
-        pending: groupEntriesByTask(pendingTimeEntries),
-        rejected: groupEntriesByTask(rejectedTimeEntries),
+        approved: groupEntriesByProject(approvedTimeEntries),
+        pending: groupEntriesByProject(pendingTimeEntries),
+        rejected: groupEntriesByProject(rejectedTimeEntries),
       })
 
       getProject({
@@ -463,6 +458,8 @@ const DetailTimesheet = () => {
       }).then(r => { })
     }
   })
+
+  console.log(entriesByStatus, 'entries')
 
   const onSubmitTimesheet = () => {
     submitTimesheet({
@@ -565,10 +562,9 @@ const DetailTimesheet = () => {
   const onSubmitAttachedTimesheet = () => {
 
   }
+
   const menu = (data: any) => (
     <Menu>
-
-
       <Menu.Item key="edit">
         <div onClick={() => {
           setEditAttachedVisibility(true);
@@ -1036,7 +1032,7 @@ const DetailTimesheet = () => {
   )
 }
 
-function groupEntriesByTask(entries: TimeEntry[]) {
+function groupEntriesByProject(entries: TimeEntry[]) {
   function groupByStartDate(array: any) {
     const startDateFn = (entry: any) => moment(entry?.startTime).format('ddd, MMM D');
     return groupBy(array, startDateFn);
@@ -1044,14 +1040,13 @@ function groupEntriesByTask(entries: TimeEntry[]) {
 
   let grouped: any = [];
 
-  const tasks = groupBy(entries, 'task_id');
+  const projects = groupBy(entries, 'project_id');
 
-  for (const [key, _entries] of Object.entries(tasks)) {
+  for (const [key, _entries] of Object.entries(projects)) {
     grouped.push({
       id: key,
-      name: _entries[0]?.task?.name,
       project: _entries[0]?.project?.name,
-      project_id: _entries[0]?.project?.id,
+      project_id: key,
       entries: groupByStartDate(_entries)
     });
   }

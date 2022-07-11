@@ -189,6 +189,22 @@
 
   }
 
+  .entry-length {
+    font-size: 13px !important;
+    padding-right: 1rem;
+
+    p {
+      padding: 0.2rem;
+      border-radius: 5px;
+      cursor: pointer;
+      background-color: var(--blue-1);
+
+      &:hover {
+        background-color: var(--blue-2);
+      }
+    }
+  }
+
 
   div.task-name>div:first-child {
     font-size: 13px;
@@ -260,7 +276,7 @@
   box-shadow: 0 7px 4px rgba(231, 231, 231, 0.25);
 }
 
-.task-col {
+.description-col {
   padding: 1.5rem;
   border-top: 1px solid #E0E0E0;
   box-sizing: border-box;
@@ -506,7 +522,7 @@
   background: var(--gray-2);
 }
 
-.timesheet-task {
+.timesheet-description {
   background-color: var(--gray-2);
   font-weight: 600;
   font-size: 18px;

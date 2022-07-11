@@ -43,7 +43,10 @@ const NewProject = () => {
   const navigate = useNavigate();
   const loggedInUser = authVar();
   const { Option } = Select;
-  const [projectCreate] = useMutation<GraphQLResponse<'ProjectCreate',Project>,MutationProjectCreateArgs>(PROJECT_CREATE);
+  const [projectCreate] = useMutation<
+    GraphQLResponse<'ProjectCreate',
+    Project>,MutationProjectCreateArgs
+  >(PROJECT_CREATE);
 
   const { data: clientData } = useQuery<GraphQLResponse<'Client',ClientPagingResult>,QueryClientArgs>(CLIENT, {
     fetchPolicy: "network-only",
@@ -79,12 +82,12 @@ const NewProject = () => {
       if (response.errors) {
         return notifyGraphqlError((response.errors))
       } else if (response?.data?.ProjectCreate) {
-        navigate(routes.addTasksProject.path(loggedInUser?.company?.code ?? '', response?.data?.ProjectCreate?.id ?? ''))
         message.success({
           content: `New Project is created successfully!`,
           key,
           className: 'custom-message'
         });
+        navigate(routes.projects.path(loggedInUser?.company?.code ?? ''))
       }
     }).catch(notifyGraphqlError)
   }

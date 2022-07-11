@@ -14,7 +14,8 @@ const auth: IAuth = {
   token: null,
   user: {
     roles: [],
-    id: null
+    id: null,
+    type: null,
   },
   isLoggedIn: false,
   company: {
@@ -25,7 +26,7 @@ const auth: IAuth = {
     id: '',
     url: null
   },
-  fullName:null
+  fullName: null,
 };
 
 const sidebar = {

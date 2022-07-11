@@ -7,6 +7,7 @@ interface IProps {
   hours: any;
   minutes: any;
   seconds: any;
+  disabled?: boolean;
 }
 
 const TimerCard = (props: IProps) => {
@@ -26,12 +27,16 @@ const TimerCard = (props: IProps) => {
           <Button
             type="primary"
             htmlType="submit"
-            danger>
+            danger
+            disabled={props.disabled}
+          >
             Stop {title ?? ''}
           </Button> :
           <Button
             type="primary"
-            htmlType="submit">
+            htmlType="submit"
+            disabled={props.disabled}
+          >
             Start {title ?? ''}
           </Button>}
       </div>

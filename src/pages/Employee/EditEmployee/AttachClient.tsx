@@ -168,7 +168,7 @@ const AttachClient = () => {
         return notifyGraphqlError((response.errors))
       } else if (response?.data?.UserClientAssociate) {
         message.success(`Client is associated with employee successfully!`).then(r => { });
-        navigate(routes.employee.path(authData?.company?.code ?? ''));
+        navigate(routes.user.path(authData?.company?.code ?? ''));
       }
     }).catch(notifyGraphqlError)
   }

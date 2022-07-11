@@ -22,6 +22,7 @@ const LOGIN = gql`
         id
         token
         refreshToken
+        type
         company {
           id
           companyCode
@@ -64,6 +65,7 @@ const Login = () => {
         user: {
           id: loginData?.id,
           roles,
+          type: loginData?.type,
         },
         company: {
           id: loginData?.company?.id ?? '',

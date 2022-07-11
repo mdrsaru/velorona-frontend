@@ -11,7 +11,7 @@ import { notifyGraphqlError } from "../../../utils/error";
 import { authVar } from "../../../App/link";
 
 import routes from "../../../config/routes";
-import { MutationChangeProfilePictureArgs, MutationUserCreateArgs, User, UserPagingResult, UserType } from "../../../interfaces/generated";
+import { MutationChangeProfilePictureArgs, MutationUserCreateArgs, User, UserPagingResult, EntryType } from "../../../interfaces/generated";
 import { USER } from "../index";
 import { STATE_CITIES, USA_STATES } from "../../../utils/cities";
 
@@ -107,7 +107,7 @@ const NewEmployee = () => {
   const redirectTo = (role: string, user: string) => {
     role === constants?.roles?.Employee ?
       navigate(routes.attachClient.path(authData?.company?.code ?? "", user ?? "")) :
-      navigate(routes.employee.path(authData?.company?.code ?? ''));
+      navigate(routes.user.path(authData?.company?.code ?? ''));
     message.success({
       content: `New User is created successfully!`,
       className: 'custom-message'
@@ -513,8 +513,8 @@ const NewEmployee = () => {
                   message: 'Please select the user type'
                 }]}>
                 <Select placeholder="Select status">
-                  <Option value={UserType.Timesheet}>{UserType.Timesheet}</Option>
-                  <Option value={UserType.Cico}>{UserType.Cico}</Option>
+                  <Option value={EntryType.Timesheet}>{EntryType.Timesheet}</Option>
+                  <Option value={EntryType.Cico}>Checkin-Checkout</Option>
                 </Select>
               </Form.Item>
             </Col>
