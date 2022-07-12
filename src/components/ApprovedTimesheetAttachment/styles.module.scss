@@ -1,0 +1,17 @@
+.close-icon-div {
+  background: var(--black);
+  color: var(--white);
+  opacity: 0.5;
+}
+
+.close-icon-div:hover {
+  background: var(--black);
+  color: var(--white);
+  opacity: 0.5;
+}
+
+.attachment {
+  width: 100%;
+  object-fit: contain;
+  max-height: 80vh;
+}
