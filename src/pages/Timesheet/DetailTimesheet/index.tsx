@@ -125,10 +125,6 @@ export const TIME_SHEET = gql`
     timesheet {
       id
     }
-    task {
-      id
-      name
-    }
     project {
       id
       name
@@ -1049,7 +1045,6 @@ function groupEntriesByTask(entries: TimeEntry[]) {
   for (const [key, _entries] of Object.entries(tasks)) {
     grouped.push({
       id: key,
-      name: _entries[0]?.task?.name,
       project: _entries[0]?.project?.name,
       project_id: _entries[0]?.project?.id,
       entries: groupByStartDate(_entries)

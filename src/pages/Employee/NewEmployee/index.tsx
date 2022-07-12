@@ -11,7 +11,7 @@ import { notifyGraphqlError } from "../../../utils/error";
 import { authVar } from "../../../App/link";
 
 import routes from "../../../config/routes";
-import { MutationChangeProfilePictureArgs, MutationUserCreateArgs, User, UserPagingResult, UserType } from "../../../interfaces/generated";
+import { MutationChangeProfilePictureArgs, MutationUserCreateArgs, User, UserPagingResult } from "../../../interfaces/generated";
 import { USER } from "../index";
 import { STATE_CITIES, USA_STATES } from "../../../utils/cities";
 
@@ -470,8 +470,8 @@ const NewEmployee = () => {
                   message: 'Please select the user type'
                 }]}>
                 <Select placeholder="Select status">
-                  <Option value={UserType.Timesheet}>{UserType.Timesheet}</Option>
-                  <Option value={UserType.Cico}>{UserType.Cico}</Option>
+                  <Option value='Timesheet'>Timesheet</Option>
+                  <Option value='Cico'>Cico</Option>
                 </Select>
               </Form.Item>
             </Col>

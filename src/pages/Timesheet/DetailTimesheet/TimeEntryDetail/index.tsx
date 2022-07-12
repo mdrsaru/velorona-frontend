@@ -151,7 +151,6 @@ const TimeEntryDetails = (props: IProps) => {
       total
     });
   }
-
   return (
     <>
       <div className={styles['detail-table']}>

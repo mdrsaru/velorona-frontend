@@ -86,10 +86,6 @@ export const TIME_ENTRY = gql`
                 duration
                 clientLocation
                 task_id
-                task {
-                    id 
-                    name
-                }
                 company {
                     id
                     name

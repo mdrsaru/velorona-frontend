@@ -130,7 +130,6 @@ const DetailEmployee = () => {
     })
     setViewUserPayRateVisibility(!showViewUserPayRate);
   };
-  console.log(userData)
   return (
     <div className={styles["main-div"]}>
       {userData?.User?.data[0] && (

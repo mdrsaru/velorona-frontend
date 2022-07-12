@@ -1,19 +1,25 @@
+:global {
+  :local(.main-div) {
+    .ant-card-grid {
+      padding: 0.8rem 1rem 0.8rem 1rem;
+      box-shadow: none;
+    }
+  }
+}
+
+.schedule-list {
+  @media screen and (min-width: 700px) {
+    display: flex;
+  }
+  .schedule-col {
+    @media screen and (min-width: 700px) {
+      width: 25%;
+    }
+  }
+}
+
 .main-div {
   padding: 2rem 0 2rem 0;
-
-  .date {
-    cursor: pointer;
-    color: var(--primary-blue);
-    font-weight: 600;
-  }
-
-  .add-new-schedule {
-    float: right;
-    font-weight: 600;
-    font-size: 18px;
-    line-height: 22px;
-    color: var(--primary-blue);
-  }
 
   .schedule-header {
     margin: 1rem 1.5rem 1rem 0;
@@ -54,7 +60,7 @@
         font-size: 13px;
       }
     }
-
+    
     @media screen and (max-width: 1508px) {
       .schedule-status {
         width: 100%;
@@ -65,6 +71,7 @@
         font-size: 13px;
       }
     }
+
   }
 
   .gridStyle {
@@ -83,7 +90,7 @@
     cursor: pointer;
     background: var(--white);
     margin: 1.5rem 1.5rem 1rem 0;
-    border: 1px solid #bdbdbd;
+    border: 1px solid #BDBDBD;
     box-sizing: border-box;
     box-shadow: 0 7px 4px rgba(231, 231, 231, 0.25);
   }
@@ -105,7 +112,7 @@
   font-size: 14px;
   line-height: 17px;
 
-  div {
+  div  {
     margin-bottom: 0.3rem;
   }
 }

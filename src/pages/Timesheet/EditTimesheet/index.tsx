@@ -200,7 +200,6 @@ const EditTimeSheet = (props: IProps) => {
                         label={`Task`}>
                         <Input
                           placeholder="task name"
-                          defaultValue={entry?.task?.name}
                           disabled />
                       </Form.Item>
                     </Col>

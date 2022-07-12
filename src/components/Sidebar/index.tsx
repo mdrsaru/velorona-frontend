@@ -111,13 +111,13 @@ const Sidebar = (props: any) => {
       route: routes.timesheet.path(loggedInUser?.company?.code ?? ''),
       accessRoles: [constants.roles.Employee]
     },
-    // {
-    //   key: routes.schedule.key,
-    //   name: routes.schedule.name,
-    //   icon: <ScheduleOutlined />,
-    //   route: routes.schedule.path(loggedInUser?.company?.code ?? ''),
-    //   accessRoles: [constants.roles.Employee]
-    // },
+    {
+      key: routes.employeeSchedule.key,
+      name: routes.employeeSchedule.name,
+      icon: <ScheduleOutlined />,
+      route: routes.employeeSchedule.path(loggedInUser?.company?.code ?? ''),
+      accessRoles: [constants.roles.Employee]
+    },
     {
       key: routes.projects.key,
       name: routes.projects.name,
@@ -139,13 +139,13 @@ const Sidebar = (props: any) => {
       route: routes.employeeTimesheet.path(loggedInUser?.company?.code ?? ''),
       accessRoles: [constants.roles.CompanyAdmin, constants.roles.TaskManager]
     },
-    // {
-    //   key: routes.schedule.key,
-    //   name: routes.schedule.name,
-    //   icon: <ScheduleOutlined />,
-    //   route: routes.schedule.path(loggedInUser?.company?.code ?? ''),
-    //   accessRoles: [constants.roles.Employee]
-    // }
+    {
+      key: routes.schedule.key,
+      name: routes.schedule.name,
+      icon: <ScheduleOutlined />,
+      route: routes.schedule.path(loggedInUser?.company?.code ?? ''),
+      accessRoles: [constants.roles.CompanyAdmin]
+    }
   ]
   const menuArray = menuItems.filter(menu => { return loggedInUser?.user?.roles?.some(role => menu.accessRoles.includes(role)) })
   // const selectedMenuKey = menuKeys.find(key => key.split('/')?.[1] === location.pathname?.split('/')?.[1]) ?? '';
