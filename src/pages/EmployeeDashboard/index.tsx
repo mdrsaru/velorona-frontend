@@ -1,17 +1,17 @@
 import React from "react";
-import { Col, Row } from "antd";
+import {Col, Row, Typography} from "antd";
+import { gql, useQuery } from "@apollo/client";
+import moment from "moment";
 import employeesImg from "../../assets/images/employees.svg";
 import clientsImg from "../../assets/images/clients.svg";
 import projectsImg from "../../assets/images/projects.svg";
 import DashboardCount from "../../components/Dashboard/DashboardCount";
 import { IDashboardCount } from "../../interfaces/IDashboard";
 import AverageHours from "../../components/Dashboard/AverageHours";
-import TotalExpenses from "../../components/Dashboard/TotalExpenses";
 import ActivityLog from "../../components/Dashboard/ActivityLog";
-import { gql, useQuery } from "@apollo/client";
 import { authVar } from "../../App/link";
 import { TIME_WEEKLY } from "../Timesheet";
-import moment from "moment";
+import styles from "./styles.module.scss";
 
 
 export const COUNT = gql`
@@ -24,7 +24,7 @@ query Count($totalDurationInput: TotalDurationCountInput!, $projectInvolvedInput
 `
 const EmployeeDashboard = () => {
 
-    const authData = authVar()
+    const authData = authVar();
 
     const { data: overallCount } = useQuery(
         COUNT,
@@ -89,27 +89,72 @@ const EmployeeDashboard = () => {
             count: totalHour as number,
             icon: employeesImg
         },
-        // {
-        //     title: 'Projects Involved',
-        //     count: overallCount?.ProjectInvolvedCount as number,
-        //     icon: clientsImg
-        // },
-        // {
-        //     title: 'Active Projects',
-        //     count: overallCount?.ActiveProjectInvolvedCount as number,
-        //     icon: projectsImg
-        // },
+        {
+            title: 'Projects Involved',
+            count: overallCount?.ProjectInvolvedCount as number,
+            icon: clientsImg
+        },
+        {
+            title: 'Active Projects',
+            count: overallCount?.ActiveProjectInvolvedCount as number,
+            icon: projectsImg
+        },
     ];
+
+    const hourLogs = [
+      '9:00 AM - 12:00 PM',
+      '1:00 PM - 4:00 PM',
+      '5:00 PM - 12:00 PM'
+    ]
 
     return (
         <div>
-            <DashboardCount data={dashboardCount} />
             <Row>
-                <Col xs={24} lg={12}>
-                    <AverageHours averageHoursData={averageHoursData} title={'Hours Tracked Per Week'} caption={'Jan 2022'} />
+                <Col xs={24} lg={12} className={styles['user-info-col']}>
+                    <Typography.Title level={1} className={styles['margin-zero']}>
+                        Welcome {authData?.fullName}
+                    </Typography.Title>
+                    <Typography.Title level={4} className={styles['margin-zero']}>
+                        Do not forget to track your time and work.
+                    </Typography.Title>
                 </Col>
                 <Col xs={24} lg={12}>
-                    <ActivityLog user_id={authData?.user?.id as string} title={' Time Tracking History'} />
+                    <DashboardCount data={dashboardCount} showIcon={false}/>
+                </Col>
+            </Row>
+            <Row>
+                <Col xs={24} lg={12}>
+                    <div className={styles['schedule-div']}>
+                        <Typography.Title level={3}>Today's Schedule</Typography.Title>
+                        <div className={styles['hour-log-div']}>
+                            <Typography.Title
+                              level={4}
+                              style={{color: 'var(--primary-blue)'}}>
+                                June 12, 2022
+                            </Typography.Title>
+                            <Typography.Text type="secondary">
+                                Monday
+                            </Typography.Text>
+                            <br/>
+                            <div>
+                                {hourLogs.map((log: any, index: number) =>
+                                  <div className={styles['hour-log']}>{log}</div>
+                                )}
+                            </div>
+
+                        </div>
+                    </div>
+                    <AverageHours
+                      averageHoursData={averageHoursData}
+                      title={'Hours Tracked Per Week'}
+                      caption={'Jan 2022'}
+                    />
+                </Col>
+                <Col xs={24} lg={12}>
+                    <ActivityLog
+                      user_id={authData?.user?.id as string}
+                      title={' Time Tracking History'}
+                    />
                 </Col>
             </Row>
         </div>
