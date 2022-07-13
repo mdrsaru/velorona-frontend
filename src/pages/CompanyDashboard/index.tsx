@@ -75,16 +75,15 @@ const CompanyDashboard = () => {
     const startDate = moment(timesheet?.weekStartDate).format('MMM D');
     const endDate = moment(timesheet?.weekEndDate).format('MMM D');
     const hour = secondsToHms(timesheet.duration)
-    averageHoursData.push({
-      label: startDate + ' - ' + endDate,
-      value: hour
-    })
-
     totalExpensesData.push({
       label: startDate + ' - ' + endDate,
       value: timesheet.totalExpense
     })
 
+    return averageHoursData.push({
+      label: startDate + ' - ' + endDate,
+      value: hour
+    })
   })
 
   const dashboardCount: IDashboardCount[] = [

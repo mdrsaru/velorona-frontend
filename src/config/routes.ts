@@ -64,6 +64,13 @@ const routes = {
     name: 'Dashboard',
     key: 'dashboard'
   },
+  taskManagerDashboard: {
+    childPath: ':dashboard',
+    path: (company: string | undefined) => `/${company}`,
+    component: lazy(() => import('../pages/TaskManagerDashboard')),
+    name: 'Dashboard',
+    key: 'dashboard'
+  },
   company: {
     childPath: ':id',
     path: (id: string | undefined) => `/${id}`,

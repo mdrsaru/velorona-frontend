@@ -103,8 +103,8 @@ const TotalExpenses = (props: IProps) => {
         {data?.labels?.length ?
         <Bar options={options} data={data} plugins={[ChartDataLabels]}/>
         :
-<Empty description='No Expense at the moment'/>
-}
+          <Empty description='No Expense at the moment'/>
+        }
       </div>
 
     </>
