@@ -254,8 +254,13 @@ const DetailTimesheet = () => {
     userRoles: roles,
   });
 
-  const canAttachedTimesheet = checkRoles({
+  const canAddAttachedTimesheet = checkRoles({
     expectedRoles: [constants.roles.Employee],
+    userRoles: roles,
+  });
+
+  const canViewAttachedTimesheet = checkRoles({
+    expectedRoles: [constants.roles.Employee, constants.roles.CompanyAdmin],
     userRoles: roles,
   });
   const [approveRejectTimeEntries] = useMutation<
@@ -459,7 +464,6 @@ const DetailTimesheet = () => {
     }
   })
 
-  console.log(entriesByStatus, 'entries')
 
   const onSubmitTimesheet = () => {
     submitTimesheet({
@@ -591,7 +595,7 @@ const DetailTimesheet = () => {
     {
       title: 'Description',
       dataIndex: 'description',
-      width:'30%',
+      width: '30%',
     },
     {
       title: 'Created At',
@@ -613,26 +617,28 @@ const DetailTimesheet = () => {
       }
     },
     {
-      title: "Actions",
+      title: '',
       key: "actions",
       render: (attachedTimesheet: any) => (
         <div
           className={styles["dropdown-menu"]}
           onClick={(event) => event.stopPropagation()}
         >
-          <Dropdown
-            overlay={menu(attachedTimesheet)}
-            trigger={["click"]}
-            placement="bottomRight"
-          >
-            <div
-              className="ant-dropdown-link"
-              onClick={(e) => e.preventDefault()}
-              style={{ paddingLeft: "1rem" }}
+          {canAddAttachedTimesheet &&
+            (<Dropdown
+              overlay={menu(attachedTimesheet)}
+              trigger={["click"]}
+              placement="bottomRight"
             >
-              <MoreOutlined />
-            </div>
-          </Dropdown>
+              <div
+                className="ant-dropdown-link"
+                onClick={(e) => e.preventDefault()}
+                style={{ paddingLeft: "1rem" }}
+              >
+                <MoreOutlined />
+              </div>
+            </Dropdown>
+            )}
         </div>
       ),
     },
@@ -858,7 +864,7 @@ const DetailTimesheet = () => {
         </Spin>
       }
 
-      {canAttachedTimesheet &&
+      {canViewAttachedTimesheet &&
         (<div className={styles['site-card-wrapper']}>
           <Card className={styles['attach-approved-timesheet']}>
             <Collapse accordion defaultActiveKey={['2']}>
@@ -868,11 +874,15 @@ const DetailTimesheet = () => {
                   columns={columns}
                   pagination={false}
                 />
-                <p className={styles['attach-new-timesheet']} onClick={attachNewTimesheet}>
-                  <PlusCircleFilled />
-                  <span style={{ marginLeft: '1rem' }}>  Attach New Timesheet
-                  </span>
-                </p>
+                {canAddAttachedTimesheet &&
+                  <>
+                    <p className={styles['attach-new-timesheet']} onClick={attachNewTimesheet}>
+                      <PlusCircleFilled />
+                      <span style={{ marginLeft: '1rem' }}>  Attach New Timesheet
+                      </span>
+                    </p>
+                  </>
+                }
                 <br />
                 <Row justify={"end"}>
                   <Col className={styles['form-col']}>

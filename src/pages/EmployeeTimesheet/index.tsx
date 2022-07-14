@@ -2,7 +2,7 @@ import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { gql, useLazyQuery, useQuery } from '@apollo/client';
-import { Card, Table, Button, Form, Row, Select, Col, Input } from 'antd';
+import { Card, Table, Button, Form, Row, Select, Col, Input, DatePicker } from 'antd';
 import { DownloadOutlined, SearchOutlined } from '@ant-design/icons';
 
 import { authVar } from '../../App/link';
@@ -57,7 +57,7 @@ const csvHeader: Array<{ label: string, key: string, subKey?: string }> = [
   { label: "Total Expense", key: "totalExpense" },
   { label: "Last Approved", key: "lastApprovedAt" }
 ]
-
+const { RangePicker } = DatePicker;
 const EmployeeTimesheet = () => {
   const authData = authVar();
   const company_id = authData.company?.id as string
@@ -76,7 +76,7 @@ const EmployeeTimesheet = () => {
     filter: false,
   });
 
-  
+
   const input: TimesheetQueryInput = {
     paging: {
       skip: pagingInput.skip,
@@ -153,7 +153,7 @@ const EmployeeTimesheet = () => {
 
   const refetchTimesheets = () => {
 
-    let values = filterForm.getFieldsValue(['search', 'role', 'status','date'])
+    let values = filterForm.getFieldsValue(['search', 'role', 'status', 'date'])
 
     let input: {
       paging?: any,
@@ -172,7 +172,7 @@ const EmployeeTimesheet = () => {
     let query: {
       status?: string,
       archived?: boolean,
-      search?:boolean,
+      search?: boolean,
       company_id: string;
       weekStartDate?: Date;
       weekEndDate?: Date;
@@ -189,9 +189,8 @@ const EmployeeTimesheet = () => {
     }
 
     if (values?.date) {
-      const date = values?.date?.split('/')
-      query['weekStartDate'] = date[0]
-      query['weekEndDate'] = date[1]
+      query['weekStartDate'] = values?.date[0]
+      query['weekEndDate'] = values?.date[1]
     }
     input['query'] = query
 
@@ -355,15 +354,7 @@ const EmployeeTimesheet = () => {
               </Col>
               <Col xs={24} xl={8}>
                 <Form.Item name="date" label="">
-                  <Select
-                    placeholder="Date"
-                    onChange={onChangeFilter}
-                  >
-                    {timesheet?.Timesheet?.data?.map((timesheet: any) =>
-                      <Option value={timesheet?.weekStartDate+'/'+timesheet?.weekEndDate} key={timesheet?.id}>
-                        {moment(timesheet?.weekStartDate).format('YYYY/MM/DD')} - {moment(timesheet?.weekEndDate).format('YYYY/MM/DD')}
-                      </Option>)}
-                  </Select>
+                  <RangePicker bordered={false} onChange={onChangeFilter} />
                 </Form.Item>
               </Col>
             </Row>}
