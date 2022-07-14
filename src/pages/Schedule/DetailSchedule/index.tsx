@@ -9,7 +9,7 @@ import moment from "moment";
 import { getWeekDays } from "../../../utils/common";
 import _ from "lodash";
 import { WORKSCHEDULEDETAIL } from "../../EmployeeSchedule";
-import { useState } from "react";
+import {Fragment, useState} from "react";
 import AddSchedule from "../../../components/AddScheduleDetail";
 import AddWorkscheduleEmployee from "../../../components/AddWorkscheduleEmployee";
 import PlusCircleFilled from "@ant-design/icons/lib/icons/PlusCircleFilled";
@@ -87,7 +87,7 @@ const ScheduleDetail = () => {
     const weekDays = getWeekDays(startDate);
 
     const workscheduleDetail = workscheduleDetailData?.WorkscheduleDetail?.data;
-    const group: any = _.groupBy(workscheduleDetail, 'user.fullName') 
+    const group: any = _.groupBy(workscheduleDetail, 'user.fullName')
 
     const handleChange = (id: any) => {
         setWorkscheduleId(id);
@@ -120,80 +120,55 @@ const ScheduleDetail = () => {
                                     <thead>
                                         <tr className={styles['table-header']}>
                                             <th>Employee</th>
-
-                                            {/* {
-                                                weekDays.map((day: any, index: number) => (
-                                                    <>
-                                                        <th key={index}>
-                                                            {moment(day).format('ddd, MMM D')}
-                                                        </th>
-
-                                                    </>
-                                                ))
-                                            } */}
                                             {
-                                                group && Object.keys(group).map(function (key, index) {
-                                                    return (
-                                                        <>
-                                                            {
-                                                                group[key].map((group: any, key: any) => {
-                                                                    return <>
-                                                                        <th key={index}>
-                                                                            {moment(group.date).format('ddd, MMM D')}
-                                                                        </th>
-                                                                    </>
-                                                                })
-                                                            }
-                                                        </>
-                                                    )
-
-                                                })
+                                                weekDays.map((day: any, index: number) => (
+                                                  <th key={index}>
+                                                      {moment(day).format('ddd, MMM D')}
+                                                  </th>
+                                                ))
                                             }
-
                                         </tr>
                                     </thead>
                                     <tbody>
+                                        <td>{group?.[0]?.user?.fullName}</td>
                                         {
-                                            group && Object.keys(group).map(function (key, index) {
-                                                return <>
-                                                    <td>{group[key]?.[0]?.user?.fullName}</td>
-                                                    {group[key].map((group: any, key: any) => {
-
-                                                        return <>
-                                                            {weekDays.map((day: any, index: number) => (
-                                                                group?.workscheduleTimeDetail &&
-                                                                group?.workscheduleTimeDetail.map((timeDetail: any, index: number) => {
-                                                                    const startTime = moment(group.date).format('YYYY-MM-DD')
-                                                                    if (day === startTime) {
-
-                                                                        return <td onClick={() => handleChange(group?.id)}>
-                                                                            {startTime}
-                                                                            {moment(timeDetail?.startTime).format('HH:MM')} - {moment(timeDetail?.endTime).format('HH:MM')}
-                                                                        </td>
-                                                                    }
-                                                                    // else {
-                                                                    //     return <td>
-                                                                    //         -
-                                                                    //     </td>
-                                                                    // }
-                                                                })
-                                                            ))
-                                                            }
-
-                                                        </>
-                                                    })
-                                                    }
-
-                                                </>
-                                            })}
-
+                                            weekDays.map((day: any, index: number) => (
+                                              <td key={index}>
+                                                  {group && group?.map((data: any, index: number) =>
+                                                      <Fragment key={index}>
+                                                          {day === moment(data?.date).format('YYYY-MM-DD') &&
+                                                          data?.workscheduleTimeDetail.length > 0 &&
+                                                            data?.workscheduleTimeDetail?.map((timeData: any,
+                                                                                               index: number) =>
+                                                              <Fragment key={index}>
+                                                                  <span>
+                                                                  {moment(timeData?.startTime).format('HH:MM')} -
+                                                                      {moment(timeData?.endTime).format('HH:MM')}
+                                                                  </span>
+                                                                  <br/>
+                                                              </Fragment>
+                                                          )}
+                                                      </Fragment>
+                                                  )}
+                                                  {!group.some((data: any) =>
+                                                    moment(data?.date).format('YYYY-MM-DD') === day) && <> - </>}
+                                              </td>
+                                            ))
+                                        }
                                     </tbody>
                                     <tfoot>
                                         <td>{employee}</td>
                                     </tfoot>
 
                                 </table>
-                                <p onClick={() => setEmployeeShow(!showEmployee)} className={styles.addEmployee}><span style={{ marginRight: '10px' }}><PlusCircleFilled /></span>Add Employee</p>
+                                <p
+                                  onClick={() => setEmployeeShow(!showEmployee)}
+                                  className={styles.addEmployee}>
+                                    <span style={{ marginRight: '10px' }}>
+                                        <PlusCircleFilled />
+                                    </span>
+                                    Add Employee
+                                </p>
                             </div>
 
                         </Col>
