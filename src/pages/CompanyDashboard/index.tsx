@@ -89,7 +89,7 @@ const CompanyDashboard = () => {
 
   const dashboardCount: IDashboardCount[] = [
     {
-      title: 'Employees',
+      title: 'Users',
       count: overallCount?.UserCount as number,
       icon: employeesImg
     },

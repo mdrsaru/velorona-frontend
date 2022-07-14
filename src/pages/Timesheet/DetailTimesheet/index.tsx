@@ -191,7 +191,6 @@ export const ATTACHED_TIMESHEET_DELETE = gql`
   mutation AttachedTimesheetDelete($input: DeleteInput!) {
     AttachedTimesheetDelete(input: $input) {
       id
-     totalCost
     }
   }
 `;
