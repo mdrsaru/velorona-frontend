@@ -283,6 +283,13 @@ const routes = {
     name: 'Detail Timesheet',
     key: 'timesheet'
   },
+  subscription: {
+    childPath: 'subscriptions',
+    path: (code: string) => `/${code}/subscriptions`,
+    component: lazy(() => import('../pages/Subscription')),
+    name: 'Subscriptions',
+    key: 'subscriptions'
+  },
 };
 
 export default routes;

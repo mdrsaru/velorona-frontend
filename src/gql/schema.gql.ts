@@ -1,5 +1,5 @@
 import { gql } from '@apollo/client';
-import { authVar, sidebarVar } from '../App/link';
+import { authVar, sidebarVar, plansVar } from '../App/link';
 
 export const typeDefs = gql`
   type AuthUser {
@@ -31,9 +31,18 @@ export const typeDefs = gql`
     collapesed: Boolean
   }
 
+  type Plan {
+    name: String
+    description: String
+    price: String
+    features: [String]
+    subscriptionStatus: String
+  }
+
   extend type Query {
     AuthUser: AuthUser
     Sidebar: Sidebar
+    Plans: [Plan]
   }
 `
 
@@ -46,6 +55,11 @@ export const fieldPolicy = {
   Sidebar: {
     read() {
       return sidebarVar();
+    },
+  },
+  Plans: {
+    read() {
+      return plansVar();
     },
   },
 };

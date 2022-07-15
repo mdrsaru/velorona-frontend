@@ -1,0 +1,31 @@
+.stripe {
+  input,
+  .StripeElement {
+    display: block;
+    margin: 10px 0 20px 0;
+    max-width: 500px;
+    padding: 20px 14px;
+    font-size: 1em;
+    font-family: 'Montserrat';
+    border: 0;
+    outline: 0;
+    border-radius: 4px;
+    background: #F2F2F2;
+  }
+
+  input::placeholder {
+    color: red;
+  }
+
+  .StripeElement.IdealBankElement,
+  .StripeElement.FpxBankElement,
+  .StripeElement.PaymentRequestButton {
+    padding: 0;
+  }
+
+  input {
+    font-weight: 600 !important;
+  }
+
+}
+
