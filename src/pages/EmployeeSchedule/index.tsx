@@ -23,6 +23,7 @@ WorkscheduleDetail(input:$input){
       workschedule{
         payrollAllocatedHours
 		    payrollUsageHours
+		    startDate
       }
 			user_id
 			user{

@@ -1,19 +1,18 @@
-
-import { Card, Col, Row, } from "antd";
-
-import styles from "./style.module.scss";
-import PageHeader from "../../../components/PageHeader";
-import { useParams } from "react-router-dom";
-import { gql, useLazyQuery, useQuery } from "@apollo/client";
-import moment from "moment";
-import { getWeekDays } from "../../../utils/common";
-import _ from "lodash";
-import { WORKSCHEDULEDETAIL } from "../../EmployeeSchedule";
 import {Fragment, useState} from "react";
+import {useParams} from "react-router-dom";
+import {Card, Col, Dropdown, Menu, Row,} from "antd";
+import PlusCircleFilled from "@ant-design/icons/lib/icons/PlusCircleFilled";
+import { gql, useLazyQuery, useQuery } from "@apollo/client";
+import {MoreOutlined} from "@ant-design/icons";
+import moment from "moment";
+import _ from "lodash";
+import { getWeekDays } from "../../../utils/common";
+import PageHeader from "../../../components/PageHeader";
+import { WORKSCHEDULEDETAIL } from "../../EmployeeSchedule";
 import AddSchedule from "../../../components/AddScheduleDetail";
 import AddWorkscheduleEmployee from "../../../components/AddWorkscheduleEmployee";
-import PlusCircleFilled from "@ant-design/icons/lib/icons/PlusCircleFilled";
 import AddTimeInterval from "./AddTimeInterval";
+import styles from "./style.module.scss";
 
 export const WORKSCHEDULETIMEDETAIL = gql`
 query WorkscheduleTimeDetail($input: WorkscheduleTimeDetailQueryInput!) {
@@ -83,11 +82,11 @@ const ScheduleDetail = () => {
         }
     );
 
-    const startDate = workscheduleDetailData?.WorkscheduleDetail?.data?.[0]?.workshedule?.startDate
+    const startDate = workscheduleDetailData?.WorkscheduleDetail?.data?.[0]?.workschedule?.startDate
     const weekDays = getWeekDays(startDate);
 
     const workscheduleDetail = workscheduleDetailData?.WorkscheduleDetail?.data;
-    const group: any = _.groupBy(workscheduleDetail, 'user.fullName')
+    const groups: any = _.groupBy(workscheduleDetail, 'user.fullName')
 
     const handleChange = (id: any) => {
         setWorkscheduleId(id);
@@ -104,6 +103,28 @@ const ScheduleDetail = () => {
                 },
             },
         })
+    }
+
+    const menu = (data: any) => (
+      <Menu>
+          <Menu.Item key="clear">
+              Clear all schedule
+          </Menu.Item>
+          <Menu.Divider />
+          <Menu.Item key="delete">
+              Delete Employee
+          </Menu.Item>
+      </Menu>
+    );
+
+    const getTotalSchedule = (group: any) => {
+        let count = 0;
+        if (group?.length > 0) {
+            for(let index in group) {
+                count += group[index].workscheduleTimeDetail?.length;
+            }
+        }
+        return count;
     }
     return (
         <>
@@ -127,34 +148,64 @@ const ScheduleDetail = () => {
                                                   </th>
                                                 ))
                                             }
+                                            <th>Total</th>
+                                            <th>Action</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <td>{group?.[0]?.user?.fullName}</td>
                                         {
-                                            weekDays.map((day: any, index: number) => (
-                                              <td key={index}>
-                                                  {group && group?.map((data: any, index: number) =>
-                                                      <Fragment key={index}>
-                                                          {day === moment(data?.date).format('YYYY-MM-DD') &&
-                                                          data?.workscheduleTimeDetail.length > 0 &&
-                                                            data?.workscheduleTimeDetail?.map((timeData: any,
-                                                                                               index: number) =>
-                                                              <Fragment key={index}>
-                                                                  <span>
-                                                                  {moment(timeData?.startTime).format('HH:MM')} -
-                                                                      {moment(timeData?.endTime).format('HH:MM')}
-                                                                  </span>
-                                                                  <br/>
-                                                              </Fragment>
-                                                          )}
-                                                      </Fragment>
-                                                  )}
-                                                  {!group.some((data: any) =>
-                                                    moment(data?.date).format('YYYY-MM-DD') === day) && <> - </>}
-                                              </td>
-                                            ))
-                                        }
+                                          groups && Object.keys(groups).map(function (key, index) {
+                                              return (<tr key={index}>
+                                                  <td>{groups[key]?.[0]?.user?.fullName}</td>
+                                                  {weekDays.map((day: any, index: number) => (
+                                                    <td key={index}>
+                                                        {groups[key] && groups[key]?.map((data: any, index: number) =>
+                                                            <Fragment key={index}>
+                                                                {day === moment(data?.date).format('YYYY-MM-DD') &&
+                                                                  data?.workscheduleTimeDetail.length > 0 &&
+                                                                  data?.workscheduleTimeDetail?.map((timeData: any,
+                                                                                                     index: number) =>
+                                                                      <Fragment key={index}>
+                                                                          <span>
+                                                                              {moment(timeData?.startTime).format('HH:MM')} -
+                                                                              {moment(timeData?.endTime).format('HH:MM')}
+                                                                          </span>
+                                                                          <br/>
+                                                                      </Fragment>
+                                                                  )}
+                                                            </Fragment>
+                                                        )}
+                                                        {!groups[key]?.some((data: any) =>
+                                                          moment(data?.date).format('YYYY-MM-DD') === day) &&
+                                                          <> - </>}
+                                                    </td>
+                                                  ))}
+                                                  <td key={index}>
+                                                      {getTotalSchedule(groups[key])}
+                                                  </td>
+                                                  <td>
+
+                                                      <div
+                                                        className={styles["dropdown-menu"]}
+                                                        onClick={(event) => event.stopPropagation()}
+                                                      >
+                                                          <Dropdown
+                                                            overlay={menu(groups[key])}
+                                                            trigger={["click"]}
+                                                            placement="bottomRight"
+                                                          >
+                                                              <div
+                                                                className="ant-dropdown-link"
+                                                                onClick={(e) => e.preventDefault()}
+                                                                style={{ paddingLeft: "1rem" }}
+                                                              >
+                                                                  <MoreOutlined />
+                                                              </div>
+                                                          </Dropdown>
+                                                      </div>
+                                                  </td>
+                                              </tr>)
+                                        })}
                                     </tbody>
                                     <tfoot>
                                         <td>{employee}</td>
@@ -164,7 +215,7 @@ const ScheduleDetail = () => {
                                 <p
                                   onClick={() => setEmployeeShow(!showEmployee)}
                                   className={styles.addEmployee}>
-                                    <span style={{ marginRight: '10px' }}>
+                                    <span style={{ marginRight: '10px', cursor: 'pointer' }}>
                                         <PlusCircleFilled />
                                     </span>
                                     Add Employee
