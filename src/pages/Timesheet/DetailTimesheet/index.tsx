@@ -14,6 +14,7 @@ import {
   PlusCircleFilled,
   MoreOutlined,
 } from '@ant-design/icons';
+import { Table } from 'antd';
 
 import { authVar } from '../../../App/link';
 import { _cs, checkRoles } from '../../../utils/common';
@@ -35,13 +36,13 @@ import InvoiceViewer from '../../../components/InvoiceViewer';
 
 import deleteImg from '../../../assets/images/delete_btn.svg';
 
-import styles from './style.module.scss';
 import NoContent from '../../../components/NoContent';
-import { Table } from 'antd';
 import AttachNewTimesheetModal from '../../../components/AddAttachedTimesheet';
 import DeleteBody from '../../../components/Delete/index';
 import ModalConfirm from '../../../components/Modal';
 import EditAttachedTimesheet from '../../../components/EditAttachedTimesheet';
+import ApprovedTimesheetAttachment from "../../../components/ApprovedTimesheetAttachment";
+import styles from './style.module.scss';
 
 type InvoicedTimeEntries = {
   invoice_id: string;
@@ -229,7 +230,9 @@ const DetailTimesheet = () => {
     invoice_id: undefined,
   })
 
-  const [showAttachTimeEntry, setAttachTimeEntry] = useState(false)
+  const [showAttachTimeEntry, setAttachTimeEntry] = useState(false);
+  const [viewAttachment, setViewAttachment] = useState(false);
+  const [attachedTimesheetAttachment, setAttachedTimesheetAttachment] = useState<any>();
 
   const entriesByStatusRef = useRef<any>({});
 
@@ -464,7 +467,6 @@ const DetailTimesheet = () => {
     }
   })
 
-
   const onSubmitTimesheet = () => {
     submitTimesheet({
       variables: {
@@ -488,6 +490,11 @@ const DetailTimesheet = () => {
 
   const attachNewTimesheet = () => {
     setAttachTimeEntry(!showAttachTimeEntry)
+  }
+
+  const handleAttachmentView = (data: any) => {
+    setViewAttachment(!viewAttachment);
+    setAttachedTimesheetAttachment(data);
   }
   const approveRejectAll = (status: string) => {
     const ids: string[] = [];
@@ -612,7 +619,10 @@ const DetailTimesheet = () => {
       dataIndex: 'attachments',
       render: (attachments: any) => {
         return (
-          <span style={{ color: 'var(--primary-blue)' }}>{attachments?.name}</span>
+          <span className={styles['table-attachment']}
+                onClick={() => handleAttachmentView(attachments)}>
+            {attachments?.name}
+          </span>
         )
       }
     },
@@ -1017,6 +1027,12 @@ const DetailTimesheet = () => {
         visibility={editAttachedVisibility}
         setVisibility={setEditAttachedVisibility}
         data={attachedTimesheet}
+      />
+
+      <ApprovedTimesheetAttachment
+        visible={viewAttachment}
+        setVisible={setViewAttachment}
+        attachment={attachedTimesheetAttachment}
       />
 
       <ModalConfirm

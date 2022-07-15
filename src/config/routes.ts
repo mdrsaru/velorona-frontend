@@ -64,6 +64,13 @@ const routes = {
     name: 'Dashboard',
     key: 'dashboard'
   },
+  taskManagerDashboard: {
+    childPath: ':dashboard',
+    path: (company: string | undefined) => `/${company}`,
+    component: lazy(() => import('../pages/TaskManagerDashboard')),
+    name: 'Dashboard',
+    key: 'dashboard'
+  },
   company: {
     childPath: ':id',
     path: (id: string | undefined) => `/${id}`,
@@ -282,6 +289,13 @@ const routes = {
     component: lazy(() => import('../pages/Timesheet/DetailTimesheet')),
     name: 'Detail Timesheet',
     key: 'timesheet'
+  },
+  subscription: {
+    childPath: 'subscriptions',
+    path: (code: string) => `/${code}/subscriptions`,
+    component: lazy(() => import('../pages/Subscription')),
+    name: 'Subscriptions',
+    key: 'subscriptions'
   },
 };
 
