@@ -374,6 +374,17 @@ const _Routes = () => {
                 }
               />
             </Route>
+
+            <Route
+              path={routes.subscription.childPath}
+              element={
+                <CheckRoles allowedRoles={[constants.roles.CompanyAdmin]}>
+                  <Suspense fallback={<RouteLoader />}>
+                    <routes.subscription.component />
+                  </Suspense>
+                </CheckRoles>
+              }
+            />
           </Route>
 
           <Route

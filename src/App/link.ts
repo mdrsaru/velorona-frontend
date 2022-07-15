@@ -9,6 +9,7 @@ import TokenService from '../services/TokenService';
 
 import { IAuth } from '../interfaces/IAuth';
 import { ISidebar } from '../interfaces/IApp';
+import { IPlan } from '../interfaces/subscription.interface';
 
 const auth: IAuth = {
   token: null,
@@ -33,8 +34,11 @@ const sidebar = {
   collapsed: false,
 };
 
+const plans: IPlan[] = [];
+
 export const authVar = makeVar<IAuth>(auth);
 export const sidebarVar = makeVar<ISidebar>(sidebar);
+export const plansVar = makeVar<IPlan[]>(plans);
 
 // Http Link
 export const httpLink = createHttpLink({

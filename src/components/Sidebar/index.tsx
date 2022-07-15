@@ -14,7 +14,7 @@ import {
   UsergroupAddOutlined,
   SolutionOutlined,
   FundProjectionScreenOutlined,
-  ProfileOutlined
+  ProfileOutlined,
 } from '@ant-design/icons';
 
 import constants from '../../config/constants';
@@ -23,6 +23,8 @@ import { authVar } from '../../App/link';
 
 import styles from './style.module.scss';
 import { useEffect, useState } from "react";
+
+import subscriptionImg from '../../assets/images/subscription.png';
 
 const { Sider } = Layout;
 
@@ -138,6 +140,13 @@ const Sidebar = (props: any) => {
       icon: <FieldTimeOutlined />,
       route: routes.employeeTimesheet.path(loggedInUser?.company?.code ?? ''),
       accessRoles: [constants.roles.CompanyAdmin, constants.roles.TaskManager]
+    },
+    {
+      key: routes.subscription.key,
+      name: routes.subscription.name,
+      icon: <img src={subscriptionImg} style={{ width: 14 }} />,
+      route: routes.subscription.path(loggedInUser?.company?.code ?? ''),
+      accessRoles: [constants.roles.CompanyAdmin]
     },
     // {
     //   key: routes.schedule.key,

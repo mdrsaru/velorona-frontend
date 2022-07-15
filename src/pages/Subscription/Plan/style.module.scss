@@ -1,0 +1,30 @@
+.container {
+  padding: 1.5rem;
+  padding-right: 5px;
+  width: 320px;
+  background-color: var(--gray-2);
+
+  .header {
+    padding-left: 8px;
+  }
+
+  .name {
+    color: var(--gray-secondary);
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+  
+  .price {
+    margin-top: 2rem;
+  }
+
+  ul {
+    padding-left: 1.5rem;
+    padding-top: 1.5rem;
+    
+    li {
+      margin-bottom: 11px;
+      line-height: 17px;
+    }
+  }
+}
