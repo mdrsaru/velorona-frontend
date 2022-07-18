@@ -15,7 +15,7 @@ const AvailablePlans = () => {
 
   return (
     <>
-      <p className={styles['remaining-time']}>21 days remaining</p>
+      {/* <p className={styles['remaining-time']}>21 days remaining</p> */}
 
       <div className={styles['plans']}>
         {
