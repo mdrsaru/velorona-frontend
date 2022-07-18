@@ -2,7 +2,7 @@ import moment from 'moment';
 import { ChangeEvent, useState } from 'react';
 import { gql, useQuery, useMutation } from '@apollo/client';
 import { useNavigate } from 'react-router-dom';
-import { Button, Col, Form, Input, Row, Select, Image, DatePicker, InputNumber, Space, message } from 'antd';
+import { Button, Col, Form, Input, Row, Select, Image, DatePicker, InputNumber, Space, message, Popover } from 'antd';
 import { CloseCircleOutlined } from '@ant-design/icons';
 
 import { round } from '../../utils/common';
@@ -67,7 +67,7 @@ const InvoiceForm = (props: IProps) => {
   const [isSendInvoiceClicked, setIsSendInvoiceClicked] = useState(false);
 
   const company_id = loggedInUser?.company?.id as string
-  const disabled = !!props.timesheet_id; 
+  const isTimesheet = !!props.timesheet_id; 
 
   const [createInvoice, { loading: creatingInvoice }] = useMutation<
     GraphQLResponse<'InvoiceCreate', Invoice>,
@@ -201,7 +201,6 @@ const InvoiceForm = (props: IProps) => {
     if(value >= 0) {
       const taxAmount = value * 0.01 * subtotal;
       const totalAmount = (1 + value * 0.01) * subtotal;
-      console.log(taxAmount, value)
       form.setFieldsValue({
         totalAmount: round(totalAmount, 2),
         taxAmount: round(taxAmount, 2),
@@ -300,11 +299,15 @@ const InvoiceForm = (props: IProps) => {
           <Form.Item
             label="Invoice Number"
           >
-            <Input 
-              placeholder="Invoice Number" 
-              value={invoice?.invoiceNumber} 
-              disabled
-            />
+            <Popover content="Invoice number will be auto generated" >
+              <div>
+                <Input 
+                  placeholder="Invoice Number" 
+                  value={invoice?.invoiceNumber} 
+                  disabled
+                />
+              </div>
+            </Popover>
           </Form.Item>
         </Col>
 
@@ -378,7 +381,7 @@ const InvoiceForm = (props: IProps) => {
                               }]}
                               {...restField}
                             >
-                              <Select placeholder="Select Project" loading={projectLoading} disabled={disabled}>
+                              <Select placeholder="Select Project" loading={projectLoading} disabled={isTimesheet}>
                                 {
                                   projectData?.Project?.data?.map((project) => (
                                     <Select.Option key={project.id} value={project.id}>{project.name}</Select.Option>
@@ -394,7 +397,7 @@ const InvoiceForm = (props: IProps) => {
                               name={[name, 'description']}
                               {...restField}
                             >
-                              <Input disabled={disabled} />
+                              <Input disabled={isTimesheet} />
                             </Form.Item>
                           </td>
 
@@ -408,7 +411,7 @@ const InvoiceForm = (props: IProps) => {
                               }]}
                               {...restField}
                             >
-                              <InputNumber min={0} autoComplete="off" disabled={disabled} onChange={() => onHourRateChange(name)} />
+                              <InputNumber min={0} autoComplete="off" disabled={isTimesheet} onChange={() => onHourRateChange(name)} />
                             </Form.Item>
                           </td>
 
@@ -422,7 +425,7 @@ const InvoiceForm = (props: IProps) => {
                                 message: 'Please enter rate'
                               }]}
                             >
-                              <Input type="number" prefix="$" min={0} autoComplete="off" disabled={disabled} onChange={() => onHourRateChange(name)} />
+                              <Input type="number" prefix="$" min={0} autoComplete="off" disabled={isTimesheet} onChange={() => onHourRateChange(name)} />
                             </Form.Item>
                           </td>
 
@@ -447,24 +450,28 @@ const InvoiceForm = (props: IProps) => {
                       ))
                     }
 
-                    <tr>
-                      <td>
-                        <Form.Item>
-                          <div 
-                            className={styles['add-project']} 
-                            onClick={() => add({
-                              project_id: undefined,
-                              quantity: 0,
-                              rate: 0,
-                              amount: 0,
-                            })}
-                          >
-                            <Image width={20} src={addIcon} preview={false} />
-                            &nbsp; &nbsp; Add Item 
-                          </div>
-                        </Form.Item>
-                      </td>
-                    </tr>
+                    {
+                      !isTimesheet && (
+                        <tr>
+                          <td>
+                            <Form.Item>
+                              <div 
+                                className={styles['add-project']} 
+                                onClick={() => add({
+                                  project_id: undefined,
+                                  quantity: 0,
+                                  rate: 0,
+                                  amount: 0,
+                                })}
+                              >
+                                <Image width={20} src={addIcon} preview={false} />
+                                &nbsp; &nbsp; Add Item 
+                              </div>
+                            </Form.Item>
+                          </td>
+                        </tr>
+                      )
+                    }
 
                     <tr>
                       <td className={styles['horizontal']} colSpan={5}></td>
