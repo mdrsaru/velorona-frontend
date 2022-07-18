@@ -780,6 +780,7 @@ const DetailTimesheet = () => {
                             <Link
                               className={styles['invoice-link']}
                               to={routes.timesheetInvoice.path(authData?.company?.code as string, params?.id as string)}
+                              state={{ from: 'timesheet' }}
                             >
                               Generate Invoice
                             </Link>

@@ -17,6 +17,7 @@ const INVOICE = gql`
     Invoice(input: $input) {
       data {
         id
+        timesheet_id
         client_id
         company_id
         issueDate
@@ -63,6 +64,8 @@ const EditInvoice = () => {
     },
   });
 
+  const invoice = invoiceData?.Invoice?.data?.[0];
+
   return (
     <div className={styles['container']}>
       <Card bordered={false}>
@@ -73,8 +76,9 @@ const EditInvoice = () => {
         {
           !invoiceLoading  && (
             <InvoiceForm 
-              client_id={invoiceData?.Invoice?.data?.[0]?.client_id as string} 
-              invoice={invoiceData?.Invoice?.data?.[0] as IInvoiceInput}
+              timesheet_id={invoice?.timesheet_id as string}
+              client_id={invoice?.client_id as string} 
+              invoice={invoice as IInvoiceInput}
             />
           )
         }

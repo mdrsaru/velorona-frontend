@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { Link, useParams, useLocation } from 'react-router-dom';
 import { gql, useQuery } from '@apollo/client';
 import { Card } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
@@ -51,11 +51,12 @@ const TIMESHEET = gql`
   }
 `;
 
-const TimesheetInvoice = () => {
+const TimesheetInvoice = (props: any) => {
   const authData = authVar();
   const { timesheetId } = useParams();
   const [invoiceInput, setInvoiceInput] = useState<IInvoiceInput | undefined>();
   const company_id = authData.company?.id as string;
+  const location = useLocation();
 
   const {
     data: timesheetData,

@@ -43,7 +43,7 @@ const CLIENT = gql`
   }
 `;
 
-const NewInvoice = () => {
+const NewInvoice = (props: any) => {
   const navigate = useNavigate();
   const [selectedClient, setSelectedClient] = useState<MayBe<Client>>();
   const [confirmed, setConfirmed] = useState(false)
