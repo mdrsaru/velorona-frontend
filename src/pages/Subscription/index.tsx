@@ -90,18 +90,19 @@ const Subscription = () => {
             </Tabs.TabPane>
 
             <Tabs.TabPane 
+              key="availablePlans"
+              tab={<TabText name="Available Plans" />} 
+            >
+              <AvailablePlans />
+            </Tabs.TabPane>
+
+            <Tabs.TabPane 
               key="invoiceAndPayment"
               tab={<TabText name="Invoice and Payments" />} 
             >
               <InvoiceAndPayment />
             </Tabs.TabPane>
 
-            <Tabs.TabPane 
-              key="availablePlans"
-              tab={<TabText name="Available Plans" />} 
-            >
-              <AvailablePlans />
-            </Tabs.TabPane>
           </Tabs>
 
         </Card>
