@@ -48,7 +48,12 @@ const InvoiceAndPayment = () => {
       input: {
         query: {
           company_id,
-        }
+        },
+        paging: {
+          skip: pagingInput.skip,
+          take: constants.paging.perPage,
+          order: ['paymentDate:ASC'],
+        },
       }
     }
   });
@@ -99,7 +104,7 @@ const InvoiceAndPayment = () => {
         current: pagingInput.currentPage,
           onChange: changePage,
           total: data?.SubscriptionPayment?.paging?.total,
-          pageSize: constants.paging.perPage
+          pageSize: constants.paging.perPage,
       }}
     />
   )

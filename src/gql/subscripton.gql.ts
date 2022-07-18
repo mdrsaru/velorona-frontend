@@ -12,3 +12,16 @@ export const PLANS = gql`
   }
 `;
 
+
+export const CURRENT_PLAN = gql`
+  query CurrentPlan {
+    CurrentPlan @client {
+      name
+      description
+      price
+      features
+      subscriptionStatus
+    }
+  }
+`;
+

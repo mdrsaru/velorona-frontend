@@ -3,8 +3,8 @@ import { Card, Tabs } from 'antd';
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 
-import { plansVar } from '../../App/link';
-import { subscription } from '../../config/constants';
+import { plansVar, currentPlanVar } from '../../App/link';
+import { subscription, stripeSetting } from '../../config/constants';
 import { AUTH } from '../../gql/auth.gql';
 import { GraphQLResponse } from '../../interfaces/graphql.interface';
 import { Company, QueryCompanyByIdArgs } from '../../interfaces/generated';
@@ -17,7 +17,7 @@ import AvailablePlans from './AvailablePlans';
 
 import styles from './style.module.scss';
 
-const stripePromise = loadStripe('pk_test_5fKbgD2x8jmV5kFsKNhJMVw2005Yc0oDbm');
+const stripePromise = loadStripe(stripeSetting.publishableKey);
 
 const COMPANY = gql`
   query CompanyById($input: CompanyByIdInput!) {
@@ -63,25 +63,16 @@ const Subscription = () => {
       }
       const plans = getPlans(currentPlan);
       plansVar(plans);
-
+      currentPlanVar(currentPlan);
     }
   });
 
   const company = companyData?.CompanyById;
-
   if(companyLoading) {
-    return <>Loading...</>
+    return null;
   }
 
   const plan = company?.plan as 'Starter' | 'Professional';
-
-  const currentPlan: IPlan = {
-    name: company?.plan as string,
-    description: company?.plan ? subscription.description[plan] : '',
-    price: subscription.price[plan] as string,
-    features: subscription.features[plan] as string[] ?? [],
-    subscriptionStatus: company?.subscriptionStatus as string,
-  }
 
   return (
     <Elements stripe={stripePromise}>
@@ -95,7 +86,7 @@ const Subscription = () => {
               key="currentPlan"
               tab={<TabText name="Current Plan" />} 
             >
-              <CurrentPlan plan={currentPlan} />
+              <CurrentPlan />
             </Tabs.TabPane>
 
             <Tabs.TabPane 
@@ -123,26 +114,17 @@ function getPlans(currentPlan: IPlan) {
   const plans = [
     {
       name: 'Starter',
-      description: 'For Small Business',
-      price: 'FREE',
+      description: subscription.description.Starter,
+      price: subscription.price.Starter,
       subscriptionStatus: 'inactive',
-      features: [
-        'Host upto 100 employees',
-        'Create upto 25 free projects',
-        'Timesheets tracking',
-      ],
+      features: subscription.features.Starter,
     },
     {
       name: 'Professional',
-      description: 'Ideal for Medium Business',
-      price: '$10 Flat + $1 per user',
+      description: subscription.description.Professional,
+      price: subscription.price.Professional,
       subscriptionStatus: currentPlan.name === 'Professional' ? 'active' : 'inactive',
-      features: [
-        'Host upto 100 employees',
-        'Create upto 25 free projects',
-        'Timesheets tracking',
-        'Invoicing included',
-      ],
+      features: subscription.features.Professional,
     },
   ];
 

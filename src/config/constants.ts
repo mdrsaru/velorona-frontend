@@ -18,6 +18,10 @@ const config = {
   },
 };
 
+export const stripeSetting = {
+  publishableKey: process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY as string,
+}
+
 export const roles_user = [{
   value: 'CompanyAdmin',
   name: 'Company Admin'

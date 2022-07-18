@@ -12,7 +12,6 @@ const AvailablePlans = () => {
   const { data: planData } = useQuery<
     GraphQLResponse<'Plans', IPlan[]>
   >(PLANS);
-  console.log(planData, 'plandata')
 
   return (
     <>
