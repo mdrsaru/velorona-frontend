@@ -15369,10 +15369,10 @@ textarea.ant-input-number {
   flex: 0 0 auto;
 }
 .ant-layout-header {
-  height: 64px;
+  height: 75px;
   padding: 0 50px;
   color: rgba(0, 0, 0, 0.85);
-  line-height: 64px;
+  line-height: 75px;
   background: #001529;
 }
 .ant-layout-footer {
@@ -15424,7 +15424,7 @@ textarea.ant-input-number {
 }
 .ant-layout-sider-zero-width-trigger {
   position: absolute;
-  top: 64px;
+  top: 75px;
   right: -36px;
   z-index: 1;
   width: 36px;
