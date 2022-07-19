@@ -15,15 +15,15 @@ import styles from "./styles.module.scss";
 
 
 export const COUNT = gql`
-query Count($totalDurationInput: TotalDurationCountInput!, $projectInvolvedInput: ProjectCountInput!,$activeProjectCountInput:ActiveProjectCountInput!) {
+query Count($userCountInput: UserCountInput!, $totalDurationInput: TotalDurationCountInput!,$activeProjectCountInput:ActiveProjectCountInput!) {
+  UserCount(input: $userCountInput)
   TotalDuration(input: $totalDurationInput)
-  ProjectInvolvedCount(input: $projectInvolvedInput)
   ActiveProjectInvolvedCount(input:$activeProjectCountInput)
 }
 
 `
 const TaskManagerDashboard = () => {
-
+console.log('task Manager')
     const authData = authVar();
 
     const { data: overallCount } = useQuery(
@@ -32,21 +32,22 @@ const TaskManagerDashboard = () => {
             fetchPolicy: "network-only",
             nextFetchPolicy: "cache-first",
             variables: {
+                userCountInput: {
+                    company_id: authData?.company?.id as string,
+                    manager_id: authData.user.id
+                },
                 totalDurationInput: {
                     company_id: authData?.company?.id as string,
-                    user_id: authData.user.id
-                },
-                projectInvolvedInput: {
-                    company_id: authData?.company?.id as string,
-                    user_id: authData.user.id
+                    manager_id: authData.user.id
                 },
                 activeProjectCountInput: {
                     company_id: authData?.company?.id as string,
-                    user_id: authData.user.id
+                    manager_id: authData.user.id
                 },
             },
         }
     );
+    console.log(overallCount)
     const {
         data: timesheetDetail } = useQuery(TIME_WEEKLY, {
             fetchPolicy: "network-only",
@@ -62,7 +63,7 @@ const TaskManagerDashboard = () => {
                 }
             }
         });
-
+console.log(timesheetDetail)
     function secondsToHms(d: any) {
         d = Number(d);
         let h = d / 3600;
@@ -86,7 +87,7 @@ const TaskManagerDashboard = () => {
     const dashboardCount: IDashboardCount[] = [
         {
             title: 'Team Members',
-            count:  overallCount?.ProjectInvolvedCount as number,
+            count:  overallCount?.UserCount as number,
             icon: employeesImg
         },
         {
@@ -111,7 +112,7 @@ const TaskManagerDashboard = () => {
                             <Typography.Title
                               level={4}
                               style={{color: 'var(--primary-blue)'}}>
-                                You have 26 Pending Timesheet
+                                You have {timesheetDetail?.Timesheet} Pending Timesheet
                             </Typography.Title>
                             <Typography.Text type="secondary">
                                 Last Updated on Feb 23, 2022

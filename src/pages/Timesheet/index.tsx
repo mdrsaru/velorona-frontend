@@ -83,6 +83,10 @@ query Timesheet($input: TimesheetQueryInput!) {
       totalExpense
       duration
       status
+      approver{
+      id 
+      }
+      lastApprovedAt
       durationFormat
       invoicedDuration
       invoicedDurationFormat
