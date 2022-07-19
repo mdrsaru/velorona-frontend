@@ -49,6 +49,12 @@ export const USER = gql`
         lastName
         fullName
         status
+        manager_id
+        manager{
+        id 
+        fullName 
+        }
+
         archived
         avatar_id
         type

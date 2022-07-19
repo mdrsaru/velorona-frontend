@@ -6,12 +6,12 @@ import constants, { roles_user } from "../../../config/constants";
 
 import type { UploadProps } from 'antd';
 import { useNavigate } from "react-router-dom";
-import { gql, useMutation } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import { notifyGraphqlError } from "../../../utils/error";
 import { authVar } from "../../../App/link";
 
 import routes from "../../../config/routes";
-import { MutationChangeProfilePictureArgs, MutationUserCreateArgs, User, UserPagingResult, EntryType } from "../../../interfaces/generated";
+import { MutationChangeProfilePictureArgs, MutationUserCreateArgs, User, UserPagingResult, EntryType, RoleName, QueryUserArgs } from "../../../interfaces/generated";
 import { USER } from "../index";
 import { STATE_CITIES, USA_STATES } from "../../../utils/cities";
 
@@ -137,6 +137,27 @@ const NewEmployee = () => {
     setCountryCities(STATE_CITIES[data]);
   }
 
+  const { loading: employeeLoading, data: managerData } = useQuery<
+    GraphQLResponse<'User', UserPagingResult>,
+    QueryUserArgs
+  >(
+    USER,
+    {
+      fetchPolicy: "network-only",
+      nextFetchPolicy: "cache-first",
+      variables: {
+        input: {
+          paging: {
+            order: ["updatedAt:DESC"],
+          },
+          query: {
+            role: RoleName.TaskManager,
+          }
+        },
+      },
+    }
+  );
+
   const [userCreate] = useMutation<GraphQLResponse<'UserCreate', User>,
     MutationUserCreateArgs
   >(USER_CREATE, {
@@ -199,6 +220,7 @@ const NewEmployee = () => {
           middleName: values.middleName,
           lastName: values.lastName,
           status: values.status,
+          manager_id: values.manager_id,
           company_id: authData?.company?.id as string,
           roles: [values?.roles],
           type: values?.type,
@@ -460,6 +482,24 @@ const NewEmployee = () => {
                 </Select>
               </Form.Item>
             </Col>
+
+            <Col
+              xs={24}
+              sm={24}
+              md={12}
+              lg={12}>
+              <Form.Item
+                name="manager_id"
+                label="Task Manager"
+              >
+                <Select placeholder="Select manager">
+                  {managerData?.User?.data?.map((manager, index) => (
+                    <Option key={index} value={manager?.id}> {`${manager?.fullName} / ${manager?.email}`}</Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </Col>
+
             <Col xs={24} sm={24} md={12} lg={12}>
               <Form.Item
                 label="Start Date"
