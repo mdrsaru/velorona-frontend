@@ -9,9 +9,10 @@ import { useStopwatch } from 'react-timer-hook';
 //import { SIDEBAR } from '../../gql/app.gql';
 // import notification from '../../assets/images/notification.svg';
 import { /*sidebarVar, */authVar } from '../../App/link';
-import logo from '../../assets/images/logo.svg';
+//import logo from '../../assets/images/logo.svg';
 import pp from '../../assets/images/default_pp.png';
-import logoContent from '../../assets/images/logo-01.svg';
+//import logoContent from '../../assets/images/logo-01.svg';
+import logoContent from '../../assets/images/logo-content.svg';
 import downArrow from '../../assets/images/down-arrow.svg';
 import routes from '../../config/routes';
 import { notifyGraphqlError } from '../../utils/error';
@@ -245,10 +246,15 @@ const TopHeader = (props: any) => {
             marginLeft: 10
           }} />
         <div>
-          <img
-            src={logo}
-            alt="logo"
-            className={styles['mini-logo']} />
+          {
+            /* 
+            <img
+              src={logo}
+              alt="logo"
+              className={styles['mini-logo']} 
+            />
+            */
+          }
           <img
             src={logoContent}
             alt="logo-01"
