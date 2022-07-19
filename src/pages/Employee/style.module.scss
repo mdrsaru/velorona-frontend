@@ -356,7 +356,7 @@ h1 {
   font-size: 14px;
   line-height: 22px;
   color: var(--primary-blue);
-  margin: 1rem 0 2rem 0;
+  margin: 3rem 0 2rem 0;
   cursor: pointer;
 }
 
@@ -389,4 +389,12 @@ h1 {
 .role-status-col {
   padding-top: 0.3rem;
   padding-bottom: 1.3rem;
+}
+
+.header-div{
+  background-color: var(--gray-secondary);
+  color: var(--white);
+  margin-bottom: 2rem;
+  margin-top: 1rem;
+  padding: 1rem;
 }

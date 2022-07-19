@@ -186,6 +186,7 @@ const Employee = () => {
   });
   const [visibility, setVisibility] = useState<boolean>(false);
   const [showArchive, setArchiveModal] = useState<boolean>(false);
+  const [showChangeClient, setShowChangeClient] = useState<boolean>(false);
   const [showUserPayRate, setUserPayRateVisibility] = useState<boolean>(false);
   const [showViewUserPayRate, setViewUserPayRateVisibility] =
     useState<boolean>(false);
@@ -235,6 +236,24 @@ const Employee = () => {
       </div>
     );
   };
+
+  const ChangeClient = () => {
+    return (
+      <div className={styles["modal-message"]}>
+        <div>
+          <img src={archiveImg} alt="archive-confirm" />
+        </div>{" "}
+        <br />
+        <p>
+          Are you sure you want to{" "}
+          change client
+          <strong> {employee.activeClient?.name}? </strong>
+        </p>
+      </div>
+    );
+  };
+
+
   // const role = Object.values(RoleName)
   const { loading: employeeLoading, data: employeeData, refetch: refetchEmployee } = useQuery<
     GraphQLResponse<'User', UserPagingResult>,
@@ -282,6 +301,14 @@ const Employee = () => {
     })
       .catch(notifyGraphqlError);
   };
+
+  const changeClient = () => {
+    navigate(routes.attachClient.path(
+      loggedInUser?.company?.code ?? "1",
+      employee?.id ?? "1"
+    ))
+  };
+
 
   const changeStatus = (value: string, id: string) => {
     let key = "status";
@@ -425,70 +452,108 @@ const Employee = () => {
     };
   });
 
-  const menu = (data: any) => (
-    <Menu>
-      {
-        data?.id !== loggedInUser?.user?.id && (
-          <SubMenu title="Change status" key="mainMenu">
-            <Menu.Item
-              key="active"
-              onClick={() => {
-                if (data?.status === "Inactive") {
-                  changeStatus("Active", data?.id);
-                }
-              }}
+  const menu = (data: any) => {
+    return (
+      <Menu>
+        {
+          data?.id !== loggedInUser?.user?.id && (
+            <SubMenu title="Change status" key="mainMenu">
+              <Menu.Item
+                key="active"
+                onClick={() => {
+                  if (data?.status === "Inactive") {
+                    changeStatus("Active", data?.id);
+                  }
+                }}
+              >
+                Active
+              </Menu.Item>
+              <Menu.Divider />
+
+              <Menu.Item
+                key="inactive"
+                onClick={() => {
+                  if (data?.status === "Active") {
+                    changeStatus("Inactive", data?.id);
+                  }
+                }}
+              >
+                Inactive
+              </Menu.Item>
+            </SubMenu>
+          )
+        }
+
+        <Menu.Divider />
+        {
+          data.roles[0]?.name === constants.roles.Employee ?
+
+            data?.activeClient ?
+
+              (<Menu.Item key="changeClient">
+                <div
+                  onClick={() => {
+                    setEmployee(data);
+                    setShowChangeClient(true)
+                  }}
+                >
+
+                  Change Client
+                </div>
+              </Menu.Item>
+              )
+              :
+              (<Menu.Item key="attachClient">
+                <div>
+                  <Link
+                    to={routes.attachClient.path(
+                      loggedInUser?.company?.code ?? "1",
+                      data?.id ?? "1"
+                    )}
+                  >
+                    Add Client
+                  </Link>
+                </div>
+              </Menu.Item>
+              )
+            :
+            <>
+            </>
+        }
+        <Menu.Divider />
+
+        <Menu.Item key="edit">
+          <div>
+            <Link
+              to={routes.editEmployee.path(
+                loggedInUser?.company?.code ?? "1",
+                data?.id ?? "1"
+              )}
             >
-              Active
+              Edit User
+            </Link>
+          </div>
+        </Menu.Item>
+
+        <Menu.Divider />
+
+        {
+          data?.id !== loggedInUser?.user?.id && (
+            <Menu.Item key="archive">
+              <div
+                onClick={() => {
+                  setEmployee(data);
+                  setArchiveVisibility(true);
+                }}
+              >
+                {data?.archived ? "Unarchive User" : "Archive User"}
+              </div>
             </Menu.Item>
-            <Menu.Divider />
-
-            <Menu.Item
-              key="inactive"
-              onClick={() => {
-                if (data?.status === "Active") {
-                  changeStatus("Inactive", data?.id);
-                }
-              }}
-            >
-              Inactive
-            </Menu.Item>
-          </SubMenu>
-        )
-      }
-
-      <Menu.Divider />
-
-      <Menu.Item key="edit">
-        <div>
-          <Link
-            to={routes.editEmployee.path(
-              loggedInUser?.company?.code ?? "1",
-              data?.id ?? "1"
-            )}
-          >
-            Edit User
-          </Link>
-        </div>
-      </Menu.Item>
-
-      <Menu.Divider />
-
-      {
-        data?.id !== loggedInUser?.user?.id && (
-          <Menu.Item key="archive">
-            <div
-              onClick={() => {
-                setEmployee(data);
-                setArchiveVisibility(true);
-              }}
-            >
-              {data?.archived ? "Unarchive User" : "Archive User"}
-            </div>
-          </Menu.Item>
-        )
-      }
-    </Menu>
-  );
+          )
+        }
+      </Menu>
+    )
+  };
 
   const columns = [
     {
@@ -523,6 +588,13 @@ const Employee = () => {
       key: "role",
       render: (user: any) => {
         return <span>{user?.roles[0]?.name}</span>;
+      },
+    },
+    {
+      title: "Active Client",
+      dataIndex: "activeClient",
+      render: (activeClient: any) => {
+        return <span>{activeClient?.name ?? '-' }</span>;
       },
     },
     {
@@ -722,6 +794,15 @@ const Employee = () => {
             okText={employee?.archived ? "Unarchive" : "Archive"}
             modalBody={<ArchiveBody />}
             onOkClick={archiveUser}
+          />
+
+          <ModalConfirm
+            visibility={showChangeClient}
+            setModalVisibility={setShowChangeClient}
+            imgSrc={archiveImg}
+            okText={"Change Client"}
+            modalBody={<ChangeClient />}
+            onOkClick={changeClient}
           />
 
           <UserPayRateModal

@@ -29,7 +29,7 @@ import { useState } from 'react'
 import styles from '../style.module.scss'
 import { authVar } from '../../../App/link'
 import RouteLoader from '../../../components/Skeleton/RouteLoader'
-import { MutationChangeProfilePictureArgs, MutationUserUpdateArgs, User } from "../../../interfaces/generated";
+import { EntryType, MutationChangeProfilePictureArgs, MutationUserUpdateArgs, User } from "../../../interfaces/generated";
 import { GraphQLResponse } from "../../../interfaces/graphql.interface";
 
 const dateFormat = "YYYY-MM-DD HH:mm:ss";
@@ -470,6 +470,24 @@ const EditEmployee = () => {
                   <Select placeholder="Select status">
                     <Option value={true}>Mandatory</Option>
                     <Option value={false}>Optional</Option>
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col
+                xs={24}
+                sm={24}
+                md={12}
+                lg={12}>
+                <Form.Item
+                  name="type"
+                  label="Entry Type"
+                  rules={[{
+                    required: true,
+                    message: 'Please select the user type'
+                  }]}>
+                  <Select placeholder="Select status">
+                    <Option value={EntryType.Timesheet}>{EntryType.Timesheet}</Option>
+                    <Option value={EntryType.Cico}>Checkin-Checkout</Option>
                   </Select>
                 </Form.Item>
               </Col>

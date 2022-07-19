@@ -7,7 +7,9 @@ import {
   Button,
   UploadProps,
   message,
-  Upload
+  Upload,
+  Collapse,
+  Space
 } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 
@@ -131,6 +133,8 @@ const DetailEmployee = () => {
     })
     setViewUserPayRateVisibility(!showViewUserPayRate);
   };
+
+  console.log(userData?.User?.data?.[0]?.client, 'detail')
   return (
     <div className={styles["main-div"]}>
       {userData?.User?.data[0] && (
@@ -195,6 +199,9 @@ const DetailEmployee = () => {
           <br />
 
           <Row className={styles["detail-row"]}>
+          <Col xs={24} sm={24} md={24} lg={24}>
+          <div className={styles['header-div']}>Contact Information</div>
+            </Col>
             <Col xs={24} sm={24} md={12} lg={12}>
               <div>
                 <div>Email</div>
@@ -261,21 +268,11 @@ const DetailEmployee = () => {
               </div>
             </Col>
 
-            <Col xs={24} sm={24} md={12} lg={8}>
-
-              <div>
-                <div>Status</div>
-                <span className={styles.detailValue}>
-                  {userData?.User?.data[0]?.status}
-                </span>
-              </div>
-
-            </Col>
 
             <Col xs={24} sm={24} md={12} lg={8}>
 
               <div>
-                <div>Type</div>
+                <div>Entry Type</div>
                 <span className={styles.detailValue}>
                   {userData?.User?.data[0]?.type ?? 'N/A'}
                 </span>
@@ -288,6 +285,21 @@ const DetailEmployee = () => {
                 <div>Timesheet Attachment Type</div>
                 <span className={styles.detailValue}>
                   {userData?.User?.data[0]?.timesheet_attachment ? 'Mandatory' : 'Optional'}
+                </span>
+              </div>
+
+            </Col>
+            <Col xs={24} sm={24} md={24} lg={24}>
+              <div className={styles['header-div']}>Employment Status</div>
+            </Col>
+            <br />
+
+            <Col xs={24} sm={24} md={12} lg={12}>
+
+              <div>
+                <div>Employment Status</div>
+                <span className={styles.detailValue}>
+                  {userData?.User?.data[0]?.status}
                 </span>
               </div>
 
@@ -308,7 +320,7 @@ const DetailEmployee = () => {
                 </span>
               </div>
             </Col>
-            <Col xs={24} sm={24} md={24} lg={24}>
+            <Col xs={24} sm={24} md={24} lg={12}>
               <p
                 className={styles["view-pay-rate"]}
                 onClick={handleViewPayRate}
@@ -316,8 +328,39 @@ const DetailEmployee = () => {
                 View Payrate
               </p>
             </Col>
-          </Row>
+            <Col xs={24} sm={24} md={24} lg={24}>
+              <div className={styles['header-div']}>Client Assigned</div>
+            </Col>
 
+            <Col xs={24} sm={24} md={24} lg={24} style={{marginBottom:'1rem'}}>
+            {userData?.User?.data[0]?.client && userData?.User?.data[0]?.client?.map((client, index) => {
+              return (
+                <Collapse defaultActiveKey={index} style={{border:0 }}>
+                  <Collapse.Panel header={client?.name} key={index}  >
+                    <Row>
+                      <Col xs={24} sm={24} md={12} lg={12}>
+                        <div>Client Email Address</div>
+                        <span className={styles.detailValue}>
+                          {client?.email}
+                        </span>
+                      </Col>
+                      <Col xs={24} sm={24} md={12} lg={12}>
+                        <div>Client Status</div>
+                        <span className={styles.detailValue}>
+                          {client?.status}
+                        </span>
+                      </Col>
+                    </Row>
+                  </Collapse.Panel>
+                </Collapse>
+              )
+            })}
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+            </Col>
+          </Row>
           <Row justify="end" className={styles["footer-btn"]}>
             <Col>
               <Button type="default" style={{ marginRight: '1rem' }}>

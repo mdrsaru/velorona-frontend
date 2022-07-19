@@ -507,7 +507,7 @@ const NewEmployee = () => {
               lg={12}>
               <Form.Item
                 name="type"
-                label="User Type"
+                label="Entry Type"
                 rules={[{
                   required: true,
                   message: 'Please select the user type'
