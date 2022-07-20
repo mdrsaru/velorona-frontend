@@ -1,5 +1,5 @@
-import React from "react";
-import {Col, Row, Typography} from "antd";
+import { Fragment, useEffect, useState } from "react";
+import { Col, Row, Typography } from "antd";
 import { gql, useQuery } from "@apollo/client";
 import moment from "moment";
 import employeesImg from "../../assets/images/employees.svg";
@@ -12,6 +12,7 @@ import ActivityLog from "../../components/Dashboard/ActivityLog";
 import { authVar } from "../../App/link";
 import { TIME_WEEKLY } from "../Timesheet";
 import styles from "./styles.module.scss";
+import { WORKSCHEDULEDETAIL } from "../EmployeeSchedule";
 
 
 export const COUNT = gql`
@@ -54,7 +55,8 @@ const EmployeeDashboard = () => {
             variables: {
                 input: {
                     query: {
-                        company_id: authData?.company?.id
+                        company_id: authData?.company?.id,
+                        user_id: authData?.user?.id,
                     },
                     paging: {
                         order: ['weekStartDate:DESC']
@@ -101,11 +103,27 @@ const EmployeeDashboard = () => {
         },
     ];
 
-    const hourLogs = [
-      '9:00 AM - 12:00 PM',
-      '1:00 PM - 4:00 PM',
-      '5:00 PM - 12:00 PM'
-    ]
+
+    const [today, setToday] = useState<any>()
+    useEffect(() => {
+        const today = new Date();
+        setToday(today)
+    }, [])
+    const {
+        data: workscheduleDetailData } = useQuery(WORKSCHEDULEDETAIL, {
+            fetchPolicy: "network-only",
+            nextFetchPolicy: "cache-first",
+            variables: {
+                input: {
+                    query: {
+                        schedule_date: today,
+                    },
+                    paging: {
+                    }
+                }
+            }
+        });
+
 
     return (
         <div>
@@ -119,7 +137,7 @@ const EmployeeDashboard = () => {
                     </Typography.Title>
                 </Col>
                 <Col xs={24} lg={12}>
-                    <DashboardCount data={dashboardCount} showIcon={false}/>
+                    <DashboardCount data={dashboardCount} showIcon={false} />
                 </Col>
             </Row>
             <Row>
@@ -128,32 +146,43 @@ const EmployeeDashboard = () => {
                         <Typography.Title level={3}>Today's Schedule</Typography.Title>
                         <div className={styles['hour-log-div']}>
                             <Typography.Title
-                              level={4}
-                              style={{color: 'var(--primary-blue)'}}>
-                                June 12, 2022
+                                level={4}
+                                style={{ color: 'var(--primary-blue)' }}>
+                                {moment(today).format('MMM DD,YYYY')}
                             </Typography.Title>
                             <Typography.Text type="secondary">
-                                Monday
+                                {moment(today).format('ddd')}
                             </Typography.Text>
-                            <br/>
+                            <br />
                             <div>
-                                {hourLogs.map((log: any, index: number) =>
-                                  <div className={styles['hour-log']}>{log}</div>
+                                {workscheduleDetailData?.WorkscheduleDetail.data.map((workscheduleDetail: any, index: number) => {
+                                    return (
+                                        <Fragment key= {index}>
+                                       { workscheduleDetail?.workscheduleTimeDetail?.map((timeDetail: any, index: number) =>
+
+                                            <div key= {index} className={styles['hour-log']}>{`${moment(timeDetail.startTime).format('HH:MM')} - ${moment(timeDetail.endTime).format('HH:MM')}`}</div>
+
+                                        )
+                                       }
+                                       </Fragment>
+                                    )
+                                    }
+                                
                                 )}
                             </div>
 
                         </div>
                     </div>
                     <AverageHours
-                      averageHoursData={averageHoursData}
-                      title={'Hours Tracked Per Week'}
-                      caption={'Jan 2022'}
+                        averageHoursData={averageHoursData}
+                        title={'Hours Tracked Per Week'}
+                        caption={'Jan 2022'}
                     />
                 </Col>
                 <Col xs={24} lg={12}>
                     <ActivityLog
-                      user_id={authData?.user?.id as string}
-                      title={' Time Tracking History'}
+                        user_id={authData?.user?.id as string}
+                        title={' Time Tracking History'}
                     />
                 </Col>
             </Row>

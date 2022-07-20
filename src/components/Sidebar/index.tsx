@@ -106,13 +106,13 @@ const Sidebar = (props: any) => {
       route: routes.client.path(loggedInUser?.company?.code ?? ''),
       accessRoles: [constants.roles.CompanyAdmin]
     },
-    {
-      key: routes.home.key,
-      name: routes.home.name,
-      icon: <HomeOutlined />,
-      route: routes.home.path,
-      accessRoles: [constants.roles.Employee, constants.roles.TaskManager]
-    },
+    // {
+    //   key: routes.home.key,
+    //   name: routes.home.name,
+    //   icon: <HomeOutlined />,
+    //   route: routes.home.path,
+    //   accessRoles: [constants.roles.Employee, constants.roles.TaskManager]
+    // },
     {
       key: routes.timesheet.key,
       name: routes.timesheet.name,
@@ -120,13 +120,13 @@ const Sidebar = (props: any) => {
       route: routes.timesheet.path(loggedInUser?.company?.code ?? ''),
       accessRoles: [constants.roles.Employee]
     },
-    // {
-    //   key: routes.schedule.key,
-    //   name: routes.schedule.name,
-    //   icon: <ScheduleOutlined />,
-    //   route: routes.schedule.path(loggedInUser?.company?.code ?? ''),
-    //   accessRoles: [constants.roles.Employee]
-    // },
+    {
+      key: routes.employeeSchedule.key,
+      name: routes.employeeSchedule.name,
+      icon: <ScheduleOutlined />,
+      route: routes.employeeSchedule.path(loggedInUser?.company?.code ?? ''),
+      accessRoles: [constants.roles.Employee]
+    },
     {
       key: routes.projects.key,
       name: routes.projects.name,
@@ -147,6 +147,13 @@ const Sidebar = (props: any) => {
       icon: <FieldTimeOutlined />,
       route: routes.employeeTimesheet.path(loggedInUser?.company?.code ?? ''),
       accessRoles: [constants.roles.CompanyAdmin, constants.roles.TaskManager]
+    },
+    {
+      key: routes.schedule.key,
+      name: routes.schedule.name,
+      icon: <ScheduleOutlined />,
+      route: routes.schedule.path(loggedInUser?.company?.code ?? ''),
+      accessRoles: [constants.roles.CompanyAdmin]
     },
     {
       key: routes.subscription.key,
