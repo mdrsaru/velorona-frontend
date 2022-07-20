@@ -262,7 +262,7 @@ const DetailTimesheet = () => {
   });
 
   const canViewAttachedTimesheet = checkRoles({
-    expectedRoles: [constants.roles.Employee, constants.roles.CompanyAdmin],
+    expectedRoles: [constants.roles.Employee, constants.roles.CompanyAdmin,constants.roles.TaskManager],
     userRoles: roles,
   });
   const [approveRejectTimeEntries] = useMutation<

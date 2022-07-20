@@ -13,7 +13,7 @@ import {
 } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 
-import { useLazyQuery, useMutation, useQuery } from "@apollo/client";
+import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import routes from "../../../config/routes";
 import { authVar } from "../../../App/link";
@@ -28,9 +28,31 @@ import constants from "../../../config/constants";
 import { CHANGE_PROFILE_IMAGE } from "../NewEmployee";
 import { notifyGraphqlError } from "../../../utils/error";
 import { GraphQLResponse, UserPayRatePagingData } from "../../../interfaces/graphql.interface";
-import { MutationChangeProfilePictureArgs, QueryUserArgs, User, UserPagingResult } from "../../../interfaces/generated";
+import { MutationChangeProfilePictureArgs, QueryUserArgs, QueryUserClientArgs, RoleName, User, UserClientPagingResult, UserPagingResult } from "../../../interfaces/generated";
 import Loader from "../../../components/Loader";
 import moment from "moment";
+import Status from "../../../components/Status";
+
+export const USERCLIENT = gql`
+  query UserClient($input: UserClientQueryInput!) {
+    UserClient(input: $input) {
+      paging {
+        total
+      }
+      data {
+      client_id
+			user_id
+      status
+			client{
+				id
+        name
+        email
+        status
+			}
+      }
+    }
+  }
+`;
 
 const DetailEmployee = () => {
   const navigate = useNavigate();
@@ -93,6 +115,20 @@ const DetailEmployee = () => {
     },
   });
 
+  const { data: userClientData } = useQuery<
+    GraphQLResponse<'UserClient', UserClientPagingResult>,
+    QueryUserClientArgs
+  >(USERCLIENT, {
+    fetchPolicy: "network-only",
+    variables: {
+      input: {
+        query: {
+          user_id: params?.eid,
+        },
+      },
+    },
+  });
+
   const props: UploadProps = {
     name: "file",
     action: `${constants.apiUrl}/v1/media/upload`,
@@ -134,7 +170,6 @@ const DetailEmployee = () => {
     setViewUserPayRateVisibility(!showViewUserPayRate);
   };
 
-  console.log(userData?.User?.data?.[0]?.client, 'detail')
   return (
     <div className={styles["main-div"]}>
       {userData?.User?.data[0] && (
@@ -199,8 +234,8 @@ const DetailEmployee = () => {
           <br />
 
           <Row className={styles["detail-row"]}>
-          <Col xs={24} sm={24} md={24} lg={24}>
-          <div className={styles['header-div']}>Contact Information</div>
+            <Col xs={24} sm={24} md={24} lg={24}>
+              <div className={styles['header-div']}>Contact Information</div>
             </Col>
             <Col xs={24} sm={24} md={12} lg={12}>
               <div>
@@ -328,34 +363,44 @@ const DetailEmployee = () => {
                 View Payrate
               </p>
             </Col>
-            <Col xs={24} sm={24} md={24} lg={24}>
-              <div className={styles['header-div']}>Client Assigned</div>
-            </Col>
+            {
+              userData?.User?.data[0]?.roles?.[0].name === RoleName.Employee &&
+              <>
+                {userClientData?.UserClient?.data?.length  &&
+                  <>
+                    <Col xs={24} sm={24} md={24} lg={24}>
+                      <div className={styles['header-div']}>Client Assigned</div>
+                    </Col>
 
-            <Col xs={24} sm={24} md={24} lg={24} style={{marginBottom:'1rem'}}>
-            {userData?.User?.data[0]?.client && userData?.User?.data[0]?.client?.map((client, index) => {
-              return (
-                <Collapse defaultActiveKey={index} style={{border:0 }}>
-                  <Collapse.Panel header={client?.name} key={index}  >
-                    <Row>
-                      <Col xs={24} sm={24} md={12} lg={12}>
-                        <div>Client Email Address</div>
-                        <span className={styles.detailValue}>
-                          {client?.email}
-                        </span>
-                      </Col>
-                      <Col xs={24} sm={24} md={12} lg={12}>
-                        <div>Client Status</div>
-                        <span className={styles.detailValue}>
-                          {client?.status}
-                        </span>
-                      </Col>
-                    </Row>
-                  </Collapse.Panel>
-                </Collapse>
-              )
-            })}
-            </Col>
+                    <Col xs={24} sm={24} md={24} lg={24} style={{ marginBottom: '1rem' }}>
+                      {userClientData?.UserClient?.data?.map((userClient, index) => {
+                        return (
+                          <Collapse defaultActiveKey={index} key={index} style={{ border: 0 }}>
+                            <Collapse.Panel header={userClient?.client?.name} key={index}  >
+                              <Row>
+                                <Col xs={24} sm={24} md={12} lg={12}>
+                                  <div>Client Email Address</div>
+                                  <span className={styles.detailValue}>
+                                    {userClient?.client?.email}
+                                  </span>
+                                </Col>
+                                <Col xs={24} sm={24} md={12} lg={12}>
+                                  <div>Client Status</div>
+                                  <span className={`${styles.detailValue} ${styles.userClientStatus}`}>
+                                    <Status status={userClient?.status} />
+                                  </span>
+                                </Col>
+                              </Row>
+                            </Collapse.Panel>
+                          </Collapse>
+                        )
+                      })}
+
+                    </Col>
+                  </>
+                }
+              </>
+            }
           </Row>
           <Row>
             <Col>
