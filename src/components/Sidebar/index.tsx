@@ -14,7 +14,7 @@ import {
   UsergroupAddOutlined,
   SolutionOutlined,
   FundProjectionScreenOutlined,
-  ProfileOutlined
+  ProfileOutlined,
 } from '@ant-design/icons';
 
 import constants from '../../config/constants';
@@ -23,6 +23,8 @@ import { authVar } from '../../App/link';
 
 import styles from './style.module.scss';
 import { useEffect, useState } from "react";
+
+import subscriptionImg from '../../assets/images/subscription.png';
 
 const { Sider } = Layout;
 
@@ -68,6 +70,13 @@ const Sidebar = (props: any) => {
       icon: <DashboardOutlined />,
       route: routes.employeeDashboard.path(loggedInUser?.company?.code ?? ''),
       accessRoles: [constants.roles.Employee]
+    },
+    {
+      key: routes.taskManagerDashboard.key,
+      name: routes.taskManagerDashboard.name,
+      icon: <DashboardOutlined />,
+      route: routes.taskManagerDashboard.path(loggedInUser?.company?.code ?? ''),
+      accessRoles: [constants.roles.TaskManager]
     },
     {
       key: routes.role.key,
@@ -145,7 +154,21 @@ const Sidebar = (props: any) => {
       icon: <ScheduleOutlined />,
       route: routes.schedule.path(loggedInUser?.company?.code ?? ''),
       accessRoles: [constants.roles.CompanyAdmin]
-    }
+    },
+    {
+      key: routes.subscription.key,
+      name: routes.subscription.name,
+      icon: <img src={subscriptionImg} style={{ width: 14 }} />,
+      route: routes.subscription.path(loggedInUser?.company?.code ?? ''),
+      accessRoles: [constants.roles.CompanyAdmin]
+    },
+    // {
+    //   key: routes.schedule.key,
+    //   name: routes.schedule.name,
+    //   icon: <ScheduleOutlined />,
+    //   route: routes.schedule.path(loggedInUser?.company?.code ?? ''),
+    //   accessRoles: [constants.roles.Employee]
+    // }
   ]
   const menuArray = menuItems.filter(menu => { return loggedInUser?.user?.roles?.some(role => menu.accessRoles.includes(role)) })
   // const selectedMenuKey = menuKeys.find(key => key.split('/')?.[1] === location.pathname?.split('/')?.[1]) ?? '';

@@ -1,8 +1,8 @@
 import moment from 'moment';
 import { ChangeEvent, useState } from 'react';
 import { gql, useQuery, useMutation } from '@apollo/client';
-import { useNavigate } from 'react-router-dom';
-import { Button, Col, Form, Input, Row, Select, Image, DatePicker, InputNumber, Space, message } from 'antd';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { Button, Col, Form, Input, Row, Select, Image, DatePicker, InputNumber, Space, message, Popover } from 'antd';
 import { CloseCircleOutlined } from '@ant-design/icons';
 
 import { round } from '../../utils/common';
@@ -62,12 +62,14 @@ const INVOICE_UPDATE = gql`
 
 const InvoiceForm = (props: IProps) => {
   const navigate = useNavigate();
+  const location = useLocation() as any;
   const loggedInUser = authVar();
   const [form] = Form.useForm();
   const [isSendInvoiceClicked, setIsSendInvoiceClicked] = useState(false);
 
   const company_id = loggedInUser?.company?.id as string
-  const disabled = !!props.timesheet_id; 
+  const companyCode = loggedInUser?.company?.code as string
+  const isTimesheet = !!props.timesheet_id; 
 
   const [createInvoice, { loading: creatingInvoice }] = useMutation<
     GraphQLResponse<'InvoiceCreate', Invoice>,
@@ -77,13 +79,17 @@ const InvoiceForm = (props: IProps) => {
       onCompleted(data) {
         if(data.InvoiceCreate) {
           message.success('Invoice created successfully');
-          navigate(routes.invoice.path(loggedInUser?.company?.code as string));
+
+          if(location?.state?.from === 'timesheet' && props.timesheet_id) {
+            return navigate(routes.detailTimesheet.path(companyCode, props.timesheet_id));
+          }
+
+          navigate(routes.invoice.path(companyCode));
         }
       },
       onError: notifyGraphqlError,
     }
   );
-
   const [updateInvoice, { loading: updatingInvoice }] = useMutation<
     GraphQLResponse<'InvoiceUpdate', Invoice>,
     MutationInvoiceUpdateArgs
@@ -92,7 +98,8 @@ const InvoiceForm = (props: IProps) => {
       onCompleted(data) {
         if(data.InvoiceUpdate) {
           message.success('Invoice updated successfully');
-          navigate(routes.invoice.path(loggedInUser?.company?.code as string));
+
+          navigate(routes.invoice.path(companyCode));
         }
       },
       onError: notifyGraphqlError,
@@ -201,7 +208,6 @@ const InvoiceForm = (props: IProps) => {
     if(value >= 0) {
       const taxAmount = value * 0.01 * subtotal;
       const totalAmount = (1 + value * 0.01) * subtotal;
-      console.log(taxAmount, value)
       form.setFieldsValue({
         totalAmount: round(totalAmount, 2),
         taxAmount: round(taxAmount, 2),
@@ -300,11 +306,15 @@ const InvoiceForm = (props: IProps) => {
           <Form.Item
             label="Invoice Number"
           >
-            <Input 
-              placeholder="Invoice Number" 
-              value={invoice?.invoiceNumber} 
-              disabled
-            />
+            <Popover content="Invoice number will be auto generated" >
+              <div>
+                <Input 
+                  placeholder="Invoice Number" 
+                  value={invoice?.invoiceNumber} 
+                  disabled
+                />
+              </div>
+            </Popover>
           </Form.Item>
         </Col>
 
@@ -378,7 +388,7 @@ const InvoiceForm = (props: IProps) => {
                               }]}
                               {...restField}
                             >
-                              <Select placeholder="Select Project" loading={projectLoading} disabled={disabled}>
+                              <Select placeholder="Select Project" loading={projectLoading} disabled={isTimesheet}>
                                 {
                                   projectData?.Project?.data?.map((project) => (
                                     <Select.Option key={project.id} value={project.id}>{project.name}</Select.Option>
@@ -394,7 +404,7 @@ const InvoiceForm = (props: IProps) => {
                               name={[name, 'description']}
                               {...restField}
                             >
-                              <Input disabled={disabled} />
+                              <Input disabled={isTimesheet} />
                             </Form.Item>
                           </td>
 
@@ -408,7 +418,7 @@ const InvoiceForm = (props: IProps) => {
                               }]}
                               {...restField}
                             >
-                              <InputNumber min={0} autoComplete="off" disabled={disabled} onChange={() => onHourRateChange(name)} />
+                              <InputNumber min={0} autoComplete="off" disabled={isTimesheet} onChange={() => onHourRateChange(name)} />
                             </Form.Item>
                           </td>
 
@@ -422,7 +432,7 @@ const InvoiceForm = (props: IProps) => {
                                 message: 'Please enter rate'
                               }]}
                             >
-                              <Input type="number" prefix="$" min={0} autoComplete="off" disabled={disabled} onChange={() => onHourRateChange(name)} />
+                              <Input type="number" prefix="$" min={0} autoComplete="off" disabled={isTimesheet} onChange={() => onHourRateChange(name)} />
                             </Form.Item>
                           </td>
 
@@ -436,35 +446,43 @@ const InvoiceForm = (props: IProps) => {
                             </Form.Item>
                           </td>
 
-                          <td>
-                            <CloseCircleOutlined 
-                              className={styles['remove-icon']} 
-                              onClick={() => onItemRowRemove(name, remove)}
-                            />
-                          </td>
+                          {
+                            !isTimesheet && (
+                              <td>
+                                <CloseCircleOutlined 
+                                  className={styles['remove-icon']} 
+                                  onClick={() => onItemRowRemove(name, remove)}
+                                />
+                              </td>
+                            )
+                          }
 
                         </tr>
                       ))
                     }
 
-                    <tr>
-                      <td>
-                        <Form.Item>
-                          <div 
-                            className={styles['add-project']} 
-                            onClick={() => add({
-                              project_id: undefined,
-                              quantity: 0,
-                              rate: 0,
-                              amount: 0,
-                            })}
-                          >
-                            <Image width={20} src={addIcon} preview={false} />
-                            &nbsp; &nbsp; Add Item 
-                          </div>
-                        </Form.Item>
-                      </td>
-                    </tr>
+                    {
+                      !isTimesheet && (
+                        <tr>
+                          <td>
+                            <Form.Item>
+                              <div 
+                                className={styles['add-project']} 
+                                onClick={() => add({
+                                  project_id: undefined,
+                                  quantity: 0,
+                                  rate: 0,
+                                  amount: 0,
+                                })}
+                              >
+                                <Image width={20} src={addIcon} preview={false} />
+                                &nbsp; &nbsp; Add Item 
+                              </div>
+                            </Form.Item>
+                          </td>
+                        </tr>
+                      )
+                    }
 
                     <tr>
                       <td className={styles['horizontal']} colSpan={5}></td>
@@ -480,14 +498,6 @@ const InvoiceForm = (props: IProps) => {
             <tr>
 
               <td colSpan={2}>
-                <Form.Item
-                  name='notes'
-                  label="Notes"
-                  className={styles['td-input']}
-                >
-                  <Input placeholder="notes" autoComplete="off" />
-                </Form.Item>
-
               </td>
 
               <td>
@@ -557,6 +567,19 @@ const InvoiceForm = (props: IProps) => {
                 >
                   <Input type="number" prefix="$" disabled />
                 </Form.Item>
+              </td>
+            </tr>
+            <tr>
+              <td colSpan={2}></td>
+              <td colSpan={3}>
+                <Form.Item
+                  name='notes'
+                  label="Notes"
+                  className={styles['td-input']}
+                >
+                  <Input.TextArea rows={3} placeholder="Notes" autoComplete="off" />
+                </Form.Item>
+
               </td>
             </tr>
           </tfoot>

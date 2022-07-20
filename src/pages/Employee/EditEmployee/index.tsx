@@ -2,6 +2,7 @@ import {
   Button,
   Card,
   Col,
+  DatePicker,
   Form,
   Input,
   message,
@@ -28,7 +29,7 @@ import { useState } from 'react'
 import styles from '../style.module.scss'
 import { authVar } from '../../../App/link'
 import RouteLoader from '../../../components/Skeleton/RouteLoader'
-import { MutationChangeProfilePictureArgs, MutationUserUpdateArgs, User } from "../../../interfaces/generated";
+import { EntryType, MutationChangeProfilePictureArgs, MutationUserUpdateArgs, QueryUserArgs, RoleName, User, UserPagingResult } from "../../../interfaces/generated";
 import { GraphQLResponse } from "../../../interfaces/graphql.interface";
 
 const dateFormat = "YYYY-MM-DD HH:mm:ss";
@@ -142,6 +143,26 @@ const EditEmployee = () => {
     },
   };
 
+  const { data: managerData } = useQuery<
+    GraphQLResponse<'User', UserPagingResult>,
+    QueryUserArgs
+  >(
+    USER,
+    {
+      fetchPolicy: "network-only",
+      nextFetchPolicy: "cache-first",
+      variables: {
+        input: {
+          paging: {
+            order: ["updatedAt:DESC"],
+          },
+          query: {
+            role: RoleName.TaskManager,
+          }
+        },
+      },
+    })
+
   const onSubmitForm = () => {
     const values = form.getFieldsValue(true, (meta) => meta.touched);
     if (Object.keys(values).length !== 0) {
@@ -211,20 +232,23 @@ const EditEmployee = () => {
               phone: userData?.User?.data[0]?.phone ?? "",
               roles: userData?.User?.data[0]?.roles[0]?.id ?? "",
               status: userData?.User?.data[0]?.status ?? "",
+              manager_id: userData?.User?.data[0]?.manager_id ?? "",
               country:
-              userData?.User?.data[0]?.address?.country ?? "",
+                userData?.User?.data[0]?.address?.country ?? "",
               streetAddress:
                 userData?.User?.data[0]?.address?.streetAddress ?? "",
               startDate: moment(
-                userData?.User?.data[0]?.record?.endDate ??
+                userData?.User?.data[0]?.endDate ??
                 "2022-01-01T00:00:00.410Z",
                 dateFormat
               ),
               endDate: moment(
-                userData?.User?.data[0]?.record?.startDate ??
-                "2022-01-02T00:00:00.410Z",
+                userData?.User?.data[0]?.startDate ??
+                "2022-01-01T00:00:00.410Z",
                 dateFormat
               ),
+              type: userData?.User?.data[0]?.type,
+              timesheet_attachment: userData?.User?.data[0]?.timesheet_attachment ? 'Mandatory' : 'Optional',
               state: userData?.User?.data[0]?.address?.state ?? "",
               city: userData?.User?.data[0]?.address?.city ?? "",
               file: userData?.User?.data[0]?.avatar?.url,
@@ -356,10 +380,10 @@ const EditEmployee = () => {
                     },
                   ]}
                 >
-                    <Input
-                  placeholder="Enter the city "
-                  name='city'
-                  autoComplete="off" />
+                  <Input
+                    placeholder="Enter the city "
+                    name='city'
+                    autoComplete="off" />
                 </Form.Item>
               </Col>
               <Col xs={24} sm={24} md={8} lg={8}>
@@ -428,6 +452,79 @@ const EditEmployee = () => {
                   <Select placeholder="Select status" disabled={authData?.user?.id === params.eid ? true : false}>
                     <Option value="Active">Active</Option>
                     <Option value="Inactive">InActive</Option>
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col
+                xs={24}
+                sm={24}
+                md={12}
+                lg={12}>
+                <Form.Item
+                  name="manager_id"
+                  label="Task Manager"
+                >
+                  <Select placeholder="Select manager">
+                    {managerData?.User?.data?.map((manager, index) => (
+                      <Option key={index} value={manager?.id}> {`${manager?.fullName} / ${manager?.email}`}</Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={24} md={12} lg={12}>
+                <Form.Item
+                  label="Start Date"
+                  name='startDate'
+                  rules={[{
+                    required: true,
+                    message: 'Please select the start date'
+                  }]}>
+                  <DatePicker placeholder='Select start date' />
+                </Form.Item>
+              </Col>
+
+              <Col xs={24} sm={24} md={12} lg={12}>
+                <Form.Item
+                  label="End Date"
+                  name='endDate'
+                >
+                  <DatePicker placeholder='Select end date' disabledDate={(current) => current.isBefore(moment().subtract(1, "day"))} />
+                </Form.Item>
+              </Col>
+
+              <Col
+                xs={24}
+                sm={24}
+                md={12}
+                lg={12}>
+                <Form.Item
+                  name="timesheet_attachment"
+                  label="Timesheet Attachment type"
+                  rules={[{
+                    required: true,
+                    message: 'Please select timesheet attachment type'
+                  }]}>
+                  <Select placeholder="Select status">
+                    <Option value={true}>Mandatory</Option>
+                    <Option value={false}>Optional</Option>
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col
+                xs={24}
+                sm={24}
+                md={12}
+                lg={12}>
+                <Form.Item
+                  name="type"
+                  label="Entry Type"
+                  rules={[{
+                    required: true,
+                    message: 'Please select the user type'
+                  }]}>
+                  <Select placeholder="Select status">
+                    <Option value={EntryType.Timesheet}>{EntryType.Timesheet}</Option>
+                    <Option value={EntryType.Cico}>Checkin-Checkout</Option>
                   </Select>
                 </Form.Item>
               </Col>

@@ -14,6 +14,7 @@ import {
   PlusCircleFilled,
   MoreOutlined,
 } from '@ant-design/icons';
+import { Table } from 'antd';
 
 import { authVar } from '../../../App/link';
 import { _cs, checkRoles } from '../../../utils/common';
@@ -35,13 +36,13 @@ import InvoiceViewer from '../../../components/InvoiceViewer';
 
 import deleteImg from '../../../assets/images/delete_btn.svg';
 
-import styles from './style.module.scss';
 import NoContent from '../../../components/NoContent';
-import { Table } from 'antd';
 import AttachNewTimesheetModal from '../../../components/AddAttachedTimesheet';
 import DeleteBody from '../../../components/Delete/index';
 import ModalConfirm from '../../../components/Modal';
 import EditAttachedTimesheet from '../../../components/EditAttachedTimesheet';
+import ApprovedTimesheetAttachment from "../../../components/ApprovedTimesheetAttachment";
+import styles from './style.module.scss';
 
 type InvoicedTimeEntries = {
   invoice_id: string;
@@ -125,12 +126,11 @@ export const TIME_SHEET = gql`
     timesheet {
       id
     }
+    project_id
     project {
       id
       name
     }
-    task_id
-
   }
 
 `
@@ -192,7 +192,6 @@ export const ATTACHED_TIMESHEET_DELETE = gql`
   mutation AttachedTimesheetDelete($input: DeleteInput!) {
     AttachedTimesheetDelete(input: $input) {
       id
-     totalCost
     }
   }
 `;
@@ -230,7 +229,9 @@ const DetailTimesheet = () => {
     invoice_id: undefined,
   })
 
-  const [showAttachTimeEntry, setAttachTimeEntry] = useState(false)
+  const [showAttachTimeEntry, setAttachTimeEntry] = useState(false);
+  const [viewAttachment, setViewAttachment] = useState(false);
+  const [attachedTimesheetAttachment, setAttachedTimesheetAttachment] = useState<any>();
 
   const entriesByStatusRef = useRef<any>({});
 
@@ -255,8 +256,13 @@ const DetailTimesheet = () => {
     userRoles: roles,
   });
 
-  const canAttachedTimesheet = checkRoles({
+  const canAddAttachedTimesheet = checkRoles({
     expectedRoles: [constants.roles.Employee],
+    userRoles: roles,
+  });
+
+  const canViewAttachedTimesheet = checkRoles({
+    expectedRoles: [constants.roles.Employee, constants.roles.CompanyAdmin,constants.roles.TaskManager],
     userRoles: roles,
   });
   const [approveRejectTimeEntries] = useMutation<
@@ -425,7 +431,7 @@ const DetailTimesheet = () => {
       byInvoice.forEach((byInv) => {
         const _invoiced: InvoicedTimeEntries = {
           invoice_id: byInv.invoice_id,
-          group: groupEntriesByTask(byInv.entries),
+          group: groupEntriesByProject(byInv.entries),
         };
 
         invoiced.push(_invoiced);
@@ -439,9 +445,9 @@ const DetailTimesheet = () => {
 
       setInvoicedTimeEntries(invoiced);
       setEntriesByStatus({
-        approved: groupEntriesByTask(approvedTimeEntries),
-        pending: groupEntriesByTask(pendingTimeEntries),
-        rejected: groupEntriesByTask(rejectedTimeEntries),
+        approved: groupEntriesByProject(approvedTimeEntries),
+        pending: groupEntriesByProject(pendingTimeEntries),
+        rejected: groupEntriesByProject(rejectedTimeEntries),
       })
 
       getProject({
@@ -483,6 +489,11 @@ const DetailTimesheet = () => {
 
   const attachNewTimesheet = () => {
     setAttachTimeEntry(!showAttachTimeEntry)
+  }
+
+  const handleAttachmentView = (data: any) => {
+    setViewAttachment(!viewAttachment);
+    setAttachedTimesheetAttachment(data);
   }
   const approveRejectAll = (status: string) => {
     const ids: string[] = [];
@@ -561,10 +572,9 @@ const DetailTimesheet = () => {
   const onSubmitAttachedTimesheet = () => {
 
   }
+
   const menu = (data: any) => (
     <Menu>
-
-
       <Menu.Item key="edit">
         <div onClick={() => {
           setEditAttachedVisibility(true);
@@ -591,7 +601,7 @@ const DetailTimesheet = () => {
     {
       title: 'Description',
       dataIndex: 'description',
-      width:'30%',
+      width: '30%',
     },
     {
       title: 'Created At',
@@ -608,31 +618,36 @@ const DetailTimesheet = () => {
       dataIndex: 'attachments',
       render: (attachments: any) => {
         return (
-          <span style={{ color: 'var(--primary-blue)' }}>{attachments?.name}</span>
+          <span className={styles['table-attachment']}
+                onClick={() => handleAttachmentView(attachments)}>
+            {attachments?.name}
+          </span>
         )
       }
     },
     {
-      title: "Actions",
+      title: '',
       key: "actions",
       render: (attachedTimesheet: any) => (
         <div
           className={styles["dropdown-menu"]}
           onClick={(event) => event.stopPropagation()}
         >
-          <Dropdown
-            overlay={menu(attachedTimesheet)}
-            trigger={["click"]}
-            placement="bottomRight"
-          >
-            <div
-              className="ant-dropdown-link"
-              onClick={(e) => e.preventDefault()}
-              style={{ paddingLeft: "1rem" }}
+          {canAddAttachedTimesheet &&
+            (<Dropdown
+              overlay={menu(attachedTimesheet)}
+              trigger={["click"]}
+              placement="bottomRight"
             >
-              <MoreOutlined />
-            </div>
-          </Dropdown>
+              <div
+                className="ant-dropdown-link"
+                onClick={(e) => e.preventDefault()}
+                style={{ paddingLeft: "1rem" }}
+              >
+                <MoreOutlined />
+              </div>
+            </Dropdown>
+            )}
         </div>
       ),
     },
@@ -771,6 +786,7 @@ const DetailTimesheet = () => {
                             <Link
                               className={styles['invoice-link']}
                               to={routes.timesheetInvoice.path(authData?.company?.code as string, params?.id as string)}
+                              state={{ from: 'timesheet' }}
                             >
                               Generate Invoice
                             </Link>
@@ -858,7 +874,7 @@ const DetailTimesheet = () => {
         </Spin>
       }
 
-      {canAttachedTimesheet &&
+      {canViewAttachedTimesheet &&
         (<div className={styles['site-card-wrapper']}>
           <Card className={styles['attach-approved-timesheet']}>
             <Collapse accordion defaultActiveKey={['2']}>
@@ -868,11 +884,15 @@ const DetailTimesheet = () => {
                   columns={columns}
                   pagination={false}
                 />
-                <p className={styles['attach-new-timesheet']} onClick={attachNewTimesheet}>
-                  <PlusCircleFilled />
-                  <span style={{ marginLeft: '1rem' }}>  Attach New Timesheet
-                  </span>
-                </p>
+                {canAddAttachedTimesheet &&
+                  <>
+                    <p className={styles['attach-new-timesheet']} onClick={attachNewTimesheet}>
+                      <PlusCircleFilled />
+                      <span style={{ marginLeft: '1rem' }}>  Attach New Timesheet
+                      </span>
+                    </p>
+                  </>
+                }
                 <br />
                 <Row justify={"end"}>
                   <Col className={styles['form-col']}>
@@ -1009,6 +1029,12 @@ const DetailTimesheet = () => {
         data={attachedTimesheet}
       />
 
+      <ApprovedTimesheetAttachment
+        visible={viewAttachment}
+        setVisible={setViewAttachment}
+        attachment={attachedTimesheetAttachment}
+      />
+
       <ModalConfirm
         visibility={deleteVisibility}
         setModalVisibility={setDeleteVisibility}
@@ -1032,7 +1058,7 @@ const DetailTimesheet = () => {
   )
 }
 
-function groupEntriesByTask(entries: TimeEntry[]) {
+function groupEntriesByProject(entries: TimeEntry[]) {
   function groupByStartDate(array: any) {
     const startDateFn = (entry: any) => moment(entry?.startTime).format('ddd, MMM D');
     return groupBy(array, startDateFn);
@@ -1040,13 +1066,13 @@ function groupEntriesByTask(entries: TimeEntry[]) {
 
   let grouped: any = [];
 
-  const tasks = groupBy(entries, 'task_id');
+  const projects = groupBy(entries, 'project_id');
 
-  for (const [key, _entries] of Object.entries(tasks)) {
+  for (const [key, _entries] of Object.entries(projects)) {
     grouped.push({
       id: key,
       project: _entries[0]?.project?.name,
-      project_id: _entries[0]?.project?.id,
+      project_id: key,
       entries: groupByStartDate(_entries)
     });
   }

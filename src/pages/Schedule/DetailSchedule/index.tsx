@@ -30,9 +30,9 @@ query WorkscheduleTimeDetail($input: WorkscheduleTimeDetailQueryInput!) {
         duration
         workschedule_detail_id
         workscheduleTimeDetail{
-                id
-				startTime		
-				endTime
+          id
+		  startTime		
+		  endTime
 				
 			}
     }
@@ -126,6 +126,7 @@ const ScheduleDetail = () => {
         }
         return count;
     }
+    console.log(groups)
     return (
         <>
             <div className={styles['main-div']}>
@@ -161,8 +162,8 @@ const ScheduleDetail = () => {
                                                     <td key={index}>
                                                         {groups[key] && groups[key]?.map((data: any, index: number) =>
                                                             <Fragment key={index}>
-                                                                {day === moment(data?.date).format('YYYY-MM-DD') &&
-                                                                  data?.workscheduleTimeDetail.length > 0 &&
+                                                                {day === moment(data?.schedule_date).format('YYYY-MM-DD') &&
+                                                                  data?.workscheduleTimeDetail?.length > 0 &&
                                                                   data?.workscheduleTimeDetail?.map((timeData: any,
                                                                                                      index: number) =>
                                                                       <Fragment key={index}>
@@ -176,7 +177,7 @@ const ScheduleDetail = () => {
                                                             </Fragment>
                                                         )}
                                                         {!groups[key]?.some((data: any) =>
-                                                          moment(data?.date).format('YYYY-MM-DD') === day) &&
+                                                          moment(data?.schedule_date).format('YYYY-MM-DD') === day) &&
                                                           <> - </>}
                                                     </td>
                                                   ))}

@@ -403,7 +403,7 @@ const ProjectPage = () => {
           className={styles["dropdown-menu"]}
           onClick={(event) => event.stopPropagation()}
         >
-          <Link
+          {/* <Link
             to={routes.addTasksProject.path(
               loggedInUser?.company?.code ? loggedInUser?.company?.code : "",
               record?.id ?? ""
@@ -414,7 +414,7 @@ const ProjectPage = () => {
             </span>{" "}
             &nbsp;
             <span className={styles["add-task"]}>Add Task</span> &nbsp; &nbsp;
-          </Link>
+          </Link> */}
           <Dropdown
             overlay={menu(record)}
             trigger={["click"]}

@@ -8,6 +8,7 @@ export const AUTH = gql`
       user {
         id
         roles
+        type
       }
       company {
         code

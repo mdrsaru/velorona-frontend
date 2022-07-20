@@ -9,12 +9,14 @@ import TokenService from '../services/TokenService';
 
 import { IAuth } from '../interfaces/IAuth';
 import { ISidebar } from '../interfaces/IApp';
+import { IPlan } from '../interfaces/subscription.interface';
 
 const auth: IAuth = {
   token: null,
   user: {
     roles: [],
-    id: null
+    id: null,
+    type: null,
   },
   isLoggedIn: false,
   company: {
@@ -25,15 +27,19 @@ const auth: IAuth = {
     id: '',
     url: null
   },
-  fullName:null
+  fullName: null,
 };
 
 const sidebar = {
   collapsed: false,
 };
 
+const plans: IPlan[] = [];
+
 export const authVar = makeVar<IAuth>(auth);
 export const sidebarVar = makeVar<ISidebar>(sidebar);
+export const plansVar = makeVar<IPlan[]>(plans);
+export const currentPlanVar = makeVar<IPlan | null>(null);
 
 // Http Link
 export const httpLink = createHttpLink({

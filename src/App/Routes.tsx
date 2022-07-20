@@ -24,6 +24,8 @@ const _Routes = () => {
       return routes.company.path(loginData?.company?.code);
     } else if (roles.includes(constants.roles.Employee)) {
       return routes.employeeDashboard.path(loginData?.company?.code);
+    }  else if (roles.includes(constants.roles.TaskManager)) {
+      return routes.taskManagerDashboard.path(loginData?.company?.code);
     } else {
       return routes.home.path;
     }
@@ -403,6 +405,17 @@ const _Routes = () => {
                 }
               />
             </Route>
+
+            <Route
+              path={routes.subscription.childPath}
+              element={
+                <CheckRoles allowedRoles={[constants.roles.CompanyAdmin]}>
+                  <Suspense fallback={<RouteLoader />}>
+                    <routes.subscription.component />
+                  </Suspense>
+                </CheckRoles>
+              }
+            />
           </Route>
 
           <Route

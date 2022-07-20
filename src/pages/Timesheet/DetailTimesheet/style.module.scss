@@ -1,6 +1,6 @@
 :global {
   .ant-modal-close {
-    padding: 1rem;
+    //padding: 1rem;
   }
 
   .ant-modal-close-x {
@@ -230,6 +230,11 @@
   font-weight: 400;
   font-size: 14px;
   line-height: 17px;
+}
+
+.table-attachment {
+  color: var(--primary-blue);
+  cursor: pointer;
 }
 
 .modal-title {

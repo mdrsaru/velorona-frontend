@@ -23,11 +23,6 @@ export const UPDATE_TIME_ENTRY = gql`
           createdAt
           duration
           clientLocation
-          task_id
-          task {
-            id 
-            name
-          }
           company {
             id
             name
@@ -192,17 +187,8 @@ const EditTimeSheet = (props: IProps) => {
                   <Row
                     key={index}
                     className={styles['form-div']}
-                    gutter={[16, 16]}>
-
-                    <Col span={8}>
-                      <Form.Item
-                        name={`task-${index}`}
-                        label={`Task`}>
-                        <Input
-                          placeholder="task name"
-                          disabled />
-                      </Form.Item>
-                    </Col>
+                    gutter={[16, 16]}
+                  >
 
                     <Col span={6}>
                       <Form.Item

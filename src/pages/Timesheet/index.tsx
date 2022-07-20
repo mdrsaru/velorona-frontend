@@ -1,130 +1,69 @@
-import { useState } from 'react'
+import _ from 'lodash'
+import moment from 'moment'
+import findIndex from 'lodash/findIndex';
+import { useState, useMemo } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { gql, useMutation, useQuery } from '@apollo/client'
+import { useStopwatch } from 'react-timer-hook'
 import {
   Card,
   Col,
   Row,
-  // DatePicker,
   Modal,
   Table,
   Form,
   Select,
   message,
   Collapse,
-  Space,
-  Typography
+  Input,
 } from 'antd'
 import {
   CloseOutlined,
-  // LeftOutlined,
-  // RightOutlined,
-  PlusCircleFilled
 } from '@ant-design/icons'
 
-import moment from 'moment'
-import _ from 'lodash'
-import { authVar } from '../../App/link'
-import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client'
-import { useStopwatch } from 'react-timer-hook'
-import constants from '../../config/constants'
-
-import routes from "../../config/routes"
-import { useNavigate } from 'react-router-dom'
-import { notifyGraphqlError } from "../../utils/error"
-import { Timesheet as ITimesheet } from '../../interfaces/generated';
-
 import { PROJECT } from '../Project'
-import { CLIENT } from '../Client'
-import { TASK } from '../Tasks'
+import { authVar } from '../../App/link'
+import constants from '../../config/constants'
+import routes from "../../config/routes"
+import { getTotalTimeForADay } from './DetailTimesheet'
+import { TIME_ENTRY_FIELDS } from '../../gql/time-entries.gql';
+import { GraphQLResponse } from '../../interfaces/graphql.interface';
+import { Timesheet as ITimesheet, TimeEntryPagingResult, TimeEntry as ITimeEntry, EntryType } from '../../interfaces/generated';
 
+import { notifyGraphqlError } from "../../utils/error"
 import TimeSheetLoader from '../../components/Skeleton/TimeSheetLoader'
 import TimeEntry from './TimeEntry'
 import NoContent from '../../components/NoContent'
-import { getTotalTimeForADay } from './DetailTimesheet'
 import TimerCard from '../../components/TimerCard'
-
-import styles from './style.module.scss'
-import TaskCreate from '../../components/TaskCreate'
 import TimeDuration from '../../components/TimeDuration'
 
+import styles from './style.module.scss'
+
+type ITodayGroupedEntries = {
+  description: string | null | undefined;
+  project_id: string;
+  entries: ITimeEntry[];
+};
+
 export const CREATE_TIME_ENTRY = gql`
+    ${TIME_ENTRY_FIELDS}
     mutation TimeEntryCreate($input: TimeEntryCreateInput!) {
       TimeEntryCreate(input: $input) {
-          id
-          startTime
-          endTime
-          createdAt
-          duration
-          task_id
-          clientLocation
-          task {
-            id 
-            name
-          }
-          company {
-            id
-            name
-          }
-          project {
-            id
-            name
-            client {
-              id
-              name
-            }
-          }
-        }
+        ...timeEntryFields
+      }
     }
 `
 export const TIME_ENTRY = gql`
+    ${TIME_ENTRY_FIELDS}
     query TimeEntry($input: TimeEntryQueryInput!) {
       TimeEntry(input: $input) {
-            data {
-                id
-                startTime
-                endTime
-                createdAt
-                duration
-                clientLocation
-                task_id
-                company {
-                    id
-                    name
-                }
-                project {
-                    id
-                    name
-                    client {
-                      id
-                      name
-                    }
-                }
-            }
-            activeEntry {
-              id
-              id
-              startTime
-              endTime
-              createdAt
-              duration
-              clientLocation
-              task {
-                  id 
-                  name
-              }
-              company {
-                  id
-                  name
-              }
-              project {
-                  id
-                  name
-                  client {
-                    id
-                    name
-                  }
-              }
-            }
+        data {
+          ...timeEntryFields
         }
+        activeEntry {
+          ...timeEntryFields
+        }
+      }
     }
 `;
 
@@ -164,32 +103,11 @@ query Timesheet($input: TimesheetQueryInput!) {
 }`;
 
 const UPDATE_TIME_ENTRY = gql`
+    ${TIME_ENTRY_FIELDS}
     mutation TimeEntryUpdate($input: TimeEntryUpdateInput!) {
       TimeEntryUpdate(input: $input) {
-          id
-          startTime
-          endTime
-          createdAt
-          duration
-          clientLocation
-          task_id
-          task {
-            id 
-            name
-          }
-          company {
-            id
-            name
-          }
-          project {
-            id
-            name
-            client {
-              id
-              name
-            }
-          }
-        }
+        ...timeEntryFields
+      }
     }
 `
 
@@ -229,16 +147,15 @@ const Timesheet = () => {
   let stopwatchOffset = new Date()
   const [visible, setVisible] = useState(false)
   const [showDetailTimeEntry, setDetailVisible] = useState<boolean>(false)
-  const [showAddTaskVisibility, setAddTaskVisbility] = useState<boolean>(false)
   const [pagingInput, setPagingInput] = useState<{
     skip: number,
     currentPage: number,
-  }>
-    ({
-      skip: 0,
-      currentPage: 1,
-    });
-
+  }> ({
+    skip: 0,
+    currentPage: 1,
+  });
+  const company_id = authData?.company?.id;
+  const entryType = authData?.user?.type;
 
   const columns = [
     {
@@ -306,81 +223,37 @@ const Timesheet = () => {
   const {
     data: timeWeeklyEntryData,
     loading: loadTimesheetWeekly,
-    refetch: refetchTimeWeekly } = useQuery(TIME_WEEKLY, {
-      fetchPolicy: "network-only",
-      nextFetchPolicy: "cache-first",
-      variables: {
-        input: {
-          query: {
-            company_id: authData?.company?.id
-          },
-          paging: {
-            order: ['weekStartDate:DESC']
-          }
+    refetch: refetchTimeWeekly 
+  } = useQuery(TIME_WEEKLY, {
+    fetchPolicy: "network-only",
+    nextFetchPolicy: "cache-first",
+    variables: {
+      input: {
+        query: {
+          company_id,
+        },
+        paging: {
+          order: ['weekStartDate:DESC']
         }
       }
-    });
+    }
+  });
+
   const [newTimeEntry, setTimeEntry] = useState({
     id: '',
     name: '',
     project: '',
-    task: '',
+    description: '',
     client: ''
   });
 
-  const [newTimeSheet, setNewTimeSheet] = useState({
-    clientLocation: '',
-    company: {
-      id: '',
-      name: '',
-      __typename: 'Company'
-    },
-    createdAt: '',
-    duration: '',
-    endTime: '',
-    id: '',
-    project: {
-      id: '',
-      name: '',
-      __typename: 'Project',
-      client: {
-        _typename: 'Client',
-        id: '',
-        name: ''
-      }
-    },
-    task_id: '',
-    startTime: '',
-    task: {
-      id: '',
-      name: '',
-      __typename: 'Task'
-    },
-    __typename: 'TimeEntry'
-  });
-
-  const { data: clientData } = useQuery(CLIENT, {
+  const { data: projectData } = useQuery(PROJECT, {
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
     variables: {
       input: {
         query: {
-          company_id: authData?.company?.id
-        },
-        paging: {
-          order: ['updatedAt:DESC']
-        }
-      }
-    }
-  })
-
-  const [getProject, { data: projectData }] = useLazyQuery(PROJECT, {
-    fetchPolicy: "network-only",
-    nextFetchPolicy: "cache-first",
-    variables: {
-      input: {
-        query: {
-          company_id: authData?.company?.id,
+          company_id,
           client_id: ''
         },
         paging: {
@@ -390,14 +263,15 @@ const Timesheet = () => {
     }
   });
 
-  const { loading, data: timeEntryData } = useQuery(TIME_ENTRY, {
+  const { loading, data: timeEntryData } = useQuery<GraphQLResponse<'TimeEntry', TimeEntryPagingResult>>(TIME_ENTRY, {
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
     variables: {
       input: {
         query: {
-          company_id: authData?.company?.id,
-          afterStart: moment().startOf('day')
+          company_id,
+          afterStart: moment().startOf('day'),
+          entryType,
         },
         paging: {
           order: ['startTime:DESC']
@@ -412,56 +286,27 @@ const Timesheet = () => {
           id: timeEntry?.TimeEntry?.activeEntry?.id,
           name: timeEntry?.TimeEntry?.activeEntry?.company?.name,
           project: timeEntry?.TimeEntry?.activeEntry?.project?.name,
-          task: timeEntry?.TimeEntry?.activeEntry?.task?.name,
+          description: timeEntry?.TimeEntry?.activeEntry?.description ?? '',
           client: timeEntry?.TimeEntry?.activeEntry?.project?.client?.name
-        })
-        setNewTimeSheet({
-          clientLocation: timeEntry?.TimeEntry?.activeEntry?.clientLocation,
-          company: {
-            id: timeEntry?.TimeEntry?.activeEntry?.company?.id,
-            name: timeEntry?.TimeEntry?.activeEntry?.company?.name,
-            __typename: 'Company'
-          },
-          createdAt: timeEntry?.TimeEntry?.activeEntry?.createdAt,
-          duration: '',
-          endTime: '',
-          id: timeEntry?.TimeEntry?.activeEntry?.id,
-          project: {
-            __typename: 'Project',
-            id: timeEntry?.TimeEntry?.activeEntry?.project?.id,
-            name: timeEntry?.TimeEntry?.activeEntry?.project?.name,
-            client: {
-              _typename: 'Client',
-              id: timeEntry?.TimeEntry?.activeEntry?.project?.client?.id,
-              name: timeEntry?.TimeEntry?.activeEntry?.project?.client?.name
-            },
-          },
-          startTime: timeEntry?.TimeEntry?.activeEntry?.startTime,
-          task_id: timeEntry?.TimeEntry?.activeEntry?.task?.id,
-          task: {
-            id: timeEntry?.TimeEntry?.activeEntry?.task?.id,
-            name: timeEntry?.TimeEntry?.activeEntry?.task?.name,
-            __typename: 'Task'
-          },
-          __typename: 'TimeEntry'
         })
         reset(stopwatchOffset)
       }
     },
   });
 
-  const [updateTimeEntry] = useMutation(UPDATE_TIME_ENTRY, {
-    update: (cache, result: any) => {
-      newTimeSheet['endTime'] = result?.data?.TimeEntryUpdate?.endTime
-      newTimeSheet['duration'] = result?.data?.TimeEntryUpdate?.duration
+  const entries = timeEntryData?.TimeEntry?.data ?? [];
+  const todayGroupedEntries: ITodayGroupedEntries[] = useMemo(() => groupByDescriptionAndProject(entries), [entries]);
 
+  const [updateTimeEntry, { loading: updatingTimeEntry }] = useMutation(UPDATE_TIME_ENTRY, {
+    update: (cache, result: any) => {
       const data: any = cache.readQuery({
         query: TIME_ENTRY,
         variables: {
           input: {
             query: {
-              company_id: authData?.company?.id,
-              afterStart: moment().startOf('day')
+              company_id,
+              afterStart: moment().startOf('day'),
+              entryType,
             },
             paging: {
               order: ['startTime:DESC']
@@ -470,13 +315,17 @@ const Timesheet = () => {
         },
       });
 
+      const entries = data?.TimeEntry?.data ?? [];
+      const newEntry = result.data.TimeEntryUpdate;
+
       cache.writeQuery({
         query: TIME_ENTRY,
         variables: {
           input: {
             query: {
-              company_id: authData?.company?.id,
-              afterStart: moment().startOf('day')
+              company_id,
+              entryType,
+              afterStart: moment().startOf('day'),
             },
             paging: {
               order: ['startTime:DESC']
@@ -486,7 +335,7 @@ const Timesheet = () => {
         data: {
           TimeEntry: {
             activeEntry: null,
-            data: [...data?.TimeEntry?.data, newTimeSheet]
+            data: [...entries, newEntry]
           }
         }
       });
@@ -497,7 +346,7 @@ const Timesheet = () => {
       refetchTimeWeekly({
         input: {
           query: {
-            company_id: authData?.company?.id
+            company_id,
           },
           paging: {
             order: ['weekStartDate:DESC']
@@ -509,25 +358,9 @@ const Timesheet = () => {
         content: `Time Entry is updated successfully!`,
         className: 'custom-message'
       });
-    }
+    },
+    onError: notifyGraphqlError,
   });
-
-  const [getTask, { data: taskData }] = useLazyQuery(TASK, {
-    fetchPolicy: "network-only",
-    nextFetchPolicy: "cache-first",
-    variables: {
-      input: {
-        query: {
-          company_id: authData?.company?.id,
-          created_by:authData?.user?.id as string,
-          project_id: ''
-        },
-        paging: {
-          order: ['updatedAt:DESC']
-        }
-      }
-    }
-  })
 
   const {
     seconds,
@@ -541,35 +374,19 @@ const Timesheet = () => {
     offsetTimestamp: new Date()
   });
 
-  const [createTimeEntry] = useMutation(CREATE_TIME_ENTRY, {
+  const [createTimeEntry, { loading: creatingTimeEntry }] = useMutation(CREATE_TIME_ENTRY, {
     onCompleted: (response: any) => {
       start();
-      setNewTimeSheet(response?.TimeEntryCreate)
       setTimeEntry({
         id: response?.TimeEntryCreate?.id,
         name: response?.TimeEntryCreate?.company?.name,
         project: response?.TimeEntryCreate?.project?.name,
-        task: response?.TimeEntryCreate?.task?.name,
+        description: response?.TimeEntryCreate?.description,
         client: response?.TimeEntryCreate?.project?.client?.name
       });
       setDetailVisible(true)
     }
   });
-
-  const getKeys = () => {
-    const vals: any = [];
-    for (const item of (timeEntryData?.TimeEntry?.data ?? [])) {
-      if (!vals.includes(item?.task?.id)) {
-        vals.push(item?.task?.id)
-      }
-    };
-    return vals
-  }
-
-  const filterData = () => {
-    const tasks = _.groupBy(timeEntryData?.TimeEntry?.data, 'task_id')
-    return tasks
-  }
 
   /* eslint-disable no-template-curly-in-string */
   const validateMessages = {
@@ -583,52 +400,15 @@ const Timesheet = () => {
     },
   };
 
-  const onChangeClientSelect = (value: string) => {
-    form.resetFields(['project', 'task'])
-    getProject({
-      variables: {
-        input: {
-          query: {
-            company_id: authData?.company?.id,
-            client_id: value
-          },
-          paging: {
-            order: ['updatedAt:DESC']
-          }
-        }
-      }
-    });
-  }
-const [projectId,setProjectId] = useState('')
-
-  const onChangeProjectSelect = (value: string) => {
-    form.resetFields(['task']);
-    setProjectId(value)
-    getTask({
-      variables: {
-        input: {
-          query: {
-            company_id: authData?.company?.id,
-            project_id: value,
-            created_by:authData?.user?.id as string,
-          },
-          paging: {
-            order: ['updatedAt:DESC']
-          }
-        }
-      }
-    });
-  }
-
   const createTimeEntries = (values: any) => {
     stopwatchOffset = new Date()
     createTimeEntry({
       variables: {
         input: {
-          startTime: moment(stopwatchOffset, "YYYY-MM-DD HH:mm:ss"),
-          task_id: values.task,
+          startTime: moment().format('YYYY-MM-DD HH:mm:ss'),
+          description: values.description,
           project_id: values.project,
-          company_id: authData?.company?.id,
+          company_id,
         }
       }
     }).then((response) => {
@@ -644,176 +424,117 @@ const [projectId,setProjectId] = useState('')
       variables: {
         input: {
           id: newTimeEntry?.id,
-          endTime: moment(stopwatchOffset, "YYYY-MM-DD HH:mm:ss"),
-          company_id: authData?.company?.id
+          endTime: moment().format('YYYY-MM-DD HH:mm:ss'),
+          company_id,
         }
       }
-    }).then((response) => {
-      if (response.errors) {
-        return notifyGraphqlError((response.errors))
-      }
-    }).catch(notifyGraphqlError)
+    })
   }
 
   const onSubmitForm = (values: any) => {
     !isRunning ? createTimeEntries(values) : submitStopTimer();
   }
 
-  const clickPlayButton = (entry: string) => {
+  const clickPlayButton = (entry: ITimeEntry) => {
     form.resetFields()
-    const timesheet = filterData()[entry][0];
-    !isRunning ? createTimeEntries({ task: entry, project: timesheet?.project?.id }) : submitStopTimer();
+    !isRunning ? createTimeEntries({ description: entry.description, project: entry?.project?.id }) : submitStopTimer();
   }
 
-  const getStartTime = (entries: any) => {
+  const getStartTime = (entries: any): any => {
     const minStartDate = entries.map((entry: any) => { return entry?.startTime })
     return _.min(minStartDate)
   }
 
-  const getEndTime = (entries: any) => {
+  const getEndTime = (entries: any): any => {
     const maxEndDate = entries.map((entry: any) => { return entry?.endTime })
     return _.max(maxEndDate)
   }
 
-  const handleAddTask = () => {
-    setAddTaskVisbility(!showAddTaskVisibility)
-  }
   return (
     <>
       {loading ? <TimeSheetLoader /> :
         <div className={styles['site-card-wrapper']}>
           {/* TimeEntry Form */}
-          <Card
-            bordered={false}
-            className={styles['form-row']}>
-            <Form
-              form={form}
-              layout="vertical"
-              onFinish={onSubmitForm}>
+          {
+            authData?.user?.type !== 'CICO' && (
+              <Card
+                bordered={false}
+                className={styles['form-row']}>
+                <Form
+                  form={form}
+                  layout="vertical"
+                  onFinish={onSubmitForm}>
 
-              {showDetailTimeEntry ?
-                <Row>
-                  <Col
-                    xs={24}
-                    sm={24}
-                    md={12}
-                    lg={12}
-                    className={styles['form-col-header']}>
-                    <b>
-                      <span>
-                        {newTimeEntry?.name ?? timeEntryData?.TimeEntry?.activeEntry?.name}
-                      </span> :
-                      &nbsp;
-                      {newTimeEntry?.project ?? timeEntryData?.TimeEntry?.activeEntry?.project?.name}
-                    </b>
-                  </Col>
-                </Row> :
-                <Row>
-                  <Col
-                    xs={24}
-                    sm={24}
-                    md={12}
-                    lg={12}
-                    className={styles['form-col']}>
-                    <Form.Item
-                      name="client"
-                      label="Client"
-                      rules={[{
-                        required: true,
-                        message: 'Choose the client'
-                      }]}>
-                      <Select
-                        placeholder="Select Client"
-                        onChange={onChangeClientSelect}>
-                        {clientData && clientData?.Client?.data.map((client: any, index: number) => (
-                          <Option value={client?.id} key={index}>
-                            <span>
-                              {client?.name} &nbsp; / &nbsp;
-                            </span>
-                            <span>{client?.email}</span>
-                          </Option>))}
-                      </Select>
-                    </Form.Item>
-                  </Col>
-                  <Col
-                    xs={24}
-                    sm={24}
-                    md={12}
-                    lg={12}
-                    className={styles['form-col']}>
-                    <Form.Item
-                      name="project"
-                      label="Project"
-                      rules={[{
-                        required: true,
-                        message: 'Choose the project'
-                      }]}>
-                      <Select
-                        placeholder="Select Project"
-                        onChange={onChangeProjectSelect}>
-                        {projectData && projectData?.Project?.data.map((project: any, index: number) => (
-                          <Option
-                            value={project?.id}
-                            key={index}>
-                            {project?.name}
-                          </Option>))}
-                      </Select>
-                    </Form.Item>
-                  </Col>
-                </Row>}
+                  {showDetailTimeEntry ?
+                    <Row>
+                      <Col className={styles['form-col-header']} xs={24} sm={24} md={12} lg={12}>
+                        <b>
+                          <span>
+                            {newTimeEntry?.name ?? timeEntryData?.TimeEntry?.activeEntry?.description}
+                          </span> :
+                          &nbsp;
+                          {newTimeEntry?.project ?? timeEntryData?.TimeEntry?.activeEntry?.project?.name}
+                        </b>
+                      </Col>
+                    </Row> :
+                    <Row>
+                      <Col className={styles['form-col']} xs={24} sm={24} md={12} lg={12}>
+                        <Form.Item
+                          name="project"
+                          label="Project"
+                          rules={[{
+                            required: true,
+                            message: 'Choose the project'
+                          }]}>
+                          <Select
+                            placeholder="Select Project"
+                          >
+                            {
+                              projectData && projectData?.Project?.data.map((project: any, index: number) => (
+                                <Option
+                                  value={project?.id}
+                                  key={index}>
+                                  {project?.name}
+                                </Option>
+                              ))
+                            }
+                          </Select>
+                        </Form.Item>
+                      </Col>
+                    </Row>}
 
-              <Row>
-                <Col
-                  xs={24}
-                  sm={24}
-                  md={12}
-                  lg={12}
-                  xl={16}
-                  className={styles['task-col']}>
-                  <Form.Item
-                    name="task"
-                    label="Task"
-                    rules={[{
-                      required: !showDetailTimeEntry,
-                      // message: 'Choose the task'
-                    }]}>
-                    {showDetailTimeEntry ?
-                      <div className={styles['timesheet-task']}>
-                        {newTimeEntry?.task}
-                      </div> :
-                      <Select placeholder="Select Task"   dropdownRender={menu => (
-                        <>
-                          
-                          <Space align="center" style={{ padding: '0 8px 4px' }}>
-                            <Typography.Link onClick={handleAddTask} className={styles['add-task-option']} style={{ whiteSpace: 'nowrap' ,fontSize:'16px',fontWeight:'600px',margin:'10px'}}>
-                              <PlusCircleFilled /> <span className={styles['add-task-text']}>Add item</span>
-                            </Typography.Link>
-                          </Space>
-                          {menu}
-                        </>
-                      )}>
-                        {taskData && taskData?.Task?.data.map((task: any, index: number) => (
-                          <Option
-                            value={task?.id}
-                            key={index}>
-                            {task?.name}
-                          </Option>)
-                        )}
-                      </Select>}
-                  </Form.Item>
-                </Col>
-                <Col
-                  xs={24}
-                  sm={24}
-                  md={12}
-                  lg={12}
-                  xl={8}
-                  className={styles['time-start-col']}>
-                  <TimerCard hours={hours} minutes={minutes} seconds={seconds} isRunning={isRunning} />
-                </Col>
-              </Row>
-            </Form>
-          </Card>
+                  <Row>
+                    <Col className={styles['description-col']} xs={24} sm={24} md={12} lg={12} xl={16}>
+                      <Form.Item
+                        name="description"
+                        label="Description"
+                        rules={[{
+                          required: !showDetailTimeEntry,
+                        }]}
+                      >
+                        {
+                          showDetailTimeEntry ? (
+                            <div className={styles['timesheet-description']}>
+                              {newTimeEntry?.description}
+                            </div> 
+                          ) : <Input />
+                        }
+                      </Form.Item>
+                    </Col>
+                    <Col className={styles['time-start-col']} xs={24} sm={24} md={12} lg={12} xl={8}>
+                      <TimerCard 
+                        hours={hours} 
+                        minutes={minutes} 
+                        seconds={seconds} 
+                        isRunning={isRunning} 
+                        disabled={creatingTimeEntry ?? updatingTimeEntry}
+                      />
+                    </Col>
+                  </Row>
+                </Form>
+              </Card>
+            )
+          }
 
           <br />
 
@@ -834,21 +555,26 @@ const [projectId,setProjectId] = useState('')
               </Col>
             </Row>
             <Row className={styles['task-div-header']}>
-              <Col
-                xs={24}
-                sm={24}
-                md={6}
-                lg={6}
-                xl={6}
-                className={styles['task-header']}>
-                Task
-              </Col>
+              {
+                entryType !== EntryType.Cico && (
+                  <Col
+                    xs={24}
+                    sm={24}
+                    md={6}
+                    lg={6}
+                    xl={6}
+                    className={styles['task-header']}
+                  >
+                    Description
+                  </Col>
+                )
+              }
               <Col
                 xs={0}
                 sm={0}
-                md={7}
-                lg={7}
-                xl={7}
+                md={entryType !== EntryType.Cico ? 7 : 13}
+                lg={entryType !== EntryType.Cico ? 7 : 13}
+                xl={entryType !== EntryType.Cico ? 7 : 13}
                 className={styles['client-header']}>
                 Client: Project
               </Col>
@@ -895,65 +621,62 @@ const [projectId,setProjectId] = useState('')
 
             <Form
               form={timeEntryForm}
-              validateMessages={validateMessages}>
+              validateMessages={validateMessages}
+            >
               <div className={styles['task-row']}>
-                {getKeys() && getKeys()?.map((entry: any, index: number) => (
-
-                  (filterData()[entry].length > 1) ?
-                    <Collapse
-                      collapsible="header"
-                      ghost
-                      className={styles['task-div-list']}
-                      key={index}>
-                      <Panel showArrow={false} header={
-                        <TimeEntry
-                          rowClassName={'filter-task-list'}
-                          index={index}
-                          data={{
-                            project: filterData()[entry][0]?.project?.name,
-                            name: filterData()[entry][0]?.task?.name,
-                            startTime: getStartTime(filterData()[entry]),
-                            client: filterData()[entry][0]?.project?.client?.name,
-                            endTime: getEndTime(filterData()[entry]),
-                            duration: getTotalTimeForADay(filterData()[entry])
-                          }}
-                          length={filterData()[entry]?.length}
-                          clickPlayButton={() => clickPlayButton(entry)} />} key={index}>
-                        {filterData()[entry].map((timeData: any, entryIndex: number) => {
-                          return (
+                {
+                  todayGroupedEntries.map((groupedEntry, index: number) => (
+                    groupedEntry.entries.length > 1 ? (
+                      <Collapse
+                        ghost
+                        key={`${groupedEntry.project_id} - ${groupedEntry.description}`}
+                        collapsible="header"
+                        className={styles['task-div-list']}
+                      >
+                        <Panel 
+                          key={`${groupedEntry.project_id} - ${groupedEntry.description}`}
+                          showArrow={false} 
+                          header={
                             <TimeEntry
-                              key={entryIndex}
-                              rowClassName={'filter-task-list'}
-                              index={index}
-                              data={{
-                                project: timeData?.project?.name,
-                                name: timeData?.task?.name,
-                                startTime: timeData?.startTime,
-                                client: timeData?.project?.client?.name,
-                                endTime: timeData?.endTime,
-                                duration: timeData?.duration
-                              }}
-                              length={timeData?.length}
-                              clickPlayButton={() => clickPlayButton(entry)} />)
-                        })}
-                      </Panel>
-                    </Collapse> :
-                    <span key={index}>
-                      <TimeEntry
-                        rowClassName={'task-div'}
-                        index={index}
-                        data={{
-                          project: filterData()[entry][0]?.project?.name,
-                          name: filterData()[entry][0]?.task?.name,
-                          startTime: filterData()[entry][0]?.startTime,
-                          client: filterData()[entry][0]?.project?.client?.name,
-                          endTime: filterData()[entry][0]?.endTime,
-                          duration: filterData()[entry][0]?.duration
-                        }}
-                        length={filterData()[entry]?.length}
-                        clickPlayButton={() => clickPlayButton(entry)} />
-                    </span>
-                ))}
+                              rowClassName="filter-task-list"
+                              length={groupedEntry.entries?.length}
+                              clickPlayButton={() => clickPlayButton(groupedEntry.entries[0])} 
+                              timeEntry={groupedEntry.entries[0]}
+                              minStartTime={getStartTime(groupedEntry.entries)}
+                              maxEndTime={getEndTime(groupedEntry.entries)}
+                              totalDuration={getTotalTimeForADay(groupedEntry.entries)}
+                            />
+                          } 
+                        >
+                          {
+                            groupedEntry.entries.map((entry: any, entryIndex: number) => {
+                              return (
+                                <TimeEntry
+                                  key={entry.id}
+                                  rowClassName="filter-task-list"
+                                  timeEntry={entry}
+                                  length={entry?.length}
+                                  clickPlayButton={() => clickPlayButton(entry)} 
+                                />
+                                )
+                            })
+                          }
+                        </Panel>
+                      </Collapse> 
+                    ) : (
+                      <span key={index}>
+                        <TimeEntry
+                          rowClassName={'task-div'}
+                          length={groupedEntry.entries?.length}
+                          clickPlayButton={() => clickPlayButton(groupedEntry.entries[0])} 
+                          timeEntry={groupedEntry.entries[0]}
+                          minStartTime={groupedEntry.entries[0]?.startTime}
+                          maxEndTime={groupedEntry.entries[0]?.endTime}
+                        />
+                      </span>
+                    )
+                ))
+                }
               </div>
             </Form>
           </Card>
@@ -1076,14 +799,35 @@ const [projectId,setProjectId] = useState('')
             </div>
           </Modal>
         </div>}
-      <TaskCreate
-        visibility={showAddTaskVisibility}
-        setVisibility={setAddTaskVisbility}
-        projectId = {projectId}
-        getTask={getTask}
-      />
     </>
   )
 }
+
+function groupByDescriptionAndProject(entries: ITimeEntry[]) {
+  const grouped: ITodayGroupedEntries[] = [];
+
+  for(let entry of entries) {
+    const project_id = entry.project_id;
+    const description = entry.description;
+
+    const foundIndex = findIndex(grouped, {
+      description,
+      project_id,
+    });
+
+    if(foundIndex >= 0) {
+      grouped[foundIndex].entries.push(entry);
+    } else {
+      grouped.push({
+        description,
+        project_id,
+        entries: [entry],
+      });
+    }
+  }
+
+  return grouped;
+}
+
 
 export default Timesheet;

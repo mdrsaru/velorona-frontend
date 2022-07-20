@@ -140,7 +140,22 @@ const AttachClient = () => {
       if (response.errors) {
         return notifyGraphqlError((response.errors))
       } else if (response?.data?.ClientCreate) {
-        console.log('elseif')
+        associateClient({
+          variables: {
+            input: {
+              user_id: params?.eid as string,
+              client_id: response?.data?.ClientCreate?.id as string,
+              company_id: authData?.company?.id as string
+            }
+          }
+        }).then((response) => {
+          if (response.errors) {
+            return notifyGraphqlError((response.errors))
+          } else if (response?.data?.UserClientAssociate) {
+            message.success(`Client is associated with employee successfully!`).then(r => { });
+            navigate(routes.user.path(authData?.company?.code ?? ''));
+          }
+        }).catch(notifyGraphqlError)
         navigate(routes.user.path(authData?.company?.code ? authData?.company?.code : ''));
         message.success({ content: `Client updated to new employee successfully!`, key, className: 'custom-message' });
       }
@@ -169,7 +184,7 @@ const AttachClient = () => {
         return notifyGraphqlError((response.errors))
       } else if (response?.data?.UserClientAssociate) {
         message.success(`Client is associated with employee successfully!`).then(r => { });
-        navigate(routes.employee.path(authData?.company?.code ?? ''));
+        navigate(routes.user.path(authData?.company?.code ?? ''));
       }
     }).catch(notifyGraphqlError)
   }

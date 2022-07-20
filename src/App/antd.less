@@ -12,6 +12,11 @@
 @btn-default-color: @primary-color;
 @btn-font-weight: 600;
 @btn-height-base: 41px;
+@tabs-hover-color: var(--black);
+@tabs-active-color: var(--black);
+@tabs-ink-bar-color: @primary-color;
+
+@layout-header-height: 75px;
 
 .ant-btn,
 .ant-btn-primary {
@@ -207,4 +212,9 @@
 
 .ant-message-error {
   color: var(--primary-red);
+}
+
+.ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: var(--black);
+  opacity: 0.85;
 }

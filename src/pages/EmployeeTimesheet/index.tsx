@@ -2,11 +2,11 @@ import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { gql, useLazyQuery, useQuery } from '@apollo/client';
-import { Card, Table, Button, Form, Row, Select, Col, Input } from 'antd';
-import { DownloadOutlined ,SearchOutlined} from '@ant-design/icons';
+import { Card, Table, Button, Form, Row, Select, Col, Input, DatePicker } from 'antd';
+import { DownloadOutlined, SearchOutlined } from '@ant-design/icons';
 
 import { authVar } from '../../App/link';
-import constants,{employee_timesheet_status, status} from '../../config/constants';
+import constants, { employee_timesheet_status, status } from '../../config/constants';
 import routes from '../../config/routes';
 import { notifyGraphqlError } from '../../utils/error';
 import { TimesheetPagingData } from '../../interfaces/graphql.interface';
@@ -21,8 +21,7 @@ import styles from './style.module.scss';
 import { downloadCSV } from '../../utils/common';
 import { debounce } from 'lodash';
 import TimeDuration from '../../components/TimeDuration';
-
-const {Option} = Select;
+const { Option } = Select;
 const EMPLOYEE_TIMESHEET = gql`
   query EmployeeTimesheet($input: TimesheetQueryInput!) {
     Timesheet(input: $input) {
@@ -37,6 +36,8 @@ const EMPLOYEE_TIMESHEET = gql`
         invoicedDurationFormat
         totalExpense
         lastApprovedAt
+        weekStartDate
+        weekEndDate
         status
         user {
           fullName
@@ -56,7 +57,7 @@ const csvHeader: Array<{ label: string, key: string, subKey?: string }> = [
   { label: "Total Expense", key: "totalExpense" },
   { label: "Last Approved", key: "lastApprovedAt" }
 ]
-
+const { RangePicker } = DatePicker;
 const EmployeeTimesheet = () => {
   const authData = authVar();
   const company_id = authData.company?.id as string
@@ -75,7 +76,7 @@ const EmployeeTimesheet = () => {
     filter: false,
   });
 
-  
+
   const input: TimesheetQueryInput = {
     paging: {
       skip: pagingInput.skip,
@@ -103,6 +104,19 @@ const EmployeeTimesheet = () => {
     },
   );
 
+  const {
+    data: timesheet,
+  } = useQuery<TimesheetPagingData, { input: TimesheetQueryInput }>(
+    EMPLOYEE_TIMESHEET,
+    {
+      fetchPolicy: 'network-only',
+      nextFetchPolicy: 'cache-first',
+      variables: {
+        input,
+      },
+      onError: notifyGraphqlError,
+    },
+  );
   const [fetchDownloadData, { data: timesheetDownloadData }] = useLazyQuery<TimesheetPagingData,
     { input: TimesheetQueryInput }>(
       EMPLOYEE_TIMESHEET,
@@ -139,7 +153,7 @@ const EmployeeTimesheet = () => {
 
   const refetchTimesheets = () => {
 
-    let values = filterForm.getFieldsValue(['search', 'role', 'status'])
+    let values = filterForm.getFieldsValue(['search', 'role', 'status', 'date'])
 
     let input: {
       paging?: any,
@@ -158,12 +172,13 @@ const EmployeeTimesheet = () => {
     let query: {
       status?: string,
       archived?: boolean,
-      search?:boolean,
+      search?: boolean,
       company_id: string;
+      weekStartDate?: Date;
+      weekEndDate?: Date;
     } = {
       company_id: authData?.company?.id as string
     }
-
 
     if (values.status) {
       query['status'] = values.status;
@@ -173,6 +188,10 @@ const EmployeeTimesheet = () => {
       query['search'] = values?.search
     }
 
+    if (values?.date) {
+      query['weekStartDate'] = values?.date[0]
+      query['weekEndDate'] = values?.date[1]
+    }
     input['query'] = query
 
     refetchTimesheet({
@@ -215,6 +234,15 @@ const EmployeeTimesheet = () => {
   const dataSource = timesheetData?.Timesheet?.data ?? [];
   const columns = [
     {
+      title: 'Date',
+      width: '20%',
+
+      render: (timesheet: any) => {
+        return <>{moment(timesheet?.weekStartDate).format('YYYY/MM/DD')}-{moment(timesheet?.weekEndDate).format('YYYY/MM/DD')}</>
+      }
+    },
+
+    {
       title: 'Employee Name',
       dataIndex: ['user', 'fullName'],
     },
@@ -226,7 +254,7 @@ const EmployeeTimesheet = () => {
       title: 'Total Hours',
       key: 'duration',
       render: (record: any) =>
-        <TimeDuration duration = {record.duration} />
+        <TimeDuration duration={record.duration} />
     },
     {
       title: 'Invoiced Time',
@@ -311,7 +339,7 @@ const EmployeeTimesheet = () => {
           {filterProperty?.filter &&
             <Row gutter={[32, 0]} className={styles["role-status-col"]}>
 
-              <Col span={5}>
+              <Col xs={24} xl={6}>
                 <Form.Item name="status" label="">
                   <Select
                     placeholder="Select status"
@@ -322,6 +350,11 @@ const EmployeeTimesheet = () => {
                         {status?.name}
                       </Option>)}
                   </Select>
+                </Form.Item>
+              </Col>
+              <Col xs={24} xl={8}>
+                <Form.Item name="date" label="">
+                  <RangePicker bordered={false} onChange={onChangeFilter} />
                 </Form.Item>
               </Col>
             </Row>}

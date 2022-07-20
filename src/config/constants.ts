@@ -15,8 +15,12 @@ const config = {
   userType: {
     SystemAdmin: 'SystemAdmin',
     Company: 'Company'
-  }
+  },
 };
+
+export const stripeSetting = {
+  publishableKey: process.env.REACT_APP_STRIPE_PUBLISHABLE_KEY as string,
+}
 
 export const roles_user = [{
   value: 'CompanyAdmin',
@@ -87,6 +91,30 @@ export const company_status = [{
   name: 'In Active'
 }
 ]
+
+export const subscription = {
+  price: {
+    Starter: 'FREE',
+    Professional: '$10 Flat + $1 per user',
+  },
+  description: {
+    Starter: 'For Small Business',
+    Professional: 'Ideal for Medium Business',
+  },
+  features: {
+    Starter: [
+      'Host upto 100 employees',
+      'Create upto 25 free projects',
+      'Timesheets tracking',
+    ],
+    Professional: [
+      'Host upto 100 employees',
+      'Create upto 25 free projects',
+      'Timesheets tracking',
+      'Invoicing included',
+    ],
+  }
+};
 
 
 export default config;

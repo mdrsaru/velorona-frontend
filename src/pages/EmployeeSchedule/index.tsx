@@ -18,7 +18,7 @@ WorkscheduleDetail(input:$input){
     }
     data {
 			id
-    date
+      schedule_date
 			workschedule_id
       workschedule{
         payrollAllocatedHours
@@ -31,9 +31,9 @@ WorkscheduleDetail(input:$input){
 				fullName
 			}
       workscheduleTimeDetail{
-                id
-				        startTime		
-				        endTime
+       id
+			 startTime		
+       endTime
 				
 			}
 		}
