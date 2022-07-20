@@ -1,0 +1,53 @@
+.detail-table {
+  overflow-x: auto;
+
+  table {
+    font-family: arial, sans-serif;
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  th {
+    text-align: left;
+    background: var(--gray-secondary);
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 17px;
+    color: var(--white);
+    padding: 1rem;
+    border: none;
+  }
+
+  td {
+    padding: 8px;
+    white-space: nowrap;
+    //text-align: center;
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 22px;
+    color: var(--gray-1);
+    font-family: Montserrat;
+  }
+
+  .detail-name {
+    text-align: left;
+  }
+
+  :global {
+    .ant-input {
+      font-weight: 600;
+      font-size: 14px;
+      line-height: 17px;
+      color: var(--gray-1);
+      font-family: Montserrat;
+    }
+  }
+}
+
+.addEmployee {
+  margin-top: 1rem;
+  color: var(--primary-blue);
+  font-weight: 600;
+  font-size: 14px;
+ cursor: pointer;
+}
