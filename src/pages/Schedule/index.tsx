@@ -41,7 +41,7 @@ const Schedule = () => {
   const [showSchedule, setScheduleShow] = useState(false)
 
 
-  const { loading: workscheduleLoading, data: workscheduleData ,refetch:refetchWorkschedule } = useQuery(
+  const { loading: workscheduleLoading, data: workscheduleData, refetch: refetchWorkschedule } = useQuery(
     WORKSCHEDULE,
     {
       fetchPolicy: "network-only",
@@ -85,6 +85,10 @@ const Schedule = () => {
     {
       title: "Payroll Allocated Hours",
       dataIndex: "payrollAllocatedHours",
+      render: (payroll: any) => {
+        const hour = (payroll / 3600).toFixed(2)
+        return hour
+      }
     },
     {
       title: "Payroll Usage Hours",
@@ -123,7 +127,7 @@ const Schedule = () => {
       <AddSchedule
         visibility={showSchedule}
         setVisibility={setScheduleShow}
-        refetchWorkschedule = {refetchWorkschedule} />
+        refetchWorkschedule={refetchWorkschedule} />
     </>
   )
 }
