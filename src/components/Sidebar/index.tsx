@@ -106,13 +106,13 @@ const Sidebar = (props: any) => {
       route: routes.client.path(loggedInUser?.company?.code ?? ''),
       accessRoles: [constants.roles.CompanyAdmin]
     },
-    {
-      key: routes.home.key,
-      name: routes.home.name,
-      icon: <HomeOutlined />,
-      route: routes.home.path,
-      accessRoles: [constants.roles.Employee, constants.roles.TaskManager]
-    },
+    // {
+    //   key: routes.home.key,
+    //   name: routes.home.name,
+    //   icon: <HomeOutlined />,
+    //   route: routes.home.path,
+    //   accessRoles: [constants.roles.Employee, constants.roles.TaskManager]
+    // },
     {
       key: routes.timesheet.key,
       name: routes.timesheet.name,

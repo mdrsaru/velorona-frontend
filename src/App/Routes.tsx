@@ -113,9 +113,13 @@ const _Routes = () => {
                         <routes.employeeDashboard.component />
                       )
                         :
-                        (
-                          <routes.home.component />
+                        roles.includes(constants.roles.TaskManager) ? (
+                          <routes.taskManagerDashboard.component />
                         )
+                          :
+                          (
+                            <routes.home.component />
+                          )
                     }
                   </Suspense>
                 </CheckRoles>

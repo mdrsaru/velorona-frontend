@@ -1,5 +1,5 @@
 import React from "react";
-import {Col, Row, Typography} from "antd";
+import { Col, Row, Typography } from "antd";
 import { gql, useQuery } from "@apollo/client";
 import moment from "moment";
 import employeesImg from "../../assets/images/employees.svg";
@@ -10,20 +10,32 @@ import { IDashboardCount } from "../../interfaces/IDashboard";
 import AverageHours from "../../components/Dashboard/AverageHours";
 import ActivityLog from "../../components/Dashboard/ActivityLog";
 import { authVar } from "../../App/link";
-import { TIME_WEEKLY } from "../Timesheet";
 import styles from "./styles.module.scss";
 
 
 export const COUNT = gql`
-query Count($totalDurationInput: TotalDurationCountInput!, $projectInvolvedInput: ProjectCountInput!,$activeProjectCountInput:ActiveProjectCountInput!) {
+query Count($userCountInput: UserCountInput!, $totalDurationInput: TotalDurationCountInput!,$activeProjectCountInput:ActiveProjectCountInput!, $timesheetCountInput:TimesheetCountInput) {
+  UserCount(input: $userCountInput)
   TotalDuration(input: $totalDurationInput)
-  ProjectInvolvedCount(input: $projectInvolvedInput)
   ActiveProjectInvolvedCount(input:$activeProjectCountInput)
+  TimesheetCount(input:$timesheetCountInput)
 }
 
 `
-const TaskManagerDashboard = () => {
 
+export const TIME_WEEKLY_MANAGER = gql`
+query TimesheetByManager($input: TimesheetCountInput!) {
+    TimesheetByManager(input: $input) {
+    
+      id
+      weekStartDate
+      weekEndDate
+      totalExpense
+      duration
+  }
+}`;
+
+const TaskManagerDashboard = () => {
     const authData = authVar();
 
     const { data: overallCount } = useQuery(
@@ -32,36 +44,38 @@ const TaskManagerDashboard = () => {
             fetchPolicy: "network-only",
             nextFetchPolicy: "cache-first",
             variables: {
+                userCountInput: {
+                    company_id: authData?.company?.id as string,
+                    manager_id: authData.user.id
+                },
                 totalDurationInput: {
                     company_id: authData?.company?.id as string,
-                    user_id: authData.user.id
-                },
-                projectInvolvedInput: {
-                    company_id: authData?.company?.id as string,
-                    user_id: authData.user.id
+                    manager_id: authData.user.id
                 },
                 activeProjectCountInput: {
                     company_id: authData?.company?.id as string,
-                    user_id: authData.user.id
+                    manager_id: authData.user.id
+                },
+                timesheetCountInput: {
+                    company_id: authData?.company?.id as string,
+                    manager_id: authData.user.id
                 },
             },
         }
     );
-    const {
-        data: timesheetDetail } = useQuery(TIME_WEEKLY, {
-            fetchPolicy: "network-only",
-            nextFetchPolicy: "cache-first",
-            variables: {
-                input: {
-                    query: {
-                        company_id: authData?.company?.id
-                    },
-                    paging: {
-                        order: ['weekStartDate:DESC']
+
+        const {
+            data: timesheetDetail } = useQuery(TIME_WEEKLY_MANAGER, {
+                fetchPolicy: "network-only",
+                nextFetchPolicy: "cache-first",
+                variables: {
+                    input: {
+                            company_id: authData?.company?.id,
+                            manager_id:authData?.user?.id
+                        }
                     }
-                }
-            }
-        });
+                
+            });
 
     function secondsToHms(d: any) {
         d = Number(d);
@@ -72,8 +86,8 @@ const TaskManagerDashboard = () => {
     const totalHour: any = secondsToHms(overallCount?.TotalDuration)
 
     let averageHoursData: any = [];
-    timesheetDetail?.Timesheet?.data?.map((timesheet: any, index: number) => {
-        const startDate = moment(timesheet?.weekStartDate).format('MMM D');
+    timesheetDetail?.TimesheetByManager?.map((timesheet: any, index: number) => {
+        const startDate = moment(new Date(timesheet?.weekStartDate)).format('MMM D');
         const endDate = moment(timesheet?.weekEndDate).format('MMM D');
         const hour = secondsToHms(timesheet.duration)
         return averageHoursData.push({
@@ -83,10 +97,11 @@ const TaskManagerDashboard = () => {
 
     })
 
+
     const dashboardCount: IDashboardCount[] = [
         {
             title: 'Team Members',
-            count:  overallCount?.ProjectInvolvedCount as number,
+            count: overallCount?.UserCount as number,
             icon: employeesImg
         },
         {
@@ -103,33 +118,29 @@ const TaskManagerDashboard = () => {
 
     return (
         <div>
-            <DashboardCount data={dashboardCount}/>
+            <DashboardCount data={dashboardCount} />
             <Row>
                 <Col xs={24} lg={12}>
                     <div className={styles['timesheet-div']}>
                         <div className={styles['pending-timesheet']}>
                             <Typography.Title
-                              level={4}
-                              style={{color: 'var(--primary-blue)'}}>
-                                You have 26 Pending Timesheet
+                                level={4}
+                                style={{ color: 'var(--primary-blue)' }}>
+                                You have {overallCount?.TimesheetCount} Pending Timesheet
                             </Typography.Title>
-                            <Typography.Text type="secondary">
-                                Last Updated on Feb 23, 2022
-                            </Typography.Text>
-                            <br/>
+                            <br />
 
                         </div>
                     </div>
                     <AverageHours
-                      averageHoursData={averageHoursData}
-                      title={'Average Time Tracked by Employee'}
-                      caption={'Jan 2022'}
+                        averageHoursData={averageHoursData}
+                        title={'Average Time Tracked by Employee'}
+                        caption={'Jan 2022'}
                     />
                 </Col>
                 <Col xs={24} lg={12}>
                     <ActivityLog
-                      user_id={authData?.user?.id as string}
-                      title={' Activities Log'}
+                        title={' Activities Log'}
                     />
                 </Col>
             </Row>

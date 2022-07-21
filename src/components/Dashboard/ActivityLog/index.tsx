@@ -1,8 +1,8 @@
-import React, {useState} from "react";
-import {Button, Empty, Typography} from "antd";
+import React, { Fragment, Suspense, useState } from "react";
+import { Button, Empty, Spin, Typography } from "antd";
 import parse from "html-react-parser";
 
-import { gql, useQuery } from "@apollo/client";
+import { gql, NetworkStatus, useQuery } from "@apollo/client";
 import { authVar } from "../../../App/link";
 
 import ApproveIcon from '../../../assets/images/approve.svg'
@@ -14,6 +14,7 @@ import moment from "moment";
 import NoContent from '../../NoContent/index';
 import { ReloadOutlined } from '@ant-design/icons';
 import constants from "../../../config/constants";
+import ActivityLogList from "./ActivityLogList";
 
 
 export const ACTIVITY_LOG = gql`
@@ -73,9 +74,11 @@ const ActivityLog = (props: IProps) => {
   }
 
   const {
-    data: activityLogData, refetch: reloadActivityData } = useQuery(ACTIVITY_LOG, {
+    loading: activityLogLoading,
+    data: activityLogData, refetch: reloadActivityData, networkStatus } = useQuery(ACTIVITY_LOG, {
       fetchPolicy: "network-only",
       nextFetchPolicy: "cache-first",
+      notifyOnNetworkStatusChange: true,
       variables: {
         input: {
           query: query,
@@ -95,58 +98,40 @@ const ActivityLog = (props: IProps) => {
       <div className={styles['title-div']}>
         <Typography.Title level={3}>{props?.title}</Typography.Title>
         <ReloadOutlined
-          style={{fontSize: '25px', color: 'var(--primary-blue)'}}
+          style={{ fontSize: '25px', color: 'var(--primary-blue)' }}
           onClick={() => reloadData()}
         />
       </div>
 
       <br />
-      {logs?.length ?
-        (<>
-          {logs.map((log: { createdAt: string, message: string, type: string, user: any }, index: number) => {
+      {( networkStatus !== NetworkStatus.refetch) &&
+        <Spin spinning={activityLogLoading}>
+          {logs?.length ?
+            (<>
+              {logs.map((log: { createdAt: string, message: string, type: string, user: any }, index: number) => {
 
-            return (
-              <>
-                <p className={styles['date']}>{moment(log?.createdAt).format('MMM D,HH:MM')}</p>
-                <div key={index} className={styles['activities']}>
-
-                <span>{log?.type === 'TimeEntry' ?
-                  <img src={TimeEntryIcon} alt={'time entry'}/>
-                  :
-                  log?.type === TimesheetStatus.Approved || TimesheetStatus.PartiallyApproved ?
-                    <img src={ApproveIcon} alt='approve'/>
-                    :
-
-                    ""
+                return (
+                  <Fragment key={index}>
+                    <ActivityLogList log={log}/>
+                  </Fragment>
+                )
+              })}
+              <div style={{ textAlign: 'center' }}>
+                {activityLogData?.ActivityLog?.paging?.hasNextPage && (
+                  <Typography.Text
+                    style={{ color: 'var(--primary-blue)' }}
+                    onClick={() => changePage(pagingInput.currentPage + 1)}>
+                    {'Load More >>'}
+                  </Typography.Text>)
                 }
-                </span>
-                  <span>
-                  {log?.user?.id === authData?.user?.id ?
-                    'You ' :
-                    log?.user?.fullName}{log?.message ?
-                    parse(log?.message) :
-                    ""
-                  }
-                </span>
-
-                </div>
-              </>
-            )
-          })}
-          <div style={{textAlign: 'center'}}>
-            {activityLogData?.ActivityLog?.paging?.hasNextPage && (
-              <Typography.Text
-                style={{color: 'var(--primary-blue)'}}
-                onClick={() =>changePage(pagingInput.currentPage + 1)}>
-                {'Load More >>'}
-              </Typography.Text>)
-            }
-          </div>
-        </>)
-        :
-        <Empty description='No history at the moment'/>
+              </div>
+            </>)
+            :
+            <Empty description='No history at the moment' />
           }
-        </div>
+        </Spin>
+      }
+    </div>
   )
 };
-      export default ActivityLog;
+export default ActivityLog;

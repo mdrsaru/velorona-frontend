@@ -9,7 +9,7 @@ import { notifyGraphqlError } from '../../utils/error';
 import constants from '../../config/constants';
 import routes from '../../config/routes';
 
-import logo from '../../assets/images/main_logo.svg';
+import logo from '../../assets/images/logo-content.svg';
 import highFiveImg from '../../assets/images/High_five.svg';
 import { LoginResponse, MutationLoginArgs } from '../../interfaces/generated';
 
@@ -83,7 +83,12 @@ const Login = () => {
         navigate(routes.dashboard.path)
       } else if (roles.includes(constants.roles.CompanyAdmin)) {
         navigate(routes.company.path(loginData?.company?.companyCode));
-      } else {
+      } else if (roles.includes(constants.roles.Employee)) {
+        navigate(routes.company.path(loginData?.company?.companyCode));
+      } else if (roles.includes(constants.roles.TaskManager)) {
+        navigate(routes.company.path(loginData?.company?.companyCode));
+      } 
+      else {
         navigate(routes.home.path);
       }
     }

@@ -19,6 +19,7 @@ WorkscheduleDetail(input:$input){
     data {
 			id
       schedule_date
+      duration
 			workschedule_id
       duration
       workschedule{
@@ -75,11 +76,30 @@ const EmployeeSchedule = () => {
     },
     {
       title: "Time Period",
-      dataIndex: "timeDetail"
+      dataIndex: "workscheduleTimeDetail",
+      render: (timeDetail: any) => {
+
+        return timeDetail?.map((timeDetail: any, index: any) => {
+          return (
+            <>
+              <span>{`${moment(timeDetail.startTime).format('HH:SS')} - ${moment(timeDetail.endTime).format('HH:SS')}`}</span>
+              <br />
+            </>
+          )
+        })
+
+      }
     },
     {
       title: "Total Hours",
-      dataIndex: "total"
+      dataIndex: "duration",
+      render: (duration: any) => {
+        let hour = (duration / 3600).toFixed(2);
+
+        return <>
+          {hour}
+        </>
+      }
     },
 
   ];
