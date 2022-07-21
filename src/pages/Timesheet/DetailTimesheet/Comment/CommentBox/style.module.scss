@@ -1,0 +1,24 @@
+.container {
+  margin-bottom: 24px;
+  background: var(--gray-2);
+
+  .reply-box {
+    border: 1px solid var(--gray-secondary);
+    border-radius: 5px;
+    margin: 2rem;
+  }
+
+  .footer {
+    padding: 21px;
+    display: flex;
+    justify-content: space-between;
+
+    .replies {
+      cursor: pointer;
+      font-weight: 600;
+      color: var(--primary-blue);
+    }
+  }
+
+}
+

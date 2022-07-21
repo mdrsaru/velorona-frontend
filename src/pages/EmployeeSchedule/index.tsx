@@ -21,6 +21,7 @@ WorkscheduleDetail(input:$input){
       schedule_date
       duration
 			workschedule_id
+      duration
       workschedule{
         payrollAllocatedHours
 		    payrollUsageHours

@@ -88,6 +88,7 @@ const AddWorkscheduleEmployee = (props: IProps) => {
   const employeeList = employeeData?.User?.data;
 
   const onSubmitForm = () => {
+    console.log(user)
     props.setEmployee(user)
     setUser('')
     props?.setVisibility(false)
@@ -142,13 +143,13 @@ const AddWorkscheduleEmployee = (props: IProps) => {
                 lg={24}>
                 {employeeList?.map((employee, index) => {
                   return (
-                    <Row>
+                    <Row key={index}>
 
                       <Col style={{ marginBottom: '2%' }} lg={23} >
                         {employee.fullName}
                       </Col>
                       <Col>
-                        <CheckCircleFilled onClick={() => handleChange(employee?.fullName)} className={user === employee?.fullName ? `${styles.selected}` : `${styles.check}`} />
+                        <CheckCircleFilled onClick={() => handleChange(employee?.id)} className={user === employee?.id ? `${styles.selected}` : `${styles.check}`} />
                       </Col>
                     </Row>
                   )
