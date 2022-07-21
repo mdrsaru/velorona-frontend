@@ -298,8 +298,10 @@ const Timesheet = () => {
     },
   });
 
-  const entries = timeEntryData?.TimeEntry?.data ?? [];
-  const todayGroupedEntries: ITodayGroupedEntries[] = useMemo(() => groupByDescriptionAndProject(entries), [entries]);
+  const todayGroupedEntries: ITodayGroupedEntries[] = useMemo(() => {
+    const entries = timeEntryData?.TimeEntry?.data ?? [];
+    return groupByDescriptionAndProject(entries)
+  }, [timeEntryData?.TimeEntry?.data]);
 
   const [updateTimeEntry, { loading: updatingTimeEntry }] = useMutation(UPDATE_TIME_ENTRY, {
     update: (cache, result: any) => {
