@@ -1,0 +1,34 @@
+.comment-body {
+  padding: 28px;
+  border-bottom: 1px solid var(--gray-secondary);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+
+  .profile {
+    display: flex;
+    align-items: center;
+  }
+
+  .commented,
+  .commenter {
+    font-weight: 600;
+    font-size: 18px;
+    padding-left: 0.7rem;
+  }
+
+  .commented {
+    color: var(--gray-secondary);
+  }
+
+  .time {
+    font-size: 14px;
+  }
+}
+
+.comment {
+  margin: 1rem 0;
+}
+
