@@ -32,16 +32,16 @@ import TimesheetInformation from './TimesheetInformation';
 import PageHeader from '../../../components/PageHeader';
 import TimeEntryDetail from './TimeEntryDetail';
 import InvoiceViewer from '../../../components/InvoiceViewer';
-
-
-import deleteImg from '../../../assets/images/delete_btn.svg';
-
 import NoContent from '../../../components/NoContent';
 import AttachNewTimesheetModal from '../../../components/AddAttachedTimesheet';
 import DeleteBody from '../../../components/Delete/index';
 import ModalConfirm from '../../../components/Modal';
 import EditAttachedTimesheet from '../../../components/EditAttachedTimesheet';
 import ApprovedTimesheetAttachment from "../../../components/ApprovedTimesheetAttachment";
+import CommentForm from './CommentForm';
+import Comment from './Comment';
+
+import deleteImg from '../../../assets/images/delete_btn.svg';
 import styles from './style.module.scss';
 
 type InvoicedTimeEntries = {
@@ -160,30 +160,30 @@ export const TIMESHEET_SUBMIT = gql`
 export const ATTACHED_TIMESHEET = gql`
   query AttachedTimesheet($input: AttachedTimesheetQueryInput!) {
     AttachedTimesheet(input: $input){
-    data{
-          id 
-          description
-          createdAt
-          company{
+      data {
+        id 
+        description
+        createdAt
+        company{
           id
           name
-          }
-          attachments{
+        }
+        attachments {
           id
           url
           name
-          }
-          timesheet{
+        }
+        timesheet {
           id 
           duration 
-          }
+        }
       }
-     paging{
-          total
-          startIndex
-          endIndex
-          hasNextPage
-     }     
+      paging {
+        total
+        startIndex
+        endIndex
+        hasNextPage
+      }     
     }
   }
 `;
@@ -219,8 +219,13 @@ const DetailTimesheet = () => {
   const roles = authData?.user?.roles ?? []
   const [form] = Form.useForm()
   const [filteredTasks, setTasks] = useState([])
-  const [submitTimesheet, { loading: submittingTimesheet }] = useMutation(TIMESHEET_SUBMIT)
-
+  const [commentDetails, setCommentDetails] = useState<{
+    showModal: boolean;
+    commentType: 'Reject' | 'UnlockApproved' | 'UnlockRejected' | undefined;
+  }>({
+    showModal: false,
+    commentType: undefined,
+  });
   const [invoiceViewer, setInvoiceViewer] = useState<{
     isVisible: boolean,
     invoice_id: string | undefined;
@@ -234,13 +239,15 @@ const DetailTimesheet = () => {
   const [attachedTimesheetAttachment, setAttachedTimesheetAttachment] = useState<any>();
 
   const entriesByStatusRef = useRef<any>({});
-
   const [invoicedTimeEntries, setInvoicedTimeEntries] = useState<InvoicedTimeEntries[]>([])
   const [entriesByStatus, setEntriesByStatus] = useState<EntriesByStatus>({
     approved: [],
     pending: [],
     rejected: [],
   });
+
+  const [submitTimesheet, { loading: submittingTimesheet }] = useMutation(TIMESHEET_SUBMIT)
+
 
   /** Modal Visibility **/
   const [showAddNewEntry, setShowAddNewEntry] = useState<boolean>(false);
@@ -344,7 +351,7 @@ const DetailTimesheet = () => {
     },
   });
 
-  const [attachedTimesheetDelete, { loading }] = useMutation<GraphQLResponse<'AttachedTimesheetDelete', AttachedTimesheet>, MutationAttachedTimesheetDeleteArgs>(ATTACHED_TIMESHEET_DELETE, {
+  const [attachedTimesheetDelete] = useMutation<GraphQLResponse<'AttachedTimesheetDelete', AttachedTimesheet>, MutationAttachedTimesheetDeleteArgs>(ATTACHED_TIMESHEET_DELETE, {
     onCompleted() {
       message.success({
         content: `Attached Timesheet is deleted successfully!`,
@@ -653,6 +660,12 @@ const DetailTimesheet = () => {
     },
   ];
 
+  const onCommentFormCancel = () => {
+    setCommentDetails({
+      showModal: false,
+      commentType: undefined,
+    })
+  }
 
   return (
     <>
@@ -783,6 +796,15 @@ const DetailTimesheet = () => {
                       {
                         roles.includes(constants.roles.CompanyAdmin) && (
                           <div className={styles['action']}>
+                            <span 
+                              onClick={() => setCommentDetails({
+                                showModal: true,
+                                commentType: 'UnlockApproved',
+                              })}
+                            >
+                              Unlock
+                            </span>
+
                             <Link
                               className={styles['invoice-link']}
                               to={routes.timesheetInvoice.path(authData?.company?.code as string, params?.id as string)}
@@ -805,15 +827,38 @@ const DetailTimesheet = () => {
                       needAction
                       timesheet_id={timesheet_id}
                     />
+
                   </div>
                 }
 
                 {
                   !!entriesByStatus.rejected.length &&
                   <div className={styles['timesheet-section']}>
-                    <div className={styles['timesheet-status']}>
-                      Rejected Timesheet
+                    <div
+                      className={
+                        _cs([styles['timesheet-status'], styles['rejected-status']])
+                      }
+                    >
+                      <div>
+                        Rejected Timesheet
+                      </div>
+
+                      {
+                        roles.includes(constants.roles.CompanyAdmin) && (
+                          <div className={styles['action']}>
+                            <span 
+                              onClick={() => setCommentDetails({
+                                showModal: true,
+                                commentType: 'UnlockRejected',
+                              })}
+                            >
+                              Unlock
+                            </span>
+                          </div>
+                        )
+                      }
                     </div>
+
                     <TimeEntryDetail
                       startDate={timeSheetDetail?.Timesheet?.data[0]?.weekStartDate as string}
                       groupedTimeEntries={entriesByStatus.rejected}
@@ -935,6 +980,16 @@ const DetailTimesheet = () => {
           </Card>
         </div>
         )}
+
+        <div className={styles['site-card-wrapper']}>
+          <Card bordered={false} className={styles['time-entries']}>
+            <Comment 
+              timesheet_id={timesheet_id}
+              company_id={authData?.company?.id as string}
+            />
+          </Card>
+        </div>
+
       <Modal
         centered
         visible={showAddNewEntry}
@@ -1054,6 +1109,25 @@ const DetailTimesheet = () => {
         }
         onOkClick={deleteAttachedTimesheet}
       />
+
+      <Modal
+        centered
+        width={800}
+        footer={null}
+        title="Unlock"
+        destroyOnClose
+        visible={commentDetails.showModal}
+        onCancel={onCommentFormCancel}
+      >
+        <CommentForm 
+          timesheet_id={timesheet_id}
+          user_id={timeSheetDetail?.Timesheet?.data[0]?.user?.id as string}
+          commentType={commentDetails.commentType}
+          company_id={authData?.company?.id as string}
+          onHideModal={onCommentFormCancel}
+          refetchTimesheet={refetchTimeSheet}
+        />
+      </Modal>
     </>
   )
 }
