@@ -66,6 +66,7 @@ const TopHeader = (props: any) => {
   const { data: authData } = useQuery(AUTH)
   const loggedInUser = authData?.AuthUser;
   const company_id = loggedInUser?.company?.id as string;
+  const afterStart = moment().startOf('day').format('YYYY-MM-DDTHH:mm:ss');
 
   const {
     seconds,
@@ -147,7 +148,7 @@ const TopHeader = (props: any) => {
           input: {
             query: {
               company_id: company_id,
-              afterStart: moment().startOf('day'),
+              afterStart,
               entryType: loggedInUser?.user?.type,
             },
             paging: {
@@ -165,7 +166,7 @@ const TopHeader = (props: any) => {
           input: {
             query: {
               company_id: authData?.company?.id,
-              afterStart: moment().startOf('day'),
+              afterStart,
               entryType: authData?.user?.type,
             },
             paging: {

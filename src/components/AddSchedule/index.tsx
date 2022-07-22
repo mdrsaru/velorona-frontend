@@ -58,8 +58,8 @@ const AddSchedule = (props: IProps) => {
       notifyGraphqlError(err)
     },
   });
+
   const onSubmitForm = (values: any) => {
-    console.log(values)
     createWorkschedule({
       variables: {
         input: {

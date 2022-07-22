@@ -160,6 +160,7 @@ const Timesheet = () => {
   });
   const company_id = authData?.company?.id;
   const entryType = authData?.user?.type;
+  const afterStart = moment().startOf('day').format('YYYY-MM-DDTHH:mm:ss');
 
   const columns = [
     {
@@ -274,7 +275,7 @@ const Timesheet = () => {
       input: {
         query: {
           company_id,
-          afterStart: moment().startOf('day'),
+          afterStart,
           entryType,
         },
         paging: {
@@ -311,7 +312,7 @@ const Timesheet = () => {
           input: {
             query: {
               company_id,
-              afterStart: moment().startOf('day'),
+              afterStart,
               entryType,
             },
             paging: {
@@ -331,7 +332,7 @@ const Timesheet = () => {
             query: {
               company_id,
               entryType,
-              afterStart: moment().startOf('day'),
+              afterStart,
             },
             paging: {
               order: ['startTime:DESC']

@@ -77,3 +77,25 @@ export const downloadCSV = (jsonData: any, csvHeader: any, fileName: string) => 
   a.click();
   document.body.removeChild(a);
 }
+
+export const getDurationFromTimeFormat = (timeFormat: string) : number => {
+  const formatList = timeFormat?.split(':');
+  let duration = 0;
+
+  if(formatList.length) {
+    const hour = parseInt(formatList[0] ?? 0);
+    const min = parseInt(formatList[1] ?? 0);
+    const seconds = parseInt(formatList[2] ?? 0);
+    duration = seconds;
+
+    if(hour) {
+      duration += hour * 60 * 60;
+    }
+
+    if(min) {
+      duration += min * 60;
+    }
+  }
+
+  return duration;
+}

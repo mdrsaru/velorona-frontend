@@ -98,9 +98,7 @@ const AttachClient = () => {
           }
         }
       }
-    }).then(r => {
-      console.log(r);
-    });
+    })
   }, 500);
 
   useEffect(() => {
@@ -113,7 +111,7 @@ const AttachClient = () => {
           }
         }
       }
-    }).then(r => { })
+    })
   }, [authData?.company?.id, searchClients])
 
   const onSubmitForm = (values: any) => {

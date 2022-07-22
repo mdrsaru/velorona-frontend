@@ -37,7 +37,7 @@ export const UPDATE_TIME_ENTRY = gql`
 
 interface IProps {
   visible: boolean,
-  setVisibility: () => void,
+  setVisibility: (visible: boolean) => void,
   day: string,
   total: number;
   refetch: any;
@@ -65,7 +65,7 @@ const EditTimeSheet = (props: IProps) => {
 
   useEffect(() => {
     setTotalDuration(props?.total)
-    setNewEntries(props?.timesheetDetail?.entries[moment(props?.day).format('ddd, MMM D')])
+    setNewEntries(props?.timesheetDetail?.entries[moment(props?.day).format('YYYY-MM-DD')])
   }, [props?.total, props?.day, props?.timesheetDetail?.entries])
 
   getTotalTimeForADay(newEntries)
@@ -122,7 +122,7 @@ const EditTimeSheet = (props: IProps) => {
     }
     form.resetFields()
     setTotalDuration(0)
-    props?.setVisibility()
+    props.setVisibility(false)
   };
 
   return (
