@@ -4,7 +4,7 @@ export type MayBe<T> = undefined | T;
 
 export interface IGroupedTimeEntries {
   /**
-   * task id
+   * project id
    */
   id: string; 
   name: string;

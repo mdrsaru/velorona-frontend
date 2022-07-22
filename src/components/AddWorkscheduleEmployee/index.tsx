@@ -88,7 +88,6 @@ const AddWorkscheduleEmployee = (props: IProps) => {
   const employeeList = employeeData?.User?.data;
 
   const onSubmitForm = () => {
-    console.log(user)
     props.setEmployee(user)
     setUser('')
     props?.setVisibility(false)

@@ -1,7 +1,7 @@
 import moment from 'moment';
 import { useState } from 'react';
 import { gql, useMutation } from '@apollo/client';
-import { Space, Input, message } from 'antd';
+import { Space, message } from 'antd';
 import {
   CloseCircleOutlined,
   CheckCircleOutlined,
@@ -17,7 +17,7 @@ import { GraphQLResponse } from '../../../../interfaces/graphql.interface';
 
 import ModalConfirm from '../../../../components/Modal';
 import Delete from '../../../../components/Delete';
-import EditTimeSheet from '../../EditTimesheet';
+import TimeInput from '../TimeInput';
 
 import deleteImg from '../../../../assets/images/delete_btn.svg';
 import styles from './style.module.scss';
@@ -55,13 +55,11 @@ const TimeEntryDetails = (props: IProps) => {
   const weekDays = getWeekDays(props.startDate);
   const groupedTimeEntries = props.groupedTimeEntries;
 
-  const [showEditModal, setShowEditModal] = useState(false);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [entriesToDelete, setEntriesToDelete] = useState<{ entryIds: string[], task_id: string }>({
     entryIds: [],
     task_id: ''
   });
-  const [selectedGroup, setSelectedGroup] = useState<any>();
 
   const canApproveReject = checkRoles({
     userRoles,
@@ -80,10 +78,6 @@ const TimeEntryDetails = (props: IProps) => {
       props.refetch();
     }
   })
-
-  const refetchGroups = () => {
-    props?.refetch()
-  }
 
   const onApproveRejectTimeEntriesClick = (status: string, group: IGroupedTimeEntries) => {
     const ids = getEntryIdsFromGroup(group);
@@ -143,14 +137,6 @@ const TimeEntryDetails = (props: IProps) => {
     }
   }
 
-  const showEditTimesheet = (day: string, group: IGroupedTimeEntries, total: number) => {
-    setShowEditModal(true);
-    setSelectedGroup({
-      day,
-      group,
-      total
-    });
-  }
   return (
     <>
       <div className={styles['detail-table']}>
@@ -187,9 +173,9 @@ const TimeEntryDetails = (props: IProps) => {
                   </td>
 
                   {
-                    weekDays.map((day: any, timeIndex: number) => {
-                      const entryKey = moment(day).format('ddd, MMM D');
-                      const duration = getTotalTimeForADay(group?.entries[entryKey]);
+                    weekDays.map((date: any, timeIndex: number) => {
+                      const entries = group?.entries[date];
+                      const duration = getTotalTimeForADay(entries);
 
                       return (
                         <td
@@ -198,20 +184,17 @@ const TimeEntryDetails = (props: IProps) => {
                           {
                             (['Approved', 'Rejected'].includes(props.status) || canApproveReject) ? (
                               <div className={styles['entry-duration']}>
-                                {
-                                  group?.entries[entryKey]
-                                    ? getTimeFormat(duration)
-                                    : '-'
-                                }
+                                { entries ? getTimeFormat(duration) : '-' }
                               </div>
                             ) : (
-                              <Input
-                                type="text"
-                                disabled={props?.status !== 'Pending'}
-                                onClick={() => showEditTimesheet(moment(day).format('YYYY-MM-DD'), group, duration)}
-                                value={
-                                  group?.entries[entryKey] ? getTimeFormat(duration) : '-'
-                                }
+                              <TimeInput 
+                                status={props.status}
+                                date={date}
+                                project_id={group.project_id}
+                                entries={entries}
+                                duration={entries ? duration : undefined}
+                                timesheet_id={props.timesheet_id}
+                                refetch={props.refetch}
                               />
                             )
                           }
@@ -315,15 +298,6 @@ const TimeEntryDetails = (props: IProps) => {
             subText="Your current time tracking will be deleted."
           />
         }
-      />
-
-      <EditTimeSheet
-        setVisibility={() => { setShowEditModal(false) }}
-        visible={showEditModal}
-        day={selectedGroup?.day}
-        refetch={refetchGroups}
-        total={selectedGroup?.total ?? 0}
-        timesheetDetail={selectedGroup?.group ?? []}
       />
     </>
   )

@@ -23,7 +23,6 @@ import { notifyGraphqlError } from "../../../utils/error";
 import constants from "../../../config/constants";
 import { TimeEntry, QueryTimesheetArgs, TimeSheetPagingResult, MutationTimeEntriesApproveRejectArgs, AttachedTimesheet, MutationAttachedTimesheetDeleteArgs } from '../../../interfaces/generated';
 import { GraphQLResponse } from '../../../interfaces/graphql.interface';
-import { TASK } from '../../Tasks';
 import { PROJECT } from '../../Project';
 import { IGroupedTimeEntries } from '../../../interfaces/common.interface';
 
@@ -122,6 +121,7 @@ export const TIME_SHEET = gql`
     startTime
     endTime
     duration
+    description
     approvalStatus
     timesheet {
       id
@@ -155,7 +155,6 @@ export const TIMESHEET_SUBMIT = gql`
     }
   }
 `
-
 
 export const ATTACHED_TIMESHEET = gql`
   query AttachedTimesheet($input: AttachedTimesheetQueryInput!) {
@@ -218,7 +217,6 @@ const DetailTimesheet = () => {
   const authData = authVar()
   const roles = authData?.user?.roles ?? []
   const [form] = Form.useForm()
-  const [filteredTasks, setTasks] = useState([])
   const [commentDetails, setCommentDetails] = useState<{
     showModal: boolean;
     commentType: 'Reject' | 'UnlockApproved' | 'UnlockRejected' | undefined;
@@ -246,17 +244,15 @@ const DetailTimesheet = () => {
     rejected: [],
   });
 
+  /** Modal Visibility **/
+  const [showAddNewEntry, setShowAddNewEntry] = useState<boolean>(false);
+  const [deleteVisibility, setDeleteVisibility] = useState<boolean>(false);
+  const [editAttachedVisibility, setEditAttachedVisibility] = useState<boolean>(false);
+  const [attachedTimesheet, setAttachedTimesheet] = useState<any>()
+
   const [submitTimesheet, { loading: submittingTimesheet }] = useMutation(TIMESHEET_SUBMIT)
 
 
-  /** Modal Visibility **/
-  const [showAddNewEntry, setShowAddNewEntry] = useState<boolean>(false);
-
-  const [deleteVisibility, setDeleteVisibility] = useState<boolean>(false);
-
-  const [editAttachedVisibility, setEditAttachedVisibility] = useState<boolean>(false);
-
-  const [attachedTimesheet, setAttachedTimesheet] = useState<any>()
 
   const canApproveReject = checkRoles({
     expectedRoles: [constants.roles.SuperAdmin, constants.roles.CompanyAdmin, constants.roles.TaskManager],
@@ -282,51 +278,23 @@ const DetailTimesheet = () => {
     onError: notifyGraphqlError,
   });
 
-  const [getTask, { data: taskData }] = useLazyQuery(TASK, {
-    fetchPolicy: "network-only",
-    nextFetchPolicy: "cache-first",
-    variables: {
-      input: {
-        query: {
-          company_id: authData?.company?.id,
-          project_id: ''
-        },
-        paging: {
-          order: ['updatedAt:DESC']
-        }
-      }
-    },
-    onCompleted: (response: any) => {
-      const taskIds = entriesByStatus?.pending.map((timesheet: any) => {
-        return timesheet?.id
-      });
-      const filtered = response?.Task?.data?.filter((task: any) => {
-        return !taskIds.includes(task?.id)
-      });
-
-      setTasks(filtered)
-    }
-  })
-
   const onSubmitNewTimeEntry = (values: any) => {
     const project = projectData?.Project?.data?.filter((data: any) =>
       data?.id === values?.project
     );
-    const task = taskData?.Task?.data?.filter((data: any) =>
-      data?.id === values?.task
-    );
     const timeEntry = {
       entries: {},
-      id: task[0]?.id,
+      id: project[0]?.id,
+      name: project[0]?.name,
       project: project[0]?.name,
       project_id: project[0]?.id,
-      name: task[0]?.name
     }
+
     const ids = entriesByStatus.pending?.map((timesheet: any) => {
       return timesheet?.id
     })
 
-    if (!ids.includes(task[0]?.id)) {
+    if (!ids.includes(project[0]?.id)) {
       setEntriesByStatus({ ...entriesByStatus, pending: [...entriesByStatus.pending, timeEntry] });
     };
 
@@ -388,19 +356,6 @@ const DetailTimesheet = () => {
   })
 
   const onChangeProjectSelect = (value: string) => {
-    getTask({
-      variables: {
-        input: {
-          query: {
-            company_id: authData?.company?.id,
-            project_id: value
-          },
-          paging: {
-            order: ['updatedAt:DESC']
-          }
-        }
-      }
-    }).then(r => { })
     if (form.getFieldValue(['task'])) {
       form.resetFields(['task']);
     }
@@ -502,6 +457,7 @@ const DetailTimesheet = () => {
     setViewAttachment(!viewAttachment);
     setAttachedTimesheetAttachment(data);
   }
+
   const approveRejectAll = (status: string) => {
     const ids: string[] = [];
 
@@ -991,18 +947,20 @@ const DetailTimesheet = () => {
         </div>
 
       <Modal
-        centered
-        visible={showAddNewEntry}
-        footer={null}
-        closeIcon={[
-          <div onClick={() => setShowAddNewEntry(false)} key={1}>
-            <span className={styles['close-icon-div']}>
-              <CloseOutlined />
-            </span>
-          </div>
-        ]}
-        width={1000}>
+          centered
+          visible={showAddNewEntry}
+          footer={null}
+          closeIcon={[
+            <div onClick={() => setShowAddNewEntry(false)} key={1}>
+              <span className={styles['close-icon-div']}>
+                <CloseOutlined />
+              </span>
+            </div>
+          ]}
+          width={1000}
+        >
         <div className={styles['modal-title']}>Select Project</div>
+
         <Form
           form={form}
           onFinish={onSubmitNewTimeEntry}
@@ -1017,26 +975,12 @@ const DetailTimesheet = () => {
               }]}>
               <Select
                 placeholder="Select Project"
-                onChange={onChangeProjectSelect}>
+                onChange={onChangeProjectSelect}
+              >
                 {projectData && projectData?.Project?.data.map((project: any, index: number) => (
                   <Option value={project?.id} key={index}>
                     {project?.name}
                   </Option>))}
-              </Select>
-            </Form.Item>
-            <Form.Item
-              name={'task'}
-              label="Task Name"
-              rules={[{
-                required: true,
-                message: 'Choose the task'
-              }]}>
-              <Select placeholder="Select Task">
-                {filteredTasks && filteredTasks?.map((task: any, index: number) => (
-                  <Option value={task?.id} key={index}>
-                    {task?.name}
-                  </Option>)
-                )}
               </Select>
             </Form.Item>
           </div>
@@ -1134,7 +1078,7 @@ const DetailTimesheet = () => {
 
 function groupEntriesByProject(entries: TimeEntry[]) {
   function groupByStartDate(array: any) {
-    const startDateFn = (entry: any) => moment(entry?.startTime).format('ddd, MMM D');
+    const startDateFn = (entry: any) => moment(entry?.startTime).utc().format('YYYY-MM-DD');
     return groupBy(array, startDateFn);
   }
 
