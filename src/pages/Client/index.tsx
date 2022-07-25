@@ -46,6 +46,8 @@ export const CLIENT = gql`
         status
         archived
         phone
+        invoiceSchedule
+        invoice_payment_config_id
         address {
           country
           streetAddress

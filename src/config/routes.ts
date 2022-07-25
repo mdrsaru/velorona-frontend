@@ -15,6 +15,13 @@ const routes = {
     name: 'Company',
     key: 'company'
   },
+  invoicePaymentConfig: {
+    childPath: 'payment-config',
+    path: '/payment-config',
+    component: lazy(() => import('../pages/PaymentConfig')),
+    name: 'Payment Config',
+    key: 'payment-config'
+  },
   login: {
     childPath: null,
     path: '/login',

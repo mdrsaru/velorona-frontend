@@ -28,7 +28,7 @@ export const CLIENT_CREATE = gql`
 const NewClient = () => {
   const authData = authVar();
   const navigate = useNavigate();
-  const [clientCreate] = useMutation<
+  const [clientCreate, { loading: creatingClient }] = useMutation<
     GraphQLResponse<'CleintCreate', Client>,
     MutationClientCreateArgs
   >(CLIENT_CREATE);
@@ -46,9 +46,11 @@ const NewClient = () => {
         input: {
           name: values.name,
           email: values.email,
-          invoicingEmail: values.invoiceEmail,
+          invoicingEmail: values.invoicingEmail,
           company_id: authData?.company?.id as string,
           phone:values?.phone,
+          invoiceSchedule: values.invoiceSchedule,
+          invoice_payment_config_id: values.invoice_payment_config_id,
           address: {
             country:values.country,
             streetAddress: values.streetAddress,
@@ -79,6 +81,7 @@ const NewClient = () => {
           </Col>
         </Row>
         <ClientForm
+          loading={creatingClient}
           onSubmitForm={onSubmitForm}
           btnText={'Add Client'}
           form={form}

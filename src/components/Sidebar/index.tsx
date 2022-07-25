@@ -15,6 +15,7 @@ import {
   SolutionOutlined,
   FundProjectionScreenOutlined,
   ProfileOutlined,
+  SettingOutlined,
 } from '@ant-design/icons';
 
 import constants from '../../config/constants';
@@ -90,6 +91,13 @@ const Sidebar = (props: any) => {
       name: routes.companyAdmin.name,
       icon: <BankOutlined />,
       route: routes.companyAdmin.path,
+      accessRoles: [constants.roles.SuperAdmin]
+    },
+    {
+      key: routes.invoicePaymentConfig.key,
+      name: routes.invoicePaymentConfig.name,
+      icon: <SettingOutlined />,
+      route: routes.invoicePaymentConfig.path,
       accessRoles: [constants.roles.SuperAdmin]
     },
     {
