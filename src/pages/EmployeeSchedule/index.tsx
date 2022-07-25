@@ -66,7 +66,7 @@ const EmployeeSchedule = () => {
   const columns = [
     {
       title: "Date",
-      dataIndex: "date",
+      dataIndex: "schedule_date",
       render: (date: any) => {
         return <span style={{ cursor: 'pointer' }} >
           {moment(date).format('ddd, MMM D')}

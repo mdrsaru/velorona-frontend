@@ -68,6 +68,13 @@ function App() {
             company: {
               id: response?.data?.company?.id ?? null,
               code: response?.data?.company?.companyCode ?? null,
+              name: response?.data?.company?.name ?? null,
+              logo:{
+              id: response?.data?.company?.logo?.id ?? null,
+              name: response?.data?.company?.logo?.name ?? null,
+              url: response?.data?.company?.logo?.url ?? null,
+                
+              }
             },
             fullName:response?.data?.fullName,
             avatar:{

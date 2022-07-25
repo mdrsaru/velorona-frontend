@@ -21,7 +21,13 @@ const auth: IAuth = {
   isLoggedIn: false,
   company: {
     code: '',
-    id: null
+    id: null,
+    name:'',
+    logo:{
+      id:null,
+      name:null,
+      url:null,
+    }
   },
   avatar: {
     id: '',

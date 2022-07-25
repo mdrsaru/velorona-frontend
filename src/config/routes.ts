@@ -134,7 +134,20 @@ const routes = {
     name: 'Profile',
     key: 'profile'
   },
-
+  companySetting: {
+    childPath: 'setting/:eid',
+    path: (eid: string) => `/setting/${eid}`,
+    component: lazy(() => import('../pages/CompanySetting')),
+    name: 'Profile',
+    key: 'profile'
+  },
+  editCompanySetting: {
+    childPath: 'setting/:eid/edit',
+    path: (eid: string) => `/setting/${eid}/edit`,
+    component: lazy(() => import('../pages/CompanySetting/EditCompanySetting')),
+    name: 'Profile',
+    key: 'profile'
+  },
   changePassword: {
     childPath: 'profile/:eid/change-password',
     path: (eid: string) => `/profile/${eid}/change-password`,

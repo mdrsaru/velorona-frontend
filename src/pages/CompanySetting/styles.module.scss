@@ -1,0 +1,48 @@
+.container{
+  margin: 1rem 1rem;
+  padding: 1rem;
+}
+.heading {
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 29px;
+}
+.title {
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 4rem;
+}
+
+.value{
+  line-height: 4rem;
+}
+
+.edit-btn {
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 17px;
+  color: var(--primary-blue);
+}
+
+
+  .browse-file {
+    text-align: end;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+
+    span {
+      color: var(--primary-blue);
+      font-weight: 600;
+      font-size: 14px;
+      line-height: 17px;
+    }
+  }
+
+.browse-file {
+  :global {
+    .ant-upload-list-text {
+      display: none;
+    }
+  }
+}
