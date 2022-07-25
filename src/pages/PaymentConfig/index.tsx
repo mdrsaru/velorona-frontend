@@ -72,7 +72,7 @@ const InvoicePaymentConfig = () => {
     <div className={styles['container']}>
       <Card bordered={false}>
         <PageHeader
-          title="Clients"
+          title="Invoice Payment"
           extra={[
             <div>
             </div>
