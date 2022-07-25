@@ -1,5 +1,5 @@
-import { Card, Row, Col, Table, Dropdown, Menu, message, Input, Button, Select, Form } from "antd"
-import { MoreOutlined, SearchOutlined, DownloadOutlined } from "@ant-design/icons"
+import { Card, Row, Col, Table, Dropdown, Menu, message, Input, Button, Select, Form, Avatar } from "antd"
+import {  SearchOutlined, DownloadOutlined, DollarCircleFilled, FormOutlined, CheckCircleFilled, DeleteOutlined, UserOutlined } from "@ant-design/icons"
 
 import { Link, useNavigate } from "react-router-dom"
 import routes from "../../config/routes"
@@ -31,7 +31,7 @@ import { debounce } from "lodash";
 import PageHeader from "../../components/PageHeader";
 import { downloadCSV } from "../../utils/common";
 
-const { SubMenu } = Menu;
+// const { SubMenu } = Menu;
 const { Option } = Select;
 
 export const USER = gql`
@@ -457,9 +457,9 @@ const Employee = () => {
   const menu = (data: any) => {
     return (
       <Menu>
-        {
+        {/* {
           data?.id !== loggedInUser?.user?.id && (
-            <SubMenu title="Change status" key="mainMenu">
+            <SubMenu title="Change status" key="mainMenu"> */}
               <Menu.Item
                 key="active"
                 onClick={() => {
@@ -482,11 +482,11 @@ const Employee = () => {
               >
                 Inactive
               </Menu.Item>
-            </SubMenu>
+            {/* </SubMenu>
           )
-        }
+        } */}
 
-        <Menu.Divider />
+        {/* <Menu.Divider />
         {
           data.roles[0]?.name === constants.roles.Employee ?
 
@@ -552,7 +552,7 @@ const Employee = () => {
               </div>
             </Menu.Item>
           )
-        }
+        } */}
       </Menu>
     )
   };
@@ -630,15 +630,110 @@ const Employee = () => {
       key: "actions",
       render: (record: any) => (
         <Row style={{ marginTop: '11px' }}>
+          {record.roles[0]?.name === constants.roles.Employee &&
+            <Col>
+              <p
+                onClick={() => handleUserPayRate(record)}
+                className={styles["table-icon"]}
+                title='Add Payrate'
+              >
+                <DollarCircleFilled />
+              </p>
+            </Col>
+          }
+
           <Col>
-            <p
-              onClick={() => handleUserPayRate(record)}
-              className={styles["add-pay-rate"]}
-            >
-              Add PayRate
-            </p>
+            {
+              record?.id !== loggedInUser?.user?.id && (<div
+                className={styles["table-icon"]}
+                onClick={(event) => event.stopPropagation()}
+              >
+                <Dropdown
+                  overlay={menu(record)}
+                  trigger={["click"]}
+                  placement="bottomRight"
+                >
+                  <div
+                    className="ant-dropdown-link"
+                    onClick={(e) => e.preventDefault()}
+                    title='Change Status'
+                  >
+                    <CheckCircleFilled />
+                  </div>
+                </Dropdown>
+              </div>
+              )}
           </Col>
           <Col>
+            {
+              record.roles[0]?.name === constants.roles.Employee ?
+
+                record?.activeClient ?
+
+                  (
+                    <div
+                      onClick={() => {
+                        setEmployee(record);
+                        setShowChangeClient(true)
+                      }}
+                      title='Edit Client'
+                      className={styles["table-icon"]}
+                    >
+
+                      <Avatar size="small" icon={<UserOutlined />} />
+                    </div>
+                  )
+                  :
+                  (
+                    <div>
+                      <Link
+                        to={routes.attachClient.path(
+                          loggedInUser?.company?.code ?? "1",
+                          record?.id ?? "1"
+                        )}
+                        title='Add Client'
+                        className={styles["table-icon"]}
+                      >
+                        <Avatar size="small" icon={<UserOutlined />} />
+
+                      </Link>
+                    </div>
+                  )
+                :
+                <>
+                </>
+            }
+          </Col>
+          <Col>
+            <Link
+              to={routes.editEmployee.path(
+                loggedInUser?.company?.code ?? "1",
+                record?.id ?? "1"
+              )}
+              className={styles["table-icon"]}
+              title='Edit User'
+            >
+              <FormOutlined />
+            </Link>
+          </Col>
+
+          <Col>
+            {
+              record?.id !== loggedInUser?.user?.id && (
+                <div
+                  onClick={() => {
+                    setEmployee(record);
+                    setArchiveVisibility(true);
+                  }}
+                  className={styles["table-icon"]}
+                  title='Archive User'
+                >
+                  <DeleteOutlined />
+                </div>
+              )
+            }
+          </Col>
+          {/*<Col>
             <div
               className={styles["dropdown-menu"]}
               onClick={(event) => event.stopPropagation()}
@@ -656,8 +751,9 @@ const Employee = () => {
                   <MoreOutlined />
                 </div>
               </Dropdown>
-            </div>
-          </Col>
+            </div> 
+
+          </Col>*/}
         </Row>
       ),
     },

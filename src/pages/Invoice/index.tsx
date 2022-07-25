@@ -2,7 +2,7 @@ import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { gql, useQuery, useMutation } from '@apollo/client';
-import { MoreOutlined,SearchOutlined } from '@ant-design/icons';
+import {  SearchOutlined, CheckCircleFilled, FormOutlined, EyeFilled } from '@ant-design/icons';
 import { Card, Col, Dropdown, Menu, Row, Table, message, Modal, Form, Select, Button, Input } from 'antd';
 
 import filterImg from "../../assets/images/filter.svg"
@@ -18,7 +18,7 @@ import {
   InvoiceStatus,
   InvoicePagingResult,
   MutationInvoiceUpdateArgs,
-  QueryInvoiceArgs
+  QueryInvoiceArgs,
 } from '../../interfaces/generated';
 import { GraphQLResponse } from '../../interfaces/graphql.interface';
 
@@ -227,7 +227,41 @@ const Invoice = () => {
       debouncedResults.cancel();
     };
   });
-  
+
+  const menu = (invoice: IInvoice) => (
+    <Menu>
+
+      <Menu.Item
+        key="Pending"
+        onClick={() => changeStatus(invoice.id, InvoiceStatus.Pending)}
+      >
+        Pending
+      </Menu.Item>
+
+      <Menu.Divider />
+
+      <Menu.Item
+        key="Received"
+        onClick={() => changeStatus(invoice.id, InvoiceStatus.Received)}
+      >
+        Received
+      </Menu.Item>
+
+      <Menu.Divider />
+
+      {
+        invoice.status === InvoiceStatus.Pending && (
+          <Menu.Item
+            key="Sent"
+            onClick={() => changeStatus(invoice.id, InvoiceStatus.Sent)}
+          >
+            Sent
+          </Menu.Item>
+        )
+      }
+    </Menu>
+  )
+
   const dataSource = invoiceData?.Invoice?.data ?? [];
 
   const columns = [
@@ -268,73 +302,116 @@ const Invoice = () => {
       title: 'Actions',
       render: (invoice: IInvoice) => {
         return (
-          <div className={styles['actions']} onClick={(event) => event.stopPropagation()}>
-            <Dropdown
-              overlay={
-                <>
-                  <Menu>
-                    <Menu.Item key="edit">
-                      {
-                        invoice.status === 'Pending' ? (
-                          <Link
-                            to={routes.editInvoice.path(loggedInUser?.company?.code as string, invoice.id)}
-                          >
-                            Edit Invoice 
-                          </Link>
-                        ): (
-                          <div 
-                            onClick={() => handleViewInvoiceClick(invoice.id)}
-                          >
-                            View Invoice
-                          </div>
-                        )
-                      }
-                    </Menu.Item>
+          // <div className={styles['actions']} onClick={(event) => event.stopPropagation()}>
+          //   <Dropdown
+          //     overlay={
+          //       <>
+          //         <Menu>
+          //           <Menu.Item key="edit">
+          //             {
+          //               invoice.status === 'Pending' ? (
+          //                 <Link
+          //                   to={routes.editInvoice.path(loggedInUser?.company?.code as string, invoice.id)}
+          //                 >
+          //                   Edit Invoice 
+          //                 </Link>
+          //               ): (
+          //                 <div 
+          //                   onClick={() => handleViewInvoiceClick(invoice.id)}
+          //                 >
+          //                   View Invoice
+          //                 </div>
+          //               )
+          //             }
+          //           </Menu.Item>
 
-                    <Menu.SubMenu title="Change status" key="mainMenu">
-                      <Menu.Item 
-                        key="Pending"
-                        onClick={() => changeStatus(invoice.id, InvoiceStatus.Pending)}
-                      >
-                        Pending
-                      </Menu.Item>
+          //           <Menu.SubMenu title="Change status" key="mainMenu">
+          //             <Menu.Item 
+          //               key="Pending"
+          //               onClick={() => changeStatus(invoice.id, InvoiceStatus.Pending)}
+          //             >
+          //               Pending
+          //             </Menu.Item>
 
-                      <Menu.Divider />
+          //             <Menu.Divider />
 
-                      <Menu.Item 
-                        key="Received"
-                        onClick={() => changeStatus(invoice.id, InvoiceStatus.Received)}
-                      >
-                        Received
-                      </Menu.Item>
+          //             <Menu.Item 
+          //               key="Received"
+          //               onClick={() => changeStatus(invoice.id, InvoiceStatus.Received)}
+          //             >
+          //               Received
+          //             </Menu.Item>
 
-                      <Menu.Divider />
+          //             <Menu.Divider />
 
-                      {
-                        invoice.status === InvoiceStatus.Pending && (
-                          <Menu.Item 
-                            key="Sent"
-                            onClick={() => changeStatus(invoice.id, InvoiceStatus.Sent)}
-                          >
-                            Sent
-                          </Menu.Item>
-                        )
-                      }
-                    </Menu.SubMenu>
-                  </Menu>
-                </>
+          //             {
+          //               invoice.status === InvoiceStatus.Pending && (
+          //                 <Menu.Item 
+          //                   key="Sent"
+          //                   onClick={() => changeStatus(invoice.id, InvoiceStatus.Sent)}
+          //                 >
+          //                   Sent
+          //                 </Menu.Item>
+          //               )
+          //             }
+          //           </Menu.SubMenu>
+          //         </Menu>
+          //       </>
+          //     }
+          //     trigger={['click']}
+          //     placement="bottomRight"
+          //   >
+          //     <div
+          //       className="ant-dropdown-link"
+          //       onClick={e => e.preventDefault()}
+          //       style={{ paddingLeft: '1rem' }}>
+          //       <MoreOutlined />
+          //     </div>
+          //   </Dropdown>
+          // </div>
+          <Row>
+            <Col>
+              {
+                invoice.status === 'Pending' ? (
+                  <Link
+                    to={routes.editInvoice.path(loggedInUser?.company?.code as string, invoice.id)}
+                    title = 'Edit Invoice'
+                    className={styles['table-icon']}
+                  >
+                    <FormOutlined />
+                  </Link>
+                ) : (
+                  <div
+                    onClick={() => handleViewInvoiceClick(invoice.id)}
+                    title='View Invoice'
+                    className={styles['table-icon']}
+                  >
+                    <EyeFilled />
+                  </div>
+                )
               }
-              trigger={['click']}
-              placement="bottomRight"
-            >
+            </Col>
+            <Col>
               <div
-                className="ant-dropdown-link"
-                onClick={e => e.preventDefault()}
-                style={{ paddingLeft: '1rem' }}>
-                <MoreOutlined />
+                className={styles["table-icon"]}
+                onClick={(event) => event.stopPropagation()}
+              >
+                <Dropdown
+                  overlay={menu(invoice)}
+                  trigger={["click"]}
+                  placement="bottomRight"
+                >
+                  <div
+                    className="ant-dropdown-link"
+                    onClick={(e) => e.preventDefault()}
+                    title='Change Status'
+                  >
+                    <CheckCircleFilled />
+                  </div>
+                </Dropdown>
               </div>
-            </Dropdown>
-          </div>
+            </Col>
+          </Row>
         )
       }
     },
@@ -343,7 +420,7 @@ const Invoice = () => {
   return (
     <div className={styles['container']}>
       <Card bordered={false}>
-        <PageHeader 
+        <PageHeader
           title="Invoice History"
           extra={[
             <div className={styles['new-invoice']} key="new-invoice">

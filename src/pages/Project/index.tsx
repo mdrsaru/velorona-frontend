@@ -4,7 +4,7 @@ import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client'
 import { Button, Card, Col, Dropdown, Form, Input, Menu, message, Row, Select, Table } from 'antd'
 import { Link, useNavigate } from 'react-router-dom'
 import routes from '../../config/routes'
-import { MoreOutlined, PlusCircleOutlined, DownloadOutlined, SearchOutlined } from '@ant-design/icons'
+import { SearchOutlined, DownloadOutlined, FormOutlined, CheckCircleFilled, DeleteOutlined } from "@ant-design/icons"
 
 import { authVar } from '../../App/link';
 import ModalConfirm from '../../components/Modal';
@@ -16,7 +16,6 @@ import archiveImg from '../../assets/images/archive_btn.svg';
 
 import ArchiveBody from '../../components/Archive';
 import { notifyGraphqlError } from '../../utils/error';
-import SubMenu from 'antd/lib/menu/SubMenu';
 
 import { MutationProjectUpdateArgs, Project, ProjectPagingResult, ProjectStatus, QueryProjectArgs } from '../../interfaces/generated';
 import { GraphQLResponse } from '../../interfaces/graphql.interface';
@@ -304,35 +303,35 @@ const ProjectPage = () => {
 
   const menu = (data: Project) => (
     <Menu>
-      <SubMenu title="Change status" key="mainMenu">
-        <Menu.Item
-          key="active"
-          onClick={() => {
-            setProject(data);
-            if (data?.status === "Inactive") {
-              changeStatus(ProjectStatus?.Active, data?.id, data?.name);
-            }
-          }}
-        >
-          Active
-        </Menu.Item>
-        <Menu.Divider />
-
-        <Menu.Item
-          key="inactive"
-          onClick={() => {
-            if (data?.status === "Active") {
-              setProject(data);
-              changeStatus(ProjectStatus?.Inactive, data?.id, data?.name);
-            }
-          }}
-        >
-          Inactive
-        </Menu.Item>
-      </SubMenu>
+      {/* <SubMenu title="Change status" key="mainMenu"> */}
+      <Menu.Item
+        key="active"
+        onClick={() => {
+          setProject(data);
+          if (data?.status === "Inactive") {
+            changeStatus(ProjectStatus?.Active, data?.id, data?.name);
+          }
+        }}
+      >
+        Active
+      </Menu.Item>
       <Menu.Divider />
 
-      <Menu.Item key="edit">
+      <Menu.Item
+        key="inactive"
+        onClick={() => {
+          if (data?.status === "Active") {
+            setProject(data);
+            changeStatus(ProjectStatus?.Inactive, data?.id, data?.name);
+          }
+        }}
+      >
+        Inactive
+      </Menu.Item>
+      {/* </SubMenu> */}
+      <Menu.Divider />
+
+      {/* <Menu.Item key="edit">
         <Link
           to={routes.editProject.path(
             loggedInUser?.company?.code ?? "1",
@@ -354,7 +353,7 @@ const ProjectPage = () => {
           {data?.archived ? "Unarchive Project" : "Archive Project"}
         </div>
       </Menu.Item>
-      <Menu.Divider />
+      <Menu.Divider /> */}
 
       {/* <Menu.Item key="delete">
         <div onClick={() => setModalVisibility(true)}>
@@ -399,22 +398,11 @@ const ProjectPage = () => {
       title: "Actions",
       key: "actions",
       render: (record: Project) => (
-        <div
+        <>
+          {/* <div
           className={styles["dropdown-menu"]}
           onClick={(event) => event.stopPropagation()}
         >
-          {/* <Link
-            to={routes.addTasksProject.path(
-              loggedInUser?.company?.code ? loggedInUser?.company?.code : "",
-              record?.id ?? ""
-            )}
-          >
-            <span className={styles["plus-circle-outline"]}>
-              <PlusCircleOutlined />
-            </span>{" "}
-            &nbsp;
-            <span className={styles["add-task"]}>Add Task</span> &nbsp; &nbsp;
-          </Link> */}
           <Dropdown
             overlay={menu(record)}
             trigger={["click"]}
@@ -428,7 +416,56 @@ const ProjectPage = () => {
               <MoreOutlined />
             </div>
           </Dropdown>
-        </div>
+        </div> */}
+          <Row style={{ marginTop: '11px' }}>
+            <Col>
+              <div
+                className={styles["table-icon"]}
+                onClick={(event) => event.stopPropagation()}
+              >
+                <Dropdown
+                  overlay={menu(record)}
+                  trigger={["click"]}
+                  placement="bottomRight"
+                >
+                  <div
+                    className="ant-dropdown-link"
+                    onClick={(e) => e.preventDefault()}
+                    title='Change Status'
+                  >
+                    <CheckCircleFilled />
+                  </div>
+                </Dropdown>
+              </div>
+            </Col>
+            <Col>
+              <Link
+                to={routes.editProject.path(
+                  loggedInUser?.company?.code ?? "1",
+                  record?.id ?? "1"
+                )}
+                className={styles["table-icon"]}
+                title='Edit Project'
+              >
+                <FormOutlined />
+              </Link>
+            </Col>
+            <Col>
+
+              <div
+                onClick={() => {
+                  setProject(record);
+                  setArchiveVisibility(true);
+                }}
+                className={styles["table-icon"]}
+                title='Archive Project'
+              >
+                <DeleteOutlined />
+              </div>
+
+            </Col>
+          </Row>
+        </>
       ),
     },
   ];

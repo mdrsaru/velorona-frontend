@@ -3,10 +3,10 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { gql, useLazyQuery, useQuery } from '@apollo/client';
 import { Card, Table, Button, Form, Row, Select, Col, Input, DatePicker } from 'antd';
-import { DownloadOutlined, SearchOutlined } from '@ant-design/icons';
+import { DownloadOutlined, SearchOutlined,EyeFilled } from '@ant-design/icons';
 
 import { authVar } from '../../App/link';
-import constants, { employee_timesheet_status, status } from '../../config/constants';
+import constants, { employee_timesheet_status } from '../../config/constants';
 import routes from '../../config/routes';
 import { notifyGraphqlError } from '../../utils/error';
 import { TimesheetPagingData } from '../../interfaces/graphql.interface';
@@ -104,19 +104,6 @@ const EmployeeTimesheet = () => {
     },
   );
 
-  const {
-    data: timesheet,
-  } = useQuery<TimesheetPagingData, { input: TimesheetQueryInput }>(
-    EMPLOYEE_TIMESHEET,
-    {
-      fetchPolicy: 'network-only',
-      nextFetchPolicy: 'cache-first',
-      variables: {
-        input,
-      },
-      onError: notifyGraphqlError,
-    },
-  );
   const [fetchDownloadData, { data: timesheetDownloadData }] = useLazyQuery<TimesheetPagingData,
     { input: TimesheetQueryInput }>(
       EMPLOYEE_TIMESHEET,
@@ -293,8 +280,9 @@ const EmployeeTimesheet = () => {
         return (
           <Link
             className={styles['invoice-link']}
+            title='View Detail'
             to={routes.detailTimesheet.path(authData?.company?.code as string, timesheet.id)}>
-            Details
+            <EyeFilled className={styles['table-icon']}/>
           </Link>
         )
       }

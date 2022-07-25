@@ -1,5 +1,5 @@
 
-import { gql, useQuery } from "@apollo/client";
+import {  useQuery } from "@apollo/client";
 import { Form, Modal, Row, Col, Button, Space, Input } from "antd"
 import { useEffect, useState } from "react";
 import { authVar } from "../../App/link";

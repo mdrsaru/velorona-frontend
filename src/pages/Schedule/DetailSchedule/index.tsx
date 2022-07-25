@@ -1,9 +1,8 @@
 import { Fragment, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Card, Col, Dropdown, Menu, message, Row, } from "antd";
-import PlusCircleFilled from "@ant-design/icons/lib/icons/PlusCircleFilled";
+import { Card, Col, message, Row, } from "antd";
+import { PlusCircleFilled, DeleteOutlined } from "@ant-design/icons";
 import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
-import { MoreOutlined } from "@ant-design/icons";
 import moment from "moment";
 import _ from "lodash";
 import { getWeekDays } from "../../../utils/common";
@@ -14,7 +13,7 @@ import AddTimeInterval from "./AddTimeInterval";
 import styles from "./style.module.scss";
 import AddNewWorkscheduleDetail from "./AddNewWorkscheduleDetail";
 import { GraphQLResponse } from "../../../interfaces/graphql.interface";
-import {  QueryUserArgs, UserPagingResult } from "../../../interfaces/generated";
+import { QueryUserArgs, UserPagingResult } from "../../../interfaces/generated";
 import { USER } from "../../Employee";
 import { notifyGraphqlError } from "../../../utils/error";
 import ModalConfirm from "../../../components/Modal";
@@ -69,7 +68,7 @@ const ScheduleDetail = () => {
         providedDate: '',
         employeeId: '',
     });
-    const [ids,setIds] = useState([])
+    const [ids, setIds] = useState([])
     const [workscheduleId, setWorkscheduleId] = useState('')
     const [employee, setEmployee] = useState('')
     const [employeeId, setEmployeeId] = useState('')
@@ -91,7 +90,7 @@ const ScheduleDetail = () => {
         }
     );
 
-    const { data: employeeData, refetch: refetchEmployee } = useQuery<
+    const { data: employeeData} = useQuery<
         GraphQLResponse<'User', UserPagingResult>,
         QueryUserArgs
     >(
@@ -130,25 +129,25 @@ const ScheduleDetail = () => {
         }
     );
 
-    const [workscheduleBulkDelete, { loading:deleting }] = useMutation(WORKSCHEDULE_DETAIL_BULK_DELETE, {
+    const [workscheduleBulkDelete, { loading: deleting }] = useMutation(WORKSCHEDULE_DETAIL_BULK_DELETE, {
         onCompleted() {
             message.success({
                 content: `Workschedule Detail is deleted successfully!`,
                 className: "custom-message",
             });
             refetchWorkscheduleDetail({
-                    input: {
-                        paging: {
-                            order: ["updatedAt:ASC"],
-                        },
-                        query: {
-                            workschedule_id: params?.sid
-                        }
+                input: {
+                    paging: {
+                        order: ["updatedAt:ASC"],
                     },
-                
+                    query: {
+                        workschedule_id: params?.sid
+                    }
+                },
+
             })
             setShowDeleteModal(false);
-          
+
         },
         onError(err) {
             setShowDeleteModal(false);
@@ -181,6 +180,7 @@ const ScheduleDetail = () => {
 
     const handleNewTimeIntervalAddition = (id: number) => {
         setShowAddNewTimeInterval(true);
+        setEmployee('')
         setAddNewTimeInterval({
             employeeId: employeeData?.User?.data?.[0]?.id,
             employeeName: employeeData?.User?.data?.[0]?.fullName,
@@ -206,7 +206,7 @@ const ScheduleDetail = () => {
         return ids;
     }
 
-    const deleteWorkscheduleDetails = () =>{
+    const deleteWorkscheduleDetails = () => {
         workscheduleBulkDelete({
 
             variables: {
@@ -223,19 +223,20 @@ const ScheduleDetail = () => {
         setEmployeeId(data?.[0]?.user?.id)
         setIds(ids)
         setShowDeleteModal(!showDeleteModal)
-      
+
     }
-    const menu = (data: any) => (
-        <Menu>
-            <Menu.Item key="clear" onClick={() => handleDeleteClick(data)}>
-                Clear all schedule
-            </Menu.Item>
-            <Menu.Divider />
-            {/* <Menu.Item key="delete" >
-                Delete Employee
-            </Menu.Item> */}
-        </Menu>
-    );
+
+    // const menu = (data: any) => (
+    //     <Menu>
+    //         <Menu.Item key="clear" onClick={() => handleDeleteClick(data)}>
+    //             Clear all schedule
+    //         </Menu.Item>
+    //         <Menu.Divider />
+    //         {/* <Menu.Item key="delete" >
+    //             Delete Employee
+    //         </Menu.Item> */}
+    //     </Menu>
+    // );
 
     const getTotalSchedule = (group: any) => {
         let count = 0;
@@ -308,7 +309,7 @@ const ScheduleDetail = () => {
                                                             {getTotalSchedule(groups[key])}
                                                         </td>
                                                         <td>
-                                                            <div
+                                                            {/* <div
                                                                 className={styles["dropdown-menu"]}
                                                                 onClick={(event) => event.stopPropagation()}
                                                             >
@@ -325,7 +326,14 @@ const ScheduleDetail = () => {
                                                                         <MoreOutlined />
                                                                     </div>
                                                                 </Dropdown>
-                                                            </div>
+                                                            </div> */}
+                                                            <span 
+                                                            title='Clear all schedule' 
+                                                            className={styles['table-icon']} 
+                                                            onClick={() => handleDeleteClick(groups[key])}
+                                                            >
+                                                                <DeleteOutlined />
+                                                            </span>
                                                         </td>
                                                     </tr>)
                                             })}
