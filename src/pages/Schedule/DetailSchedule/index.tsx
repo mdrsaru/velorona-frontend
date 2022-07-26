@@ -290,8 +290,8 @@ const ScheduleDetail = () => {
                                                                                 index: number) =>
                                                                                 <Fragment key={index} >
                                                                                     <span onClick={() => handleChange(data?.id)} style={{ cursor: 'pointer' }}>
-                                                                                        {moment(timeData?.startTime).format('HH:MM')} -
-                                                                                        {moment(timeData?.endTime).format('HH:MM')}
+                                                                                        {moment(timeData?.startTime).format('HH:mm')} -
+                                                                                        {moment(timeData?.endTime).format('HH:mm')}
                                                                                     </span>
                                                                                     <br />
                                                                                 </Fragment>
@@ -309,24 +309,6 @@ const ScheduleDetail = () => {
                                                             {getTotalSchedule(groups[key])}
                                                         </td>
                                                         <td>
-                                                            {/* <div
-                                                                className={styles["dropdown-menu"]}
-                                                                onClick={(event) => event.stopPropagation()}
-                                                            >
-                                                                <Dropdown
-                                                                    overlay={menu(groups[key])}
-                                                                    trigger={["click"]}
-                                                                    placement="bottomRight"
-                                                                >
-                                                                    <div
-                                                                        className="ant-dropdown-link"
-                                                                        onClick={(e) => e.preventDefault()}
-                                                                        style={{ paddingLeft: "1rem" }}
-                                                                    >
-                                                                        <MoreOutlined />
-                                                                    </div>
-                                                                </Dropdown>
-                                                            </div> */}
                                                             <span 
                                                             title='Clear all schedule' 
                                                             className={styles['table-icon']} 

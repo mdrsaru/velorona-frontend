@@ -58,14 +58,14 @@ const routes = {
     key: 'dashboard'
   },
   employeeDashboard: {
-    childPath: ':dashboard',
+    childPath: ':company',
     path: (company: string | undefined) => `/${company}`,
     component: lazy(() => import('../pages/EmployeeDashboard')),
     name: 'Dashboard',
     key: 'dashboard'
   },
   taskManagerDashboard: {
-    childPath: ':dashboard',
+    childPath: ':company',
     path: (company: string | undefined) => `/${company}`,
     component: lazy(() => import('../pages/TaskManagerDashboard')),
     name: 'Dashboard',
@@ -190,14 +190,14 @@ const routes = {
     path: (id: string) => `/${id}/scheduleList`,
     component: lazy(() => import('../pages/Schedule')),
     name: 'Schedule',
-    key: 'workScheduleList'
+    key: 'scheduleList'
   },
  detailSchedule: {
-    childPath: 'schedule/:sid',
-    path: (id: string,sid:string) => `/${id}/schedule/${sid}`,
+    childPath: 'scheduleList/:sid',
+    path: (id: string,sid:string) => `/${id}/scheduleList/${sid}`,
     component: lazy(() => import('../pages/Schedule/DetailSchedule')),
-    name: 'Schedule',
-    key: 'workScheduleDetail'
+    name: 'DetailSchedule',
+    key: 'scheduleList'
   },
   projects: {
     childPath: 'projects',
