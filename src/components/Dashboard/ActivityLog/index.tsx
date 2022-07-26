@@ -1,17 +1,10 @@
-import React, { Fragment, Suspense, useState } from "react";
-import { Button, Empty, Spin, Typography } from "antd";
-import parse from "html-react-parser";
+import  { Fragment, useState } from "react";
+import {  Empty, Spin, Typography } from "antd";
 
 import { gql, NetworkStatus, useQuery } from "@apollo/client";
 import { authVar } from "../../../App/link";
 
-import ApproveIcon from '../../../assets/images/approve.svg'
-import TimeEntryIcon from '../../../assets/images/timeEntry.svg'
-
 import styles from "./style.module.scss";
-import { TimesheetStatus } from "../../../interfaces/generated";
-import moment from "moment";
-import NoContent from '../../NoContent/index';
 import { ReloadOutlined } from '@ant-design/icons';
 import constants from "../../../config/constants";
 import ActivityLogList from "./ActivityLogList";
@@ -117,9 +110,16 @@ const ActivityLog = (props: IProps) => {
                 )
               })}
               <div style={{ textAlign: 'center' }}>
+                {(activityLogData?.ActivityLog?.paging?.total >= activityLogData?.ActivityLog?.paging?.endIndex && activityLogData?.ActivityLog?.paging?.startIndex !== 0) && (
+                  <Typography.Text
+                    style={{ color: 'var(--primary-blue)', marginRight:'10px' ,cursor: 'pointer'}}
+                    onClick={() => changePage(pagingInput.currentPage - 1)}>
+                    {'<< Load Less '}
+                  </Typography.Text>)
+                }
                 {activityLogData?.ActivityLog?.paging?.hasNextPage && (
                   <Typography.Text
-                    style={{ color: 'var(--primary-blue)' }}
+                    style={{ color: 'var(--primary-blue)', cursor: 'pointer' }}
                     onClick={() => changePage(pagingInput.currentPage + 1)}>
                     {'Load More >>'}
                   </Typography.Text>)
