@@ -2,8 +2,9 @@ import React, { useState } from "react";
 import { Button, Card, Col, Dropdown, Form, Input, Menu, message, Row, Select, Table } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import { gql, useMutation, useQuery } from "@apollo/client";
-import { MoreOutlined, SearchOutlined } from "@ant-design/icons";
-import SubMenu from "antd/lib/menu/SubMenu";
+import {  SearchOutlined,FormOutlined, CheckCircleFilled, DeleteOutlined } from "@ant-design/icons"
+
+// import SubMenu from "antd/lib/menu/SubMenu";
 
 import routes from "../../config/routes";
 import { authVar } from "../../App/link";
@@ -45,6 +46,8 @@ export const CLIENT = gql`
         status
         archived
         phone
+        invoiceSchedule
+        invoice_payment_config_id
         address {
           country
           streetAddress
@@ -249,32 +252,32 @@ const Client = () => {
 
   const menu = (data: any) => (
     <Menu>
-      <SubMenu title="Change status" key="mainMenu">
-        <Menu.Item
-          key="active"
-          onClick={() => {
-            if (data?.status === "Inactive") {
-              changeStatus("Active", data?.id);
-            }
-          }}
-        >
-          Active
-        </Menu.Item>
-        <Menu.Divider />
-
-        <Menu.Item
-          key="inactive"
-          onClick={() => {
-            if (data?.status === "Active") {
-              changeStatus("Inactive", data?.id);
-            }
-          }}
-        >
-          Inactive
-        </Menu.Item>
-      </SubMenu>
+      {/* <SubMenu title="Change status" key="mainMenu"> */}
+      <Menu.Item
+        key="active"
+        onClick={() => {
+          if (data?.status === "Inactive") {
+            changeStatus("Active", data?.id);
+          }
+        }}
+      >
+        Active
+      </Menu.Item>
       <Menu.Divider />
 
+      <Menu.Item
+        key="inactive"
+        onClick={() => {
+          if (data?.status === "Active") {
+            changeStatus("Inactive", data?.id);
+          }
+        }}
+      >
+        Inactive
+      </Menu.Item>
+      {/* </SubMenu> */}
+      <Menu.Divider />
+      {/* 
       <Menu.Item key="edit">
         <div>
           <Link
@@ -298,7 +301,7 @@ const Client = () => {
         >
           {data?.archived ? "Unarchive Client" : "Archive Client"}
         </div>
-      </Menu.Item>
+      </Menu.Item>*/}
     </Menu>
   );
 
@@ -340,24 +343,72 @@ const Client = () => {
       title: "Actions",
       key: "actions",
       render: (record: any) => (
-        <div
-          className={styles["dropdown-menu"]}
-          onClick={(event) => event.stopPropagation()}
-        >
-          <Dropdown
-            overlay={menu(record)}
-            trigger={["click"]}
-            placement="bottomRight"
-          >
+        // <div
+        //   className={styles["dropdown-menu"]}
+        //   onClick={(event) => event.stopPropagation()}
+        // >
+        //   <Dropdown
+        //     overlay={menu(record)}
+        //     trigger={["click"]}
+        //     placement="bottomRight"
+        //   >
+        //     <div
+        //       className="ant-dropdown-link"
+        //       onClick={(e) => e.preventDefault()}
+        //       style={{ paddingLeft: "1rem" }}
+        //     >
+        //       <MoreOutlined />
+        //     </div>
+        //   </Dropdown>
+        // </div>
+        <Row style={{ marginTop: '11px' }}>
+          <Col>
             <div
-              className="ant-dropdown-link"
-              onClick={(e) => e.preventDefault()}
-              style={{ paddingLeft: "1rem" }}
+              className={styles["table-icon"]}
+              onClick={(event) => event.stopPropagation()}
             >
-              <MoreOutlined />
+              <Dropdown
+                overlay={menu(record)}
+                trigger={["click"]}
+                placement="bottomRight"
+              >
+                <div
+                  className="ant-dropdown-link"
+                  onClick={(e) => e.preventDefault()}
+                  title='Change Status'
+                >
+                  <CheckCircleFilled />
+                </div>
+              </Dropdown>
             </div>
-          </Dropdown>
-        </div>
+          </Col>
+          <Col>
+            <Link
+               to={routes.editClient.path(
+                loggedInUser?.company?.code ?? "1",
+                record?.id ?? "1"
+              )}
+              className={styles["table-icon"]}
+              title='Edit Client'
+            >
+              <FormOutlined />
+            </Link>
+          </Col>
+          <Col>
+           
+                <div
+                    onClick={() => {
+                      setClient(record);
+                      setArchiveVisibility(true);
+                    }}
+                  className={styles["table-icon"]}
+                  title='Archive Client'
+                >
+                  <DeleteOutlined />
+                </div>
+             
+          </Col>
+        </Row>
       ),
     },
   ];

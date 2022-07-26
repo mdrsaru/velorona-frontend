@@ -26059,6 +26059,9 @@ input {
 .ant-select .ant-select-arrow {
   padding-right: 1.5rem;
 }
+.ant-select .ant-select-selection-item {
+  font-weight: 600;
+}
 .ant-input-affix-wrapper {
   border: var(--gray-2);
 }

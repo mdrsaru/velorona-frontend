@@ -158,7 +158,7 @@ const NewEmployee = () => {
     }
   );
 
-  const [userCreate] = useMutation<GraphQLResponse<'UserCreate', User>,
+  const [userCreate, { loading: creatingUser }] = useMutation<GraphQLResponse<'UserCreate', User>,
     MutationUserCreateArgs
   >(USER_CREATE, {
     onCompleted: (response) => {
@@ -595,6 +595,7 @@ const NewEmployee = () => {
                     Cancel
                   </Button>
                   <Button
+                    loading={creatingUser}
                     type="primary"
                     htmlType="submit">
                     Continue

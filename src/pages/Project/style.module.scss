@@ -95,7 +95,11 @@
   color: var(--primary-blue);
   padding: 0 1rem 0 1rem;
 }
-
+.table-icon {
+  color: var(--gray-secondary);
+  font-size: 1.5rem;
+  margin-left: 1rem;
+}
 .modal-message {
   padding: 3rem 0 0 0;
   text-align: center;

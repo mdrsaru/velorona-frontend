@@ -1,33 +1,30 @@
-import React, { useState } from "react";
-import { Button, Card, Col, Form, Input, message, Row, Select, Space } from "antd";
+import { Card, Col, Form, message, Row } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import { useNavigate, useParams } from "react-router-dom";
 
+import { GraphQLResponse } from "../../../interfaces/graphql.interface";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { notifyGraphqlError } from "../../../utils/error";
 import { authVar } from "../../../App/link";
 import { Client, ClientPagingResult, MutationClientUpdateArgs, QueryClientArgs } from "../../../interfaces/generated";
 import { CLIENT } from "../index";
 
-import styles from "../style.module.scss";
-import { STATE_CITIES, USA_STATES } from "../../../utils/cities";
-import { GraphQLResponse } from "../../../interfaces/graphql.interface";
-// import { debounce } from "lodash";
-// import { data } from "../../../utils/dummyData";
+import ClientForm from '../NewClient/ClientForm';
 
+import styles from "../style.module.scss";
 
 export const CLIENT_UPDATE = gql`
     mutation ClientUpdate($input: ClientUpdateInput!) {
-        ClientUpdate(input: $input) {
-            id
-            name
-            email
-            invoicingEmail
-            address {
-                id
-                streetAddress
-            }
+      ClientUpdate(input: $input) {
+        id
+        name
+        email
+        invoicingEmail
+        address {
+          id
+          streetAddress
         }
+      }
     }
 
 `
@@ -36,8 +33,7 @@ const EditClient = () => {
   let params = useParams();
   const authData = authVar();
   const navigate = useNavigate();
-  const [cities, setCountryCities] = useState<string[]>([]);
-  const [clientUpdate] = useMutation<
+  const [clientUpdate, { loading: updatingClient }] = useMutation<
     GraphQLResponse<'ClientUpdate', Client>,
     MutationClientUpdateArgs
   >(CLIENT_UPDATE);
@@ -46,7 +42,7 @@ const EditClient = () => {
   const cancelAddClient = () => {
     navigate(-1);
   }
-  const { data: userData } = useQuery<
+  const { data: clientData } = useQuery<
     GraphQLResponse<'Client', ClientPagingResult>,
     QueryClientArgs
   >
@@ -70,6 +66,8 @@ const EditClient = () => {
           name: values.name,
           company_id: authData?.company?.id as string,
           phone: values?.phone,
+          invoiceSchedule: values.invoiceSchedule,
+          invoice_payment_config_id: values.invoice_payment_config_id,
           address: {
             country: values?.country,
             streetAddress: values.streetAddress,
@@ -93,10 +91,20 @@ const EditClient = () => {
     }).catch(notifyGraphqlError)
   }
 
-  const setState = (data: string) => {
-    setCountryCities(STATE_CITIES[data]);
+  const client = clientData?.Client?.data?.[0]
+  const initialValues = {
+    email: client?.email ?? '',
+    name: client?.name ?? '',
+    country: client?.address?.country ?? '',
+    streetAddress: client?.address?.streetAddress ?? '',
+    state: client?.address?.state ?? '',
+    city: client?.address?.city ?? '',
+    zipcode: client?.address?.zipcode ?? '',
+    phone: client?.phone ?? '',
+    invoicingEmail: client?.invoicingEmail ?? '',
+    invoiceSchedule: client?.invoiceSchedule,
+    invoice_payment_config_id: client?.invoice_payment_config_id,
   }
-
 
   return (
     <div className={styles['main-div']}>
@@ -113,238 +121,19 @@ const EditClient = () => {
           </Col>
         </Row>
         <div>
-          {userData &&
-            <Form
-              form={form}
-              layout="vertical"
-              onFinish={onSubmitForm}
-              initialValues={{
-                email: userData?.Client?.data[0]?.email ?? '',
-                name: userData?.Client?.data[0]?.name ?? '',
-                country: userData?.Client?.data[0]?.address?.country ?? '',
-                streetAddress: userData?.Client?.data[0]?.address?.streetAddress ?? '',
-                state: userData?.Client?.data[0]?.address?.state ?? '',
-                city: userData?.Client?.data[0]?.address?.city ?? '',
-                zipcode: userData?.Client?.data[0]?.address?.zipcode ?? '',
-                phone: userData?.Client?.data[0]?.phone ?? '',
-                invoiceEmail: userData?.Client?.data[0]?.invoicingEmail ?? ''
-              }}>
-              <Row>
-                <Col
-                  xs={24}
-                  sm={24}
-                  md={12}
-                  lg={12}
-                  className={styles.formCol}>
-                  <Form.Item
-                    label="Full Name"
-                    name='name'
-                    rules={[{
-                      required: true,
-                      message: 'Please enter full name!'
-                    }]}>
-                    <Input
-                      placeholder="Enter the full name"
-                      autoComplete="off" />
-                  </Form.Item>
-                </Col>
-                <Col
-                  xs={24}
-                  sm={24}
-                  md={12}
-                  lg={12}
-                  className={styles.formCol}>
-                  <Form.Item
-                    label="Email Address"
-                    name='email'
-                    rules={[{
-                      type: 'email',
-                      message: 'The input is not valid E-mail!'
-                    }, {
-                      required: true,
-                      message: 'Please input your E-mail!'
-                    },]}>
-                    <Input
-                      placeholder="Enter your email"
-                      autoComplete="off"
-                      disabled />
-                  </Form.Item>
-                </Col>
-                <Col
-                  xs={24}
-                  sm={24}
-                  md={12}
-                  lg={12}
-                  className={styles.formCol}>
-                  <Form.Item
-                    label="Invoice Email"
-                    name='invoiceEmail'
-                    rules={[{
-                      type: 'email',
-                      message: 'The input is not valid Invoice E-mail!'
-                    }, {
-                      required: true,
-                      message: 'Please input your invoice E-mail!'
-                    }]}>
-                    <Input
-                      placeholder="Enter your invoice email"
-                      autoComplete="off"
-                      disabled />
-                  </Form.Item>
-                </Col>
-                <Col
-                  xs={24}
-                  sm={24}
-                  md={12}
-                  lg={12}
-                  className={styles.formCol}>
-                  <Form.Item
-                    name="country"
-                    label="Country"
-                    rules={[{
-                      required: true,
-                      message: 'Please enter country!'
-                    }]}>
-                    <Input
-                      placeholder="Enter the country"
-                      autoComplete="off" />
-                  </Form.Item>
-                </Col>
-                <Col
-                  xs={24}
-                  sm={24}
-                  md={12}
-                  lg={12}
-                  className={styles.formCol}>
-                  <Form.Item
-                    label="Street Address"
-                    name='streetAddress'
-                    rules={[{
-                      required: true,
-                      message: 'Please enter address!'
-                    }]}>
-                    <Input
-                      placeholder="Enter the address of the client"
-                      name='address'
-                      autoComplete="off" />
-                  </Form.Item>
-                </Col>
-
-                <Col
-                  xs={24}
-                  sm={24}
-                  md={12}
-                  lg={12}
-                  className={styles.formCol}>
-                  <Form.Item
-                    name="state"
-                    label="State"
-                    rules={[{
-                      required: true,
-                      message: 'Please enter state!'
-                    }]}>
-                    {/* <Select
-                      showSearch
-                      placeholder={'Select the state'} onChange={setState}>
-                      {USA_STATES?.map((state: any, index: number) =>
-                        <Select.Option value={state?.name} key={index}>
-                          {state?.name}
-                        </Select.Option>
-                      )} 
-                    </Select> */}
-                    <Input
-                      placeholder="Enter the state "
-                      name='city'
-                      autoComplete="off" />
-                  </Form.Item>
-                </Col>
-                <Col
-                  xs={24}
-                  sm={24}
-                  md={12}
-                  lg={12}
-                  className={styles.formCol}>
-                  <Form.Item
-                    name="city"
-                    label="City"
-                    rules={[{
-                      required: true,
-                      message: 'Please enter city!'
-                    }]}>
-                    {/* <Select
-                      showSearch
-                      placeholder={'Select the city'}>
-                      {cities?.map((city: string, index: number) =>
-                        <Select.Option value={city} key={index}>
-                          {city}
-                        </Select.Option>
-                      )}
-                    </Select> */}
-                    <Input
-                      placeholder="Enter the city "
-                      name='city'
-                      autoComplete="off" />
-                  </Form.Item>
-                </Col>
-
-                <Col
-                  xs={24}
-                  sm={24}
-                  md={12}
-                  lg={12}
-                  className={styles.formCol}>
-                  <Form.Item
-                    label="Zip Code"
-                    name='zipcode'
-                    rules={[{
-                      required: true,
-                      message: 'Please enter zipcode!'
-                    }]}>
-                    <Input
-                      placeholder="Enter the zipcode"
-                      autoComplete="off" />
-                  </Form.Item>
-                </Col>
-
-                <Col
-                  xs={24}
-                  sm={24}
-                  md={12}
-                  lg={12}
-                  className={styles.formCol}>
-                  <Form.Item
-                    label="Contact Number"
-                    name='phone'
-                  >
-                    <Input
-                      type='number'
-                      placeholder="Enter the contact number"
-                      autoComplete="off" />
-                  </Form.Item>
-                </Col>
-              </Row>
-              <Row
-                justify="end"
-                style={{ padding: '1rem 1rem 2rem 0' }}>
-                <Col>
-                  <Form.Item>
-                    <Space>
-                      <Button
-                        type="default"
-                        htmlType="button"
-                        onClick={cancelAddClient}>
-                        Cancel
-                      </Button>
-                      <Button
-                        type="primary"
-                        htmlType="submit">
-                        Update Client
-                      </Button>
-                    </Space>
-                  </Form.Item>
-                </Col>
-              </Row>
-            </Form>}
+          {
+            client && (
+              <ClientForm
+                id={client?.id}
+                loading={updatingClient}
+                form={form}
+                btnText="Update Client"
+                onSubmitForm={onSubmitForm}
+                cancelAddClient={cancelAddClient}
+                initialValues={initialValues}
+              />
+            )
+          }
         </div>
       </Card>
     </div>

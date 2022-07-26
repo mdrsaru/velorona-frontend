@@ -49,7 +49,7 @@ const AttachClient = () => {
     MutationUserClientAssociateArgs
   >(ASSOCIATE_USER_WITH_CLIENT);
 
-  const [clientCreate] = useMutation<
+  const [clientCreate, { loading: creatingClient }] = useMutation<
     GraphQLResponse<'ClientCreate', Client>,
     MutationClientCreateArgs
   >(CLIENT_CREATE);
@@ -122,9 +122,11 @@ const AttachClient = () => {
         input: {
           name: values.name,
           email: values.email,
-          invoicingEmail: values.invoiceEmail,
+          invoicingEmail: values.invoicingEmail,
           company_id: authData?.company?.id as string,
           phone:values.phone,
+          invoiceSchedule: values.invoiceSchedule,
+          invoice_payment_config_id: values.invoice_payment_config_id,
           address: {
             country : values.country,
             streetAddress: values.streetAddress,
@@ -206,9 +208,12 @@ const AttachClient = () => {
         </Row>
 
         <ClientForm
+          form={form}
+          btnText="Add Client"
+          loading={creatingClient}
           onSubmitForm={onSubmitForm}
-          btnText={'Add Client'} form={form}
-          cancelAddClient={cancelAddClient} />
+          cancelAddClient={cancelAddClient}
+        />
       </Card>
 
       <Modal

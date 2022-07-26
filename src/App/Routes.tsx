@@ -84,6 +84,17 @@ const _Routes = () => {
             }
           />
 
+          <Route path={routes.invoicePaymentConfig.path}>
+            <Route
+              index
+              element={
+                <Suspense fallback={<LoginLoader />}>
+                  <routes.invoicePaymentConfig.component />
+                </Suspense>
+              }
+            />
+          </Route>
+
           <Route
             path={routes.editProfile.childPath}
             element={

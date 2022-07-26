@@ -1,47 +1,73 @@
-import React, { useState } from 'react';
+import { gql, useQuery } from '@apollo/client';
 import { Button, Col, Form, Input, Row, Select, Space } from 'antd';
 
-import { STATE_CITIES, USA_STATES } from '../../../utils/cities';
+import { GraphQLResponse } from '../../../interfaces/graphql.interface';
+import {
+  InvoicePaymentConfigPagingResult,
+  InvoiceSchedule,
+} from '../../../interfaces/generated';
+
 import styles from '../style.module.scss';
 
+export const INVOICE_PAYMENT_CONFIG = gql`
+  query InvoicePaymentConfig($input: InvoicePaymentConfigQueryInput!) {
+    InvoicePaymentConfig(input: $input) {
+      data {
+        id
+        name
+        days
+      }
+      paging {
+        total
+        startIndex
+        endIndex
+        hasNextPage
+      }
+    }
+  }
+ `;
 
 const ClientForm = (props: any) => {
-  const { form, onSubmitForm, btnText, cancelAddClient } = props;
-  const [cities, setCountryCities] = useState<string[]>([]);
-  const setState = (data: string) => {
-    setCountryCities(STATE_CITIES[data]);
-  }
+  const { id, loading, form, onSubmitForm, btnText, cancelAddClient, initialValues } = props;
+
+  const { data: paymentConfigData, loading: paymnentConfigLoading } = useQuery<
+    GraphQLResponse<'InvoicePaymentConfig', InvoicePaymentConfigPagingResult>
+  >(INVOICE_PAYMENT_CONFIG, {
+    fetchPolicy: 'cache-first',
+    variables: {
+      input: {
+        paging: {
+          order: ['days:ASC'],
+        },
+      },
+    },
+  });
+
   return (
     <div>
       <Form
         form={form}
         layout="vertical"
-        onFinish={onSubmitForm}>
+        onFinish={onSubmitForm}
+        initialValues={initialValues}
+      >
         <Row>
-          <Col
-            xs={24}
-            sm={24}
-            md={12}
-            lg={12}
-            className={styles.formCol}>
+          <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
             <Form.Item
               label="Full Name"
               name='name'
               rules={[{
                 required: true,
                 message: 'Please enter full name!'
-              }]}>
+              }]}
+            >
               <Input
                 placeholder="Enter the full name"
                 autoComplete="off" />
             </Form.Item>
           </Col>
-          <Col
-            xs={24}
-            sm={24}
-            md={12}
-            lg={12}
-            className={styles.formCol}>
+
+          <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
             <Form.Item
               label="Email Address"
               name='email'
@@ -51,78 +77,60 @@ const ClientForm = (props: any) => {
               }, {
                 required: true,
                 message: 'Please input your E-mail!'
-              }]}>
+              }]}
+            >
               <Input
+                disabled={!!id}
                 placeholder="Enter your email"
                 autoComplete="off" />
             </Form.Item>
           </Col>
         </Row>
+
         <Row>
-          <Col
-            xs={24}
-            sm={24}
-            md={12}
-            lg={12}
-            className={styles.formCol}>
+          <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
             <Form.Item
               label="Invoice Email"
-              name='invoiceEmail'
+              name='invoicingEmail'
               rules={[{
                 type: 'email',
                 message: 'The input is not valid Invoice E-mail!',
               }, {
                 required: true,
                 message: 'Please input your invoice E-mail!'
-              }]}>
+              }]}
+            >
               <Input
+                disabled={!!id}
                 placeholder="Enter your invoice email"
                 autoComplete="off" />
             </Form.Item>
           </Col>
-          <Col
-            xs={24}
-            sm={24}
-            md={12}
-            lg={12}
-            className={styles.formCol}>
+
+          <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
             <Form.Item
               name="country"
               label="Country"
               rules={[{
                 required: true,
                 message: 'Please enter country!'
-              }]}>
+              }]}
+            >
               <Input
                 placeholder="Enter the country"
                 autoComplete="off" />
             </Form.Item>
           </Col>
-          <Col
-            xs={24}
-            sm={24}
-            md={12}
-            lg={12}
-            className={styles.formCol}>
+
+          <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
             <Form.Item
               name="state"
               label="State"
               rules={[{
                 required: true,
                 message: 'Please enter state!'
-              }]}>
-              {/* <Select
-                showSearch
-                placeholder={'Select the state'}
-                onChange={setState}
-              >
-                {USA_STATES?.map((state: any, index: number) =>
-                  <Select.Option value={state?.name} key={index}>
-                    {state?.name}
-                  </Select.Option>
-                )}
-              </Select> */}
-
+              }]}
+            >
               <Input
                 placeholder="Enter the state"
                 name='state'
@@ -217,7 +225,36 @@ const ClientForm = (props: any) => {
                 autoComplete="off" />
             </Form.Item>
           </Col>
+
+          <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+            <Form.Item
+              label="Invoice Schedule"
+              name='invoiceSchedule'
+            >
+              <Select placeholder="Invoice Schedule">
+                <Select.Option value={InvoiceSchedule.Weekly}>{InvoiceSchedule.Weekly}</Select.Option>
+                <Select.Option value={InvoiceSchedule.Biweekly}>{InvoiceSchedule.Biweekly}</Select.Option>
+                <Select.Option value={InvoiceSchedule.Monthly}>{InvoiceSchedule.Monthly}</Select.Option>
+              </Select>
+            </Form.Item>
+          </Col>
+
+          <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+            <Form.Item
+              label="Invoice Payment"
+              name='invoice_payment_config_id'
+            >
+              <Select placeholder="Invoice Payment" loading={paymnentConfigLoading}>
+                {
+                  paymentConfigData?.InvoicePaymentConfig?.data?.map((config) => (
+                    <Select.Option value={config.id}>{config.name}</Select.Option>
+                  ))
+                }
+              </Select>
+            </Form.Item>
+          </Col>
         </Row>
+
         <Row
           justify="end"
           style={{ padding: '1rem 1rem 2rem 0' }}>
@@ -231,6 +268,7 @@ const ClientForm = (props: any) => {
                   Cancel
                 </Button>
                 <Button
+                  loading={loading}
                   type="primary"
                   htmlType="submit">
                   {btnText}
