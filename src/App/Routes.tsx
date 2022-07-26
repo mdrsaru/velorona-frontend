@@ -93,8 +93,26 @@ const _Routes = () => {
             }
           />
 
+          <Route
+            path={routes.checkDashboard.childPath}
+            element={
+              <CheckRoles
+                allowedRoles={[
+                  constants.roles.CompanyAdmin,
+                  constants.roles.Employee,
+                  constants.roles.TaskManager,
+                  constants.roles.SuperAdmin,
+                ]}
+              >
+                <Suspense fallback={<RouteLoader />}>
+                  <routes.checkDashboard.component />
+                </Suspense>
+              </CheckRoles>
+            }
+          />
+
           <Route path={routes.company.childPath}>
-            <Route
+            {/* <Route
               index
               element={
                 <CheckRoles
@@ -124,7 +142,7 @@ const _Routes = () => {
                   </Suspense>
                 </CheckRoles>
               }
-            />
+            /> */}
             <Route
               path={routes.employeeTimesheet.childPath}
               element={
@@ -490,7 +508,7 @@ const _Routes = () => {
                   constants.roles.Employee,
                   constants.roles.TaskManager,
                 ]}
-                redirect_to={getRoute()}
+              redirect_to={getRoute()}
               >
                 <Suspense fallback={<RouteLoader />}>
                   <routes.home.component />

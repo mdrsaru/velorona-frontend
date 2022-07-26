@@ -50,33 +50,40 @@ const Sidebar = (props: any) => {
   }, [location, params?.id])
 
   const menuItems = [
+    // {
+    //   key: routes.dashboard.key,
+    //   name: routes.dashboard.name,
+    //   icon: <DashboardOutlined />,
+    //   route: routes.dashboard.path,
+    //   accessRoles: [constants.roles.SuperAdmin]
+    // },
+    // {
+    //   key: routes.companyDashboard.key,
+    //   name: routes.companyDashboard.name,
+    //   icon: <DashboardOutlined />,
+    //   route: routes.companyDashboard.path(loggedInUser?.company?.code ?? ''),
+    //   accessRoles: [constants.roles.CompanyAdmin]
+    // },
+    // {
+    //   key: routes.employeeDashboard.key,
+    //   name: routes.employeeDashboard.name,
+    //   icon: <DashboardOutlined />,
+    //   route: routes.employeeDashboard.path(loggedInUser?.company?.code ?? ''),
+    //   accessRoles: [constants.roles.Employee]
+    // },
+    // {
+    //   key: routes.taskManagerDashboard.key,
+    //   name: routes.taskManagerDashboard.name,
+    //   icon: <DashboardOutlined />,
+    //   route: routes.taskManagerDashboard.path(loggedInUser?.company?.code ?? ''),
+    //   accessRoles: [constants.roles.TaskManager]
+    // },
     {
-      key: routes.dashboard.key,
-      name: routes.dashboard.name,
+      key: routes.checkDashboard.key,
+      name: routes.checkDashboard.name,
       icon: <DashboardOutlined />,
-      route: routes.dashboard.path,
-      accessRoles: [constants.roles.SuperAdmin]
-    },
-    {
-      key: routes.companyDashboard.key,
-      name: routes.companyDashboard.name,
-      icon: <DashboardOutlined />,
-      route: routes.companyDashboard.path(loggedInUser?.company?.code ?? ''),
-      accessRoles: [constants.roles.CompanyAdmin]
-    },
-    {
-      key: routes.employeeDashboard.key,
-      name: routes.employeeDashboard.name,
-      icon: <DashboardOutlined />,
-      route: routes.employeeDashboard.path(loggedInUser?.company?.code ?? ''),
-      accessRoles: [constants.roles.Employee]
-    },
-    {
-      key: routes.taskManagerDashboard.key,
-      name: routes.taskManagerDashboard.name,
-      icon: <DashboardOutlined />,
-      route: routes.taskManagerDashboard.path(loggedInUser?.company?.code ?? ''),
-      accessRoles: [constants.roles.TaskManager]
+      route: routes.checkDashboard.path(loggedInUser?.company?.code ?? ''),
+      accessRoles: [constants.roles.SuperAdmin, constants.roles.CompanyAdmin, constants.roles.Employee, constants.roles.TaskManager]
     },
     {
       key: routes.role.key,

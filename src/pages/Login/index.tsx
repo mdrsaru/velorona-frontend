@@ -81,13 +81,9 @@ const Login = () => {
 
       if (roles.includes(constants.roles.SuperAdmin)) {
         navigate(routes.dashboard.path)
-      } else if (roles.includes(constants.roles.CompanyAdmin)) {
-        navigate(routes.company.path(loginData?.company?.companyCode));
-      } else if (roles.includes(constants.roles.Employee)) {
-        navigate(routes.company.path(loginData?.company?.companyCode));
-      } else if (roles.includes(constants.roles.TaskManager)) {
-        navigate(routes.company.path(loginData?.company?.companyCode));
-      } 
+      } else if (roles.includes(constants.roles.CompanyAdmin) || roles.includes(constants.roles.Employee) || roles.includes(constants.roles.TaskManager)) {
+        navigate(routes.checkDashboard.path(loginData?.company?.code ?? ''))
+      }
       else {
         navigate(routes.home.path);
       }
