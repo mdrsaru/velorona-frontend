@@ -2,7 +2,7 @@ const config = {
   apiUrl: process.env.REACT_APP_API_URL,
   graphqlEndpoint: process.env.REACT_APP_GRAPHQL_ENDPOINT,
   paging: {
-    perPage: 25,
+    perPage: 10,
   },
   roles: {
     SuperAdmin: 'SuperAdmin',
