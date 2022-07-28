@@ -21,6 +21,8 @@ import Delete from "../../../components/Delete";
 
 
 import deleteImg from '../../../assets/images/delete_btn.svg';
+import { WORKSCHEDULE } from "..";
+import { authVar } from '../../../App/link';
 
 export const WORKSCHEDULETIMEDETAIL = gql`
 query WorkscheduleTimeDetail($input: WorkscheduleTimeDetailQueryInput!) {
@@ -58,7 +60,7 @@ export const WORKSCHEDULE_DETAIL_BULK_DELETE = gql`
 
 const ScheduleDetail = () => {
     const params = useParams();
-
+const loggedInUser = authVar()
     const [showDeleteModal, setShowDeleteModal] = useState(false)
     const [showEmployee, setEmployeeShow] = useState(false)
     const [addTimeInterval, setAddTimeInterval] = useState(false)
@@ -72,6 +74,26 @@ const ScheduleDetail = () => {
     const [workscheduleId, setWorkscheduleId] = useState('')
     const [employee, setEmployee] = useState('')
     const [employeeId, setEmployeeId] = useState('')
+
+    const { data: workscheduleData} = useQuery(
+        WORKSCHEDULE,
+        {
+          fetchPolicy: "network-only",
+          nextFetchPolicy: "cache-first",
+          variables: {
+            input: {
+              paging: {
+                order: ["updatedAt:DESC"],
+              },
+              query: {
+                company_id: loggedInUser?.company?.id,
+                id: params?.sid,
+              }
+            },
+          },
+        }
+      );
+      
     const { data: workscheduleDetailData, refetch: refetchWorkscheduleDetail } = useQuery(
         WORKSCHEDULEDETAIL,
         {
@@ -155,9 +177,8 @@ const ScheduleDetail = () => {
         }
     })
 
-    const startDate = workscheduleDetailData?.WorkscheduleDetail?.data?.[0]?.workschedule?.startDate
+    const startDate = workscheduleData?.Workschedule?.data?.[0]?.startDate;
     const weekDays = getWeekDays(startDate);
-
     const workscheduleDetail = workscheduleDetailData?.WorkscheduleDetail?.data;
     const groups: any = _.groupBy(workscheduleDetail, 'user.fullName')
 

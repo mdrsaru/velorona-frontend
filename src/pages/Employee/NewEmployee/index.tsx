@@ -259,6 +259,7 @@ const NewEmployee = () => {
         <Form
           form={form}
           layout="vertical"
+          scrollToFirstError
           onFinish={onSubmitForm}>
           <Row gutter={[32, 0]}>
             <Col className={styles['form-header']}>

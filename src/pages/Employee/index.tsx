@@ -453,7 +453,6 @@ const Employee = () => {
   }
 
   const onChangeTabs = (keys: any) => {
-    console.log(keys)
 
     let input: {
       paging: any,
@@ -674,7 +673,6 @@ const Employee = () => {
       title: "Actions",
       key: "actions",
       render: (record: any) => {
-        console.log(record)
         return (
           <Row style={{ marginTop: '11px' }}>
             {!record.archived ? (

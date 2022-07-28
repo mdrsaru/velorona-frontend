@@ -74,6 +74,7 @@ export const TIME_SHEET = gql`
         durationFormat
         lastApprovedAt
         lastSubmittedAt
+        isSubmitted
         status
         user {
           id
@@ -555,12 +556,6 @@ const DetailTimesheet = () => {
     })
   }
 
-
-
-  const onSubmitAttachedTimesheet = () => {
-
-  }
-
   const menu = (data: any) => (
     <Menu>
       <Menu.Item key="edit">
@@ -647,6 +642,8 @@ const DetailTimesheet = () => {
       commentType: undefined,
     })
   }
+
+  const isSubmitted:any =timeSheetDetail?.Timesheet?.data?.[0]?.isSubmitted;
 
   return (
     <>
@@ -885,11 +882,13 @@ const DetailTimesheet = () => {
                             title="Submit timesheet?"
                             onConfirm={onSubmitTimesheet}
                             okText="Yes" cancelText="No"
+                            disabled={isSubmitted}
                           >
                             <Button
                               type="default"
                               htmlType="button"
                               loading={submittingTimesheet}
+                              disabled={isSubmitted}
                             >
                               Submit
                             </Button>
@@ -1078,7 +1077,7 @@ const DetailTimesheet = () => {
           <TimesheetConfirmation
             title={
               <>
-                There's still working days left ? Are you sure you want to submit it ??
+                There's still working days left ? Are you sure you want to submit it ?
               </>
             }
           />
