@@ -40,8 +40,10 @@ import ApprovedTimesheetAttachment from "../../../components/ApprovedTimesheetAt
 import CommentForm from './CommentForm';
 import Comment from './Comment';
 
+import archiveImg from "../../../assets/images/archive_btn.svg";
 import deleteImg from '../../../assets/images/delete_btn.svg';
 import styles from './style.module.scss';
+import TimesheetConfirmation from '../../../components/TimesheetConfirmation/index';
 
 type InvoicedTimeEntries = {
   invoice_id: string;
@@ -249,6 +251,7 @@ const DetailTimesheet = () => {
   const [deleteVisibility, setDeleteVisibility] = useState<boolean>(false);
   const [editAttachedVisibility, setEditAttachedVisibility] = useState<boolean>(false);
   const [attachedTimesheet, setAttachedTimesheet] = useState<any>()
+  const [confirmShow, setConfirmShow] = useState(false)
 
   const [submitTimesheet, { loading: submittingTimesheet }] = useMutation(TIMESHEET_SUBMIT)
 
@@ -265,7 +268,7 @@ const DetailTimesheet = () => {
   });
 
   const canViewAttachedTimesheet = checkRoles({
-    expectedRoles: [constants.roles.Employee, constants.roles.CompanyAdmin,constants.roles.TaskManager],
+    expectedRoles: [constants.roles.Employee, constants.roles.CompanyAdmin, constants.roles.TaskManager],
     userRoles: roles,
   });
   const [approveRejectTimeEntries] = useMutation<
@@ -428,7 +431,28 @@ const DetailTimesheet = () => {
     }
   })
 
+  const checkDate = (today: any, weekEndDate: any) => {
+    return today.getFullYear() === weekEndDate.getFullYear() &&
+      today.getDate() <= weekEndDate.getDate() &&
+      today.getMonth() === weekEndDate.getMonth();
+  }
+
   const onSubmitTimesheet = () => {
+    const weekEndDate: any = new Date(timeSheetDetail?.Timesheet?.data?.[0]?.weekEndDate as any);
+    const today = new Date();
+
+    const result = checkDate(today, weekEndDate)
+
+    if (result) {
+      setConfirmShow(!confirmShow)
+    }
+    else {
+      handleSubmitTimesheet()
+    }
+
+  }
+
+  const handleSubmitTimesheet = () => {
     submitTimesheet({
       variables: {
         input: {
@@ -446,6 +470,7 @@ const DetailTimesheet = () => {
         });
       }
     }).catch(notifyGraphqlError)
+    setConfirmShow(false)
   }
 
 
@@ -1072,6 +1097,24 @@ const DetailTimesheet = () => {
           refetchTimesheet={refetchTimeSheet}
         />
       </Modal>
+
+
+      <ModalConfirm
+        visibility={confirmShow}
+        setModalVisibility={setConfirmShow}
+        okText={'Confirm'}
+        imgSrc={archiveImg}
+        modalBody={
+          <TimesheetConfirmation
+            title={
+              <>
+                There's still working days left ? Are you sure you want to submit it ??
+              </>
+            }
+          />
+        }
+        onOkClick={handleSubmitTimesheet}
+      />
     </>
   )
 }
