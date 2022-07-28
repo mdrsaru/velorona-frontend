@@ -233,7 +233,7 @@ const EditCompany = () => {
               <Col xs={24} sm={24} md={12} lg={12}>
                 <Form.Item
                   name="upload"
-                  label="Upload Profile Image"
+                  label="Upload Company Logo"
                   valuePropName="filelist"
                   getValueFromEvent={normFile}
                   style={{ position: "relative" }}

@@ -95,6 +95,7 @@ const NewCompany = () => {
         lastName: values.lastName,
         email: values.email,
         address: {
+          country:values.country,
           streetAddress: values.streetAddress,
           state: values.state,
           city: values.city,
@@ -251,30 +252,58 @@ const NewCompany = () => {
                 />
               </Form.Item>
             </Col>
-            <Col xs={24} sm={24} md={12}>
-              <Form.Item label="State" name="state">
-                <Select
-                  showSearch
-                  placeholder={"Select the state"}
-                  onChange={setState}
-                >
-                  {USA_STATES?.map((state: any, index: number) => (
-                    <Select.Option value={state?.name} key={index}>
-                      {state?.name}
-                    </Select.Option>
-                  ))}
-                </Select>
+            <Col
+              xs={24}
+              sm={24}
+              md={8}
+              lg={8}
+              className={styles.formCol}>
+              <Form.Item
+                name="country"
+                label="Country"
+                rules={[{
+                  required: true,
+                  message: 'Please enter country!'
+                }]}>
+                <Input
+                  placeholder="Enter the country"
+                  autoComplete="off" />
               </Form.Item>
             </Col>
-            <Col xs={24} sm={24} md={12}>
-              <Form.Item label="City" name="city">
-                <Select showSearch placeholder={"Select the city"}>
-                  {cities?.map((city: string, index: number) => (
-                    <Select.Option value={city} key={index}>
-                      {city}
-                    </Select.Option>
-                  ))}
-                </Select>
+            <Col
+              xs={24}
+              sm={24}
+              md={8}
+              lg={8}>
+              <Form.Item
+                label="State"
+                name='state'
+                rules={[{
+                  required: true,
+                  message: 'Please enter your state!'
+                }]}>
+                <Input
+                  placeholder="Enter the state"
+                  name='state'
+                  autoComplete="off" />
+              </Form.Item>
+            </Col>
+            <Col
+              xs={24}
+              sm={24}
+              md={8}
+              lg={8}>
+              <Form.Item
+                label="City"
+                name='city'
+                rules={[{
+                  required: true,
+                  message: 'Please enter your city!'
+                }]}>
+                <Input
+                  placeholder="Enter the city "
+                  name='city'
+                  autoComplete="off" />
               </Form.Item>
             </Col>
             <Col xs={24} sm={24} md={8}>
@@ -299,7 +328,7 @@ const NewCompany = () => {
             <Col xs={24} sm={24} md={12} lg={12}>
               <Form.Item
                 name="upload"
-                label="Upload Profile Image"
+                label="Upload Company Logo"
                 valuePropName="filelist"
                 getValueFromEvent={normFile}
                 style={{ position: "relative" }}

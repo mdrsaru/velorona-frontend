@@ -419,115 +419,123 @@ const EditEmployee = () => {
               <Col className={styles["form-header"]}>
                 <p>User Roles</p>
               </Col>
-              <Col xs={24} sm={24} md={12} lg={12}>
-                <Form.Item
-                  name="roles"
-                  label="Role"
-                  rules={[
-                    {
-                      message: "Please select the role!",
-                    },
-                  ]}
-                >
-                  <Select placeholder="Employee" disabled={authData?.user?.id === params.eid ? true : false}>
-                    {roles &&
-                      roles?.Role?.data.map((role: IRole, index: number) => (
-                        <Option value={role?.id} key={index}>
-                          {role?.name}
-                        </Option>
-                      ))}
-                  </Select>
-                </Form.Item>
-              </Col>
-              <Col xs={24} sm={24} md={12} lg={12}>
-                <Form.Item
-                  name="status"
-                  label="User Status"
-                  rules={[
-                    {
-                      message: "Please select the status",
-                    },
-                  ]}
-                >
-                  <Select placeholder="Select status" disabled={authData?.user?.id === params.eid ? true : false}>
-                    <Option value="Active">Active</Option>
-                    <Option value="Inactive">InActive</Option>
-                  </Select>
-                </Form.Item>
-              </Col>
-              <Col
-                xs={24}
-                sm={24}
-                md={12}
-                lg={12}>
-                <Form.Item
-                  name="manager_id"
-                  label="Task Manager"
-                >
-                  <Select placeholder="Select manager">
-                    {managerData?.User?.data?.map((manager, index) => (
-                      <Option key={index} value={manager?.id}> {`${manager?.fullName} / ${manager?.email}`}</Option>
-                    ))}
-                  </Select>
-                </Form.Item>
-              </Col>
-              <Col xs={24} sm={24} md={12} lg={12}>
-                <Form.Item
-                  label="Start Date"
-                  name='startDate'
-                  rules={[{
-                    required: true,
-                    message: 'Please select the start date'
-                  }]}>
-                  <DatePicker placeholder='Select start date' />
-                </Form.Item>
-              </Col>
+              {authData?.user?.id !== params.eid &&
+                <>
+                  <Col xs={24} sm={24} md={12} lg={12}>
+                    <Form.Item
+                      name="roles"
+                      label="Role"
+                      rules={[
+                        {
+                          message: "Please select the role!",
+                        },
+                      ]}
+                    >
+                      <Select placeholder="Employee" disabled={authData?.user?.id === params.eid ? true : false}>
+                        {roles &&
+                          roles?.Role?.data.map((role: IRole, index: number) => (
+                            <Option value={role?.id} key={index}>
+                              {role?.name}
+                            </Option>
+                          ))}
+                      </Select>
+                    </Form.Item>
+                  </Col>
+                  <Col xs={24} sm={24} md={12} lg={12}>
+                    <Form.Item
+                      name="status"
+                      label="User Status"
+                      rules={[
+                        {
+                          message: "Please select the status",
+                        },
+                      ]}
+                    >
+                      <Select placeholder="Select status" disabled={authData?.user?.id === params.eid ? true : false}>
+                        <Option value="Active">Active</Option>
+                        <Option value="Inactive">InActive</Option>
+                      </Select>
+                    </Form.Item>
+                  </Col>
+                  <Col
+                    xs={24}
+                    sm={24}
+                    md={12}
+                    lg={12}>
+                    <Form.Item
+                      name="manager_id"
+                      label="Task Manager"
+                    >
+                      <Select placeholder="Select manager" disabled={authData?.user?.id === params.eid ? true : false}>
+                        {managerData?.User?.data?.map((manager, index) => (
+                          <Option key={index} value={manager?.id}> {`${manager?.fullName} / ${manager?.email}`}</Option>
+                        ))}
+                      </Select>
+                    </Form.Item>
+                  </Col>
+                  <Col xs={24} sm={24} md={12} lg={12}>
+                    <Form.Item
+                      label="Start Date"
+                      name='startDate'
+                      rules={[{
+                        required: true,
+                        message: 'Please select the start date'
+                      }]}
+                    >
+                      <DatePicker placeholder='Select start date' disabled={authData?.user?.id === params.eid ? true : false} />
+                    </Form.Item>
+                  </Col>
 
-              <Col xs={24} sm={24} md={12} lg={12}>
-                <Form.Item
-                  label="End Date"
-                  name='endDate'
-                >
-                  <DatePicker placeholder='Select end date' disabledDate={(current) => current.isBefore(moment().subtract(1, "day"))} />
-                </Form.Item>
-              </Col>
+                  <Col xs={24} sm={24} md={12} lg={12}>
+                    <Form.Item
+                      label="End Date"
+                      name='endDate'
+                    >
+                      <DatePicker
+                        placeholder='Select end date'
+                        disabledDate={(current) => current.isBefore(moment().subtract(1, "day"))}
+                        disabled={authData?.user?.id === params.eid ? true : false} />
+                    </Form.Item>
+                  </Col>
 
-              <Col
-                xs={24}
-                sm={24}
-                md={12}
-                lg={12}>
-                <Form.Item
-                  name="timesheet_attachment"
-                  label="Timesheet Attachment type"
-                  rules={[{
-                    required: true,
-                    message: 'Please select timesheet attachment type'
-                  }]}>
-                  <Select placeholder="Select status">
-                    <Option value={true}>Mandatory</Option>
-                    <Option value={false}>Optional</Option>
-                  </Select>
-                </Form.Item>
-              </Col>
-              <Col
-                xs={24}
-                sm={24}
-                md={12}
-                lg={12}>
-                <Form.Item
-                  name="type"
-                  label="Entry Type"
-                  rules={[{
-                    required: true,
-                    message: 'Please select the user type'
-                  }]}>
-                  <Select placeholder="Select status">
-                    <Option value={EntryType.Timesheet}>{EntryType.Timesheet}</Option>
-                    <Option value={EntryType.Cico}>Checkin-Checkout</Option>
-                  </Select>
-                </Form.Item>
-              </Col>
+                  <Col
+                    xs={24}
+                    sm={24}
+                    md={12}
+                    lg={12}>
+                    <Form.Item
+                      name="timesheet_attachment"
+                      label="Timesheet Attachment type"
+                      rules={[{
+                        required: true,
+                        message: 'Please select timesheet attachment type'
+                      }]}>
+                      <Select placeholder="Select status" disabled={authData?.user?.id === params.eid ? true : false}>
+                        <Option value={true}>Mandatory</Option>
+                        <Option value={false}>Optional</Option>
+                      </Select>
+                    </Form.Item>
+                  </Col>
+                  <Col
+                    xs={24}
+                    sm={24}
+                    md={12}
+                    lg={12}>
+                    <Form.Item
+                      name="type"
+                      label="Entry Type"
+                      rules={[{
+                        required: true,
+                        message: 'Please select the user type'
+                      }]}>
+                      <Select placeholder="Select status" disabled={authData?.user?.id === params.eid ? true : false}>
+                        <Option value={EntryType.Timesheet}>{EntryType.Timesheet}</Option>
+                        <Option value={EntryType.Cico}>Checkin-Checkout</Option>
+                      </Select>
+                    </Form.Item>
+                  </Col>
+                </>
+              }
               <Col xs={24} sm={24} md={12} lg={12}>
                 <Form.Item
                   name="file"

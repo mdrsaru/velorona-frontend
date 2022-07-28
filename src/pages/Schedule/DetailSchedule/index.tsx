@@ -311,7 +311,7 @@ const ScheduleDetail = () => {
                                                         <td>
                                                             <span 
                                                             title='Clear all schedule' 
-                                                            className={styles['table-icon']} 
+                                                            className={`${styles["table-icon"]} ${styles["table-delete-icon"]}`}
                                                             onClick={() => handleDeleteClick(groups[key])}
                                                             >
                                                                 <DeleteOutlined />
