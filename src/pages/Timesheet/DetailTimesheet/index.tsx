@@ -775,7 +775,10 @@ const DetailTimesheet = () => {
                       </div>
 
                       {
-                        roles.includes(constants.roles.CompanyAdmin) && (
+                        checkRoles({
+                          expectedRoles: [constants.roles.CompanyAdmin, constants.roles.TaskManager],
+                          userRoles: roles,
+                        }) && (
                           <div className={styles['action']}>
                             <span 
                               onClick={() => setCommentDetails({
@@ -825,7 +828,10 @@ const DetailTimesheet = () => {
                       </div>
 
                       {
-                        roles.includes(constants.roles.CompanyAdmin) && (
+                        checkRoles({
+                          expectedRoles: [constants.roles.CompanyAdmin, constants.roles.TaskManager],
+                          userRoles: roles,
+                        }) && (
                           <div className={styles['action']}>
                             <span 
                               onClick={() => setCommentDetails({
