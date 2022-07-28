@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useState } from "react";
-import { Col, Row, Typography } from "antd";
+import { Col, Empty, Row, Typography } from "antd";
 import { gql, useQuery } from "@apollo/client";
 import moment from "moment";
 import employeesImg from "../../assets/images/employees.svg";
@@ -107,7 +107,9 @@ const EmployeeDashboard = () => {
     const [today, setToday] = useState<any>()
     useEffect(() => {
         const today = new Date();
-        setToday(today)
+        const split = today.toISOString().split('T')
+        console.log(split)
+        setToday(split?.[0])
     }, [])
     const {
         data: workscheduleDetailData } = useQuery(WORKSCHEDULEDETAIL, {
@@ -117,6 +119,7 @@ const EmployeeDashboard = () => {
                 input: {
                     query: {
                         schedule_date: today,
+                        user_id:authData?.user?.id
                     },
                     paging: {
                     }
@@ -154,24 +157,27 @@ const EmployeeDashboard = () => {
                                 {moment(today).format('ddd')}
                             </Typography.Text>
                             <br />
-                            <div>
-                                {workscheduleDetailData?.WorkscheduleDetail.data.map((workscheduleDetail: any, index: number) => {
-                                    return (
-                                        <Fragment key= {index}>
-                                       { workscheduleDetail?.workscheduleTimeDetail?.map((timeDetail: any, index: number) =>
+                            {workscheduleDetailData?.WorkscheduleDetail.data?.length ?
+                              <div>
+                                    {workscheduleDetailData?.WorkscheduleDetail.data.map((workscheduleDetail: any, index: number) => {
+                                        return (
+                                            <Fragment key={index}>
+                                                {workscheduleDetail?.workscheduleTimeDetail?.map((timeDetail: any, index: number) =>
 
-                                            <div key= {index} className={styles['hour-log']}>{`${moment(timeDetail.startTime).format('HH:MM')} - ${moment(timeDetail.endTime).format('HH:MM')}`}</div>
+                                                    <div key={index} className={styles['hour-log']}>{`${moment(timeDetail.startTime).format('HH:mm')} - ${moment(timeDetail.endTime).format('HH:mm')}`}</div>
 
+                                                )
+                                                }
+                                            </Fragment>
                                         )
-                                       }
-                                       </Fragment>
-                                    )
                                     }
-                                
-                                )}
-                            </div>
 
-                        </div>
+                                    )}
+                                </div>
+                                :
+                                <Empty description='No Schedule for today' />
+                            }
+                    </div>
                     </div>
                     <AverageHours
                         averageHoursData={averageHoursData}

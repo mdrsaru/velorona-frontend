@@ -1,11 +1,11 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import { Button, Col, Form, message, Modal, Row, Space, Table, TimePicker } from "antd"
 import DeleteOutlined from "@ant-design/icons/lib/icons/DeleteOutlined";
 import { useState } from "react";
 import moment from "moment";
 
 import { GraphQLResponse } from "../../../../interfaces/graphql.interface";
-import { MutationWorkscheduleDetailCreateArgs, MutationWorkscheduleTimeDetailCreateArgs, MutationWorkscheduleTimeDetailDeleteArgs, WorkscheduleDetail, WorkscheduleTimeDetail } from "../../../../interfaces/generated";
+import { MutationWorkscheduleDetailCreateArgs, MutationWorkscheduleTimeDetailDeleteArgs, QueryWorkscheduleTimeDetailArgs, WorkscheduleDetail, WorkscheduleTimeDetail, WorkscheduleTimeDetailPagingResult } from "../../../../interfaces/generated";
 import { notifyGraphqlError } from "../../../../utils/error";
 
 
@@ -17,11 +17,13 @@ import DeleteBody from "../../../../components/Delete";
 
 import styles from './styles.module.scss'
 import { useParams } from 'react-router';
+import { WORKSCHEDULE_TIME_DETAIL } from "../AddTimeInterval";
+import { useForm } from "antd/lib/form/Form";
 
 interface IProps {
   visibility: boolean;
   setVisibility: any;
-  getWorkschedule:any;
+  getWorkschedule: any;
   employeeName: string;
   employeeId?: string;
   providedData: string;
@@ -62,7 +64,8 @@ export const WORKSCHEDULE_TIME_DETAIL_DELETE = gql`
   }
 `;
 const AddNewWorkscheduleDetail = (props: IProps) => {
-const params = useParams();
+  const params = useParams();
+  const [form] = useForm();
   const [deleteVisibility, setDeleteVisibility] = useState<boolean>(false);
 
   const [timeIntervalId, setTimeIntervalId] = useState<any>()
@@ -76,14 +79,14 @@ const params = useParams();
       });
       props?.refetch({
         variables: {
-            input: {
-                paging: {
-                    order: ["updatedAt:ASC"],
-                },
-                query: {
-                  workschedule_id: params?.sid
-                }
+          input: {
+            paging: {
+              order: ["updatedAt:ASC"],
             },
+            query: {
+              workschedule_id: params?.sid
+            }
+          },
         },
     })
 
@@ -95,7 +98,24 @@ const params = useParams();
     },
   });
 
-  const [timeIntervalDelete, { loading }] = useMutation<GraphQLResponse<'WorkscheduleTimeDetailDelete',
+  const { data: workscheduleTimeDetail, refetch: refetchWorkscheduleTimeDetail } = useQuery<
+    GraphQLResponse<'WorkscheduleTimeDetail', WorkscheduleTimeDetailPagingResult>,
+    QueryWorkscheduleTimeDetailArgs
+  >(WORKSCHEDULE_TIME_DETAIL, {
+    fetchPolicy: "network-only",
+    nextFetchPolicy: "cache-first",
+    variables: {
+      input: {
+        query: {
+          workschedule_detail_id: params?.sid
+        },
+        paging: {
+          order: ['updatedAt:DESC']
+        }
+      }
+    }
+  })
+  const [timeIntervalDelete] = useMutation<GraphQLResponse<'WorkscheduleTimeDetailDelete',
     WorkscheduleTimeDetail>,
     MutationWorkscheduleTimeDetailDeleteArgs>(WORKSCHEDULE_TIME_DETAIL_DELETE, {
       onCompleted() {
@@ -103,6 +123,25 @@ const params = useParams();
           content: `Attached Timesheet is deleted successfully!`,
           className: "custom-message",
         });
+        refetchWorkscheduleTimeDetail({
+          input: {
+            query: {
+              workschedule_detail_id: params?.sid
+            },
+          }
+        })
+        props?.refetch({
+          variables: {
+            input: {
+              paging: {
+                order: ["updatedAt:ASC"],
+              },
+              query: {
+                id: params?.sid
+              }
+            },
+          },
+        })
         setDeleteVisibility(false);
       },
       onError(err) {
@@ -129,7 +168,7 @@ const params = useParams();
       dataIndex: "startTime",
       render: (startTime: any) => {
         return <span style={{ cursor: 'pointer' }} >
-          {moment(startTime).format('HH:SS')}
+          {moment(startTime).format('HH:mm')}
         </span>
       },
     },
@@ -138,7 +177,7 @@ const params = useParams();
       dataIndex: "endTime",
       render: (endTime: any) => {
         return <span style={{ cursor: 'pointer' }} >
-          {moment(endTime).format('HH:SS')}
+          {moment(endTime).format('HH:mm')}
         </span>
       },
     },
@@ -156,6 +195,10 @@ const params = useParams();
   ];
   const format = 'HH:mm';
   const handleSubmit = (values: any) => {
+    form.resetFields()
+    if (Date.parse(values?.endTime) < Date.parse(values?.startTime)) {
+      return message.error('End time cannot be less than start time')
+    }
     createWorkscheduleDetail({
       variables: {
         input: {
@@ -189,7 +232,7 @@ const params = useParams();
 
         <p className={styles.title}>Work schedule</p>
         <Table
-          dataSource={[]}
+          dataSource={workscheduleTimeDetail?.WorkscheduleTimeDetail?.data}
           columns={columns}
           pagination={false}
         />

@@ -904,7 +904,7 @@ const DetailTimesheet = () => {
         (<div className={styles['site-card-wrapper']}>
           <Card className={styles['attach-approved-timesheet']}>
             <Collapse accordion defaultActiveKey={['2']}>
-              <Panel header="Attach Approved Timesheet" key="2" className={styles['attachApprovedTitle']}>
+              <Panel header="Attachments" key="2" className={styles['attachApprovedTitle']}>
                 <Table
                   dataSource={attachedTimesheetData?.AttachedTimesheet?.data}
                   columns={columns}
@@ -920,42 +920,6 @@ const DetailTimesheet = () => {
                   </>
                 }
                 <br />
-                <Row justify={"end"}>
-                  <Col className={styles['form-col']}>
-                    <Space>
-                      <Button
-                        type="primary"
-                        htmlType="button"
-                        onClick={exit}
-                      >
-                        Exit
-                      </Button>
-
-                      {
-                        checkRoles({
-                          expectedRoles: [constants.roles.Employee],
-                          userRoles: roles,
-                        }) && (
-                          <Popconfirm
-                            placement="top"
-                            title="Submit timesheet?"
-                            onConfirm={onSubmitAttachedTimesheet}
-                            okText="Yes" cancelText="No"
-                          >
-                            <Button
-                              type="default"
-                              htmlType="button"
-                              loading={submittingTimesheet}
-                            >
-                              Submit
-                            </Button>
-                          </Popconfirm>
-
-                        )
-                      }
-                    </Space>
-                  </Col>
-                </Row>
               </Panel>
             </Collapse>
           </Card>

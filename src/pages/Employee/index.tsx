@@ -49,6 +49,11 @@ export const USER = gql`
         lastName
         fullName
         status
+        manager{
+        id 
+        fullName 
+        }
+        manager_id
      
 
         archived
@@ -562,6 +567,8 @@ const Employee = () => {
       title: "Name",
       key: "fullName",
       dataIndex: "fullName",
+      // sortDirections: ['descend', 'ascend'],
+      // sorter: (a:any, b:any) => a.fullName.localeCompare(b.fullName),
       render: (fullName: any) => {
         return <span style={{ cursor: 'pointer' }} >
           {fullName}
@@ -613,6 +620,7 @@ const Employee = () => {
       title: "Status",
       dataIndex: "status",
       key: "status",
+      // sorter: (a:any, b:any) => a.  .localeCompare(b.status),
       render: (status: string) => (
         <span
           className={
@@ -769,6 +777,19 @@ const Employee = () => {
             <PageHeader
               title="Users"
               extra={[
+              <>
+                <div className={styles["add-new-employee"]} key="new-employee">
+                <Link
+                  to={routes.addEmployee.path(
+                    loggedInUser?.company?.code
+                      ? loggedInUser?.company?.code
+                      : ""
+                  )}
+                >
+                  View Archived User
+                </Link>
+              </div>
+            
                 <div className={styles["add-new-employee"]} key="new-employee">
                   <Link
                     to={routes.addEmployee.path(
@@ -780,6 +801,7 @@ const Employee = () => {
                     Add New User
                   </Link>
                 </div>
+              </>
               ]}
             />
             <Form

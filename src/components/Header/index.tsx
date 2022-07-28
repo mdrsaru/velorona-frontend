@@ -11,7 +11,6 @@ import { useStopwatch } from 'react-timer-hook';
 import { /*sidebarVar, */authVar } from '../../App/link';
 //import logo from '../../assets/images/logo.svg';
 import pp from '../../assets/images/default_pp.png';
-//import logoContent from '../../assets/images/logo-01.svg';
 import logoContent from '../../assets/images/logo-content.svg';
 import downArrow from '../../assets/images/down-arrow.svg';
 import routes from '../../config/routes';
@@ -19,7 +18,7 @@ import { notifyGraphqlError } from '../../utils/error';
 import { AUTH } from '../../gql/auth.gql';
 import { TIME_ENTRY_FIELDS } from '../../gql/time-entries.gql';
 import { GraphQLResponse } from '../../interfaces/graphql.interface';
-import { QueryTimeEntryArgs, TimeEntry, MutationTimeEntryUpdateArgs, TimeEntryPagingResult, EntryType } from '../../interfaces/generated';
+import { QueryTimeEntryArgs, TimeEntry, MutationTimeEntryUpdateArgs, TimeEntryPagingResult, EntryType, RoleName } from '../../interfaces/generated';
 
 import CheckIn from './CheckIn';
 import Digit from '../../components/Digit';
@@ -80,27 +79,27 @@ const TopHeader = (props: any) => {
     GraphQLResponse<'TimeEntry', TimeEntryPagingResult>,
     QueryTimeEntryArgs
   >(TIME_ENTRY, {
-      variables: {
-        input: {
-          paging: {
-            take: 1,
-          },
-          query: {
-            entryType: EntryType.Cico,
-            company_id,
-          },
-        }
-      },
-      onCompleted(response) {
-        if(response.TimeEntry.activeEntry) {
-          let startTime = response.TimeEntry.activeEntry?.startTime;
-          if(startTime) {
-            startTime = moment(startTime).utc().format('YYYY-MM-DDTHH:mm:ss');
-            startTimer(response.TimeEntry.activeEntry.id, startTime);
-          }
+    variables: {
+      input: {
+        paging: {
+          take: 1,
+        },
+        query: {
+          entryType: EntryType.Cico,
+          company_id,
+        },
+      }
+    },
+    onCompleted(response) {
+      if (response.TimeEntry.activeEntry) {
+        let startTime = response.TimeEntry.activeEntry?.startTime;
+        if (startTime) {
+          startTime = moment(startTime).utc().format('YYYY-MM-DDTHH:mm:ss');
+          startTimer(response.TimeEntry.activeEntry.id, startTime);
         }
       }
-    })
+    }
+  })
 
   /* Uncomment it to make sidebar toggle
   const { data: sidebarData } = useQuery(SIDEBAR);
@@ -125,8 +124,14 @@ const TopHeader = (props: any) => {
         company: {
           id: null,
           code: '',
+          name: '',
+          logo: {
+            id: null,
+            name: null,
+            url: null,
+          }
         },
-        fullName:null,
+        fullName: null,
         avatar: {
           id: null,
           url: '',
@@ -183,7 +188,7 @@ const TopHeader = (props: any) => {
       });
     },
     onCompleted(response) {
-      if(response.TimeEntryUpdate) {
+      if (response.TimeEntryUpdate) {
         reset(undefined, false);
       }
     },
@@ -192,6 +197,10 @@ const TopHeader = (props: any) => {
 
   const profile = () => {
     navigate(routes.profile.path(loggedInUser?.user?.id as string))
+  }
+
+  const setting = () => {
+    navigate(routes.companySetting.path(loggedInUser?.user?.id as string))
   }
 
   const showCheckInModal = () => {
@@ -203,7 +212,7 @@ const TopHeader = (props: any) => {
   }
 
   const checkOut = () => {
-    if(activeEntry_id) {
+    if (activeEntry_id) {
       updateTimeEntry({
         variables: {
           input: {
@@ -219,7 +228,7 @@ const TopHeader = (props: any) => {
   const startTimer = (id: string, date: string) => {
     const offset = new Date();
     const now = moment();
-    const diff = now.diff(moment(date),  'seconds');
+    const diff = now.diff(moment(date), 'seconds');
     const time = offset.setSeconds(offset.getSeconds() + diff)
     reset(new Date(time))
     setActiveEntry_id(id);
@@ -227,12 +236,17 @@ const TopHeader = (props: any) => {
 
   const menu = (
     <Menu style={{ width: 120 }}>
-     <Menu.Item key={"1"}>
-       <div onClick={() => profile()}>Profile</div>
-     </Menu.Item>
-     <Menu.Item key={"2"}>
-       <div onClick={() => logout()}>Logout</div>
-     </Menu.Item>
+      <Menu.Item key={"1"}>
+        <div onClick={() => profile()}>Profile</div>
+      </Menu.Item>
+      {loggedInUser?.user?.roles?.includes(RoleName.CompanyAdmin) &&
+        <Menu.Item key={"2"}>
+          <div onClick={() => setting()}>Setting</div>
+        </Menu.Item>
+      }
+      <Menu.Item key={"3"}>
+        <div onClick={() => logout()}>Logout</div>
+      </Menu.Item>
     </Menu>
   );
 
@@ -247,19 +261,15 @@ const TopHeader = (props: any) => {
             marginLeft: 10
           }} />
         <div>
-          {
-            /* 
+          {authData?.AuthUser?.company?.logo?.url ?
             <img
-              src={logo}
+              src={authData?.AuthUser?.company?.logo?.url}
               alt="logo"
-              className={styles['mini-logo']} 
+              className={styles['text-logo']}
             />
-            */
+            :
+            <p className={styles['company-name']}>{authData?.AuthUser?.company?.name}</p>
           }
-          <img
-            src={logoContent}
-            alt="logo-01"
-            className={styles['text-logo']} />
         </div>
       </div>
 
@@ -292,7 +302,7 @@ const TopHeader = (props: any) => {
             alt="notification" />
         </div> */}
         <div className={styles['avatar']}>
-          <Avatar size={38} src = {loggedInUser?.avatar?.url ?? pp } />
+          <Avatar size={38} src={loggedInUser?.avatar?.url ?? pp} />
           <Dropdown
             overlay={menu}
             trigger={['click']}>
@@ -318,8 +328,8 @@ const TopHeader = (props: any) => {
         onCancel={hideCheckInModal}
         title={<h2 className="modal-title">Check in</h2>}
       >
-        <CheckIn 
-          startTimer={startTimer} 
+        <CheckIn
+          startTimer={startTimer}
           hideCheckInModal={hideCheckInModal}
         />
       </Modal>

@@ -29,9 +29,16 @@ export interface IAuthUser {
   type?: string | null;
 }
 
+export interface ICompanyLogo{
+  id:string | null;
+  name:string | null;
+  url:string | null;
+}
 export interface ICompanyUser {
   id: string | null;
   code: string;
+  name:string;
+  logo:ICompanyLogo;
 }
 
 export interface IAvatarUser {

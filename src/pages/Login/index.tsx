@@ -26,6 +26,12 @@ const LOGIN = gql`
         company {
           id
           companyCode
+          name
+          logo{
+          id 
+          name 
+          url 
+          }
         }
         roles {
           id
@@ -69,7 +75,13 @@ const Login = () => {
         },
         company: {
           id: loginData?.company?.id ?? '',
-          code: loginData?.company?.companyCode ?? ''
+          code: loginData?.company?.companyCode ?? '',
+          name:loginData?.company?.name ?? '',
+          logo:{
+          id: loginData?.company?.logo?.id ?? '',
+          name: loginData?.company?.logo?.name ?? '',
+          url: loginData?.company?.logo?.url ?? '',      
+          }
         },
         fullName: loginData?.fullName,
         avatar: {
@@ -81,13 +93,9 @@ const Login = () => {
 
       if (roles.includes(constants.roles.SuperAdmin)) {
         navigate(routes.dashboard.path)
-      } else if (roles.includes(constants.roles.CompanyAdmin)) {
-        navigate(routes.company.path(loginData?.company?.companyCode));
-      } else if (roles.includes(constants.roles.Employee)) {
-        navigate(routes.company.path(loginData?.company?.companyCode));
-      } else if (roles.includes(constants.roles.TaskManager)) {
-        navigate(routes.company.path(loginData?.company?.companyCode));
-      } 
+      } else if (roles.includes(constants.roles.CompanyAdmin) || roles.includes(constants.roles.Employee) || roles.includes(constants.roles.TaskManager)) {
+        navigate(routes.checkDashboard.path(loginData?.company?.code ?? ''))
+      }
       else {
         navigate(routes.home.path);
       }

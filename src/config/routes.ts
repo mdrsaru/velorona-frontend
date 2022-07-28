@@ -57,6 +57,13 @@ const routes = {
     name: 'Roles',
     key: 'role'
   },
+  checkDashboard:{
+    childPath: 'dashboard',
+    path: (company: string | undefined) => `/dashboard`,
+    component: lazy(() => import('../components/CheckDashboard')),
+    name: 'Dashboard',
+    key: 'dashboard'
+  },
   companyDashboard: {
     childPath: ':dashboard',
     path: (company: string | undefined) => `/${company}`,
@@ -65,14 +72,14 @@ const routes = {
     key: 'dashboard'
   },
   employeeDashboard: {
-    childPath: ':dashboard',
+    childPath: ':company',
     path: (company: string | undefined) => `/${company}`,
     component: lazy(() => import('../pages/EmployeeDashboard')),
     name: 'Dashboard',
     key: 'dashboard'
   },
   taskManagerDashboard: {
-    childPath: ':dashboard',
+    childPath: ':company',
     path: (company: string | undefined) => `/${company}`,
     component: lazy(() => import('../pages/TaskManagerDashboard')),
     name: 'Dashboard',
@@ -141,7 +148,20 @@ const routes = {
     name: 'Profile',
     key: 'profile'
   },
-
+  companySetting: {
+    childPath: 'setting/:eid',
+    path: (eid: string) => `/setting/${eid}`,
+    component: lazy(() => import('../pages/CompanySetting')),
+    name: 'Profile',
+    key: 'profile'
+  },
+  editCompanySetting: {
+    childPath: 'setting/:eid/edit',
+    path: (eid: string) => `/setting/${eid}/edit`,
+    component: lazy(() => import('../pages/CompanySetting/EditCompanySetting')),
+    name: 'Profile',
+    key: 'profile'
+  },
   changePassword: {
     childPath: 'profile/:eid/change-password',
     path: (eid: string) => `/profile/${eid}/change-password`,
@@ -190,21 +210,21 @@ const routes = {
     path: (id: string) => `/${id}/schedule`,
     component: lazy(() => import('../pages/EmployeeSchedule')),
     name: 'Schedule',
-    key: 'employeeSchedule'
+    key: 'schedule'
   },
   schedule: {
     childPath: 'scheduleList',
     path: (id: string) => `/${id}/scheduleList`,
     component: lazy(() => import('../pages/Schedule')),
     name: 'Schedule',
-    key: 'workScheduleList'
+    key: 'scheduleList'
   },
  detailSchedule: {
-    childPath: 'schedule/:sid',
-    path: (id: string,sid:string) => `/${id}/schedule/${sid}`,
+    childPath: 'scheduleList/:sid',
+    path: (id: string,sid:string) => `/${id}/scheduleList/${sid}`,
     component: lazy(() => import('../pages/Schedule/DetailSchedule')),
-    name: 'Schedule',
-    key: 'workScheduleDetail'
+    name: 'DetailSchedule',
+    key: 'scheduleList'
   },
   projects: {
     childPath: 'projects',
