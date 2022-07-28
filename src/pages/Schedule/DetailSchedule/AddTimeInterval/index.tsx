@@ -1,11 +1,11 @@
-import { gql, useMutation } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import { Button, Col, Form, message, Modal, Row, Space, Table, TimePicker } from "antd"
 import DeleteOutlined from "@ant-design/icons/lib/icons/DeleteOutlined";
 import { useState } from "react";
 import moment from "moment";
 
 import { GraphQLResponse } from "../../../../interfaces/graphql.interface";
-import { MutationWorkscheduleTimeDetailCreateArgs, MutationWorkscheduleTimeDetailDeleteArgs, WorkscheduleTimeDetail } from "../../../../interfaces/generated";
+import { MutationWorkscheduleTimeDetailCreateArgs, MutationWorkscheduleTimeDetailDeleteArgs, QueryWorkscheduleTimeDetailArgs, WorkscheduleTimeDetail, WorkscheduleTimeDetailPagingResult } from "../../../../interfaces/generated";
 import { notifyGraphqlError } from "../../../../utils/error";
 
 
@@ -16,12 +16,13 @@ import ModalConfirm from "../../../../components/Modal";
 import DeleteBody from "../../../../components/Delete";
 
 import styles from './styles.module.scss'
+import { useForm } from 'antd/lib/form/Form';
 
 interface IProps {
   visibility: boolean;
   setVisibility: any;
   workschedule: any;
-  getWorkschedule:any;
+  getWorkschedule: any;
 }
 
 export const WORKSCHEDULE_TIME_DETAIL_CREATE = gql`
@@ -44,8 +45,37 @@ export const WORKSCHEDULE_TIME_DETAIL_DELETE = gql`
     }
   }
 `;
-const AddTimeInterval = (props: IProps) => {
+export const WORKSCHEDULE_TIME_DETAIL = gql`
+  query WorkscheduleTimeDetail($input: WorkscheduleTimeDetailQueryInput!) {
+    WorkscheduleTimeDetail(input: $input) {
+      paging {
+      total
+      startIndex
+      endIndex
+      hasNextPage
+    }
+    data {
+			id
+			duration
+			startTime
+      endTime
+    workschedule_detail_id
+  }
+    }
+  }
+`;
 
+export const WORKSCHEDULE_DETAIL_DELETE = gql`
+  mutation WorkscheduleDetailDelete($input: DeleteInput!) {
+    WorkscheduleDetailDelete(input: $input) {
+      id
+     workschedule_id
+    }
+  }
+`;
+
+const AddTimeInterval = (props: IProps) => {
+  const [form] = useForm()
   const [deleteVisibility, setDeleteVisibility] = useState<boolean>(false);
 
   const [timeIntervalId, setTimeIntervalId] = useState<any>()
@@ -60,16 +90,16 @@ const AddTimeInterval = (props: IProps) => {
       });
       props?.getWorkschedule({
         variables: {
-            input: {
-                paging: {
-                    order: ["updatedAt:ASC"],
-                },
-                query: {
-                    id: workschedule?.id
-                }
+          input: {
+            paging: {
+              order: ["updatedAt:ASC"],
             },
+            query: {
+              id: workschedule?.id
+            }
+          },
         },
-    })
+      })
 
       props?.setVisibility(false)
 
@@ -79,7 +109,36 @@ const AddTimeInterval = (props: IProps) => {
     },
   });
 
-  const [timeIntervalDelete, { loading }] = useMutation<GraphQLResponse<'WorkscheduleTimeDetailDelete',
+  const { data: workscheduleTimeDetail, refetch: refetchWorkscheduleTimeDetail } = useQuery<
+    GraphQLResponse<'WorkscheduleTimeDetail', WorkscheduleTimeDetailPagingResult>,
+    QueryWorkscheduleTimeDetailArgs
+  >(WORKSCHEDULE_TIME_DETAIL, {
+    fetchPolicy: "network-only",
+    nextFetchPolicy: "cache-first",
+    variables: {
+      input: {
+        query: {
+          workschedule_detail_id: workschedule?.id
+        },
+        paging: {
+          order: ['updatedAt:DESC']
+        }
+      }
+    }
+  })
+
+  const [workscheduleDetailDelete] = useMutation(WORKSCHEDULE_DETAIL_DELETE, {
+    onCompleted() {
+      setDeleteVisibility(false);
+
+    },
+    onError(err) {
+      setDeleteVisibility(false);
+      notifyGraphqlError(err);
+    }
+  })
+
+  const [timeIntervalDelete] = useMutation<GraphQLResponse<'WorkscheduleTimeDetailDelete',
     WorkscheduleTimeDetail>,
     MutationWorkscheduleTimeDetailDeleteArgs>(WORKSCHEDULE_TIME_DETAIL_DELETE, {
       onCompleted() {
@@ -87,6 +146,35 @@ const AddTimeInterval = (props: IProps) => {
           content: `Attached Timesheet is deleted successfully!`,
           className: "custom-message",
         });
+        refetchWorkscheduleTimeDetail({
+          input: {
+            query: {
+              workschedule_detail_id: workschedule?.id
+            },
+          }
+        }).then((timeInterval) => {
+          if (!timeInterval?.data?.WorkscheduleTimeDetail?.data?.length) {
+            workscheduleDetailDelete({
+              variables: {
+                input: {
+                  id: workschedule?.id
+                }
+              }
+            })
+          }
+        })
+        props?.getWorkschedule({
+          variables: {
+            input: {
+              paging: {
+                order: ["updatedAt:ASC"],
+              },
+              query: {
+                id: workschedule?.id
+              }
+            },
+          },
+        })
         setDeleteVisibility(false);
       },
       onError(err) {
@@ -113,7 +201,7 @@ const AddTimeInterval = (props: IProps) => {
       dataIndex: "startTime",
       render: (startTime: any) => {
         return <span style={{ cursor: 'pointer' }} >
-          {moment(startTime).format('HH:SS')}
+          {moment(startTime).format('HH:mm')}
         </span>
       },
     },
@@ -122,7 +210,7 @@ const AddTimeInterval = (props: IProps) => {
       dataIndex: "endTime",
       render: (endTime: any) => {
         return <span style={{ cursor: 'pointer' }} >
-          {moment(endTime).format('HH:SS')}
+          {moment(endTime).format('HH:mm')}
         </span>
       },
     },
@@ -140,6 +228,10 @@ const AddTimeInterval = (props: IProps) => {
   ];
   const format = 'HH:mm';
   const handleSubmit = (values: any) => {
+    form.resetFields()
+    if (Date.parse(values?.endTime) < Date.parse(values?.startTime)) {
+      return message.error('End time cannot be less than start time')
+    }
     createWorkscheduleTimeEntry({
       variables: {
         input: {
@@ -169,7 +261,7 @@ const AddTimeInterval = (props: IProps) => {
 
         <p className={styles.title}>Work schedule</p>
         <Table
-          dataSource={workschedule?.workscheduleTimeDetail}
+          dataSource={workscheduleTimeDetail?.WorkscheduleTimeDetail?.data}
           columns={columns}
           pagination={false}
         />

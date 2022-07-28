@@ -66,7 +66,7 @@ const EmployeeSchedule = () => {
   const columns = [
     {
       title: "Date",
-      dataIndex: "date",
+      dataIndex: "schedule_date",
       render: (date: any) => {
         return <span style={{ cursor: 'pointer' }} >
           {moment(date).format('ddd, MMM D')}
@@ -82,7 +82,7 @@ const EmployeeSchedule = () => {
         return timeDetail?.map((timeDetail: any, index: any) => {
           return (
             <>
-              <span>{`${moment(timeDetail.startTime).format('HH:SS')} - ${moment(timeDetail.endTime).format('HH:SS')}`}</span>
+              <span>{`${moment(timeDetail.startTime).format('HH:mm')} - ${moment(timeDetail.endTime).format('HH:mm')}`}</span>
               <br />
             </>
           )
