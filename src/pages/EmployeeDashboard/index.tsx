@@ -119,6 +119,7 @@ const EmployeeDashboard = () => {
                 input: {
                     query: {
                         schedule_date: today,
+                        user_id:authData?.user?.id
                     },
                     paging: {
                     }

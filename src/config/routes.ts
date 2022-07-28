@@ -210,7 +210,7 @@ const routes = {
     path: (id: string) => `/${id}/schedule`,
     component: lazy(() => import('../pages/EmployeeSchedule')),
     name: 'Schedule',
-    key: 'employeeSchedule'
+    key: 'schedule'
   },
   schedule: {
     childPath: 'scheduleList',
