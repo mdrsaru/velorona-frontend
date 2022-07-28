@@ -778,17 +778,6 @@ const Employee = () => {
               title="Users"
               extra={[
               <>
-                <div className={styles["add-new-employee"]} key="new-employee">
-                <Link
-                  to={routes.addEmployee.path(
-                    loggedInUser?.company?.code
-                      ? loggedInUser?.company?.code
-                      : ""
-                  )}
-                >
-                  View Archived User
-                </Link>
-              </div>
             
                 <div className={styles["add-new-employee"]} key="new-employee">
                   <Link
