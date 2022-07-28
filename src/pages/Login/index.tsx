@@ -84,9 +84,9 @@ const Login = () => {
       } else if (roles.includes(constants.roles.CompanyAdmin)) {
         navigate(routes.company.path(loginData?.company?.companyCode));
       } else if (roles.includes(constants.roles.Employee)) {
-        navigate(routes.company.path(loginData?.company?.companyCode));
+        navigate(routes.employeeDashboard.path(loginData?.company?.companyCode));
       } else if (roles.includes(constants.roles.TaskManager)) {
-        navigate(routes.company.path(loginData?.company?.companyCode));
+        navigate(routes.taskManagerDashboard.path(loginData?.company?.companyCode));
       } 
       else {
         navigate(routes.home.path);
