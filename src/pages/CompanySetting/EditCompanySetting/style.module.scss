@@ -1,0 +1,30 @@
+.container {
+  margin: 2rem 1rem;
+  padding: 1rem;
+}
+
+.form-col {
+  margin-bottom: 2rem;
+}
+
+.browse-file {
+  text-align: end;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 14px;
+
+  span {
+    color: var(--primary-blue);
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 17px;
+  }
+}
+
+.browse-file {
+  :global {
+    .ant-upload-list-text {
+      display: none;
+    }
+  }
+}

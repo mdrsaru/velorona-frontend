@@ -50,7 +50,13 @@ export const COMPANY_UPDATE = gql`
       id
       name
       status
+      companyCode
       createdAt 
+      logo{
+      id
+      name 
+      url 
+      }
     }
   }
 `

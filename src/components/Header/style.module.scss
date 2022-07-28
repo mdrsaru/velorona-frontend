@@ -5,7 +5,7 @@
       justify-content: space-between;
       background: var(--white);
       position: fixed;
-      z-index: 1; 
+      z-index: 1;
       width: 100%;
       padding-left: 20px;
       padding-right: 50px;
@@ -13,7 +13,7 @@
 
     .anticon-menu {
       @media only screen and (min-width: 992px) {
-          display: none;
+        display: none;
       }
     }
   }
@@ -27,13 +27,26 @@
   margin-left: 24px;
 }
 
+.text-logo {
+  width: 100%;
+  height: 3rem;
+}
+
+.company-name {
+  color: var(--primary-color);
+  font-size: 24px;
+  font-weight: bold;
+  margin-top: 18px;
+  text-transform: capitalize;
+}
+
 .locale-wrapper {
   float: right;
   margin-right: 15px;
 
   .divider,
   .language-switcher {
-    color: var(--white);
+    color: var(--whi te);
   }
 
   .language-switcher {
@@ -43,7 +56,7 @@
     cursor: pointer;
 
     &.active {
-      font-weight: bold; 
+      font-weight: bold;
     }
   }
 }
@@ -116,7 +129,6 @@
   .text-logo {
     display: none;
   }
-
 }
 @media only screen and (max-width: 992px) {
   .mini-logo {

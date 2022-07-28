@@ -13,6 +13,12 @@ export const AUTH = gql`
       company {
         code
         id
+        name
+        logo{
+        id 
+        name 
+        url 
+        }
       }
       avatar {
         id

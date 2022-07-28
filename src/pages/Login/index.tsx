@@ -26,6 +26,12 @@ const LOGIN = gql`
         company {
           id
           companyCode
+          name
+          logo{
+          id 
+          name 
+          url 
+          }
         }
         roles {
           id
@@ -69,7 +75,13 @@ const Login = () => {
         },
         company: {
           id: loginData?.company?.id ?? '',
-          code: loginData?.company?.companyCode ?? ''
+          code: loginData?.company?.companyCode ?? '',
+          name:loginData?.company?.name ?? '',
+          logo:{
+          id: loginData?.company?.logo?.id ?? '',
+          name: loginData?.company?.logo?.name ?? '',
+          url: loginData?.company?.logo?.url ?? '',      
+          }
         },
         fullName: loginData?.fullName,
         avatar: {
