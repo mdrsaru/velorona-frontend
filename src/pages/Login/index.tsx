@@ -94,7 +94,7 @@ const Login = () => {
       if (roles.includes(constants.roles.SuperAdmin)) {
         navigate(routes.dashboard.path)
       } else if (roles.includes(constants.roles.CompanyAdmin) || roles.includes(constants.roles.Employee) || roles.includes(constants.roles.TaskManager)) {
-        navigate(routes.checkDashboard.path(loginData?.company?.code ?? ''))
+         navigate(routes.checkDashboard.path(loginData?.company?.companyCode ?? ''))
       }
       else {
         navigate(routes.home.path);

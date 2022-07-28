@@ -261,14 +261,23 @@ const TopHeader = (props: any) => {
             marginLeft: 10
           }} />
         <div>
-          {authData?.AuthUser?.company?.logo?.url ?
+          {authData?.AuthUser?.user?.roles?.includes('SuperAdmin') ?
             <img
-              src={authData?.AuthUser?.company?.logo?.url}
+              src={logoContent}
               alt="logo"
-              className={styles['text-logo']}
             />
             :
-            <p className={styles['company-name']}>{authData?.AuthUser?.company?.name}</p>
+            <>
+              {authData?.AuthUser?.company?.logo?.url ?
+                <img
+                  src={authData?.AuthUser?.company?.logo?.url}
+                  alt="logo"
+                  className={styles['text-logo']}
+                />
+                :
+                <p className={styles['company-name']}>{authData?.AuthUser?.company?.name}</p>
+              }
+            </>
           }
         </div>
       </div>
