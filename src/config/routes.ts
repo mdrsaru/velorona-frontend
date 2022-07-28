@@ -57,6 +57,13 @@ const routes = {
     name: 'Roles',
     key: 'role'
   },
+  checkDashboard:{
+    childPath: 'dashboard',
+    path: (company: string | undefined) => `/dashboard`,
+    component: lazy(() => import('../components/CheckDashboard')),
+    name: 'Dashboard',
+    key: 'dashboard'
+  },
   companyDashboard: {
     childPath: ':dashboard',
     path: (company: string | undefined) => `/${company}`,
