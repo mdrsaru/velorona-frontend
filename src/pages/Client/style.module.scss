@@ -15,11 +15,29 @@
 }
 
 .table-icon{
-  color: var(--gray-secondary);
   font-size:1.5rem;
   margin-right: 1rem;
 }
 
+.table-active-status-icon{
+  color: var(--primary-green);
+}
+
+.table-inactive-status-icon{
+  color: var(--primary-red);
+}
+
+.table-client-icon{
+  color: var(--black);
+}
+
+.table-archive-icon{
+  color: var(--primary-red);
+}
+
+.table-unarchive-icon ,.table-edit-icon{
+  color:var(--primary-blue)
+}
 h1 {
   font-weight: 600;
   font-size: 24px;

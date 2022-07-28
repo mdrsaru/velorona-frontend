@@ -376,7 +376,7 @@ const Invoice = () => {
                   <Link
                     to={routes.editInvoice.path(loggedInUser?.company?.code as string, invoice.id)}
                     title = 'Edit Invoice'
-                    className={styles['table-icon']}
+                    className={`${styles["table-icon"]} ${styles["table-view-icon"]}`}
                   >
                     <FormOutlined />
                   </Link>
@@ -384,7 +384,7 @@ const Invoice = () => {
                   <div
                     onClick={() => handleViewInvoiceClick(invoice.id)}
                     title='View Invoice'
-                    className={styles['table-icon']}
+                    className={`${styles["table-icon"]} ${styles["table-view-icon"]}`}
                   >
                     <EyeFilled />
                   </div>
@@ -393,7 +393,7 @@ const Invoice = () => {
             </Col>
             <Col>
               <div
-                className={styles["table-icon"]}
+               className={`${styles["table-icon"]} ${styles["table-status-icon"]}`}
                 onClick={(event) => event.stopPropagation()}
               >
                 <Dropdown

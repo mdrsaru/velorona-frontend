@@ -282,7 +282,7 @@ const EmployeeTimesheet = () => {
             className={styles['invoice-link']}
             title='View Detail'
             to={routes.detailTimesheet.path(authData?.company?.code as string, timesheet.id)}>
-            <EyeFilled className={styles['table-icon']}/>
+            <EyeFilled  className={`${styles["table-icon"]} ${styles["table-view-icon"]}`}/>
           </Link>
         )
       }

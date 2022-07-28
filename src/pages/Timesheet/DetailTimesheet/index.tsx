@@ -312,7 +312,7 @@ const DetailTimesheet = () => {
       input: {
         query: {
           company_id: authData?.company?.id,
-          created_by: authData?.user?.id,
+          // created_by: authData?.user?.id,
           timesheet_id: timesheet_id
         },
         paging: {

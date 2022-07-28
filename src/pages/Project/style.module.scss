@@ -96,9 +96,24 @@
   padding: 0 1rem 0 1rem;
 }
 .table-icon {
-  color: var(--gray-secondary);
   font-size: 1.5rem;
   margin-right: 1rem;
+}
+
+.table-active-status-icon{
+  color: var(--primary-green);
+}
+
+.table-inactive-status-icon{
+  color: var(--primary-red);
+}
+
+.table-archive-icon{
+  color: var(--primary-red);
+}
+
+.table-unarchive-icon ,.table-edit-icon{
+  color:var(--primary-blue)
 }
 .modal-message {
   padding: 3rem 0 0 0;

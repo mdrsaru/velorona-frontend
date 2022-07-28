@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button, Card, Col, Dropdown, Form, Input, Menu, message, Row, Select, Table } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import { gql, useMutation, useQuery } from "@apollo/client";
-import {  SearchOutlined,FormOutlined, CheckCircleFilled, DeleteOutlined } from "@ant-design/icons"
+import {  SearchOutlined,FormOutlined, CheckCircleFilled, DeleteOutlined,CloseCircleFilled } from "@ant-design/icons"
 
 // import SubMenu from "antd/lib/menu/SubMenu";
 
@@ -377,7 +377,16 @@ const Client = () => {
                   onClick={(e) => e.preventDefault()}
                   title='Change Status'
                 >
-                  <CheckCircleFilled />
+                   {record?.status === 'Active' ?
+                            <div className={styles["table-inactive-status-icon"]} >
+                            <CloseCircleFilled />
+                            </div>
+                            :
+                            <div className={styles["table-active-status-icon"]}>
+                              
+                              <CheckCircleFilled />
+                            </div>
+                          }
                 </div>
               </Dropdown>
             </div>
@@ -388,7 +397,7 @@ const Client = () => {
                 loggedInUser?.company?.code ?? "1",
                 record?.id ?? "1"
               )}
-              className={styles["table-icon"]}
+              className={`${styles["table-icon"]} ${styles["table-edit-icon"]}`}
               title='Edit Client'
             >
               <FormOutlined />
@@ -401,7 +410,7 @@ const Client = () => {
                       setClient(record);
                       setArchiveVisibility(true);
                     }}
-                  className={styles["table-icon"]}
+                    className={`${styles["table-icon"]} ${styles["table-archive-icon"]}`}
                   title='Archive Client'
                 >
                   <DeleteOutlined />
