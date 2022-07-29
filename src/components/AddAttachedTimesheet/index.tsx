@@ -6,18 +6,19 @@ import { CloseOutlined } from '@ant-design/icons';
 import constants from "../../config/constants";
 
 import styles from './styles.module.scss'
-import { gql, useLazyQuery, useMutation } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import { useState } from "react";
 import { GraphQLResponse } from "../../interfaces/graphql.interface";
 import { AttachedTimesheet, MutationAttachedTimesheetCreateArgs } from "../../interfaces/generated";
 import { notifyGraphqlError } from "../../utils/error";
-import { ATTACHED_TIMESHEET } from "../../pages/Timesheet/DetailTimesheet";
 
 interface IProps {
     visibility: boolean;
     setVisibility: any;
     data?: any;
-    timesheet_id: string;
+    timesheet_id?: string;
+    invoice_id?: string;
+    refetch?: any;
 }
 
 
@@ -50,23 +51,6 @@ const AttachNewTimesheetModal = (props: IProps) => {
         name: "",
     });
 
-    const [getAttachedTimesheet] = useLazyQuery(ATTACHED_TIMESHEET, {
-        fetchPolicy: "network-only",
-        nextFetchPolicy: "cache-first",
-        variables: {
-            input: {
-                query: {
-                    company_id: authData?.company?.id,
-                    created_by: authData?.user?.id as string,
-                    timesheet_id:props?.timesheet_id as string,
-                },
-                paging: {
-                    order: ['updatedAt:DESC']
-                }
-            }
-        }
-    })
-
     const [createAttachedTimesheet] = useMutation<GraphQLResponse<'AttachedTimesheetCreate', AttachedTimesheet>, MutationAttachedTimesheetCreateArgs>(ATTACH_TIMESHEET_CREATE, {
 
         onCompleted() {
@@ -74,20 +58,24 @@ const AttachNewTimesheetModal = (props: IProps) => {
                 content: `New attached timesheet is added successfully!`,
                 className: "custom-message",
             });
-            getAttachedTimesheet({
-                variables: {
-                    input: {
-                        query: {
-                            company_id: authData?.company?.id as string,
-                            created_by: authData?.user?.id as string,
-                            timesheet_id:props?.timesheet_id as string,
-                        },
-                        paging: {
-                            order: ['updatedAt:DESC']
+
+            if (props?.refetch) {
+                props?.refetch({
+                    variables: {
+                        input: {
+                            query: {
+                                company_id: authData?.company?.id as string,
+                                created_by: authData?.user?.id as string,
+                                timesheet_id: props?.timesheet_id as string,
+                                invoice_id: props?.invoice_id as string,
+                            },
+                            paging: {
+                                order: ['updatedAt:DESC']
+                            }
                         }
                     }
-                }
-            })
+                })
+            }
             props?.setVisibility(false)
 
         },
@@ -122,6 +110,7 @@ const AttachNewTimesheetModal = (props: IProps) => {
             company_id: authData?.company?.id,
             description: values?.description,
             timesheet_id: props?.timesheet_id,
+            invoice_id: props?.invoice_id,
         }
         if (fileData?.id) {
             data.attachment_id = fileData?.id

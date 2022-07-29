@@ -306,7 +306,7 @@ const DetailTimesheet = () => {
     form.resetFields();
   }
 
-  const { data: attachedTimesheetData } = useQuery(ATTACHED_TIMESHEET, {
+  const { data: attachedTimesheetData ,refetch:refetchAttachedTimesheet} = useQuery(ATTACHED_TIMESHEET, {
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
     variables: {
@@ -1013,7 +1013,8 @@ const DetailTimesheet = () => {
       <AttachNewTimesheetModal
         visibility={showAttachTimeEntry}
         setVisibility={setAttachTimeEntry}
-        timesheet_id={timesheet_id} />
+        timesheet_id={timesheet_id}
+        refetch={refetchAttachedTimesheet} />
 
 
       <EditAttachedTimesheet
