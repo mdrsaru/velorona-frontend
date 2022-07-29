@@ -108,7 +108,6 @@ const EmployeeDashboard = () => {
     useEffect(() => {
         const today = new Date();
         const split = today.toISOString().split('T')
-        console.log(split)
         setToday(split?.[0])
     }, [])
     const {

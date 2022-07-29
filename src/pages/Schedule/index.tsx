@@ -1,14 +1,22 @@
 import React, { useState } from "react";
-import { Card, Col, Row, Table } from "antd";
-
+import { Card, Col, message, Row, Table } from "antd";
+import { DeleteOutlined } from '@ant-design/icons';
 import styles from "./style.module.scss";
 import PageHeader from "../../components/PageHeader";
 import { useNavigate } from "react-router-dom";
 import routes from "../../config/routes";
 import { authVar } from "../../App/link";
-import { gql, useQuery } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import moment from "moment";
 import AddSchedule from "../../components/AddSchedule";
+import { MutationWorkscheduleDeleteArgs, Workschedule } from "../../interfaces/generated";
+import ModalConfirm from "../../components/Modal";
+
+
+import deleteImg from '../../assets/images/delete_btn.svg';
+import DeleteBody from "../../components/Delete";
+import { GraphQLResponse } from "../../interfaces/graphql.interface";
+import { notifyGraphqlError } from "../../utils/error";
 
 export const WORKSCHEDULE = gql`
 query Workschedule($input: WorkscheduleQueryInput!) {
@@ -33,6 +41,16 @@ query Workschedule($input: WorkscheduleQueryInput!) {
     }
   }
 }`
+
+export const WORKSCHEDULE_DELETE = gql`
+  mutation WorkscheduleDelete($input: DeleteInput!) {
+    WorkscheduleDelete(input: $input) {
+      id
+      startDate
+      endDate
+    }
+  }
+`;
 
 const Schedule = () => {
   const loggedInUser = authVar()
@@ -59,6 +77,41 @@ const Schedule = () => {
     }
   );
 
+  const [workscheduleDelete] = useMutation<GraphQLResponse<'WorkscheduleDelete', Workschedule>, MutationWorkscheduleDeleteArgs>(WORKSCHEDULE_DELETE, {
+    onCompleted() {
+      message.success({
+        content: `Workschedule is deleted successfully!`,
+        className: "custom-message",
+      });
+      setVisibility(false);
+    },
+    onError(err) {
+      setVisibility(false);
+      notifyGraphqlError(err);
+    },
+
+    update(cache) {
+      const normalizedId = cache.identify({ id: workschedule?.id, __typename: "Workschedule" });
+      cache.evict({ id: normalizedId });
+      cache.gc();
+    },
+  });
+
+  const [workschedule, setWorkschedule] = useState<any>()
+
+  const [visibility, setVisibility] = useState<boolean>(false);
+
+  const deleteWorkschedule = () => {
+    setVisibility(false);
+    workscheduleDelete({
+      variables: {
+        input: {
+          id: workschedule?.id as string,
+        },
+      },
+    });
+  };
+  
   const columns = [
     {
       title: "Time Period",
@@ -98,7 +151,26 @@ const Schedule = () => {
       title: "Status",
       dataIndex: "status"
     },
+    {
+      title: "Actions",
+      key: "actions",
+      render: (record: Workschedule) => (
+        <>
+          <span
+            title='Delete schedule'
+            className={`${styles["table-icon"]} ${styles["table-delete-icon"]}`}
+            onClick={() => {
+              setWorkschedule(record);
+              setVisibility(true);
+            }}
+          >
+            <DeleteOutlined />
+          </span>
+        </>
+      )
+    }
   ];
+
   return (
     <>
       <div className={styles['main-div']}>
@@ -128,6 +200,26 @@ const Schedule = () => {
         visibility={showSchedule}
         setVisibility={setScheduleShow}
         refetchWorkschedule={refetchWorkschedule} />
+
+      <ModalConfirm
+        visibility={visibility}
+        setModalVisibility={visibility}
+        imgSrc={deleteImg}
+        okText={'Delete'}
+        closable
+        modalBody={
+          <DeleteBody
+            title={
+              <>
+                Are you sure you want to delete it?{" "}
+                {/* <strong> {project?.name}</strong> */}
+              </>
+            }
+            subText={`All the data associated with this will be deleted permanently.`}
+          />
+        }
+        onOkClick={deleteWorkschedule}
+      />
     </>
   )
 }

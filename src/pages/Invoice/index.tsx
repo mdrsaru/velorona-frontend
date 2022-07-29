@@ -1,18 +1,18 @@
 import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { gql, useQuery, useMutation } from '@apollo/client';
-import {  SearchOutlined, CheckCircleFilled, FormOutlined, EyeFilled } from '@ant-design/icons';
+import { gql, useQuery, useMutation, useLazyQuery } from '@apollo/client';
+import { SearchOutlined, CheckCircleFilled, FormOutlined, EyeFilled, PlusCircleFilled } from '@ant-design/icons';
 import { Card, Col, Dropdown, Menu, Row, Table, message, Modal, Form, Select, Button, Input } from 'antd';
 
 import filterImg from "../../assets/images/filter.svg"
 
 import { authVar } from '../../App/link';
-import constants,{invoice_status} from '../../config/constants';
+import constants, { invoice_status } from '../../config/constants';
 import routes from '../../config/routes';
 import { notifyGraphqlError } from '../../utils/error';
 
-import { 
+import {
   Invoice as IInvoice,
   InvoiceQueryInput,
   InvoiceStatus,
@@ -27,6 +27,9 @@ import Status from '../../components/Status';
 import InvoiceViewer from '../../components/InvoiceViewer';
 import styles from './style.module.scss';
 import { debounce } from 'lodash';
+import AttachmentModal from '../../components/AttachmentsModal/index';
+import AttachNewTimesheetModal from '../../components/AddAttachedTimesheet';
+import { ATTACHED_TIMESHEET } from '../Timesheet/DetailTimesheet';
 
 const INVOICE = gql`
   query Invoice($input: InvoiceQueryInput!) {
@@ -40,6 +43,7 @@ const INVOICE = gql`
         totalAmount
         status
         invoiceNumber
+        timesheet_id
         client {
           name
           invoicingEmail
@@ -57,7 +61,7 @@ const INVOICE_STATUS_UPDATE = gql`
     }
   }
 `;
-const {Option} = Select;
+const { Option } = Select;
 const Invoice = () => {
   const loggedInUser = authVar();
 
@@ -83,7 +87,10 @@ const Invoice = () => {
     filter: false,
   });
 
+  const [invoiceId, setInvoiceId] = useState('');
+  const [showAttachment, setShowAttachment] = useState(false)
 
+  const [showAttachTimeEntry, setAttachTimeEntry] = useState(false);
   const [updateStatus, { loading: updateLoading }] = useMutation<
     GraphQLResponse<'InvoiceUpdate', IInvoice>,
     MutationInvoiceUpdateArgs
@@ -116,6 +123,22 @@ const Invoice = () => {
     variables: {
       input,
     }
+  });
+
+  const [ attachments,{ data: attachmentsData }] = useLazyQuery(ATTACHED_TIMESHEET, {
+    fetchPolicy: "network-only",
+    nextFetchPolicy: "cache-first",
+    variables: {
+      input: {
+        query: {
+          company_id: loggedInUser?.company?.id,
+          invoice_id: invoiceId
+        },
+        paging: {
+          order: ["updatedAt:DESC"],
+        },
+      },
+    },
   });
 
   const changeStatus = (id: string, status: InvoiceStatus) => {
@@ -152,6 +175,30 @@ const Invoice = () => {
       invoice_id: undefined,
     });
   }
+
+  const handleViewAttachmentClick = (invoice_id: string) => {
+    setShowAttachment(!showAttachment)
+    setInvoiceId(invoice_id)
+
+    attachments({
+      variables: {
+        input: {
+            query: {
+                company_id: loggedInUser?.company?.id as string,
+                invoice_id: invoice_id as string,
+            },
+            paging: {
+                order: ['updatedAt:DESC']
+            }
+        }
+    }
+    })
+  }
+  const handleAddAttachment = (invoice_id: string) => {
+    setAttachTimeEntry(!showAttachTimeEntry)
+    setInvoiceId(invoice_id)
+  }
+
 
   const refetchInvoices = () => {
 
@@ -267,7 +314,8 @@ const Invoice = () => {
   const columns = [
     {
       title: 'Invoice Number',
-      dataIndex: 'invoiceNumber'
+      dataIndex: 'invoiceNumber',
+      width: '10%',
     },
     {
       title: 'Client Name',
@@ -298,84 +346,51 @@ const Invoice = () => {
         return <Status status={status} />
       }
     },
+
+    {
+      title: 'Attachments',
+      render: (invoice: IInvoice) => {
+        return (
+          <Row>
+            <Col>
+              {
+
+                <div
+                  onClick={() => handleViewAttachmentClick(invoice.id)}
+                  title='View Invoice'
+                  className={`${styles["table-icon"]} ${styles["table-view-attachment-icon"]}`}
+                >
+                  <EyeFilled />
+                </div>
+              }
+            </Col>
+            <Col>
+              {
+                invoice.status === 'Pending' && (
+                  <div
+                    onClick={() => handleAddAttachment(invoice.id)}
+                    title='Add Attachment'
+                    className={`${styles["table-icon"]} ${styles["table-add-icon"]}`}
+                  >
+                    <PlusCircleFilled />
+                  </div>
+                )
+              }</Col>
+          </Row>
+        )
+      }
+    },
     {
       title: 'Actions',
       render: (invoice: IInvoice) => {
         return (
-          // <div className={styles['actions']} onClick={(event) => event.stopPropagation()}>
-          //   <Dropdown
-          //     overlay={
-          //       <>
-          //         <Menu>
-          //           <Menu.Item key="edit">
-          //             {
-          //               invoice.status === 'Pending' ? (
-          //                 <Link
-          //                   to={routes.editInvoice.path(loggedInUser?.company?.code as string, invoice.id)}
-          //                 >
-          //                   Edit Invoice 
-          //                 </Link>
-          //               ): (
-          //                 <div 
-          //                   onClick={() => handleViewInvoiceClick(invoice.id)}
-          //                 >
-          //                   View Invoice
-          //                 </div>
-          //               )
-          //             }
-          //           </Menu.Item>
-
-          //           <Menu.SubMenu title="Change status" key="mainMenu">
-          //             <Menu.Item 
-          //               key="Pending"
-          //               onClick={() => changeStatus(invoice.id, InvoiceStatus.Pending)}
-          //             >
-          //               Pending
-          //             </Menu.Item>
-
-          //             <Menu.Divider />
-
-          //             <Menu.Item 
-          //               key="Received"
-          //               onClick={() => changeStatus(invoice.id, InvoiceStatus.Received)}
-          //             >
-          //               Received
-          //             </Menu.Item>
-
-          //             <Menu.Divider />
-
-          //             {
-          //               invoice.status === InvoiceStatus.Pending && (
-          //                 <Menu.Item 
-          //                   key="Sent"
-          //                   onClick={() => changeStatus(invoice.id, InvoiceStatus.Sent)}
-          //                 >
-          //                   Sent
-          //                 </Menu.Item>
-          //               )
-          //             }
-          //           </Menu.SubMenu>
-          //         </Menu>
-          //       </>
-          //     }
-          //     trigger={['click']}
-          //     placement="bottomRight"
-          //   >
-          //     <div
-          //       className="ant-dropdown-link"
-          //       onClick={e => e.preventDefault()}
-          //       style={{ paddingLeft: '1rem' }}>
-          //       <MoreOutlined />
-          //     </div>
-          //   </Dropdown>
-          // </div>
           <Row>
             <Col>
               {
                 invoice.status === 'Pending' ? (
                   <Link
                     to={routes.editInvoice.path(loggedInUser?.company?.code as string, invoice.id)}
-                    title = 'Edit Invoice'
+                    title='Edit Invoice'
                     className={`${styles["table-icon"]} ${styles["table-view-icon"]}`}
                   >
                     <FormOutlined />
@@ -393,7 +408,7 @@ const Invoice = () => {
             </Col>
             <Col>
               <div
-               className={`${styles["table-icon"]} ${styles["table-status-icon"]}`}
+                className={`${styles["table-icon"]} ${styles["table-status-icon"]}`}
                 onClick={(event) => event.stopPropagation()}
               >
                 <Dropdown
@@ -485,7 +500,7 @@ const Invoice = () => {
               loading={loading || updateLoading}
               dataSource={dataSource}
               columns={columns}
-              rowKey={(record => record.id)} 
+              rowKey={(record => record.id)}
               pagination={{
                 current: pagingInput.currentPage,
                 onChange: changePage,
@@ -509,6 +524,19 @@ const Invoice = () => {
           invoiceViewer.invoice_id && <InvoiceViewer id={invoiceViewer.invoice_id} />
         }
       </Modal>
+
+      <AttachmentModal
+        visibility={showAttachment}
+        setVisibility={setShowAttachment}
+        attachment ={attachmentsData?.AttachedTimesheet?.data}
+      />
+
+
+      <AttachNewTimesheetModal
+        visibility={showAttachTimeEntry}
+        setVisibility={setAttachTimeEntry}
+        invoice_id={invoiceId} 
+        refetch = {attachments}/>
     </div>
   )
 }

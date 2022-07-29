@@ -24,7 +24,6 @@ import { USER_UPDATE, USER } from '..'
 import { ROLES } from '../../Role'
 import { CHANGE_PROFILE_IMAGE } from '../NewEmployee'
 
-import { STATE_CITIES, USA_STATES } from '../../../utils/cities'
 import { useState } from 'react'
 import styles from '../style.module.scss'
 import { authVar } from '../../../App/link'
@@ -199,10 +198,6 @@ const EditEmployee = () => {
     }
   };
 
-  const [cities, setCountryCities] = useState<string[]>([]);
-  const setState = (data: string) => {
-    setCountryCities(STATE_CITIES[data]);
-  };
 
   return (
     <div className={styles["main-div"]}>
@@ -223,6 +218,7 @@ const EditEmployee = () => {
           <Form
             form={form}
             layout="vertical"
+            scrollToFirstError
             onFinish={onSubmitForm}
             initialValues={{
               email: userData?.User?.data[0]?.email ?? "",
