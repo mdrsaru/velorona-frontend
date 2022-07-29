@@ -53,7 +53,7 @@ const EmployeeSchedule = () => {
       variables: {
         input: {
           paging: {
-            order: ["updatedAt:DESC"],
+            order: ["schedule_date:ASC"],
           },
           query: {
             user_id: loggedInUser?.user?.id
