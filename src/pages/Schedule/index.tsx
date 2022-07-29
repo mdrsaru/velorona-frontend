@@ -171,24 +171,6 @@ const Schedule = () => {
     }
   ];
 
-  // const DeleteBody = () => {
-  //   return (
-  //     <div className={styles["modal-message"]}>
-  //       <div>
-  //         <img src={deleteImg} alt="confirm" />
-  //       </div>
-  //       <br />
-  //       <p>
-  //         Are you sure you want to delete
-  //         <strong>Insight Workshop Pvt. Ltd?</strong>
-  //       </p>
-  //       <p className={styles["warning-text"]}>
-  //         All the data associated with the employee will be deleted permanently.
-  //       </p>
-  //     </div>
-  //   );
-  // };
-
   return (
     <>
       <div className={styles['main-div']}>
