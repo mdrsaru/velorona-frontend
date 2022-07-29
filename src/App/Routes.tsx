@@ -178,6 +178,7 @@ const _Routes = () => {
                   allowedRoles={[
                     constants.roles.CompanyAdmin,
                     constants.roles.SuperAdmin,
+                    constants.roles.TaskManager,
                   ]}
                 >
                   <Suspense fallback={<RouteLoader />}>

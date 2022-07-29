@@ -404,7 +404,7 @@ const InvoiceForm = (props: IProps) => {
                               name={[name, 'description']}
                               {...restField}
                             >
-                              <Input disabled={isTimesheet} />
+                              <Input />
                             </Form.Item>
                           </td>
 
@@ -418,7 +418,7 @@ const InvoiceForm = (props: IProps) => {
                               }]}
                               {...restField}
                             >
-                              <InputNumber min={0} autoComplete="off" disabled={isTimesheet} onChange={() => onHourRateChange(name)} />
+                              <InputNumber min={0} autoComplete="off" onChange={() => onHourRateChange(name)} />
                             </Form.Item>
                           </td>
 
@@ -432,7 +432,7 @@ const InvoiceForm = (props: IProps) => {
                                 message: 'Please enter rate'
                               }]}
                             >
-                              <Input type="number" prefix="$" min={0} autoComplete="off" disabled={isTimesheet} onChange={() => onHourRateChange(name)} />
+                              <Input type="number" prefix="$" min={0} autoComplete="off" onChange={() => onHourRateChange(name)} />
                             </Form.Item>
                           </td>
 
