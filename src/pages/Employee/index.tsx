@@ -55,8 +55,6 @@ export const USER = gql`
         fullName 
         }
         manager_id
-     
-
         archived
         avatar_id
         type
