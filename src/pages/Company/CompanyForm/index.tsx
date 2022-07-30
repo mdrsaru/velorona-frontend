@@ -74,7 +74,7 @@ const CompanyForm = (props: IProps) => {
     }
   }, [props.company?.logo])
 
-  const [createCompany] = useMutation<
+  const [createCompany, { loading: creatingCompany }] = useMutation<
     GraphQLResponse<'CompanyCreate', Company>,
     MutationCompanyCreateArgs
   >(COMPANY_CREATE, {
@@ -87,7 +87,7 @@ const CompanyForm = (props: IProps) => {
     onError: notifyGraphqlError,
   });
 
-  const [updateCompany] = useMutation<
+  const [updateCompany, { loading: updatingCompany }] = useMutation<
     GraphQLResponse<'CompanyUpdate', Company>,
     MutationCompanyUpdateArgs
   >(COMPANY_UPDATE, {
@@ -238,7 +238,7 @@ const CompanyForm = (props: IProps) => {
         <Col xs={24} sm={24} md={12}>
           <Form.Item
             name="status"
-            label="Company Status"
+            label="Select company status"
             rules={[
               {
                 required: true,
@@ -246,7 +246,7 @@ const CompanyForm = (props: IProps) => {
               },
             ]}
           >
-            <Select placeholder="Active">
+            <Select placeholder="Company Status">
               <Option value="Active">Active</Option>
               <Option value="Inactive">In Active</Option>
             </Select>
@@ -431,7 +431,7 @@ const CompanyForm = (props: IProps) => {
               <Button type="default" htmlType="button" onClick={() => navigate(routes.companyAdmin.path)}>
                 Cancel
               </Button>
-              <Button type="primary" htmlType="submit">
+              <Button type="primary" htmlType="submit" loading={creatingCompany || updatingCompany}>
                 { props.company ? 'Save': 'Add Company' }
               </Button>
             </Space>
