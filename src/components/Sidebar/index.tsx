@@ -38,7 +38,7 @@ const Sidebar = (props: any) => {
 
   useEffect(() => {
     let path = ''
-    if (location?.pathname === '/' + params?.id) {
+    if (location?.pathname === '/' + params?.company) {
       path = routes.companyDashboard.key
     } else if (params?.id && location?.pathname !== '/' + params?.id) {
       path = location?.pathname?.split('/').slice(2, 3).toString()

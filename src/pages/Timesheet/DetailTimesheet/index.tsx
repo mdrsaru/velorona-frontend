@@ -222,7 +222,7 @@ const DetailTimesheet = () => {
   const [form] = Form.useForm()
   const [commentDetails, setCommentDetails] = useState<{
     showModal: boolean;
-    commentType: 'Reject' | 'UnlockApproved' | 'UnlockRejected' | undefined;
+    commentType: 'Reject' | 'UnlockApproved' | 'UnlockRejected' | 'UndoSubmit' | undefined;
   }>({
     showModal: false,
     commentType: undefined,
@@ -643,7 +643,7 @@ const DetailTimesheet = () => {
     })
   }
 
-  const isSubmitted:any =timeSheetDetail?.Timesheet?.data?.[0]?.isSubmitted;
+  const isSubmitted:any = timeSheetDetail?.Timesheet?.data?.[0]?.isSubmitted;
 
   return (
     <>
@@ -684,8 +684,32 @@ const DetailTimesheet = () => {
                 {
                   !!entriesByStatus.pending?.length &&
                   <div className={styles['timesheet-section']}>
-                    <div className={styles['timesheet-status']}>
-                      Unapproved Timesheet
+                    <div
+                      className={
+                        _cs([styles['timesheet-status'], styles['unapproved-status']])
+                      }
+                    >
+                      <div>
+                        Unapproved Timesheet
+                      </div>
+
+                      {
+                        timesheetDetail?.isSubmitted && checkRoles({
+                          expectedRoles: [constants.roles.CompanyAdmin, constants.roles.TaskManager],
+                          userRoles: roles,
+                        }) && (
+                          <div className={styles['action']}>
+                            <span 
+                              onClick={() => setCommentDetails({
+                                showModal: true,
+                                commentType: 'UndoSubmit',
+                              })}
+                            >
+                              Unlock
+                            </span>
+                          </div>
+                        )
+                      }
                     </div>
 
                     <TimeEntryDetail
@@ -698,6 +722,7 @@ const DetailTimesheet = () => {
                       deleteAction={deletePendingGroups}
                       needAction
                       timesheet_id={timesheet_id}
+                      isTimesheetSubmitted={isSubmitted}
                     />
 
                     {

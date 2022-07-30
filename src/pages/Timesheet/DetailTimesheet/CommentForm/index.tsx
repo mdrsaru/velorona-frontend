@@ -9,6 +9,8 @@ import {
   MutationTimesheetCommentCreateArgs,
   MutationTimeEntriesUnlockArgs,
   TimesheetCommentPagingResult,
+  Timesheet,
+  MutationTimesheetSubmitUndoArgs,
 } from '../../../../interfaces/generated';
 
 const COMMENT = gql`
@@ -39,18 +41,24 @@ const TIME_ENTRIES_UNLOCK = gql`
   }
 `;
 
+const TIMESHEET_SUBMIT_UNDO = gql`
+  mutation TimesheetSubmitUndo($input: TimesheetSubmitInput!) {
+    TimesheetSubmitUndo(input: $input) {
+      id
+    }
+  }
+`;
+
 interface IProps {
   timesheet_id: string;
   company_id: string,
   user_id: string;
-  commentType: 'Reject' | 'UnlockApproved' | 'UnlockRejected' | undefined;
+  commentType: 'Reject' | 'UnlockApproved' | 'UnlockRejected' | 'UndoSubmit' | undefined;
   onHideModal: () => void;
   refetchTimesheet: any;
 }
 
 const CommentForm = (props: IProps) => {
-
-  const statusToUnlock = props.commentType === 'UnlockApproved' ? 'Approved' : 'Rejected';
 
   const [createComment, { loading: creatingComment }] = useMutation<
     GraphQLResponse<'TimesheetCommentCreate', TimesheetComment>,
@@ -108,27 +116,68 @@ const CommentForm = (props: IProps) => {
     }
   })
 
-  const onFinish = (values: any) => {
-    unlockTimeEntries({
-      variables: {
-        input: {
-          company_id: props.company_id,
-          timesheet_id: props.timesheet_id,
-          statusToUnlock,
-          user_id: props.user_id
-        }
+  const [undoTimesheetSubmit, { loading: loadingUndo }] = useMutation<
+    GraphQLResponse<'TimesheetSubmitUndo', Timesheet>,
+    MutationTimesheetSubmitUndoArgs
+  >(TIMESHEET_SUBMIT_UNDO, {
+    onError: notifyGraphqlError,
+    onCompleted(response) {
+      if(response.TimesheetSubmitUndo) {
+        props.refetchTimesheet();
       }
-    })
+    }
+  })
 
-    createComment({
-      variables: {
-        input: {
-          comment: values.comment,
-          company_id: props.company_id,
-          timesheet_id: props.timesheet_id,
+  const onFinish = (values: any) => {
+    let statusToUnlock: string | undefined;
+    if(props.commentType === 'UnlockApproved') {
+      statusToUnlock = 'Approved';
+    } else if(props.commentType === 'UnlockRejected') {
+      statusToUnlock = 'Rejected';
+    }
+    console.log(props.commentType, statusToUnlock, 'asdkj')
+
+    if(statusToUnlock) {
+      unlockTimeEntries({
+        variables: {
+          input: {
+            company_id: props.company_id,
+            timesheet_id: props.timesheet_id,
+            statusToUnlock,
+            user_id: props.user_id
+          }
         }
-      }
-    })
+      }).then((response) => {
+        if(response.data?.TimeEntriesUnlock) {
+          _createComment(values);
+        }
+      })
+    } else if(props.commentType === 'UndoSubmit') {
+      undoTimesheetSubmit({
+        variables: {
+          input: {
+            id: props.timesheet_id,
+            company_id: props.company_id,
+          }
+        }
+      }).then((response) => {
+        if(response.data?.TimesheetSubmitUndo) {
+          _createComment(values);
+        }
+      })
+    }
+
+    function _createComment(values: any) {
+      createComment({
+        variables: {
+          input: {
+            comment: values.comment,
+            company_id: props.company_id,
+            timesheet_id: props.timesheet_id,
+          }
+        }
+      })
+    }
   }
 
   return (
@@ -144,7 +193,7 @@ const CommentForm = (props: IProps) => {
         <Row justify="end">
           <Space>
             <Button onClick={props.onHideModal}>Cancel</Button>
-            <Button type="primary" htmlType="submit" loading={creatingComment || unlockingTimeEntries}>Submit</Button>
+            <Button type="primary" htmlType="submit" loading={creatingComment || unlockingTimeEntries || loadingUndo}>Submit</Button>
           </Space>
         </Row>
       </Form>

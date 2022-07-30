@@ -90,7 +90,7 @@ const routes = {
     path: (id: string | undefined) => `/${id}`,
     component: lazy(() => import('../pages/Company')),
     name: 'Company',
-    key: 'company'
+    key: 'dashboard'
   },
   addCompany: {
     childPath: ':add',

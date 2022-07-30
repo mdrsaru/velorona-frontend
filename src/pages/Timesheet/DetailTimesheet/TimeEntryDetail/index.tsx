@@ -46,6 +46,7 @@ interface IProps {
   client_id: string;
   refetch: any;
   timesheet_id: string;
+  isTimesheetSubmitted?: boolean;
 }
 
 const TimeEntryDetails = (props: IProps) => {
@@ -182,7 +183,7 @@ const TimeEntryDetails = (props: IProps) => {
                           key={timeIndex}
                         >
                           {
-                            (['Approved', 'Rejected'].includes(props.status) || canApproveReject) ? (
+                            (['Approved', 'Rejected'].includes(props.status) || canApproveReject || props.isTimesheetSubmitted) ? (
                               <div className={styles['entry-duration']}>
                                 { entries ? getTimeFormat(duration) : '-' }
                               </div>
@@ -214,7 +215,7 @@ const TimeEntryDetails = (props: IProps) => {
                     props?.needAction && (
                       <td>
                         {
-                          canDelete && ['Pending'].includes(props.status) && (
+                          !props.isTimesheetSubmitted && canDelete && ['Pending'].includes(props.status) && (
                             <CloseCircleOutlined
                               className={styles['delete-entry']}
                               onClick={() => onDeleteClick(group)}
