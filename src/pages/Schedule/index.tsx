@@ -145,7 +145,11 @@ const Schedule = () => {
     },
     {
       title: "Payroll Usage Hours",
-      dataIndex: "payrollUsageHours"
+      dataIndex: "payrollUsageHours",
+      render: (payrollUsage: number) => {
+        const hour = ((payrollUsage ?? 0) / 3600).toFixed(2)
+        return hour
+      }
     },
     {
       title: "Status",
