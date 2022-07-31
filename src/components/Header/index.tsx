@@ -154,7 +154,7 @@ const TopHeader = (props: any) => {
             query: {
               company_id: company_id,
               afterStart,
-              entryType: loggedInUser?.user?.type,
+              entryType: loggedInUser?.user?.entryType,
             },
             paging: {
               order: ['startTime:DESC']
@@ -172,7 +172,7 @@ const TopHeader = (props: any) => {
             query: {
               company_id: authData?.company?.id,
               afterStart,
-              entryType: authData?.user?.type,
+              entryType: authData?.user?.entryType,
             },
             paging: {
               order: ['startTime:DESC']
@@ -284,7 +284,7 @@ const TopHeader = (props: any) => {
 
       <div className={styles['header-right']}>
         {
-          loggedInUser?.user?.type === 'CICO' && (
+          loggedInUser?.user?.entryType === 'CICO' && (
             <div className={styles['cico']}>
               {
                 isRunning ? (

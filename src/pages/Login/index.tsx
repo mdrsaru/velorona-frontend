@@ -22,7 +22,7 @@ const LOGIN = gql`
         id
         token
         refreshToken
-        type
+        entryType
         company {
           id
           companyCode
@@ -62,7 +62,7 @@ const Login = () => {
     GraphQLResponse<'Login', LoginResponse>,
     MutationLoginArgs
   >(LOGIN, {
-    onCompleted: (response: any) => {
+    onCompleted: (response) => {
       message.success({ content: `LoggedIn successfully!`, key, className: 'custom-message' })
       const loginData = response?.Login;
       const roles = loginData?.roles?.map((role: any) => role?.name);
@@ -71,7 +71,7 @@ const Login = () => {
         user: {
           id: loginData?.id,
           roles,
-          type: loginData?.type,
+          entryType: loginData?.entryType,
         },
         company: {
           id: loginData?.company?.id ?? '',

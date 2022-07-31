@@ -159,7 +159,7 @@ const Timesheet = () => {
     currentPage: 1,
   });
   const company_id = authData?.company?.id;
-  const entryType = authData?.user?.type;
+  const entryType = authData?.user?.entryType;
   const afterStart = moment().startOf('day').format('YYYY-MM-DDTHH:mm:ss');
 
   const columns = [
@@ -463,7 +463,7 @@ const Timesheet = () => {
         <div className={styles['site-card-wrapper']}>
           {/* TimeEntry Form */}
           {
-            authData?.user?.type !== 'CICO' && (
+            authData?.user?.entryType !== 'CICO' && (
               <Card
                 bordered={false}
                 className={styles['form-row']}>

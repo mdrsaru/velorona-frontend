@@ -63,7 +63,7 @@ function App() {
             user: {
               id: response?.data?._id ?? null,
               roles: response?.data?.roles?.map((role: any) => role.name),
-              type: response?.data?.type,
+              entryType: response?.data?.entryType,
             },
             company: {
               id: response?.data?.company?.id ?? null,

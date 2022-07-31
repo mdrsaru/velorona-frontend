@@ -243,7 +243,7 @@ const EditEmployee = () => {
                 "2022-01-01T00:00:00.410Z",
                 dateFormat
               ),
-              type: userData?.User?.data[0]?.type,
+              entryType: userData?.User?.data[0]?.entryType,
               timesheet_attachment: userData?.User?.data[0]?.timesheet_attachment ? 'Mandatory' : 'Optional',
               state: userData?.User?.data[0]?.address?.state ?? "",
               city: userData?.User?.data[0]?.address?.city ?? "",
@@ -518,11 +518,11 @@ const EditEmployee = () => {
                     md={12}
                     lg={12}>
                     <Form.Item
-                      name="type"
+                      name="entryType"
                       label="Entry Type"
                       rules={[{
                         required: true,
-                        message: 'Please select the user type'
+                        message: 'Please select the entry type'
                       }]}>
                       <Select placeholder="Select status" disabled={authData?.user?.id === params.eid ? true : false}>
                         <Option value={EntryType.Timesheet}>{EntryType.Timesheet}</Option>

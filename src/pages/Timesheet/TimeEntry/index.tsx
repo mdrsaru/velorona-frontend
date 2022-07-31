@@ -43,7 +43,7 @@ const Length = (props: ILengthProps) => (
 const TimeEntry = (props: IProps) => {
   const { length, timeEntry, clickPlayButton, rowClassName, minStartTime, maxEndTime } = props
   const { data: authData } = useQuery(AUTH)
-  const entryType = authData?.AuthUser?.user?.type;
+  const entryType = authData?.AuthUser?.user?.entryType;
 
   return (
     <Row className={styles[rowClassName]}>

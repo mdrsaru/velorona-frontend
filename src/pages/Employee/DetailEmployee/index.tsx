@@ -308,7 +308,7 @@ const DetailEmployee = () => {
               <div>
                 <div>Entry Type</div>
                 <span className={styles.detailValue}>
-                  {userData?.User?.data[0]?.type ?? 'N/A'}
+                  {userData?.User?.data[0]?.entryType ?? 'N/A'}
                 </span>
               </div>
 

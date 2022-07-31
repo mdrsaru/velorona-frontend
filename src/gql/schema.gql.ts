@@ -14,7 +14,7 @@ export const typeDefs = gql`
   type User {
     id: String
     roles: [String]
-    type: String
+    entryType: String
   }
 
   type Avatar {

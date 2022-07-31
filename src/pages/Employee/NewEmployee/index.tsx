@@ -223,7 +223,7 @@ const NewEmployee = () => {
           manager_id: values.manager_id,
           company_id: authData?.company?.id as string,
           roles: [values?.roles],
-          type: values?.type,
+          entryType: values?.entryType,
           startDate: values?.startDate,
           endDate: values?.endDate,
           timesheet_attachment: values?.timesheet_attachment,
@@ -547,11 +547,11 @@ const NewEmployee = () => {
               md={12}
               lg={12}>
               <Form.Item
-                name="type"
+                name="entryType"
                 label="Entry Type"
                 rules={[{
                   required: true,
-                  message: 'Please select the user type'
+                  message: 'Please select the entry type'
                 }]}>
                 <Select placeholder="Select status">
                   <Option value={EntryType.Timesheet}>{EntryType.Timesheet}</Option>

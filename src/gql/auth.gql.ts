@@ -8,16 +8,16 @@ export const AUTH = gql`
       user {
         id
         roles
-        type
+        entryType
       }
       company {
         code
         id
         name
         logo{
-        id 
-        name 
-        url 
+          id 
+          name 
+          url 
         }
       }
       avatar {

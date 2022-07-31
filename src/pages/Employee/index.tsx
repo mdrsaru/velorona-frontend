@@ -57,7 +57,7 @@ export const USER = gql`
         manager_id
         archived
         avatar_id
-        type
+        entryType
         startDate
         endDate
         timesheet_attachment

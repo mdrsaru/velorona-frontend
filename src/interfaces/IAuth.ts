@@ -26,7 +26,7 @@ export interface IToken {
 export interface IAuthUser {
   id: string | null;
   roles: string[];
-  type?: string | null;
+  entryType?: string | null;
 }
 
 export interface ICompanyLogo{
