@@ -15,13 +15,11 @@ import { ArrowLeftOutlined } from "@ant-design/icons";
 import moment from "moment";
 import type { UploadProps } from "antd";
 
-import constants from '../../../config/constants'
+import constants, { roles_user } from '../../../config/constants'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery } from '@apollo/client'
 import { notifyGraphqlError } from '../../../utils/error'
-import { IRole } from '../../../interfaces/IRole'
 import { USER_UPDATE, USER } from '..'
-import { ROLES } from '../../Role'
 import { CHANGE_PROFILE_IMAGE } from '../NewEmployee'
 
 import { useState } from 'react'
@@ -91,9 +89,7 @@ const EditEmployee = () => {
     GraphQLResponse<'ChangeProfilePicture', User>,
     MutationChangeProfilePictureArgs
   >(CHANGE_PROFILE_IMAGE);
-  const { data: roles } = useQuery(ROLES, {
-    fetchPolicy: "cache-first",
-  });
+
   const { data: userData, loading: userLoading } = useQuery(USER, {
     variables: {
       input: {
@@ -181,8 +177,10 @@ const EditEmployee = () => {
         } else if (data !== "upload") {
           formData[data] = values[data];
         }
+        else if (values?.roles) {
+          formData["roles"] = [values?.roles]
+        }
       }
-
       userUpdate({
         variables: {
           input: formData,
@@ -197,7 +195,46 @@ const EditEmployee = () => {
       navigate(-1);
     }
   };
+  const [role, setRole] = useState('')
+  const handleChange = (value: any) => {
+    setRole(value)
+  }
 
+  let initialValues: any;
+  if(userData) {
+    const user = userData?.User?.data?.[0];
+    initialValues = {
+      email: user?.email ?? "",
+      firstName: user?.firstName ?? "",
+      middleName: user?.middleName ?? "",
+      lastName: user?.lastName ?? "",
+      phone: user?.phone ?? "",
+      roles: user?.roles[0]?.name ?? "",
+      status: user?.status ?? "",
+      manager_id: user?.manager_id ?? "",
+      country:
+        user?.address?.country ?? "",
+      streetAddress:
+        user?.address?.streetAddress ?? "",
+      startDate: moment(
+        user?.startDate ?? "2022-01-01T00:00:00.410Z",
+        dateFormat
+      ),
+      endDate: moment(
+        user?.endDate ??
+        "2022-12-30T00:00:00.410Z",
+        dateFormat
+      ),
+      entryType: user?.entryType,
+      timesheet_attachment: user?.timesheet_attachment ? 'Mandatory' : 'Optional',
+      state: user?.address?.state ?? "",
+      city: user?.address?.city ?? "",
+      file: user?.avatar?.url,
+      zipcode: user?.address?.zipcode ?? "",
+      aptOrSuite: user?.address?.aptOrSuite ?? "",
+      payRate: user?.record?.payRate ?? "",
+    }
+  }
 
   return (
     <div className={styles["main-div"]}>
@@ -220,38 +257,7 @@ const EditEmployee = () => {
             layout="vertical"
             scrollToFirstError
             onFinish={onSubmitForm}
-            initialValues={{
-              email: userData?.User?.data[0]?.email ?? "",
-              firstName: userData?.User?.data[0]?.firstName ?? "",
-              middleName: userData?.User?.data[0]?.middleName ?? "",
-              lastName: userData?.User?.data[0]?.lastName ?? "",
-              phone: userData?.User?.data[0]?.phone ?? "",
-              roles: userData?.User?.data[0]?.roles[0]?.id ?? "",
-              status: userData?.User?.data[0]?.status ?? "",
-              manager_id: userData?.User?.data[0]?.manager_id ?? "",
-              country:
-                userData?.User?.data[0]?.address?.country ?? "",
-              streetAddress:
-                userData?.User?.data[0]?.address?.streetAddress ?? "",
-              startDate: moment(
-                userData?.User?.data[0]?.endDate ??
-                "2022-01-01T00:00:00.410Z",
-                dateFormat
-              ),
-              endDate: moment(
-                userData?.User?.data[0]?.startDate ??
-                "2022-01-01T00:00:00.410Z",
-                dateFormat
-              ),
-              entryType: userData?.User?.data[0]?.entryType,
-              timesheet_attachment: userData?.User?.data[0]?.timesheet_attachment ? 'Mandatory' : 'Optional',
-              state: userData?.User?.data[0]?.address?.state ?? "",
-              city: userData?.User?.data[0]?.address?.city ?? "",
-              file: userData?.User?.data[0]?.avatar?.url,
-              zipcode: userData?.User?.data[0]?.address?.zipcode ?? "",
-              aptOrSuite: userData?.User?.data[0]?.address?.aptOrSuite ?? "",
-              payRate: userData?.User?.data[0]?.record?.payRate ?? "",
-            }}
+            initialValues={initialValues}
           >
             <Row gutter={[24, 0]}>
               <Col className={styles["form-header"]}>
@@ -320,8 +326,8 @@ const EditEmployee = () => {
                       message: "Please input your phone number!",
                     },
                     {
-                      max: 10,
-                      message: "Phone number should be less than 10 digits",
+                      max: 11,
+                      message: "Phone number should be less than 11 digits",
                     },
                   ]}
                 >
@@ -427,13 +433,12 @@ const EditEmployee = () => {
                         },
                       ]}
                     >
-                      <Select placeholder="Employee" disabled={authData?.user?.id === params.eid ? true : false}>
-                        {roles &&
-                          roles?.Role?.data.map((role: IRole, index: number) => (
-                            <Option value={role?.id} key={index}>
-                              {role?.name}
-                            </Option>
-                          ))}
+                      <Select placeholder="Employee" disabled={authData?.user?.id === params.eid ? true : false} onChange={handleChange}>
+                        {roles_user?.map((role: any, index: number) => (
+                          <Option value={role?.value} key={index}>
+                            {role?.name}
+                          </Option>
+                        ))}
                       </Select>
                     </Form.Item>
                   </Col>
@@ -453,83 +458,87 @@ const EditEmployee = () => {
                       </Select>
                     </Form.Item>
                   </Col>
-                  <Col
-                    xs={24}
-                    sm={24}
-                    md={12}
-                    lg={12}>
-                    <Form.Item
-                      name="manager_id"
-                      label="Task Manager"
-                    >
-                      <Select placeholder="Select manager" disabled={authData?.user?.id === params.eid ? true : false}>
-                        {managerData?.User?.data?.map((manager, index) => (
-                          <Option key={index} value={manager?.id}> {`${manager?.fullName} / ${manager?.email}`}</Option>
-                        ))}
-                      </Select>
-                    </Form.Item>
-                  </Col>
-                  <Col xs={24} sm={24} md={12} lg={12}>
-                    <Form.Item
-                      label="Start Date"
-                      name='startDate'
-                      rules={[{
-                        required: true,
-                        message: 'Please select the start date'
-                      }]}
-                    >
-                      <DatePicker placeholder='Select start date' disabled={authData?.user?.id === params.eid ? true : false} />
-                    </Form.Item>
-                  </Col>
+                  {(userData?.User?.data[0]?.roles?.[0]?.name === constants.roles.Employee || role === constants.roles.Employee) &&
+                    <>
+                      <Col
+                        xs={24}
+                        sm={24}
+                        md={12}
+                        lg={12}>
+                        <Form.Item
+                          name="manager_id"
+                          label="Task Manager"
+                        >
+                          <Select placeholder="Select manager" disabled={authData?.user?.id === params.eid ? true : false}>
+                            {managerData?.User?.data?.map((manager, index) => (
+                              <Option key={index} value={manager?.id}> {`${manager?.fullName} / ${manager?.email}`}</Option>
+                            ))}
+                          </Select>
+                        </Form.Item>
+                      </Col>
+                      <Col xs={24} sm={24} md={12} lg={12}>
+                        <Form.Item
+                          label="Start Date"
+                          name='startDate'
+                          rules={[{
+                            required: true,
+                            message: 'Please select the start date'
+                          }]}
+                        >
+                          <DatePicker placeholder='Select start date' disabled={authData?.user?.id === params.eid ? true : false} />
+                        </Form.Item>
+                      </Col>
 
-                  <Col xs={24} sm={24} md={12} lg={12}>
-                    <Form.Item
-                      label="End Date"
-                      name='endDate'
-                    >
-                      <DatePicker
-                        placeholder='Select end date'
-                        disabledDate={(current) => current.isBefore(moment().subtract(1, "day"))}
-                        disabled={authData?.user?.id === params.eid ? true : false} />
-                    </Form.Item>
-                  </Col>
+                      <Col xs={24} sm={24} md={12} lg={12}>
+                        <Form.Item
+                          label="End Date"
+                          name='endDate'
+                        >
+                          <DatePicker
+                            placeholder='Select end date'
+                            disabledDate={(current) => current.isBefore(moment().subtract(1, "day"))}
+                            disabled={authData?.user?.id === params.eid ? true : false} />
+                        </Form.Item>
+                      </Col>
 
-                  <Col
-                    xs={24}
-                    sm={24}
-                    md={12}
-                    lg={12}>
-                    <Form.Item
-                      name="timesheet_attachment"
-                      label="Timesheet Attachment type"
-                      rules={[{
-                        required: true,
-                        message: 'Please select timesheet attachment type'
-                      }]}>
-                      <Select placeholder="Select status" disabled={authData?.user?.id === params.eid ? true : false}>
-                        <Option value={true}>Mandatory</Option>
-                        <Option value={false}>Optional</Option>
-                      </Select>
-                    </Form.Item>
-                  </Col>
-                  <Col
-                    xs={24}
-                    sm={24}
-                    md={12}
-                    lg={12}>
-                    <Form.Item
-                      name="entryType"
-                      label="Entry Type"
-                      rules={[{
-                        required: true,
-                        message: 'Please select the entry type'
-                      }]}>
-                      <Select placeholder="Select status" disabled={authData?.user?.id === params.eid ? true : false}>
-                        <Option value={EntryType.Timesheet}>{EntryType.Timesheet}</Option>
-                        <Option value={EntryType.Cico}>Checkin-Checkout</Option>
-                      </Select>
-                    </Form.Item>
-                  </Col>
+                      <Col
+                        xs={24}
+                        sm={24}
+                        md={12}
+                        lg={12}>
+                        <Form.Item
+                          name="timesheet_attachment"
+                          label="Timesheet Attachment type"
+                          rules={[{
+                            required: true,
+                            message: 'Please select timesheet attachment type'
+                          }]}>
+                          <Select placeholder="Select status" disabled={authData?.user?.id === params.eid ? true : false}>
+                            <Option value={true}>Mandatory</Option>
+                            <Option value={false}>Optional</Option>
+                          </Select>
+                        </Form.Item>
+                      </Col>
+                      <Col
+                        xs={24}
+                        sm={24}
+                        md={12}
+                        lg={12}>
+                        <Form.Item
+                          name="entryType"
+                          label="Entry Type"
+                          rules={[{
+                            required: true,
+                            message: 'Please select the entry type'
+                          }]}>
+                          <Select placeholder="Select status" disabled={authData?.user?.id === params.eid ? true : false}>
+                            <Option value={EntryType.Timesheet}>{EntryType.Timesheet}</Option>
+                            <Option value={EntryType.Cico}>Checkin-Checkout</Option>
+                          </Select>
+                        </Form.Item>
+                      </Col>
+                    </>
+                  }
                 </>
               }
               <Col xs={24} sm={24} md={12} lg={12}>

@@ -9,6 +9,7 @@ import Sidebar from '../Sidebar';
 import Header from '../Header';
 import { sidebarVar, authVar } from "../../App/link";
 import styles from './style.module.scss';
+import Footer from '../Footer';
 
 const { Content } = Layout;
 
@@ -49,6 +50,7 @@ const _Layout = () => {
           </Content>
         </Layout>
       </Layout>
+      <Footer/>
     </Layout>
   );
 };

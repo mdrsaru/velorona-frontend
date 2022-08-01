@@ -13,7 +13,6 @@ import { authVar } from "../../../App/link";
 import routes from "../../../config/routes";
 import { MutationChangeProfilePictureArgs, MutationUserCreateArgs, User, UserPagingResult, EntryType, RoleName, QueryUserArgs } from "../../../interfaces/generated";
 import { USER } from "../index";
-import { STATE_CITIES, USA_STATES } from "../../../utils/cities";
 
 import styles from "../style.module.scss";
 import { GraphQLResponse } from "../../../interfaces/graphql.interface";
@@ -88,7 +87,6 @@ const NewEmployee = () => {
   let key = 'employee'
   const navigate = useNavigate();
   const authData = authVar();
-  const [cities, setCountryCities] = useState<string[]>([]);
   const [fileData, setFile] = useState({
     id: '',
     name: ''
@@ -133,11 +131,7 @@ const NewEmployee = () => {
     }
   };
 
-  const setState = (data: string) => {
-    setCountryCities(STATE_CITIES[data]);
-  }
-
-  const { loading: employeeLoading, data: managerData } = useQuery<
+  const {  data: managerData } = useQuery<
     GraphQLResponse<'User', UserPagingResult>,
     QueryUserArgs
   >(
@@ -241,6 +235,11 @@ const NewEmployee = () => {
         return notifyGraphqlError((response.errors), key)
       };
     }).catch(notifyGraphqlError)
+  }
+
+  const [role, setRole] = useState('')
+  const handleChange = (value: any) => {
+      setRole(value)
   }
 
   return (
@@ -454,7 +453,7 @@ const NewEmployee = () => {
                   required: true,
                   message: 'Please enter role!'
                 }]}>
-                <Select placeholder="Select Role">
+                <Select placeholder="Select Role" onChange={handleChange}>
                   {roles_user?.map((role: any, index: number) => (
                     <Option value={role?.value} key={index}>
                       {role?.name}
@@ -483,82 +482,85 @@ const NewEmployee = () => {
                 </Select>
               </Form.Item>
             </Col>
+            {role === constants.roles.Employee &&
+              <>
+                <Col
+                  xs={24}
+                  sm={24}
+                  md={12}
+                  lg={12}>
+                  <Form.Item
+                    name="manager_id"
+                    label="Task Manager"
+                  >
+                    <Select placeholder="Select manager">
+                      {managerData?.User?.data?.map((manager, index) => (
+                        <Option key={index} value={manager?.id}> {`${manager?.fullName} / ${manager?.email}`}</Option>
+                      ))}
+                    </Select>
+                  </Form.Item>
+                </Col>
 
-            <Col
-              xs={24}
-              sm={24}
-              md={12}
-              lg={12}>
-              <Form.Item
-                name="manager_id"
-                label="Task Manager"
-              >
-                <Select placeholder="Select manager">
-                  {managerData?.User?.data?.map((manager, index) => (
-                    <Option key={index} value={manager?.id}> {`${manager?.fullName} / ${manager?.email}`}</Option>
-                  ))}
-                </Select>
-              </Form.Item>
-            </Col>
+                <Col xs={24} sm={24} md={12} lg={12}>
+                  <Form.Item
+                    label="Start Date"
+                    name='startDate'
+                    rules={[{
+                      required: true,
+                      message: 'Please select the start date'
+                    }]}>
+                    <DatePicker placeholder='Select start date' />
+                  </Form.Item>
+                </Col>
 
-            <Col xs={24} sm={24} md={12} lg={12}>
-              <Form.Item
-                label="Start Date"
-                name='startDate'
-                rules={[{
-                  required: true,
-                  message: 'Please select the start date'
-                }]}>
-                <DatePicker placeholder='Select start date' />
-              </Form.Item>
-            </Col>
+                <Col xs={24} sm={24} md={12} lg={12}>
+                  <Form.Item
+                    label="End Date"
+                    name='endDate'
+                  >
+                    <DatePicker placeholder='Select end date' />
+                  </Form.Item>
+                </Col>
 
-            <Col xs={24} sm={24} md={12} lg={12}>
-              <Form.Item
-                label="End Date"
-                name='endDate'
-              >
-                <DatePicker placeholder='Select end date' />
-              </Form.Item>
-            </Col>
+                <Col
+                  xs={24}
+                  sm={24}
+                  md={12}
+                  lg={12}>
+                  <Form.Item
+                    name="timesheet_attachment"
+                    label="Timesheet Attachment type"
+                    rules={[{
+                      required: true,
+                      message: 'Please select timesheet attachment type'
+                    }]}>
+                    <Select placeholder="Select status">
+                      <Option value={true}>Mandatory</Option>
+                      <Option value={false}>Optional</Option>
+                    </Select>
+                  </Form.Item>
+                </Col>
 
-            <Col
-              xs={24}
-              sm={24}
-              md={12}
-              lg={12}>
-              <Form.Item
-                name="timesheet_attachment"
-                label="Timesheet Attachment type"
-                rules={[{
-                  required: true,
-                  message: 'Please select timesheet attachment type'
-                }]}>
-                <Select placeholder="Select status">
-                  <Option value={true}>Mandatory</Option>
-                  <Option value={false}>Optional</Option>
-                </Select>
-              </Form.Item>
-            </Col>
-
-            <Col
-              xs={24}
-              sm={24}
-              md={12}
-              lg={12}>
-              <Form.Item
-                name="entryType"
-                label="Entry Type"
-                rules={[{
-                  required: true,
-                  message: 'Please select the entry type'
-                }]}>
-                <Select placeholder="Select status">
-                  <Option value={EntryType.Timesheet}>{EntryType.Timesheet}</Option>
-                  <Option value={EntryType.Cico}>Checkin-Checkout</Option>
-                </Select>
-              </Form.Item>
-            </Col>
+                <Col
+                  xs={24}
+                  sm={24}
+                  md={12}
+                  lg={12}>
+                  <Form.Item
+                    name="entryType"
+                    label="Entry Type"
+                    rules={[{
+                      required: true,
+                      message: 'Please select the entry type'
+                    }]}>
+                    <Select placeholder="Select status">
+                      <Option value={EntryType.Timesheet}>{EntryType.Timesheet}</Option>
+                      <Option value={EntryType.Cico}>Checkin-Checkout</Option>
+                    </Select>
+                  </Form.Item>
+                </Col>
+              </>
+            }
             <Col
               xs={24}
               sm={24}

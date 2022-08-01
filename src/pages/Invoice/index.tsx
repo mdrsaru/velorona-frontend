@@ -357,7 +357,7 @@ const Invoice = () => {
 
                 <div
                   onClick={() => handleViewAttachmentClick(invoice.id)}
-                  title='View Invoice'
+                  title='View Attachment'
                   className={`${styles["table-icon"]} ${styles["table-view-attachment-icon"]}`}
                 >
                   <EyeFilled />

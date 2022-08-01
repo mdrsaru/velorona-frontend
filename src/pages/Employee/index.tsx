@@ -103,6 +103,8 @@ export const USER_UPDATE = gql`
       status
       archived
       timesheet_attachment
+      startDate
+      endDate
       avatar{
         url
         id

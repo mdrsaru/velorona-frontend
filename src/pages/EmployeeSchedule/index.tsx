@@ -82,7 +82,7 @@ const EmployeeSchedule = () => {
         return timeDetail?.map((timeDetail: any, index: any) => {
           return (
             <>
-              <span>{`${moment(timeDetail.startTime).format('HH:mm')} - ${moment(timeDetail.endTime).format('HH:mm')}`}</span>
+              <span>{`${moment(timeDetail.startTime).utc().format('HH:mm')} - ${moment(timeDetail.endTime).utc().format('HH:mm')}`}</span>
               <br />
             </>
           )
