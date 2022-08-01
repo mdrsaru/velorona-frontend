@@ -4,6 +4,7 @@ import { MutationWorkscheduleCreateArgs, Workschedule } from "../../interfaces/g
 import { GraphQLResponse } from "../../interfaces/graphql.interface";
 import { notifyGraphqlError } from "../../utils/error";
 import { authVar } from "../../App/link";
+import moment from "moment";
 
 interface IProps {
   visibility: boolean;
@@ -39,6 +40,7 @@ const AddSchedule = (props: IProps) => {
         content: `New schedule is added successfully!`,
         className: "custom-message",
       });
+      form.resetFields();
       props?.refetchWorkschedule({
         variables: {
           input: {
@@ -60,6 +62,20 @@ const AddSchedule = (props: IProps) => {
   });
 
   const onSubmitForm = (values: any) => {
+
+    const diff = values?.endDate.diff(values?.startDate);
+    const diffDuration = moment.duration(diff);
+    console.log(diffDuration.asDays())
+
+    if (diffDuration.asDays() > 7 || diffDuration.asDays() < 6) {
+      form.setFields([
+        {
+          name: 'endDate',
+          errors: ["Week days should be of 7 days"],
+        },
+      ]);
+      return
+    }
     createWorkschedule({
       variables: {
         input: {
@@ -76,6 +92,18 @@ const AddSchedule = (props: IProps) => {
     props?.setVisibility(false)
   }
 
+  function disabledStartDate(value: any) {
+    return (
+      value.format("YYYY-MM-DD") !==
+      moment(value).startOf("isoWeek").format("YYYY-MM-DD")
+    );
+  }
+  function disabledEndDate(value: any) {
+    const enabledDays = value.format("YYYY-MM-DD") !==
+      moment(value).endOf("isoWeek").format("YYYY-MM-DD")
+
+    return (enabledDays);
+  }
   return (
     <Modal
       centered
@@ -98,7 +126,7 @@ const AddSchedule = (props: IProps) => {
               md={24}
               lg={24}>
               <Form.Item label='Select start date' name='startDate'>
-                <DatePicker placeholder='Select start date' />
+                <DatePicker placeholder='Select start date' disabledDate={disabledStartDate} />
               </Form.Item>
             </Col>
             <Col
@@ -107,7 +135,7 @@ const AddSchedule = (props: IProps) => {
               md={24}
               lg={24}>
               <Form.Item label='Select end date' name='endDate'>
-                <DatePicker placeholder='Select end date' />
+                <DatePicker placeholder='Select end date' disabledDate={disabledEndDate} />
               </Form.Item>
             </Col>
             <Col

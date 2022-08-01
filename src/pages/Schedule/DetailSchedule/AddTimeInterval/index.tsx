@@ -81,33 +81,6 @@ const AddTimeInterval = (props: IProps) => {
   const [timeIntervalId, setTimeIntervalId] = useState<any>()
 
   const workschedule = props?.workschedule?.WorkscheduleDetail?.data?.[0];
-  const [createWorkscheduleTimeEntry] = useMutation<GraphQLResponse<'WorkscheduleTimeDetailCreate', WorkscheduleTimeDetail>, MutationWorkscheduleTimeDetailCreateArgs>(WORKSCHEDULE_TIME_DETAIL_CREATE, {
-
-    onCompleted() {
-      message.success({
-        content: `New schedule is added successfully!`,
-        className: "custom-message",
-      });
-      props?.getWorkschedule({
-        variables: {
-          input: {
-            paging: {
-              order: ["updatedAt:ASC"],
-            },
-            query: {
-              id: workschedule?.id
-            }
-          },
-        },
-      })
-
-      props?.setVisibility(false)
-
-    },
-    onError(err) {
-      notifyGraphqlError(err)
-    },
-  });
 
   const { data: workscheduleTimeDetail, refetch: refetchWorkscheduleTimeDetail } = useQuery<
     GraphQLResponse<'WorkscheduleTimeDetail', WorkscheduleTimeDetailPagingResult>,
@@ -126,6 +99,43 @@ const AddTimeInterval = (props: IProps) => {
       }
     }
   })
+
+  const [createWorkscheduleTimeEntry] = useMutation<GraphQLResponse<'WorkscheduleTimeDetailCreate', WorkscheduleTimeDetail>, MutationWorkscheduleTimeDetailCreateArgs>(WORKSCHEDULE_TIME_DETAIL_CREATE, {
+
+    onCompleted() {
+      message.success({
+        content: `New schedule is added successfully!`,
+        className: "custom-message",
+      });
+      form.resetFields()
+      props?.getWorkschedule({
+        variables: {
+          input: {
+            paging: {
+              order: ["updatedAt:ASC"],
+            },
+            query: {
+              id: workschedule?.id
+            }
+          },
+        },
+      })
+      refetchWorkscheduleTimeDetail({
+        input: {
+          query: {
+            workschedule_detail_id: workschedule?.id
+          },
+        }
+      })
+      props?.setVisibility(false)
+
+    },
+    onError(err) {
+      notifyGraphqlError(err)
+    },
+  });
+
+
 
   const [workscheduleDetailDelete] = useMutation(WORKSCHEDULE_DETAIL_DELETE, {
     onCompleted() {
@@ -201,7 +211,7 @@ const AddTimeInterval = (props: IProps) => {
       dataIndex: "startTime",
       render: (startTime: any) => {
         return <span style={{ cursor: 'pointer' }} >
-          {moment(startTime).format('HH:mm')}
+          {moment(startTime).utc().format('HH:mm')}
         </span>
       },
     },
@@ -210,7 +220,7 @@ const AddTimeInterval = (props: IProps) => {
       dataIndex: "endTime",
       render: (endTime: any) => {
         return <span style={{ cursor: 'pointer' }} >
-          {moment(endTime).format('HH:mm')}
+          {moment(endTime).utc().format('HH:mm')}
         </span>
       },
     },
@@ -228,15 +238,19 @@ const AddTimeInterval = (props: IProps) => {
   ];
   const format = 'HH:mm';
   const handleSubmit = (values: any) => {
-    form.resetFields()
+
     if (Date.parse(values?.endTime) < Date.parse(values?.startTime)) {
       return message.error('End time cannot be less than start time')
     }
+    const date = moment(workschedule?.date).format('YYYY-MM-DD')
+    const startTime = date + 'T' + moment(values?.startTime).format('HH:mm:ss');
+    const endTime = date + 'T' + moment(values?.endTime).format('HH:mm:ss');
+    form.resetFields()
     createWorkscheduleTimeEntry({
       variables: {
         input: {
-          startTime: values?.startTime,
-          endTime: values?.endTime,
+          startTime: startTime,
+          endTime: endTime,
           workschedule_detail_id: workschedule?.id
         }
       }
@@ -255,7 +269,6 @@ const AddTimeInterval = (props: IProps) => {
         visible={props?.visibility}
         onCancel={() => props?.setVisibility(false)}
       >
-
         <p className={styles.fullName}>{workschedule?.user?.fullName}</p>
         <p>{moment(workschedule?.date).format('MMM DD,YYYY')}</p>
 

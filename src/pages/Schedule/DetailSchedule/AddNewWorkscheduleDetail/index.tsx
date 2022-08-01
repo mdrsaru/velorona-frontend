@@ -77,6 +77,7 @@ const AddNewWorkscheduleDetail = (props: IProps) => {
         content: `New schedule is added successfully!`,
         className: "custom-message",
       });
+      form.resetFields()
       props?.refetch({
         variables: {
           input: {
@@ -199,11 +200,14 @@ const AddNewWorkscheduleDetail = (props: IProps) => {
     if (Date.parse(values?.endTime) < Date.parse(values?.startTime)) {
       return message.error('End time cannot be less than start time')
     }
+    const date = moment(props?.providedData).format('YYYY-MM-DD')
+    const startTime = date + 'T' +moment(values?.startTime).format('HH:mm:ss');
+    const endTime = date + 'T' +moment(values?.endTime).format('HH:mm:ss');
     createWorkscheduleDetail({
       variables: {
         input: {
-          startTime: values?.startTime,
-          endTime: values?.endTime,
+          startTime:startTime,
+          endTime: endTime,
           user_id : props?.employeeId as string,
           workschedule_id:params?.sid,
           schedule_date:props?.providedData,
