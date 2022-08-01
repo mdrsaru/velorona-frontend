@@ -311,8 +311,8 @@ const loggedInUser = authVar()
                                                                                 index: number) =>
                                                                                 <Fragment key={index} >
                                                                                     <span onClick={() => handleChange(data?.id)} style={{ cursor: 'pointer' }}>
-                                                                                        {moment(timeData?.startTime).format('HH:mm')} -
-                                                                                        {moment(timeData?.endTime).format('HH:mm')}
+                                                                                        {moment(timeData?.startTime).utc().format('HH:mm')} -
+                                                                                        {moment(timeData?.endTime).utc().format('HH:mm')}
                                                                                     </span>
                                                                                     <br />
                                                                                 </Fragment>
