@@ -14,6 +14,7 @@ import { USER } from "../../Employee";
 import styles from "../style.module.scss";
 import { GraphQLResponse } from "../../../interfaces/graphql.interface";
 import { MutationProjectUpdateArgs, Project } from "../../../interfaces/generated";
+import routes from "../../../config/routes";
 
 interface ItemProps {
   label: string;
@@ -154,7 +155,7 @@ const EditProject = () => {
               <Col>
                 <Form.Item>
                   <Space>
-                    <Button type="default" htmlType="button">Cancel</Button>
+                    <Button type="default" htmlType="button" onClick={()=>navigate(routes.projects.path(loggedInUser?.company?.id as string))}>Cancel</Button>
                     <Button type="primary" htmlType="submit">Edit Project</Button>
                   </Space>
                 </Form.Item>
