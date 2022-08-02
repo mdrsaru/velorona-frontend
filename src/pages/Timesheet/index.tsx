@@ -294,7 +294,14 @@ const Timesheet = () => {
           description: timeEntry?.TimeEntry?.activeEntry?.description ?? '',
           client: timeEntry?.TimeEntry?.activeEntry?.project?.client?.name
         })
-        reset(stopwatchOffset)
+        // reset(stopwatchOffset)
+        if (timeEntry.TimeEntry.activeEntry) {
+          let startTime = timeEntry.TimeEntry.activeEntry?.startTime;
+          if (startTime) {
+            startTime = moment(startTime).utc().format('YYYY-MM-DDTHH:mm:ss');
+            startTimer(timeEntry.TimeEntry.activeEntry.id, startTime);
+          }
+        }
       }
     },
   });
@@ -383,7 +390,12 @@ const Timesheet = () => {
 
   const [createTimeEntry, { loading: creatingTimeEntry }] = useMutation(CREATE_TIME_ENTRY, {
     onCompleted: (response: any) => {
-      start();
+      // start();
+      const id = response.TimeEntryCreate.id;
+        let startTime = response.TimeEntryCreate.startTime;
+        startTime = moment(startTime).utc().format('YYYY-MM-DDTHH:mm:ss')
+        startTimer(id, startTime);
+
       setTimeEntry({
         id: response?.TimeEntryCreate?.id,
         name: response?.TimeEntryCreate?.company?.name,
@@ -457,6 +469,14 @@ const Timesheet = () => {
     return _.max(maxEndDate)
   }
 
+  const startTimer = (id: string, date: string) => {
+    const offset = new Date();
+    const now = moment();
+    const diff = now.diff(moment(date), 'seconds');
+    const time = offset.setSeconds(offset.getSeconds() + diff)
+    reset(new Date(time))
+  }
+
   return (
     <>
       {loading ? <TimeSheetLoader /> :
@@ -517,6 +537,7 @@ const Timesheet = () => {
                         label="Description"
                         rules={[{
                           required: !showDetailTimeEntry,
+                          message:'Description is required'
                         }]}
                       >
                         {
