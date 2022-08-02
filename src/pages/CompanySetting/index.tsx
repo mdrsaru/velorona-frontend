@@ -71,7 +71,7 @@ const CompanySetting = () => {
           <Col>
             <Form.Item>
               <Space size={"large"}>
-                <Button type="primary" htmlType="submit" onClick={() => navigate(routes.editCompanySetting.path(authData?.company?.id ?? ''))}>
+                <Button type="primary" htmlType="submit" onClick={() => navigate(routes.editCompanySetting.path(authData?.company?.code ?? '',authData?.company?.id ?? ''))}>
                   Edit Settings
                 </Button>
               </Space>
