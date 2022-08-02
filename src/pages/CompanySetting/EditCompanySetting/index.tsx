@@ -78,6 +78,7 @@ const EditCompanySetting = () => {
   const props: UploadProps = {
     name: "file",
     action: `${constants.apiUrl}/v1/media/upload`,
+		accept:'image/*',
     maxCount: 1,
     headers: {
       authorization: authData?.token ? `Bearer ${authData?.token}` : "",
