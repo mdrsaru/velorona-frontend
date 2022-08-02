@@ -201,7 +201,7 @@ const loggedInUser = authVar()
 
     const handleNewTimeIntervalAddition = (id: number) => {
         setShowAddNewTimeInterval(true);
-        setEmployee('')
+        // setEmployee('')
         setAddNewTimeInterval({
             employeeId: employeeData?.User?.data?.[0]?.id,
             employeeName: employeeData?.User?.data?.[0]?.fullName,

@@ -65,7 +65,6 @@ const AddSchedule = (props: IProps) => {
 
     const diff = values?.endDate.diff(values?.startDate);
     const diffDuration = moment.duration(diff);
-    console.log(diffDuration.asDays())
 
     if (diffDuration.asDays() > 7 || diffDuration.asDays() < 6) {
       form.setFields([

@@ -12,6 +12,7 @@ import { gql, useQuery } from "@apollo/client";
 import { authVar } from "../../../App/link";
 import { TIME_WEEKLY } from "../../Timesheet";
 import moment from "moment";
+import _ from "lodash";
 
 
 export const COUNT = gql`
@@ -71,20 +72,32 @@ const CompanyAdminDashboard = () => {
 
   let averageHoursData: any = [];
   let totalExpensesData: any = [];
-  timesheetDetail?.Timesheet?.data?.map((timesheet: any, index: number) => {
-    const startDate = moment(timesheet?.weekStartDate).format('MMM D');
-    const endDate = moment(timesheet?.weekEndDate).format('MMM D');
-    const hour = secondsToHms(timesheet.duration)
-    totalExpensesData.push({
+
+  const timesheet = timesheetDetail?.Timesheet?.data;
+  const timesheetGroups = _.groupBy(timesheet, "weekStartDate");
+
+  Object.keys(timesheetGroups).map(function (key) {
+    const startDate = moment(timesheetGroups[key]?.[0]?.weekStartDate).format('MMM D');
+    const endDate = moment(timesheetGroups[key]?.[0]?.weekEndDate).format('MMM D');
+    let totalTimesheetHour: number = 0;
+    let totalExpense = 0;
+    timesheetGroups[key].map((timesheet) => {
+      const hour = secondsToHms(timesheet.duration);
+      totalTimesheetHour = totalTimesheetHour + parseFloat(hour);
+      totalExpense = totalExpense + timesheet.totalExpense
+    })
+    averageHoursData.push({
+
       label: startDate + ' - ' + endDate,
-      value: timesheet.totalExpense
+      value: totalTimesheetHour
     })
 
-    return averageHoursData.push({
+    totalExpensesData.push({
       label: startDate + ' - ' + endDate,
-      value: hour
+      value: totalExpense
     })
   })
+
 
   const dashboardCount: IDashboardCount[] = [
     {

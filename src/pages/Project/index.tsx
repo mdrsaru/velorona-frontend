@@ -367,19 +367,7 @@ const ProjectPage = () => {
     {
       title: "Project Name",
       key: "name",
-      render: (record: Project) => <div style={{ cursor: 'pointer' }}>{record?.name}</div>,
-      onCell: (record: Project) => {
-        return {
-          onClick: () => {
-            navigate(
-              routes.detailProject.path(
-                loggedInUser?.company?.code ?? "",
-                record?.id ?? ""
-              )
-            );
-          },
-        };
-      },
+      render: (record: Project) => <div>{record?.name}</div>
     },
     {
       title: "Client",

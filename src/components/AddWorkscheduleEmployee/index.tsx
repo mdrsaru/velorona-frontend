@@ -3,7 +3,7 @@ import {  useQuery } from "@apollo/client";
 import { Form, Modal, Row, Col, Button, Space, Input } from "antd"
 import { useEffect, useState } from "react";
 import { authVar } from "../../App/link";
-import { QueryUserArgs, UserPagingResult } from "../../interfaces/generated";
+import { QueryUserArgs, RoleName, UserPagingResult } from "../../interfaces/generated";
 import { GraphQLResponse } from "../../interfaces/graphql.interface";
 import { USER } from "../../pages/Employee";
 
@@ -45,7 +45,8 @@ const AddWorkscheduleEmployee = (props: IProps) => {
             order: ["updatedAt:DESC"],
           },
           query: {
-            company_id: loggedInUser?.user?.id
+            company_id: loggedInUser?.user?.id,
+			role:RoleName.Employee
           }
         },
       },
@@ -145,7 +146,7 @@ const AddWorkscheduleEmployee = (props: IProps) => {
                     <Row key={index}>
 
                       <Col style={{ marginBottom: '2%' }} lg={23} >
-                        {employee.fullName}
+                        {employee.fullName+ ' / '+employee.email}
                       </Col>
                       <Col>
                         <CheckCircleFilled onClick={() => handleChange(employee?.id)} className={user === employee?.id ? `${styles.selected}` : `${styles.check}`} />
