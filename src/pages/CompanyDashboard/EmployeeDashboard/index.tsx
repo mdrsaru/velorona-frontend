@@ -13,6 +13,7 @@ import { authVar } from "../../../App/link";
 import { TIME_WEEKLY } from "../../Timesheet";
 import styles from "./styles.module.scss";
 import { WORKSCHEDULEDETAIL } from "../../EmployeeSchedule";
+import _ from "lodash";
 
 
 export const COUNT = gql`
@@ -74,17 +75,24 @@ const EmployeeDashboard = () => {
     const totalHour: any = secondsToHms(overallCount?.TotalDuration)
 
     let averageHoursData: any = [];
-    timesheetDetail?.Timesheet?.data?.map((timesheet: any, index: number) => {
-        const startDate = moment(timesheet?.weekStartDate).format('MMM D');
-        const endDate = moment(timesheet?.weekEndDate).format('MMM D');
-        const hour = secondsToHms(timesheet.duration)
-        return averageHoursData.push({
-            label: startDate + ' - ' + endDate,
-            value: hour
-        })
-
-    })
-
+		const timesheet = timesheetDetail?.Timesheet?.data;
+		const timesheetGroups = _.groupBy(timesheet, "weekStartDate");
+	
+		Object.keys(timesheetGroups).map(function (key) {
+			const startDate = moment(timesheetGroups[key]?.[0]?.weekStartDate).format('MMM D');
+			const endDate = moment(timesheetGroups[key]?.[0]?.weekEndDate).format('MMM D');
+			let totalTimesheetHour: number = 0;
+			timesheetGroups[key].map((timesheet) => {
+				const hour = secondsToHms(timesheet.duration);
+				totalTimesheetHour = totalTimesheetHour + parseFloat(hour);
+			})
+			averageHoursData.push({
+	
+				label: startDate + ' - ' + endDate,
+				value: totalTimesheetHour
+			})
+		})
+	
     const dashboardCount: IDashboardCount[] = [
         {
             title: 'Hours Tracked',
