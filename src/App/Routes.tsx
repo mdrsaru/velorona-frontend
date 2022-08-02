@@ -106,7 +106,7 @@ const _Routes = () => {
               index
               element={
                 <Suspense fallback={<RouteLoader />}>
-                  <routes.company.component />
+                  <routes.companyAdmin.component />
                 </Suspense>
               }
             />
@@ -139,20 +139,15 @@ const _Routes = () => {
             }
           />
 
-          <Route
-            path={routes.companyDashboard.childPath}
+          <Route path={routes.company.childPath}>
+					<Route
+            index
             element={
-              <CheckRoles
-                allowedRoles={routes.companyDashboard.allowedRoles}
-              >
                 <Suspense fallback={<RouteLoader />}>
-                  <routes.companyDashboard.component />
+                  <routes.company.component />
                 </Suspense>
-              </CheckRoles>
             }
           />
-
-          <Route path={routes.company.childPath}>
             <Route
               path={routes.employeeTimesheet.childPath}
               element={

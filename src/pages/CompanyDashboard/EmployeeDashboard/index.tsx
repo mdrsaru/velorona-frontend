@@ -82,11 +82,11 @@ const EmployeeDashboard = () => {
 			const startDate = moment(timesheetGroups[key]?.[0]?.weekStartDate).format('MMM D');
 			const endDate = moment(timesheetGroups[key]?.[0]?.weekEndDate).format('MMM D');
 			let totalTimesheetHour: number = 0;
-			timesheetGroups[key].map((timesheet) => {
+			timesheetGroups[key].forEach((timesheet) => {
 				const hour = secondsToHms(timesheet.duration);
 				totalTimesheetHour = totalTimesheetHour + parseFloat(hour);
 			})
-			averageHoursData.push({
+			return averageHoursData.push({
 	
 				label: startDate + ' - ' + endDate,
 				value: totalTimesheetHour

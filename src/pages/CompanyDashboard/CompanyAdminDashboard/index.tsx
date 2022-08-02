@@ -76,18 +76,17 @@ const CompanyAdminDashboard = () => {
   const timesheet = timesheetDetail?.Timesheet?.data;
   const timesheetGroups = _.groupBy(timesheet, "weekStartDate");
 
-  Object.keys(timesheetGroups).map(function (key) {
+  Object.keys(timesheetGroups).forEach(function (key) {
     const startDate = moment(timesheetGroups[key]?.[0]?.weekStartDate).format('MMM D');
     const endDate = moment(timesheetGroups[key]?.[0]?.weekEndDate).format('MMM D');
     let totalTimesheetHour: number = 0;
     let totalExpense = 0;
-    timesheetGroups[key].map((timesheet) => {
+    timesheetGroups[key].forEach((timesheet) => {
       const hour = secondsToHms(timesheet.duration);
       totalTimesheetHour = totalTimesheetHour + parseFloat(hour);
       totalExpense = totalExpense + timesheet.totalExpense
     })
     averageHoursData.push({
-
       label: startDate + ' - ' + endDate,
       value: totalTimesheetHour
     })

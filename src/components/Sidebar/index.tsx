@@ -51,10 +51,10 @@ const Sidebar = (props: any) => {
 
   const menuItems = [
     {
-      key: routes.companyDashboard.key,
-      name: routes.companyDashboard.name,
+      key: routes.company.key,
+      name: routes.company.name,
       icon: <DashboardOutlined />,
-      route: routes.companyDashboard.path(loggedInUser?.company?.code ?? ''),
+      route: routes.company.path(loggedInUser?.company?.code ?? ''),
       accessRoles: [ constants.roles.CompanyAdmin, constants.roles.Employee, constants.roles.TaskManager]
     },
 	{
