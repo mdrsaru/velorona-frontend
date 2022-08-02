@@ -7,7 +7,6 @@ import { Menu, Layout } from 'antd';
 import {
   BankOutlined,
   DashboardOutlined,
-  HomeOutlined,
   FieldTimeOutlined,
   UserSwitchOutlined,
   ScheduleOutlined,
@@ -39,7 +38,7 @@ const Sidebar = (props: any) => {
   useEffect(() => {
     let path = ''
     if (location?.pathname === '/' + params?.company) {
-      path = routes.companyDashboard.key
+      path = routes.company.key
     } else if (params?.id && location?.pathname !== '/' + params?.id) {
       path = location?.pathname?.split('/').slice(2, 3).toString()
     } else if (!params.id && location?.pathname !== routes.home.path) {
@@ -48,37 +47,9 @@ const Sidebar = (props: any) => {
       path = routes.home.key
     }
     setMenuKey(path)
-  }, [location, params?.id])
+  }, [location, params?.id, params?.company])
 
   const menuItems = [
-    // {
-    //   key: routes.dashboard.key,
-    //   name: routes.dashboard.name,
-    //   icon: <DashboardOutlined />,
-    //   route: routes.dashboard.path,
-    //   accessRoles: [constants.roles.SuperAdmin]
-    // },
-    // {
-    //   key: routes.companyDashboard.key,
-    //   name: routes.companyDashboard.name,
-    //   icon: <DashboardOutlined />,
-    //   route: routes.companyDashboard.path(loggedInUser?.company?.code ?? ''),
-    //   accessRoles: [constants.roles.CompanyAdmin]
-    // },
-    // {
-    //   key: routes.employeeDashboard.key,
-    //   name: routes.employeeDashboard.name,
-    //   icon: <DashboardOutlined />,
-    //   route: routes.employeeDashboard.path(loggedInUser?.company?.code ?? ''),
-    //   accessRoles: [constants.roles.Employee]
-    // },
-    // {
-    //   key: routes.taskManagerDashboard.key,
-    //   name: routes.taskManagerDashboard.name,
-    //   icon: <DashboardOutlined />,
-    //   route: routes.taskManagerDashboard.path(loggedInUser?.company?.code ?? ''),
-    //   accessRoles: [constants.roles.TaskManager]
-    // },
     {
       key: routes.checkDashboard.key,
       name: routes.checkDashboard.name,
@@ -121,13 +92,6 @@ const Sidebar = (props: any) => {
       route: routes.client.path(loggedInUser?.company?.code ?? ''),
       accessRoles: [constants.roles.CompanyAdmin]
     },
-    // {
-    //   key: routes.home.key,
-    //   name: routes.home.name,
-    //   icon: <HomeOutlined />,
-    //   route: routes.home.path,
-    //   accessRoles: [constants.roles.Employee, constants.roles.TaskManager]
-    // },
     {
       key: routes.timesheet.key,
       name: routes.timesheet.name,
@@ -173,17 +137,10 @@ const Sidebar = (props: any) => {
     {
       key: routes.subscription.key,
       name: routes.subscription.name,
-      icon: <img src={subscriptionImg} style={{ width: 14 }} />,
+      icon: <img src={subscriptionImg} style={{ width: 14 }} alt="subscription" />,
       route: routes.subscription.path(loggedInUser?.company?.code ?? ''),
       accessRoles: [constants.roles.CompanyAdmin]
     },
-    // {
-    //   key: routes.schedule.key,
-    //   name: routes.schedule.name,
-    //   icon: <ScheduleOutlined />,
-    //   route: routes.schedule.path(loggedInUser?.company?.code ?? ''),
-    //   accessRoles: [constants.roles.Employee]
-    // }
   ]
   const menuArray = menuItems.filter(menu => { return loggedInUser?.user?.roles?.some(role => menu.accessRoles.includes(role)) })
   // const selectedMenuKey = menuKeys.find(key => key.split('/')?.[1] === location.pathname?.split('/')?.[1]) ?? '';

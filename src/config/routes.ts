@@ -1,26 +1,33 @@
 import { lazy } from 'react';
 
+import constants from '../config/constants';
+
+const { SuperAdmin, CompanyAdmin, Employee, TaskManager } = constants.roles;
+
 const routes = {
   dashboard: {
     childPath: 'dashboard',
     path: '/dashboard',
     component: lazy(() => import('../pages/Dashboard')),
     name: 'Dashboard',
-    key: 'dashboard'
+    key: 'dashboard',
+    allowedRoles: [SuperAdmin],
   },
   companyAdmin: {
     childPath: 'company',
     path: '/company',
     component: lazy(() => import('../pages/Company')),
     name: 'Company',
-    key: 'company'
+    key: 'company',
+    allowedRoles: [SuperAdmin],
   },
   invoicePaymentConfig: {
     childPath: 'payment-config',
     path: '/payment-config',
     component: lazy(() => import('../pages/PaymentConfig')),
     name: 'Payment Config',
-    key: 'payment-config'
+    key: 'payment-config',
+    allowedRoles: [SuperAdmin],
   },
   login: {
     childPath: null,
@@ -48,49 +55,32 @@ const routes = {
     path: '/',
     component: lazy(() => import('../pages/Home')),
     name: 'Home',
-    key: '/'
+    key: '/',
+    allowedRoles: [SuperAdmin],
   },
   role: {
     childPath: 'role',
     path: '/role',
     component: lazy(() => import('../pages/Role')),
     name: 'Roles',
-    key: 'role'
+    key: 'role',
+    allowedRoles: [SuperAdmin],
   },
   checkDashboard:{
     childPath: ':company',
     path: (company: string | undefined) => `/${company}`,
     component: lazy(() => import('../components/CheckDashboard')),
     name: 'Dashboard',
-    key: 'dashboard'
-  },
-  companyDashboard: {
-    childPath: ':dashboard',
-    path: (company: string | undefined) => `/${company}`,
-    component: lazy(() => import('../pages/CompanyDashboard')),
-    name: 'Dashboard',
-    key: 'dashboard'
-  },
-  employeeDashboard: {
-    childPath: ':company',
-    path: (company: string | undefined) => `/${company}`,
-    component: lazy(() => import('../pages/EmployeeDashboard')),
-    name: 'Dashboard',
-    key: 'dashboard'
-  },
-  taskManagerDashboard: {
-    childPath: ':company',
-    path: (company: string | undefined) => `/${company}`,
-    component: lazy(() => import('../pages/TaskManagerDashboard')),
-    name: 'Dashboard',
-    key: 'dashboard'
+    key: 'dashboard',
+    allowedRoles: [CompanyAdmin, Employee, TaskManager, SuperAdmin],
   },
   company: {
     childPath: ':id',
     path: (id: string | undefined) => `/${id}`,
     component: lazy(() => import('../pages/Company')),
     name: 'Company',
-    key: 'dashboard'
+    key: 'dashboard',
+    allowedRoles: [CompanyAdmin, SuperAdmin, TaskManager],
   },
   addCompany: {
     childPath: ':add',
@@ -106,19 +96,13 @@ const routes = {
     name: 'Edit Company',
     key: 'company'
   },
-  employee: {
-    childPath: 'employees',
-    path: (id: string) => `/${id}/employees`,
-    component: lazy(() => import('../pages/Employee')),
-    name: 'Employee',
-    key: 'employees'
-  },
   user: {
     childPath: 'users',
     path: (id: string) => `/${id}/users`,
     component: lazy(() => import('../pages/Employee')),
     name: 'Users',
-    key: 'users'
+    key: 'users',
+    allowedRoles: [CompanyAdmin, SuperAdmin],
   },
   editEmployee: {
     childPath: ':eid',
@@ -153,14 +137,16 @@ const routes = {
     path: (eid: string) => `/setting/${eid}`,
     component: lazy(() => import('../pages/CompanySetting')),
     name: 'Profile',
-    key: 'profile'
+    key: 'profile',
+    allowedRoles: [CompanyAdmin, SuperAdmin],
   },
   editCompanySetting: {
     childPath: 'setting/:eid/edit',
     path: (eid: string) => `/setting/${eid}/edit`,
     component: lazy(() => import('../pages/CompanySetting/EditCompanySetting')),
     name: 'Profile',
-    key: 'profile'
+    key: 'profile',
+    allowedRoles: [CompanyAdmin, SuperAdmin],
   },
   changePassword: {
     childPath: 'profile/:eid/change-password',
@@ -189,56 +175,64 @@ const routes = {
     path: (id: string) => `/${id}/timesheet`,
     component: lazy(() => import('../pages/Timesheet')),
     name: 'Timesheet',
-    key: 'timesheet'
+    key: 'timesheet',
+    allowedRoles: [Employee],
   },
   employeeTimesheet: {
     childPath: 'timesheet/employee',
     path: (id: string) => `/${id}/timesheet/employee`,
     component: lazy(() => import('../pages/EmployeeTimesheet')),
     name: 'Employee Timesheet',
-    key: 'timesheet'
+    key: 'timesheet',
+    allowedRoles: [CompanyAdmin, SuperAdmin, TaskManager],
   },
   timesheetInvoice: {
     childPath: 'timesheet/employee/:timesheetId/add-invoice',
     path: (code: string, id: string) => `/${code}/timesheet/employee/${id}/add-invoice`,
     component: lazy(() => import('../pages/TimesheetInvoice')),
     name: 'Add Invoice',
-    key: 'timesheet'
+    key: 'timesheet',
+    allowedRoles: [CompanyAdmin, SuperAdmin, TaskManager],
   },
   employeeSchedule: {
     childPath: 'schedule',
     path: (id: string) => `/${id}/schedule`,
     component: lazy(() => import('../pages/EmployeeSchedule')),
     name: 'Schedule',
-    key: 'schedule'
+    key: 'schedule',
+    allowedRoles: [Employee],
   },
   schedule: {
     childPath: 'scheduleList',
     path: (id: string) => `/${id}/scheduleList`,
     component: lazy(() => import('../pages/Schedule')),
     name: 'Schedule',
-    key: 'scheduleList'
+    key: 'scheduleList',
+    allowedRoles: [CompanyAdmin, SuperAdmin],
   },
  detailSchedule: {
     childPath: 'scheduleList/:sid',
     path: (id: string,sid:string) => `/${id}/scheduleList/${sid}`,
     component: lazy(() => import('../pages/Schedule/DetailSchedule')),
     name: 'DetailSchedule',
-    key: 'scheduleList'
+    key: 'scheduleList',
+    allowedRoles: [CompanyAdmin, SuperAdmin],
   },
   projects: {
     childPath: 'projects',
     path: (id: string) => `/${id}/projects`,
     component: lazy(() => import('../pages/Project')),
     name: 'Projects',
-    key: 'projects'
+    key: 'projects',
+    allowedRoles: [CompanyAdmin, SuperAdmin],
   },
   addProject: {
     childPath: 'add',
     path: (id: string) => `/${id}/projects/add`,
     component: lazy(() => import('../pages/Project/NewProject')),
     name: 'Add Projects',
-    key: 'projects'
+    key: 'projects',
+    allowedRoles: [CompanyAdmin, SuperAdmin],
   },
   detailProject: {
     childPath: ':pid/detail',
@@ -273,7 +267,8 @@ const routes = {
     path: (id: string) => `/${id}/invoices`,
     component: lazy(() => import('../pages/Invoice')),
     name: 'Invoices',
-    key: 'invoices'
+    key: 'invoices',
+    allowedRoles: [CompanyAdmin, SuperAdmin],
   },
   addInvoice: {
     childPath: 'add',
@@ -294,7 +289,8 @@ const routes = {
     path: (id: string) => `/${id}/clients`,
     component: lazy(() => import('../pages/Client')),
     name: 'Clients',
-    key: 'clients'
+    key: 'clients',
+    allowedRoles: [CompanyAdmin, SuperAdmin],
   },
   addClient: {
     childPath: 'add',
@@ -329,14 +325,16 @@ const routes = {
     path: (id: string, tid: string) => `/${id}/timesheet/${tid}/detail`,
     component: lazy(() => import('../pages/Timesheet/DetailTimesheet')),
     name: 'Detail Timesheet',
-    key: 'timesheet'
+    key: 'timesheet',
+    allowedRoles: [CompanyAdmin, SuperAdmin, Employee, TaskManager],
   },
   subscription: {
     childPath: 'subscriptions',
     path: (code: string) => `/${code}/subscriptions`,
     component: lazy(() => import('../pages/Subscription')),
     name: 'Subscriptions',
-    key: 'subscriptions'
+    key: 'subscriptions',
+    allowedRoles: [CompanyAdmin, SuperAdmin],
   },
 };
 

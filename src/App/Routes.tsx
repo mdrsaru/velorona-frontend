@@ -1,35 +1,18 @@
-import { Suspense } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Suspense } from 'react';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 
-import NotFound from "../components/NotFound";
-import Layout from "../components/Layout";
-import CheckRoles from "../components/CheckRoles";
+import NotFound from '../components/NotFound';
+import Layout from '../components/Layout';
+import CheckRoles from '../components/CheckRoles';
 
-import routes from "../config/routes";
-import constants from "../config/constants";
+import routes from '../config/routes';
 
-import LoginLoader from "../components/Skeleton/LoginLoader";
-import RouteLoader from "../components/Skeleton/RouteLoader";
-import PublicRoutes from "../components/PublicRoutes";
-import { authVar } from "./link";
-import TimeSheetLoader from "../components/Skeleton/TimeSheetLoader";
+import LoginLoader from '../components/Skeleton/LoginLoader';
+import RouteLoader from '../components/Skeleton/RouteLoader';
+import PublicRoutes from '../components/PublicRoutes';
+import TimeSheetLoader from '../components/Skeleton/TimeSheetLoader';
 
 const _Routes = () => {
-  const loginData = authVar();
-  const roles = loginData?.user?.roles;
-  const getRoute = () => {
-    if (roles.includes(constants.roles.SuperAdmin)) {
-      return routes.dashboard.path;
-    } else if (roles.includes(constants.roles.CompanyAdmin)) {
-      return routes.company.path(loginData?.company?.code);
-    } else if (roles.includes(constants.roles.Employee)) {
-      return routes.employeeDashboard.path(loginData?.company?.code);
-    } else if (roles.includes(constants.roles.TaskManager)) {
-      return routes.taskManagerDashboard.path(loginData?.company?.code);
-    } else {
-      return routes.home.path;
-    }
-  };
 
   return (
     <Router>
@@ -74,9 +57,18 @@ const _Routes = () => {
         {/* protected routes */}
         <Route path={routes.home.path} element={<Layout />}>
           <Route
+            index
+            element={
+              <Suspense fallback={<RouteLoader />}>
+                <routes.home.component />
+              </Suspense>
+            }
+          />
+
+          <Route
             path={routes.role.path}
             element={
-              <CheckRoles allowedRoles={[constants.roles.SuperAdmin]}>
+              <CheckRoles allowedRoles={routes.role.allowedRoles}>
                 <Suspense fallback={<RouteLoader />}>
                   <routes.role.component />
                 </Suspense>
@@ -108,12 +100,7 @@ const _Routes = () => {
             path={routes.checkDashboard.childPath}
             element={
               <CheckRoles
-                allowedRoles={[
-                  constants.roles.CompanyAdmin,
-                  constants.roles.Employee,
-                  constants.roles.TaskManager,
-                  constants.roles.SuperAdmin,
-                ]}
+                allowedRoles={routes.checkDashboard.allowedRoles}
               >
                 <Suspense fallback={<RouteLoader />}>
                   <routes.checkDashboard.component />
@@ -123,47 +110,10 @@ const _Routes = () => {
           />
 
           <Route path={routes.company.childPath}>
-            {/* <Route
-              index
-              element={
-                <CheckRoles
-                  allowedRoles={[
-                    constants.roles.CompanyAdmin,
-                    constants.roles.SuperAdmin,
-                    constants.roles.Employee,
-                    constants.roles.TaskManager,
-                  ]}
-                >
-                  <Suspense fallback={<RouteLoader />}>
-                    {roles.includes(constants.roles.CompanyAdmin) ? (
-                      <routes.companyDashboard.component />
-                    ) :
-                      roles.includes(constants.roles.Employee) ? (
-                        <routes.employeeDashboard.component />
-                      )
-                        :
-                        roles.includes(constants.roles.TaskManager) ? (
-                          <routes.taskManagerDashboard.component />
-                        )
-                          :
-                          (
-                            <routes.home.component />
-                          )
-                    }
-                  </Suspense>
-                </CheckRoles>
-              }
-            /> */}
             <Route
               path={routes.employeeTimesheet.childPath}
               element={
-                <CheckRoles
-                  allowedRoles={[
-                    constants.roles.CompanyAdmin,
-                    constants.roles.SuperAdmin,
-                    constants.roles.TaskManager,
-                  ]}
-                >
+                <CheckRoles allowedRoles={routes.employeeTimesheet.allowedRoles}>
                   <Suspense fallback={<RouteLoader />}>
                     <routes.employeeTimesheet.component />
                   </Suspense>
@@ -174,13 +124,7 @@ const _Routes = () => {
             <Route
               path={routes.timesheetInvoice.childPath}
               element={
-                <CheckRoles
-                  allowedRoles={[
-                    constants.roles.CompanyAdmin,
-                    constants.roles.SuperAdmin,
-                    constants.roles.TaskManager,
-                  ]}
-                >
+                <CheckRoles allowedRoles={routes.timesheetInvoice.allowedRoles}>
                   <Suspense fallback={<RouteLoader />}>
                     <routes.timesheetInvoice.component />
                   </Suspense>
@@ -192,7 +136,7 @@ const _Routes = () => {
               <Route
                 index
                 element={
-                  <CheckRoles allowedRoles={[constants.roles.Employee]}>
+                  <CheckRoles allowedRoles={routes.timesheet.allowedRoles}>
                     <Suspense fallback={<TimeSheetLoader />}>
                       <routes.timesheet.component />
                     </Suspense>
@@ -212,11 +156,7 @@ const _Routes = () => {
               <Route
                 path={routes.detailTimesheet.childPath}
                 element={
-                  <CheckRoles allowedRoles={[
-                    constants.roles.Employee,
-                    constants.roles.TaskManager,
-                    constants.roles.CompanyAdmin
-                  ]}>
+                  <CheckRoles allowedRoles={routes.detailTimesheet.allowedRoles}>
                     <Suspense fallback={<TimeSheetLoader />}>
                       <routes.detailTimesheet.component />
                     </Suspense>
@@ -227,11 +167,7 @@ const _Routes = () => {
             <Route
               path={routes.employeeSchedule.childPath}
               element={
-                <CheckRoles
-                  allowedRoles={[
-                    constants.roles.Employee,
-                  ]}
-                >
+                <CheckRoles allowedRoles={routes.employeeSchedule.allowedRoles}>
                   <Suspense fallback={<RouteLoader />}>
                     <routes.employeeSchedule.component />
                   </Suspense>
@@ -242,11 +178,7 @@ const _Routes = () => {
             <Route
               path={routes.schedule.childPath}
               element={
-                <CheckRoles
-                  allowedRoles={[
-                    constants.roles.CompanyAdmin,
-                  ]}
-                >
+                <CheckRoles allowedRoles={routes.schedule.allowedRoles}>
                   <Suspense fallback={<RouteLoader />}>
                     <routes.schedule.component />
                   </Suspense>
@@ -257,11 +189,7 @@ const _Routes = () => {
             <Route
               path={routes.detailSchedule.childPath}
               element={
-                <CheckRoles
-                  allowedRoles={[
-                    constants.roles.CompanyAdmin,
-                  ]}
-                >
+                <CheckRoles allowedRoles={routes.detailSchedule.allowedRoles}>
                   <Suspense fallback={<RouteLoader />}>
                     <routes.detailSchedule.component />
                   </Suspense>
@@ -269,15 +197,16 @@ const _Routes = () => {
               }
             />
 
-            <Route path={routes.projects.childPath}>
+            <Route
+              path={routes.projects.childPath}
+              element={<CheckRoles allowedRoles={routes.projects.allowedRoles} />}
+            >
               <Route
                 index
                 element={
-                  <CheckRoles allowedRoles={[constants.roles.CompanyAdmin]}>
-                    <Suspense fallback={<RouteLoader />}>
-                      <routes.projects.component />
-                    </Suspense>
-                  </CheckRoles>
+                  <Suspense fallback={<RouteLoader />}>
+                    <routes.projects.component />
+                  </Suspense>
                 }
               />
               <Route
@@ -322,15 +251,16 @@ const _Routes = () => {
               />
             </Route>
 
-            <Route path={routes.invoice.childPath}>
+            <Route
+              path={routes.invoice.childPath}
+              element={<CheckRoles allowedRoles={routes.invoice.allowedRoles} />}
+            >
               <Route
                 index
                 element={
-                  <CheckRoles allowedRoles={[constants.roles.CompanyAdmin]}>
-                    <Suspense fallback={<RouteLoader />}>
-                      <routes.invoice.component />
-                    </Suspense>
-                  </CheckRoles>
+                  <Suspense fallback={<RouteLoader />}>
+                    <routes.invoice.component />
+                  </Suspense>
                 }
               />
 
@@ -353,15 +283,16 @@ const _Routes = () => {
               />
             </Route>
 
-            <Route path={routes.client.childPath}>
+            <Route
+              path={routes.client.childPath}
+              element={<CheckRoles allowedRoles={routes.client.allowedRoles} />}
+            >
               <Route
                 index
                 element={
-                  <CheckRoles allowedRoles={[constants.roles.CompanyAdmin]}>
-                    <Suspense fallback={<RouteLoader />}>
-                      <routes.client.component />
-                    </Suspense>
-                  </CheckRoles>
+                  <Suspense fallback={<RouteLoader />}>
+                    <routes.client.component />
+                  </Suspense>
                 }
               />
               <Route
@@ -391,15 +322,16 @@ const _Routes = () => {
               />
             </Route>
 
-            <Route path={routes.user.childPath}>
+            <Route 
+              path={routes.user.childPath}
+              element={<CheckRoles allowedRoles={routes.user.allowedRoles} />}
+            >
               <Route
                 index
                 element={
-                  <CheckRoles allowedRoles={[constants.roles.CompanyAdmin]}>
-                    <Suspense fallback={<RouteLoader />}>
-                      <routes.user.component />
-                    </Suspense>
-                  </CheckRoles>
+                  <Suspense fallback={<RouteLoader />}>
+                    <routes.user.component />
+                  </Suspense>
                 }
               />
 
@@ -443,7 +375,7 @@ const _Routes = () => {
             <Route
               path={routes.subscription.childPath}
               element={
-                <CheckRoles allowedRoles={[constants.roles.CompanyAdmin]}>
+                <CheckRoles allowedRoles={routes.subscription.allowedRoles}>
                   <Suspense fallback={<RouteLoader />}>
                     <routes.subscription.component />
                   </Suspense>
@@ -464,7 +396,7 @@ const _Routes = () => {
           <Route
             path={routes.companySetting.childPath}
             element={
-              <CheckRoles allowedRoles={[constants.roles.CompanyAdmin]}>
+              <CheckRoles allowedRoles={routes.companySetting.allowedRoles}>
                 <Suspense fallback={<RouteLoader />}>
                   <routes.companySetting.component />
                 </Suspense>
@@ -475,13 +407,14 @@ const _Routes = () => {
           <Route
             path={routes.editCompanySetting.childPath}
             element={
-              <CheckRoles allowedRoles={[constants.roles.CompanyAdmin]}>
+              <CheckRoles allowedRoles={routes.editCompanySetting.allowedRoles}>
                 <Suspense fallback={<RouteLoader />}>
                   <routes.editCompanySetting.component />
                 </Suspense>
               </CheckRoles>
             }
           />
+
           <Route
             path={routes.changePassword.childPath}
             element={
@@ -494,7 +427,7 @@ const _Routes = () => {
           <Route
             path={routes.dashboard.path}
             element={
-              <CheckRoles allowedRoles={[constants.roles.SuperAdmin]}>
+              <CheckRoles allowedRoles={routes.dashboard.allowedRoles}>
                 <Suspense fallback={<RouteLoader />}>
                   <routes.dashboard.component />
                 </Suspense>
@@ -502,15 +435,16 @@ const _Routes = () => {
             }
           />
 
-          <Route path={routes.companyAdmin.path}>
+          <Route 
+            path={routes.companyAdmin.path}
+            element={<CheckRoles allowedRoles={routes.companyAdmin.allowedRoles} />}
+          >
             <Route
               index
               element={
-                <CheckRoles allowedRoles={[constants.roles.SuperAdmin]}>
-                  <Suspense fallback={<RouteLoader />}>
-                    <routes.company.component />
-                  </Suspense>
-                </CheckRoles>
+                <Suspense fallback={<RouteLoader />}>
+                  <routes.company.component />
+                </Suspense>
               }
             />
 
@@ -532,23 +466,6 @@ const _Routes = () => {
               }
             />
           </Route>
-
-          <Route
-            index
-            element={
-              <CheckRoles
-                allowedRoles={[
-                  constants.roles.Employee,
-                  constants.roles.TaskManager,
-                ]}
-              redirect_to={getRoute()}
-              >
-                <Suspense fallback={<RouteLoader />}>
-                  <routes.home.component />
-                </Suspense>
-              </CheckRoles>
-            }
-          />
 
           <Route path="*" element={<NotFound />} />
         </Route>

@@ -381,7 +381,6 @@ const Timesheet = () => {
     minutes,
     hours,
     isRunning,
-    start,
     reset
   } = useStopwatch({
     autoStart: showDetailTimeEntry,
