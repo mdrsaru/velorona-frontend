@@ -137,7 +137,7 @@ const EditCompanySetting = () => {
           }
         },
       });
-      navigate(routes.companySetting.path(params?.eid ?? ''));
+      navigate(routes.companySetting.path(authData?.company?.code ?? '',params?.eid ?? ''));
     },
   });
 
@@ -167,7 +167,7 @@ const EditCompanySetting = () => {
       <Row>
         <Col span={24} className={styles["form-col"]}>
           <h1>
-            <ArrowLeftOutlined onClick={() => navigate(routes.companySetting.path(params?.eid ?? ''))} />
+            <ArrowLeftOutlined onClick={() => navigate(routes.companySetting.path(authData?.company?.code ?? '',params?.eid ?? ''))} />
             &nbsp; General Setting
           </h1>
         </Col>
@@ -237,7 +237,7 @@ const EditCompanySetting = () => {
             <Col>
               <Form.Item>
                 <Space size={"large"}>
-                  <Button type="default" htmlType="button" onClick={() => navigate(routes.companySetting.path(params?.eid ?? ''))}>
+                  <Button type="default" htmlType="button" onClick={() => navigate(routes.companySetting.path(authData?.company?.code ?? '',params?.eid ?? ''))}>
                     Cancel
                   </Button>
                   <Button type="primary" htmlType="submit">

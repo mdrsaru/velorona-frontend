@@ -66,13 +66,13 @@ const routes = {
     key: 'role',
     allowedRoles: [SuperAdmin],
   },
-  checkDashboard:{
+  companyDashboard:{
     childPath: ':company',
     path: (company: string | undefined) => `/${company}`,
-    component: lazy(() => import('../components/CheckDashboard')),
+    component: lazy(() => import('../pages/CompanyDashboard')),
     name: 'Dashboard',
     key: 'dashboard',
-    allowedRoles: [CompanyAdmin, Employee, TaskManager, SuperAdmin],
+    allowedRoles: [CompanyAdmin, Employee, TaskManager],
   },
   company: {
     childPath: ':id',
@@ -133,16 +133,16 @@ const routes = {
     key: 'profile'
   },
   companySetting: {
-    childPath: 'setting/:eid',
-    path: (eid: string) => `/setting/${eid}`,
+    childPath: '/:id/setting/:eid',
+    path: (id:string,eid: string) => `/${id}/setting/${eid}`,
     component: lazy(() => import('../pages/CompanySetting')),
     name: 'Profile',
     key: 'profile',
     allowedRoles: [CompanyAdmin, SuperAdmin],
   },
   editCompanySetting: {
-    childPath: 'setting/:eid/edit',
-    path: (eid: string) => `/setting/${eid}/edit`,
+    childPath: '/:id/setting/:eid/edit',
+    path: (id:string,eid: string) => `/${id}/setting/${eid}/edit`,
     component: lazy(() => import('../pages/CompanySetting/EditCompanySetting')),
     name: 'Profile',
     key: 'profile',

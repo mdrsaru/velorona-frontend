@@ -200,7 +200,7 @@ const TopHeader = (props: any) => {
   }
 
   const setting = () => {
-    navigate(routes.companySetting.path(loggedInUser?.user?.id as string))
+    navigate(routes.companySetting.path(loggedInUser?.company?.code,loggedInUser?.company?.id as string))
   }
 
   const showCheckInModal = () => {
