@@ -135,7 +135,6 @@ const CommentForm = (props: IProps) => {
     } else if(props.commentType === 'UnlockRejected') {
       statusToUnlock = 'Rejected';
     }
-    console.log(props.commentType, statusToUnlock, 'asdkj')
 
     if(statusToUnlock) {
       unlockTimeEntries({

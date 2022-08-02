@@ -11,6 +11,7 @@ import AverageHours from "../../components/Dashboard/AverageHours";
 import ActivityLog from "../../components/Dashboard/ActivityLog";
 import { authVar } from "../../App/link";
 import styles from "./styles.module.scss";
+import _ from "lodash";
 
 
 export const COUNT = gql`
@@ -85,16 +86,24 @@ const TaskManagerDashboard = () => {
     }
     const totalHour: any = secondsToHms(overallCount?.TotalDuration)
 
+
     let averageHoursData: any = [];
-    timesheetDetail?.TimesheetByManager?.map((timesheet: any, index: number) => {
-        const startDate = moment(new Date(timesheet?.weekStartDate)).format('MMM D');
-        const endDate = moment(timesheet?.weekEndDate).format('MMM D');
-        const hour = secondsToHms(timesheet.duration)
+
+    const timesheet = timesheetDetail?.TimesheetByManager;
+    const timesheetGroups = _.groupBy(timesheet, "weekStartDate");
+
+    Object.keys(timesheetGroups).map(function (key) {
+        const startDate = moment(timesheetGroups[key]?.[0]?.weekStartDate).format('MMM D');
+        const endDate = moment(timesheetGroups[key]?.[0]?.weekEndDate).format('MMM D');
+        let totalTimesheetHour: number = 0;
+        timesheetGroups[key].map((timesheet) => {
+            const hour = secondsToHms(timesheet.duration);
+            totalTimesheetHour = totalTimesheetHour + parseFloat(hour);
+        })
         return averageHoursData.push({
             label: startDate + ' - ' + endDate,
-            value: hour
+            value: totalTimesheetHour
         })
-
     })
 
 
