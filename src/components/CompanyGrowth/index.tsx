@@ -95,7 +95,7 @@ const CompanyGrowth = (props: IProps) => {
     <>
       <div className={styles['chart']}>
         <div className={styles['chart-title']}>
-          <Typography.Title level={3}>Total Expenses Per Week</Typography.Title>
+          <Typography.Title level={3}>Company Growth By Month</Typography.Title>
           {/* <Typography.Title level={4} keyboard className={styles['no-margin']}>
             {caption}
           </Typography.Title> */}
