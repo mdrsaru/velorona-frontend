@@ -225,7 +225,7 @@ const TimeEntryDetails = (props: IProps) => {
 
                         <Space>
                           {
-                            canApproveReject && ['Pending', 'Approved'].includes(props.status) && (
+                            canApproveReject && ['Pending', 'Approved'].includes(props.status) && props.isTimesheetSubmitted &&(
                               <CloseCircleOutlined
                                 className={styles['reject-entry']}
                                 onClick={() => {
@@ -236,7 +236,7 @@ const TimeEntryDetails = (props: IProps) => {
                           }
 
                           {
-                            canApproveReject && ['Pending', 'Rejected'].includes(props.status) && (
+                            canApproveReject && ['Pending', 'Rejected'].includes(props.status) && props.isTimesheetSubmitted && (
                               <Space>
                                 <CheckCircleOutlined
                                   style={{ color: 'var(--primary-green)' }}
