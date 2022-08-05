@@ -162,6 +162,14 @@ const routes = {
     name: 'Add Client',
     key: 'employee'
   },
+  timeTracker: {
+    childPath: 'time-tracker',
+    path: (id: string) => `/${id}/time-tracker`,
+    component: lazy(() => import('../pages/Timesheet/TimeTracker')),
+    name: 'Time Tracker',
+    key: 'time-tracker',
+    allowedRoles: [Employee],
+  },
   timesheet: {
     childPath: 'timesheet',
     path: (id: string) => `/${id}/timesheet`,

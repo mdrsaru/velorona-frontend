@@ -1,10 +1,7 @@
-import _ from 'lodash'
 import moment from 'moment'
-import findIndex from 'lodash/findIndex';
-import { useState, useMemo } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { gql, useMutation, useQuery } from '@apollo/client'
-import { useStopwatch } from 'react-timer-hook'
+import { gql, useQuery } from '@apollo/client'
 import {
   Card,
   Col,
@@ -13,37 +10,21 @@ import {
   Table,
   Form,
   Select,
-  message,
-  Collapse,
-  Input,
 } from 'antd'
 import {
   CloseOutlined,
 } from '@ant-design/icons'
 
-import { PROJECT } from '../Project'
 import { authVar } from '../../App/link'
 import constants from '../../config/constants'
 import routes from "../../config/routes"
-import { getTotalTimeForADay } from './DetailTimesheet'
 import { TIME_ENTRY_FIELDS } from '../../gql/time-entries.gql';
-import { GraphQLResponse } from '../../interfaces/graphql.interface';
-import { Timesheet as ITimesheet, TimeEntryPagingResult, TimeEntry as ITimeEntry, EntryType } from '../../interfaces/generated';
+import { Timesheet as ITimesheet } from '../../interfaces/generated';
 
-import { notifyGraphqlError } from "../../utils/error"
-import TimeSheetLoader from '../../components/Skeleton/TimeSheetLoader'
-import TimeEntry from './TimeEntry'
-import NoContent from '../../components/NoContent'
-import TimerCard from '../../components/TimerCard'
 import TimeDuration from '../../components/TimeDuration'
 
 import styles from './style.module.scss'
 
-type ITodayGroupedEntries = {
-  description: string | null | undefined;
-  project_id: string;
-  entries: ITimeEntry[];
-};
 
 export const CREATE_TIME_ENTRY = gql`
     ${TIME_ENTRY_FIELDS}
@@ -106,17 +87,6 @@ query Timesheet($input: TimesheetQueryInput!) {
   }
 }`;
 
-const UPDATE_TIME_ENTRY = gql`
-    ${TIME_ENTRY_FIELDS}
-    mutation TimeEntryUpdate($input: TimeEntryUpdateInput!) {
-      TimeEntryUpdate(input: $input) {
-        ...timeEntryFields
-      }
-    }
-`
-
-const { Panel } = Collapse;
-
 export const computeDiff = (date: Date) => {
   const currentDate = new Date()
   const pastDate = new Date(date)
@@ -147,10 +117,9 @@ const Timesheet = () => {
   const authData = authVar()
   let navigate = useNavigate()
   const [form] = Form.useForm()
-  const [timeEntryForm] = Form.useForm()
-  let stopwatchOffset = new Date()
+
   const [visible, setVisible] = useState(false)
-  const [showDetailTimeEntry, setDetailVisible] = useState<boolean>(false)
+  
   const [pagingInput, setPagingInput] = useState<{
     skip: number,
     currentPage: number,
@@ -159,8 +128,6 @@ const Timesheet = () => {
     currentPage: 1,
   });
   const company_id = authData?.company?.id;
-  const entryType = authData?.user?.entryType;
-  const afterStart = moment().startOf('day').format('YYYY-MM-DDTHH:mm:ss');
 
   const columns = [
     {
@@ -228,7 +195,6 @@ const Timesheet = () => {
   const {
     data: timeWeeklyEntryData,
     loading: loadTimesheetWeekly,
-    refetch: refetchTimeWeekly 
   } = useQuery(TIME_WEEKLY, {
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
@@ -244,244 +210,12 @@ const Timesheet = () => {
     }
   });
 
-  const [newTimeEntry, setTimeEntry] = useState({
-    id: '',
-    name: '',
-    project: '',
-    description: '',
-    client: ''
-  });
-
-  const { data: projectData } = useQuery(PROJECT, {
-    fetchPolicy: "network-only",
-    nextFetchPolicy: "cache-first",
-    variables: {
-      input: {
-        query: {
-          company_id,
-          client_id: ''
-        },
-        paging: {
-          order: ['updatedAt:DESC']
-        }
-      }
-    }
-  });
-
-  const { loading, data: timeEntryData } = useQuery<GraphQLResponse<'TimeEntry', TimeEntryPagingResult>>(TIME_ENTRY, {
-    fetchPolicy: "network-only",
-    nextFetchPolicy: "cache-first",
-    variables: {
-      input: {
-        query: {
-          company_id,
-          afterStart,
-          entryType,
-        },
-        paging: {
-          order: ['startTime:DESC']
-        }
-      }
-    },
-    onCompleted: (timeEntry) => {
-      if (timeEntry?.TimeEntry?.activeEntry) {
-        setDetailVisible(true)
-        stopwatchOffset.setSeconds(stopwatchOffset.getSeconds() + computeDiff(timeEntry?.TimeEntry?.activeEntry?.startTime))
-        setTimeEntry({
-          id: timeEntry?.TimeEntry?.activeEntry?.id,
-          name: timeEntry?.TimeEntry?.activeEntry?.company?.name,
-          project: timeEntry?.TimeEntry?.activeEntry?.project?.name,
-          description: timeEntry?.TimeEntry?.activeEntry?.description ?? '',
-          client: timeEntry?.TimeEntry?.activeEntry?.project?.client?.name
-        })
-        // reset(stopwatchOffset)
-        if (timeEntry.TimeEntry.activeEntry) {
-          let startTime = timeEntry.TimeEntry.activeEntry?.startTime;
-          if (startTime) {
-            startTime = moment(startTime).utc().format('YYYY-MM-DDTHH:mm:ss');
-            startTimer(timeEntry.TimeEntry.activeEntry.id, startTime);
-          }
-        }
-      }
-    },
-  });
-
-  const todayGroupedEntries: ITodayGroupedEntries[] = useMemo(() => {
-    const entries = timeEntryData?.TimeEntry?.data ?? [];
-    return groupByDescriptionAndProject(entries)
-  }, [timeEntryData?.TimeEntry?.data]);
-
-  const [updateTimeEntry, { loading: updatingTimeEntry }] = useMutation(UPDATE_TIME_ENTRY, {
-    update: (cache, result: any) => {
-      const data: any = cache.readQuery({
-        query: TIME_ENTRY,
-        variables: {
-          input: {
-            query: {
-              company_id,
-              afterStart,
-              entryType,
-            },
-            paging: {
-              order: ['startTime:DESC']
-            }
-          }
-        },
-      });
-
-      const entries = data?.TimeEntry?.data ?? [];
-      const newEntry = result.data.TimeEntryUpdate;
-
-      cache.writeQuery({
-        query: TIME_ENTRY,
-        variables: {
-          input: {
-            query: {
-              company_id,
-              entryType,
-              afterStart,
-            },
-            paging: {
-              order: ['startTime:DESC']
-            }
-          }
-        },
-        data: {
-          TimeEntry: {
-            activeEntry: null,
-            data: [...entries, newEntry]
-          }
-        }
-      });
-    },
-    onCompleted: () => {
-      reset(undefined, false)
-      setDetailVisible(false);
-      refetchTimeWeekly({
-        input: {
-          query: {
-            company_id,
-          },
-          paging: {
-            order: ['weekStartDate:DESC']
-          }
-        }
-      })
-      form.resetFields();
-      message.success({
-        content: `Time Entry is updated successfully!`,
-        className: 'custom-message'
-      });
-    },
-    onError: notifyGraphqlError,
-  });
-
-  const {
-    seconds,
-    minutes,
-    hours,
-    isRunning,
-    reset
-  } = useStopwatch({
-    autoStart: showDetailTimeEntry,
-    offsetTimestamp: new Date()
-  });
-
-  const [createTimeEntry, { loading: creatingTimeEntry }] = useMutation(CREATE_TIME_ENTRY, {
-    onCompleted: (response: any) => {
-      // start();
-      const id = response.TimeEntryCreate.id;
-        let startTime = response.TimeEntryCreate.startTime;
-        startTime = moment(startTime).utc().format('YYYY-MM-DDTHH:mm:ss')
-        startTimer(id, startTime);
-
-      setTimeEntry({
-        id: response?.TimeEntryCreate?.id,
-        name: response?.TimeEntryCreate?.company?.name,
-        project: response?.TimeEntryCreate?.project?.name,
-        description: response?.TimeEntryCreate?.description,
-        client: response?.TimeEntryCreate?.project?.client?.name
-      });
-      setDetailVisible(true)
-    }
-  });
-
-  /* eslint-disable no-template-curly-in-string */
-  const validateMessages = {
-    required: '${label} is required!',
-    types: {
-      email: '${label} is not a valid email!',
-      number: '${label} is not a valid number!',
-    },
-    number: {
-      range: '${label} must be between ${min} and ${max}',
-    },
-  };
-
-  const createTimeEntries = (values: any) => {
-    stopwatchOffset = new Date()
-    createTimeEntry({
-      variables: {
-        input: {
-          startTime: moment().format('YYYY-MM-DD HH:mm:ss'),
-          description: values.description,
-          project_id: values.project,
-          company_id,
-        }
-      }
-    }).then((response) => {
-      if (response.errors) {
-        return notifyGraphqlError((response.errors))
-      }
-    }).catch(notifyGraphqlError)
-  }
-
-  const submitStopTimer = () => {
-    stopwatchOffset = new Date()
-    updateTimeEntry({
-      variables: {
-        input: {
-          id: newTimeEntry?.id,
-          endTime: moment().format('YYYY-MM-DD HH:mm:ss'),
-          company_id,
-        }
-      }
-    })
-  }
-
-  const onSubmitForm = (values: any) => {
-    !isRunning ? createTimeEntries(values) : submitStopTimer();
-  }
-
-  const clickPlayButton = (entry: ITimeEntry) => {
-    form.resetFields()
-    !isRunning ? createTimeEntries({ description: entry.description, project: entry?.project?.id }) : submitStopTimer();
-  }
-
-  const getStartTime = (entries: any): any => {
-    const minStartDate = entries.map((entry: any) => { return entry?.startTime })
-    return _.min(minStartDate)
-  }
-
-  const getEndTime = (entries: any): any => {
-    const maxEndDate = entries.map((entry: any) => { return entry?.endTime })
-    return _.max(maxEndDate)
-  }
-
-  const startTimer = (id: string, date: string) => {
-    const offset = new Date();
-    const now = moment();
-    const diff = now.diff(moment(date), 'seconds');
-    const time = offset.setSeconds(offset.getSeconds() + diff)
-    reset(new Date(time))
-  }
 
   return (
     <>
-      {loading ? <TimeSheetLoader /> :
         <div className={styles['site-card-wrapper']}>
           {/* TimeEntry Form */}
-          {
+          {/* {
             authData?.user?.entryType !== 'CICO' && (
               <Card
                 bordered={false}
@@ -561,12 +295,12 @@ const Timesheet = () => {
                 </Form>
               </Card>
             )
-          }
+          } */}
 
           <br />
 
           {/* Today's TimeEntries Listing */}
-          <Card
+          {/* <Card
             bordered={false}
             className={styles['task-card']}>
             <Row>
@@ -706,7 +440,7 @@ const Timesheet = () => {
                 }
               </div>
             </Form>
-          </Card>
+          </Card> */}
 
           <br />
 
@@ -825,35 +559,9 @@ const Timesheet = () => {
               </Form>
             </div>
           </Modal>
-        </div>}
+        </div>
     </>
   )
-}
-
-function groupByDescriptionAndProject(entries: ITimeEntry[]) {
-  const grouped: ITodayGroupedEntries[] = [];
-
-  for(let entry of entries) {
-    const project_id = entry.project_id;
-    const description = entry.description;
-
-    const foundIndex = findIndex(grouped, {
-      description,
-      project_id,
-    });
-
-    if(foundIndex >= 0) {
-      grouped[foundIndex].entries.push(entry);
-    } else {
-      grouped.push({
-        description,
-        project_id,
-        entries: [entry],
-      });
-    }
-  }
-
-  return grouped;
 }
 
 
