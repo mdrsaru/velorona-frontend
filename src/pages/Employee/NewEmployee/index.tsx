@@ -213,6 +213,7 @@ const NewEmployee = () => {
           firstName: values.firstName,
           middleName: values.middleName,
           lastName: values.lastName,
+		  designation:values.designation,
           status: values.status,
           manager_id: values.manager_id,
           company_id: authData?.company?.id as string,
@@ -340,6 +341,19 @@ const NewEmployee = () => {
                   message: "Phone number should be less than 11 digits"
                 }]}>
                 <Input placeholder="Enter your phone number" autoComplete="off" />
+              </Form.Item>
+            </Col>
+			<Col
+              xs={24}
+              sm={24}
+              md={8}
+              lg={8}
+              className={styles.formCol}>
+              <Form.Item
+                label="Designation"
+                name='designation'
+				>
+                <Input placeholder="Enter designation" autoComplete="off" />
               </Form.Item>
             </Col>
             <Col className={styles['form-header']}>

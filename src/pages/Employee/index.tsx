@@ -50,6 +50,7 @@ export const USER = gql`
         lastName
         fullName
         status
+		designation
         manager{
         id 
         fullName 

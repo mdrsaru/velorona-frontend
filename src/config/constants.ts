@@ -92,6 +92,20 @@ export const company_status = [{
 }
 ]
 
+export const attachment_type = [{
+	value: 'Timesheet',
+	name: 'Timesheet'
+  },
+  {
+	value: 'Attachment',
+	name: 'Attachment'
+  },
+  {
+	value: 'Others',
+	name: 'Others'
+  }
+  ]
+
 export const subscription = {
   price: {
     Starter: 'FREE',
