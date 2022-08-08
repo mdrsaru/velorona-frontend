@@ -1,0 +1,43 @@
+.add-new-employee {
+  float: right;
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 22px;
+  color: var(--primary-blue);
+}
+
+.active-status {
+  color: var(--primary-green);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 17px;
+}
+
+.inactive-status {
+  color: var(--gray-secondary);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 17px;
+}
+
+.table-icon {
+  font-size: 1.5rem;
+  margin-right: 1rem;
+}
+
+.table-active-status-icon {
+  color: var(--primary-green);
+}
+
+.table-inactive-status-icon {
+  color: var(--primary-red);
+}
+
+.table-archive-icon {
+  color: var(--primary-red);
+}
+
+.table-unarchive-icon,
+.table-edit-icon {
+  color: var(--primary-blue);
+}

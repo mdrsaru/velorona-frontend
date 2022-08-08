@@ -76,6 +76,37 @@ const _Routes = () => {
             }
           />
 
+		<Route path={routes.superAdmin.path}>
+		<Route
+            index
+            element={
+                <Suspense fallback={<RouteLoader />}>
+                  <routes.superAdmin.component />
+                </Suspense>
+            }
+          />
+
+		 <Route
+            path={routes.editSuperAdmin.childPath}
+            element={
+              <CheckRoles allowedRoles={routes.addSuperAdmin.allowedRoles}>
+                <Suspense fallback={<RouteLoader />}>
+                  <routes.editSuperAdmin.component />
+                </Suspense>
+              </CheckRoles>
+            }
+          />
+		  <Route
+            path={routes.addSuperAdmin.path}
+            element={
+              <CheckRoles allowedRoles={routes.addSuperAdmin.allowedRoles}>
+                <Suspense fallback={<RouteLoader />}>
+                  <routes.addSuperAdmin.component />
+                </Suspense>
+              </CheckRoles>
+            }
+          />
+		</Route>
           <Route path={routes.invoicePaymentConfig.path}>
             <Route
               index
