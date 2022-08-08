@@ -48,6 +48,12 @@ export const COMPANY_UPDATE = gql`
     CompanyUpdate(input: $input) {
       id
       name
+	  users{
+	  id
+	  address{
+	  country 
+	  state
+	  }}
     }
   }
 `;
@@ -94,7 +100,7 @@ const CompanyForm = (props: IProps) => {
     onCompleted(response) {
       if(response?.CompanyUpdate) {
         message.success(`Company ${response?.CompanyUpdate?.name} updated successfully!`)
-        //navigate(routes.companyAdmin.path);
+        navigate(routes.companyAdmin.path);
       }
     },
     onError: notifyGraphqlError,
@@ -122,7 +128,7 @@ const CompanyForm = (props: IProps) => {
   const onSubmitForm = (values: any) => {
     if(props.company) {
       const address = {
-        id: props.company.admin?.address_id as string,
+
         country:values.country,
         streetAddress: values.streetAddress,
         state: values.state,
@@ -132,7 +138,7 @@ const CompanyForm = (props: IProps) => {
       }
 
 
-      const input: CompanyUpdateInput = {
+  const input: CompanyUpdateInput = {
         id: props.company.id,
         name: values.name,
         status: values.status,

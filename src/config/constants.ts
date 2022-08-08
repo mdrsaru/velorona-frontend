@@ -80,6 +80,10 @@ export const employee_timesheet_status = [{
   value: 'Rejected',
   name: 'Rejected'
 },
+{
+	value: 'PartiallyApproved',
+	name: 'PartiallyApproved'
+},
 ]
 
 export const company_status = [{

@@ -64,13 +64,13 @@ const Sidebar = (props: any) => {
 		route: routes.dashboard.path,
 		accessRoles: [ constants.roles.SuperAdmin ]
 	  },
-    {
-      key: routes.role.key,
-      name: routes.role.name,
-      icon: <UserSwitchOutlined />,
-      route: routes.role.path,
-      accessRoles: [constants.roles.SuperAdmin]
-    },
+    // {
+    //   key: routes.role.key,
+    //   name: routes.role.name,
+    //   icon: <UserSwitchOutlined />,
+    //   route: routes.role.path,
+    //   accessRoles: [constants.roles.SuperAdmin]
+    // },
     {
       key: routes.companyAdmin.key,
       name: routes.companyAdmin.name,
