@@ -28,6 +28,7 @@ interface IProps {
   employeeId?: string;
   providedData: string;
   refetch:any;
+  setEmployee?:any;
 }
 
 export const WORKSCHEDULE_DETAIL_CREATE = gql`
@@ -91,7 +92,8 @@ const AddNewWorkscheduleDetail = (props: IProps) => {
         },
     })
 
-      props?.setVisibility(false)
+		props?.setEmployee('')
+		props?.setVisibility(false)
 
     },
     onError(err) {

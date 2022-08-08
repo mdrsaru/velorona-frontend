@@ -23,6 +23,7 @@ interface IProps {
   setVisibility: any;
   workschedule: any;
   getWorkschedule: any;
+  setEmployee?:any;
 }
 
 export const WORKSCHEDULE_TIME_DETAIL_CREATE = gql`
@@ -127,6 +128,7 @@ const AddTimeInterval = (props: IProps) => {
           },
         }
       })
+	  props?.setEmployee('')
       props?.setVisibility(false)
 
     },

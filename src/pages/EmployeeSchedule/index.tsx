@@ -31,6 +31,7 @@ WorkscheduleDetail(input:$input){
 			user{
 				id
 				fullName
+				designation
 			}
       workscheduleTimeDetail{
        id

@@ -1,6 +1,6 @@
 import { Fragment, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Card, Col, message, Row, } from "antd";
+import {  Card, Col, message, Row, } from "antd";
 import { PlusCircleFilled, DeleteOutlined } from "@ant-design/icons";
 import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import moment from "moment";
@@ -274,7 +274,7 @@ const loggedInUser = authVar()
             <div className={styles['main-div']}>
                 <Card bordered={false}>
                     <PageHeader
-                        title="Scheduling"
+                        title={`Scheduling ( ${moment(workscheduleData?.Workschedule?.data?.[0]?.startDate).format('MMM DD')} -${moment(workscheduleData?.Workschedule?.data?.[0]?.endDate).format('MMM DD')} )`}
 
                     />
                     <Row className='container-row'>
@@ -300,8 +300,12 @@ const loggedInUser = authVar()
                                             groups && Object.keys(groups).map(function (key, index) {
                                                 return (
                                                     <tr key={index}>
-                                                        <td>{groups[key]?.[0]?.user?.fullName}</td>
-                                                        {weekDays.map((day: any, index: number) => (
+                                                        <td>
+															{groups[key]?.[0]?.user?.fullName}
+															<br/>
+															<span>({groups[key]?.[0]?.user?.designation})</span>
+															</td>
+													    {weekDays.map((day: any, index: number) => (
                                                             <td key={index}>
                                                                 {groups[key] && groups[key]?.map((data: any, index: number) =>
                                                                     <Fragment key={index}>
@@ -375,6 +379,7 @@ const loggedInUser = authVar()
                     setVisibility={setAddTimeInterval}
                     workschedule={workscheduleDetailByIdData}
                     getWorkschedule={getWorkschedule}
+					setEmployee = {setEmployee}
                 />
 
                 <AddNewWorkscheduleDetail
@@ -385,6 +390,7 @@ const loggedInUser = authVar()
                     employeeId={addNewTimeInterval?.employeeId}
                     providedData={addNewTimeInterval?.providedData}
                     refetch={refetchWorkscheduleDetail}
+					setEmployee = {setEmployee}
                 />
 
                 <AddWorkscheduleEmployee
