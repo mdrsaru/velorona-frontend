@@ -25,6 +25,7 @@ import styles from './style.module.scss';
 import { useEffect, useState } from "react";
 
 import subscriptionImg from '../../assets/images/subscription.png';
+import { UserOutlined } from '@ant-design/icons';
 
 const { Sider } = Layout;
 
@@ -85,6 +86,13 @@ const Sidebar = (props: any) => {
       route: routes.invoicePaymentConfig.path,
       accessRoles: [constants.roles.SuperAdmin]
     },
+	{
+		key: routes.superAdmin.key,
+		name: routes.superAdmin.name,
+		icon: <UserOutlined />,
+		route: routes.superAdmin.path,
+		accessRoles: [constants.roles.SuperAdmin]
+	},
     {
       key: routes.user.key,
       name: routes.user.name,

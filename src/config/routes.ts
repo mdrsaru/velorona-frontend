@@ -88,6 +88,31 @@ const routes = {
     name: 'Edit Company',
     key: 'company'
   },
+  superAdmin: {
+    childPath: 'super-admin',
+    path: '/super-admin',
+    component: lazy(() => import('../pages/SuperAdmin')),
+    name: 'Super admin',
+    key: 'super-admin',
+    allowedRoles: [SuperAdmin],
+  },
+  addSuperAdmin: {
+    childPath: 'add',
+    path: '/super-admin/add',
+    component: lazy(() => import('../pages/SuperAdmin/AddSuperAdmin')),
+    name: 'Add super admin',
+    key: 'add',
+    allowedRoles: [SuperAdmin],
+  },
+  editSuperAdmin: {
+    childPath: ':id/edit',
+    path:(id: string) => `/super-admin/${id}/edit`,
+    component: lazy(() => import('../pages/SuperAdmin/AddSuperAdmin')),
+    name: 'Add super admin',
+    key: 'add',
+    allowedRoles: [SuperAdmin],
+  },
+
   user: {
     childPath: 'users',
     path: (id: string) => `/${id}/users`,
