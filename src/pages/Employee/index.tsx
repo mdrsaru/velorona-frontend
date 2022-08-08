@@ -50,7 +50,7 @@ export const USER = gql`
         lastName
         fullName
         status
-		designation
+        designation
         manager{
         id 
         fullName 
@@ -274,6 +274,9 @@ const Employee = () => {
       nextFetchPolicy: "cache-first",
       variables: {
         input: {
+          query: {
+            company_id: loggedInUser?.company?.id,
+          },
           paging: {
             order: ["updatedAt:DESC"],
           },
