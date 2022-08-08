@@ -97,7 +97,7 @@ const _Routes = () => {
               </CheckRoles>
             }
           />
-		  <Route
+          <Route
             path={routes.addSuperAdmin.path}
             element={
               <CheckRoles allowedRoles={routes.addSuperAdmin.allowedRoles}>
@@ -107,17 +107,27 @@ const _Routes = () => {
               </CheckRoles>
             }
           />
-		</Route>
+          </Route>
+
           <Route path={routes.invoicePaymentConfig.path}>
             <Route
               index
               element={
-                <Suspense fallback={<LoginLoader />}>
+                <Suspense fallback={<RouteLoader />}>
                   <routes.invoicePaymentConfig.component />
                 </Suspense>
               }
             />
           </Route>
+
+          <Route 
+            path={routes.payments.path}
+            element={
+              <Suspense fallback={<RouteLoader />}>
+                <routes.payments.component />
+              </Suspense>
+            }
+          />
 
 					<Route
             path={routes.dashboard.path}

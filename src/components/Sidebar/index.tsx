@@ -86,14 +86,6 @@ const Sidebar = (props: any) => {
       viewAsAdmin: false,
     },
     {
-      key: routes.invoicePaymentConfig.key,
-      name: routes.invoicePaymentConfig.name,
-      icon: <SettingOutlined />,
-      route: routes.invoicePaymentConfig.path,
-      accessRoles: [constants.roles.SuperAdmin],
-      viewAsAdmin: false,
-    },
-    {
       key: routes.superAdmin.key,
       name: routes.superAdmin.name,
       icon: <UserOutlined />,
@@ -180,6 +172,22 @@ const Sidebar = (props: any) => {
       route: routes.subscription.path(loggedInUser?.company?.code ?? ''),
       accessRoles: [constants.roles.CompanyAdmin],
       viewAsAdmin: true,
+    },
+    {
+      key: routes.payments.key,
+      name: routes.payments.name,
+      icon: <img src={subscriptionImg} style={{ width: 14 }} alt="subscription" />,
+      route: routes.payments.path,
+      accessRoles: [constants.roles.SuperAdmin],
+      viewAsAdmin: false,
+    },
+    {
+      key: routes.invoicePaymentConfig.key,
+      name: routes.invoicePaymentConfig.name,
+      icon: <SettingOutlined />,
+      route: routes.invoicePaymentConfig.path,
+      accessRoles: [constants.roles.SuperAdmin],
+      viewAsAdmin: false,
     },
   ]
 

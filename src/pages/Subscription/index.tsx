@@ -41,7 +41,7 @@ const Subscription = () => {
   const { data: authData } = useQuery(AUTH)
   const company_id = authData.AuthUser?.company?.id as string;
 
-  const { data: companyData, loading: companyLoading } = useQuery<
+  const { loading: companyLoading } = useQuery<
     GraphQLResponse<'CompanyById', Company>,
     QueryCompanyByIdArgs
   >(COMPANY, {
@@ -67,12 +67,9 @@ const Subscription = () => {
     }
   });
 
-  const company = companyData?.CompanyById;
   if(companyLoading) {
     return null;
   }
-
-  const plan = company?.plan as 'Starter' | 'Professional';
 
   return (
     <Elements stripe={stripePromise}>

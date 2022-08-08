@@ -21,6 +21,14 @@ const routes = {
     key: 'company',
     allowedRoles: [SuperAdmin],
   },
+  payments: {
+    childPath: 'payments',
+    path: '/payments',
+    component: lazy(() => import('../pages/Payment')),
+    name: 'Payments',
+    key: 'payments',
+    allowedRoles: [SuperAdmin],
+  },
   invoicePaymentConfig: {
     childPath: 'payment-config',
     path: '/payment-config',
