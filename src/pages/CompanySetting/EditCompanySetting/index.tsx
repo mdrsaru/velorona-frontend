@@ -6,7 +6,6 @@ import {
   Input,
   Space,
   Button,
-  Select,
   message,
   UploadProps,
   Upload,

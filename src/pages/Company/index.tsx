@@ -34,10 +34,11 @@ export const COMPANY = gql`
         name
         status
         createdAt 
-        logo{
-        id
-        name
-        url 
+        companyCode
+        logo {
+          id
+          name
+          url
         }
       }
     }
@@ -233,12 +234,22 @@ const Company = () => {
   const menu = (data: any) => (
     <Menu>
       <Menu.Item key="1">
+        <a href={`/${data.companyCode}`} target="_blank" rel="noreferrer">
+          Login To Company
+        </a>
+      </Menu.Item>
+
+      <Menu.Divider />
+
+      <Menu.Item key="2">
         <div onClick={() => navigate(routes.editCompany.path(data?.id ?? '1'))}>
           Edit Company
         </div>
       </Menu.Item>
+
       <Menu.Divider />
-      <SubMenu title="Change status" key="2">
+
+      <SubMenu title="Change status" key="3">
         <Menu.Item key="active"
           onClick={() => {
             if (data?.status === 'Inactive') {

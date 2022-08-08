@@ -1,0 +1,17 @@
+.cico {
+  border-right: 1px solid var(--gray-3);
+  padding: 0 1.5rem;
+  margin-right: 1rem;
+  cursor: pointer;
+
+  .check-out {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+
+    .timer {
+      font-weight: 600;
+      font-size: 18px;
+    }
+  }
+}
