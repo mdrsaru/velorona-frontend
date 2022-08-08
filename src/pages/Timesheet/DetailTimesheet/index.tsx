@@ -79,6 +79,7 @@ export const TIME_SHEET = gql`
         user {
           id
           email
+		  timesheet_attachment
         }
         client {
           id
@@ -179,6 +180,9 @@ export const ATTACHED_TIMESHEET = gql`
           id 
           duration 
         }
+		amount
+		type
+		date 
       }
       paging {
         total
@@ -306,23 +310,36 @@ const DetailTimesheet = () => {
     form.resetFields();
   }
 
+  const [fileData, setFile] = useState({
+	id: "",
+	name: "",
+	url:""
+ });
+  
   const { data: attachedTimesheetData ,refetch:refetchAttachedTimesheet} = useQuery(ATTACHED_TIMESHEET, {
-    fetchPolicy: "network-only",
-    nextFetchPolicy: "cache-first",
-    variables: {
-      input: {
-        query: {
-          company_id: authData?.company?.id,
-          // created_by: authData?.user?.id,
-          timesheet_id: timesheet_id
-        },
-        paging: {
-          order: ["updatedAt:DESC"],
-        },
-      },
-    },
+	fetchPolicy: "network-only",
+	nextFetchPolicy: "cache-first",
+	variables: {
+	  input: {
+		query: {
+		  company_id: authData?.company?.id,
+		  // created_by: authData?.user?.id,
+		  timesheet_id: timesheet_id
+		},
+		paging: {
+		  order: ["updatedAt:DESC"],
+		},
+	  },
+	},
+	onCompleted(response){
+		setFile({
+			id:  response?.AttachedTimesheet?.data[0]?.attachments?.id,
+			name: response?.AttachedTimesheet?.data[0]?.attachments?.name as string,
+			url: response?.AttachedTimesheet?.data[0]?.attachments?.url as string,
+		  });
+	}
   });
-
+ 
   const [attachedTimesheetDelete] = useMutation<GraphQLResponse<'AttachedTimesheetDelete', AttachedTimesheet>, MutationAttachedTimesheetDeleteArgs>(ATTACHED_TIMESHEET_DELETE, {
     onCompleted() {
       message.success({
@@ -563,7 +580,7 @@ const DetailTimesheet = () => {
           setEditAttachedVisibility(true);
           setAttachedTimesheet(data);
         }}>
-          Edit Timesheet Attachments
+          Edit Attachments
         </div>
       </Menu.Item>
       <Menu.Divider />
@@ -573,7 +590,7 @@ const DetailTimesheet = () => {
           setAttachedTimesheet(data);
         }}
         >
-          Delete Timesheet Attachments
+          Delete Attachments
         </div>
       </Menu.Item>
 
@@ -595,6 +612,28 @@ const DetailTimesheet = () => {
         )
       }
     },
+	{
+		title: 'Attachment Type',
+		dataIndex: 'type',
+	  },
+	  {
+		title: 'Amount',
+		dataIndex: 'amount',
+		render: (amount: any) => {
+			return (
+			  <span>{amount ?? '-' }</span>
+			)
+		  }
+	  },
+	  {
+		title: 'Date',
+		dataIndex: 'date',
+		render: (date: any) => {
+			return (
+			  <span>{date?.split('T')?.[0] ?? '-' }</span>
+			)
+		  }
+	  }, 
     {
       title: 'Attachment',
       key: 'attachments',
@@ -679,7 +718,11 @@ const DetailTimesheet = () => {
                   ]}
                 />
               </Row>
-
+ 			 {(!timeSheetDetail?.Timesheet?.data[0]?.entriesGroup?.byStatus.length &&
+                !timeSheetDetail?.Timesheet?.data[0]?.entriesGroup?.byInvoice.length) ?
+                <NoContent title={'No Time Entry added'} subtitle={'There are no entries added at the moment'} /> 
+				:
+              <>
               <div className={styles['resp-table']}>
                 {
                   !!entriesByStatus.pending?.length &&
@@ -881,56 +924,18 @@ const DetailTimesheet = () => {
                   </div>
                 }
               </div>
-
+			  </>
+			   }
               <br />
-              {(!timeSheetDetail?.Timesheet?.data[0]?.entriesGroup?.byStatus.length &&
-                !timeSheetDetail?.Timesheet?.data[0]?.entriesGroup?.byInvoice.length) ?
-                <NoContent title={'No Time Entry added'} subtitle={'There are no entries added at the moment'} /> :
-                <Row justify={"end"}>
-                  <Col className={styles['form-col']}>
-                    <Space>
-                      <Button
-                        type="primary"
-                        htmlType="button"
-                        onClick={exit}
-                      >
-                        Exit
-                      </Button>
-
-                      {
-                        checkRoles({
-                          expectedRoles: [constants.roles.Employee],
-                          userRoles: roles,
-                        }) && (
-                          <Popconfirm
-                            placement="top"
-                            title="Submit timesheet?"
-                            onConfirm={onSubmitTimesheet}
-                            okText="Yes" cancelText="No"
-                            disabled={isSubmitted}
-                          >
-                            <Button
-                              type="default"
-                              htmlType="button"
-                              loading={submittingTimesheet}
-                              disabled={isSubmitted}
-                            >
-                              Submit
-                            </Button>
-                          </Popconfirm>
-
-                        )
-                      }
-                    </Space>
-                  </Col>
-                </Row>}
               <br />
             </Card>
           </div>
         </Spin>
-      }
+      } 
 
-      {canViewAttachedTimesheet &&
+{timesheetDetail?.user.timesheet_attachment &&  
+      (
+		canViewAttachedTimesheet &&
         (<div className={styles['site-card-wrapper']}>
           <Card className={styles['attach-approved-timesheet']}>
             <Collapse accordion defaultActiveKey={['2']}>
@@ -954,7 +959,51 @@ const DetailTimesheet = () => {
             </Collapse>
           </Card>
         </div>
-        )}
+        )
+	)}
+
+		{(!timeSheetDetail?.Timesheet?.data[0]?.entriesGroup?.byStatus?.length &&
+               !timeSheetDetail?.Timesheet?.data[0]?.entriesGroup?.byInvoice?.length ) ?
+               "" :
+               <Row justify={"end"} className={styles['button-row']}>
+                 <Col className={styles['form-col']}>
+                   <Space>
+                     <Button
+                       type="primary"
+                       htmlType="button"
+                       onClick={exit}
+                     >
+                       Exit
+                     </Button>
+ 
+                     {
+                       checkRoles({
+                         expectedRoles: [constants.roles.Employee],
+                         userRoles: roles,
+                       }) && (
+                         <Popconfirm
+                           placement="top"
+                           title="Submit timesheet?"
+                           onConfirm={onSubmitTimesheet}
+                           okText="Yes" cancelText="No"
+                           disabled={isSubmitted}
+                         >
+                           <Button
+                             type="default"
+                             htmlType="button"
+                             loading={submittingTimesheet}
+                             disabled={isSubmitted}
+                           >
+                             Submit
+                           </Button>
+                         </Popconfirm>
+ 
+                       )
+                     }
+                   </Space>
+                 </Col>
+               </Row>}
+
 
         <div className={styles['site-card-wrapper']}>
           <Card bordered={false} className={styles['time-entries']}>
@@ -1046,6 +1095,9 @@ const DetailTimesheet = () => {
         visibility={editAttachedVisibility}
         setVisibility={setEditAttachedVisibility}
         data={attachedTimesheet}
+		setFile={setFile}
+		fileData = {fileData}
+		refetch= {refetchAttachedTimesheet}
       />
 
       <ApprovedTimesheetAttachment

@@ -1,15 +1,15 @@
-import { Button, Col, Form, Input, message, Modal, Row, Space, Upload, UploadProps } from "antd";
+import { Button, Col, DatePicker, Form, Input, InputNumber, message, Modal, Row, Select, Space, Upload, UploadProps } from "antd";
 import { authVar } from "../../App/link";
 import { CloseOutlined } from '@ant-design/icons';
 
 
-import constants from "../../config/constants";
+import constants, { attachment_type } from "../../config/constants";
 
 import styles from './styles.module.scss'
 import { gql, useMutation } from "@apollo/client";
 import { useState } from "react";
 import { GraphQLResponse } from "../../interfaces/graphql.interface";
-import { AttachedTimesheet, MutationAttachedTimesheetCreateArgs } from "../../interfaces/generated";
+import { AttachedTimesheet, AttachmentType, MutationAttachedTimesheetCreateArgs } from "../../interfaces/generated";
 import { notifyGraphqlError } from "../../utils/error";
 
 interface IProps {
@@ -41,6 +41,7 @@ export const ATTACH_TIMESHEET_CREATE = gql`
     }
   `;
 
+const {Option} = Select
 const AttachNewTimesheetModal = (props: IProps) => {
     const authData = authVar()
 
@@ -50,6 +51,7 @@ const AttachNewTimesheetModal = (props: IProps) => {
         id: null,
         name: "",
     });
+	const [type,setType] = useState('')
 
     const [createAttachedTimesheet] = useMutation<GraphQLResponse<'AttachedTimesheetCreate', AttachedTimesheet>, MutationAttachedTimesheetCreateArgs>(ATTACH_TIMESHEET_CREATE, {
 
@@ -111,6 +113,10 @@ const AttachNewTimesheetModal = (props: IProps) => {
             description: values?.description,
             timesheet_id: props?.timesheet_id,
             invoice_id: props?.invoice_id,
+            type: values?.type,
+            amount: values?.amount,
+            date: values?.date,
+
         }
         if (fileData?.id) {
             data.attachment_id = fileData?.id
@@ -133,6 +139,9 @@ const AttachNewTimesheetModal = (props: IProps) => {
         }
         return e && e.fileList;
     };
+	const handleTypeChange = (value:any) =>{
+		setType(value)
+	}
     return (
         <Modal
             centered
@@ -160,6 +169,56 @@ const AttachNewTimesheetModal = (props: IProps) => {
                     name="payrate-form"
                     onFinish={onSubmitForm}>
                     <Row gutter={[24, 0]}>
+					<Col
+                            xs={24}
+                            sm={24}
+                            md={24}
+                            lg={24}>
+                            <Form.Item
+                                label="Attachment Type"
+                                name="type"
+                                rules={[{
+                                    required: true,
+                                    message: 'Please enter attachment type'
+                                }]}                                >
+                              <Select placeholder='Select attachment type' onChange={handleTypeChange}>
+								{attachment_type.map((type,index)=>(
+									<Option value={type.value} key={index}>{type.name}</Option>
+								))}
+							  </Select>
+                            </Form.Item>
+                        </Col>
+					{type === AttachmentType.Attachment && (
+						<>
+							<Col
+                            xs={24}
+                            sm={24}
+                            md={12}
+                            lg={12}>
+                            <Form.Item
+                                label="Amount"
+                                name="amount"
+                            >
+                                <InputNumber
+									type='number'
+                                    placeholder="Enter amount"
+                                    autoComplete="off"
+                                    style={{ width: '100%' }} />
+                            </Form.Item>
+                        </Col>
+						<Col
+                            xs={24}
+                            sm={24}
+                            md={12}
+                            lg={12}>
+                            <Form.Item
+                                label="Date"
+                                name="date" >
+                                <DatePicker placeholder="Please select date"/>
+                            </Form.Item>
+                        </Col>
+					</>
+					)}
                         <Col
                             xs={24}
                             sm={24}

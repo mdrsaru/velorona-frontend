@@ -209,6 +209,7 @@ const EditEmployee = () => {
       middleName: user?.middleName ?? "",
       lastName: user?.lastName ?? "",
       phone: user?.phone ?? "",
+	  designation:user?.designation ?? "",
       roles: user?.roles[0]?.name ?? "",
       status: user?.status ?? "",
       manager_id: user?.manager_id ?? "",
@@ -337,6 +338,19 @@ const EditEmployee = () => {
                   />
                 </Form.Item>
               </Col>
+			  <Col
+              xs={24}
+              sm={24}
+              md={8}
+              lg={8}
+              className={styles.formCol}>
+              <Form.Item
+                label="Designation"
+                name='designation'
+				>
+                <Input placeholder="Enter designation" autoComplete="off" />
+              </Form.Item>
+            </Col>
               <Col className={styles["form-header"]}>
                 <p>Address</p>
               </Col>

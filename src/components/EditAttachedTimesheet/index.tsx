@@ -1,23 +1,27 @@
-import { Button, Col, Form, Input, message, Modal, Row, Space, Upload, UploadProps } from "antd";
+import { Button, Col, DatePicker, Form, Input, InputNumber, message, Modal, Row, Select, Space, Upload, UploadProps } from "antd";
 import { authVar } from "../../App/link";
 import { CloseOutlined } from '@ant-design/icons';
+import moment from "moment";
 
-
-import constants from "../../config/constants";
+import constants, { attachment_type } from "../../config/constants";
 
 import styles from '../AddAttachedTimesheet/styles.module.scss'
-import { gql, useLazyQuery, useMutation } from "@apollo/client";
-import { useState } from "react";
+import { gql, useMutation } from "@apollo/client";
+import { useEffect, useMemo, useState } from "react";
 import { GraphQLResponse } from "../../interfaces/graphql.interface";
-import { AttachedTimesheet, MutationAttachedTimesheetUpdateArgs } from "../../interfaces/generated";
+import { AttachedTimesheet, AttachmentType, MutationAttachedTimesheetUpdateArgs } from "../../interfaces/generated";
 import { notifyGraphqlError } from "../../utils/error";
-import { ATTACHED_TIMESHEET } from "../../pages/Timesheet/DetailTimesheet";
 interface IProps {
     visibility: boolean;
     setVisibility: any;
     data?: any;
+	fileData:any;
+	setFile:any;
+	refetch:any;
 }
 
+
+const dateFormat = "YYYY-MM-DD HH:mm:ss";
 
 export const ATTACH_TIMESHEET_UPDATE = gql`
     mutation AttachedTimesheetUpdate($input: AttachedTimesheetUpdateInput!) {
@@ -36,47 +40,26 @@ export const ATTACH_TIMESHEET_UPDATE = gql`
     }
   `;
 
+const {Option} = Select;
+
 const EditAttachedTimesheet = (props: IProps) => {
     const authData = authVar()
-
-    const attachedTimesheet = props?.data;
     const [form] = Form.useForm();
-
-    const [fileData, setFile] = useState({
-        id: null,
-        name: "",
-    });
-    const [getAttachedTimesheet] = useLazyQuery(ATTACHED_TIMESHEET, {
-        fetchPolicy: "network-only",
-        nextFetchPolicy: "cache-first",
-        variables: {
-            input: {
-                query: {
-                    company_id: authData?.company?.id,
-                    created_by: authData?.user?.id as string,
-                    timesheet_id: props?.data?.timesheet?.id
-
-                },
-                paging: {
-                    order: ['updatedAt:DESC']
-                }
-            }
-        }
-    })
+	const attachedTimesheet = props?.data;
+	const [option,setOption] = useState('')
 
     const [attachedTimesheetUpdate] = useMutation<GraphQLResponse<'AttachedTimesheetUpdate', AttachedTimesheet>, MutationAttachedTimesheetUpdateArgs>(ATTACH_TIMESHEET_UPDATE, {
 
         onCompleted() {
             message.success({
-                content: `New attached timesheet is added successfully!`,
+                content: `Attachment updated successfully!`,
                 className: "custom-message",
             });
-            getAttachedTimesheet({
+           props?.refetch({
                 variables: {
                     input: {
                         query: {
                             company_id: authData?.company?.id as string,
-                            created_by: authData?.user?.id as string,
                             timesheet_id: props?.data?.timesheet?.id
                         },
                         paging: {
@@ -103,7 +86,7 @@ const EditAttachedTimesheet = (props: IProps) => {
         },
         onChange(info) {
             if (info.file.status === 'done') {
-                setFile({
+                props.setFile({
                     name: info?.file?.name,
                     id: info?.file?.response?.data?.id
                 })
@@ -119,9 +102,14 @@ const EditAttachedTimesheet = (props: IProps) => {
             id: props?.data?.id,
             company_id: authData?.company?.id,
             description: values?.description,
+			type: values?.type,
+            date: values?.date,
         }
-        if (fileData?.id) {
-            data.attachment_id = fileData?.id
+		if(values?.amount){
+			data.amount= values?.amount
+		}
+        if (props.fileData?.id) {
+            data.attachment_id = props.fileData?.id
         }
 
         attachedTimesheetUpdate({
@@ -142,6 +130,25 @@ const EditAttachedTimesheet = (props: IProps) => {
         return e && e.fileList;
     };
 
+	const handleTypeChange = (value:any) =>{
+		setOption(value)
+	}
+	let defaultValues:any = useMemo(() => {}, []);
+	 defaultValues = {
+			description: attachedTimesheet?.description ?? '',
+			file: attachedTimesheet?.attachments?.url ?? '',
+			type:attachedTimesheet?.type ?? '',
+			amount:attachedTimesheet?.amount ?? '',
+			date: moment(
+				attachedTimesheet?.date ?? "2022-01-01T00:00:00.410Z",
+				dateFormat
+			  ), 
+		}
+
+	useEffect(() => {
+		form.setFieldsValue(defaultValues)
+	   }, [form, defaultValues])
+
     return (
         <Modal
             centered
@@ -159,7 +166,7 @@ const EditAttachedTimesheet = (props: IProps) => {
             <div className={styles["modal-body"]}>
                 <div className={styles['title-div']}>
                     <span className={styles["title"]}>
-                        Edit Approved Timesheet
+                        Edit Attachment
                     </span>
                 </div>
 
@@ -168,12 +175,59 @@ const EditAttachedTimesheet = (props: IProps) => {
                     layout="vertical"
                     name="payrate-form"
                     onFinish={onSubmitForm}
-                    initialValues={{
-                        description: attachedTimesheet?.description ?? '',
-                        file: attachedTimesheet?.attachments?.url ?? '',
-                    }}
+                    initialValues={defaultValues}
                 >
                     <Row gutter={[24, 0]}>
+					<Col
+                            xs={24}
+                            sm={24}
+                            md={24}
+                            lg={24}>
+                            <Form.Item
+                                label="Attachment Type"
+                                name="type"
+                                rules={[{
+                                    required: true,
+                                    message: 'Please enter attachment type'
+                                }]}                                >
+                              <Select placeholder='Select attachment type' onChange={handleTypeChange}>
+								{attachment_type.map((type,index)=>(
+									<Option value={type.value} key={index}>{type.name}</Option>
+								))}
+							  </Select>
+                            </Form.Item>
+                        </Col>
+					{(attachedTimesheet?.type === AttachmentType.Attachment || option === AttachmentType.Attachment) && (
+						<>
+							<Col
+                            xs={24}
+                            sm={24}
+                            md={12}
+                            lg={12}>
+                            <Form.Item
+                                label="Amount"
+                                name="amount"
+                            >
+                                <InputNumber
+									type='number'
+                                    placeholder="Enter amount"
+                                    autoComplete="off"
+                                    style={{ width: '100%' }} />
+                            </Form.Item>
+                        </Col>
+						<Col
+                            xs={24}
+                            sm={24}
+                            md={12}
+                            lg={12}>
+                            <Form.Item
+                                label="Date"
+                                name="date" >
+                                <DatePicker placeholder="Please select date"/>
+                            </Form.Item>
+                        </Col>
+					</>
+					)}
                         <Col
                             xs={24}
                             sm={24}
@@ -200,8 +254,8 @@ const EditAttachedTimesheet = (props: IProps) => {
                                 <div className={styles["upload-file"]}>
                                     <div>
                                         <span>
-                                            {fileData?.name
-                                                ? fileData?.name
+                                            {props.fileData?.name
+                                                ? props.fileData?.name
                                                 : " Attach your files here"}
                                         </span>
                                     </div>
