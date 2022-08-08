@@ -11,6 +11,7 @@ import LoginLoader from '../components/Skeleton/LoginLoader';
 import RouteLoader from '../components/Skeleton/RouteLoader';
 import PublicRoutes from '../components/PublicRoutes';
 import TimeSheetLoader from '../components/Skeleton/TimeSheetLoader';
+import CompanySet from '../components/CompanySet';
 
 const _Routes = () => {
 
@@ -170,15 +171,16 @@ const _Routes = () => {
             }
           />
 
-          <Route path={routes.company.childPath}>
-					<Route
-            index
-            element={
-                <Suspense fallback={<RouteLoader />}>
-                  <routes.company.component />
-                </Suspense>
-            }
-          />
+          <Route path={routes.company.childPath} element={<CompanySet />}>
+            <Route
+              index
+              element={
+                  <Suspense fallback={<RouteLoader />}>
+                    <routes.company.component />
+                  </Suspense>
+              }
+            />
+
             <Route
               path={routes.employeeTimesheet.childPath}
               element={

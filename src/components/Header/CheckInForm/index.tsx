@@ -35,7 +35,7 @@ interface IProps {
   hideCheckInModal: () => void;
 }
 
-const CheckInCheckOut = (props: IProps) => {
+const CheckInForm = (props: IProps) => {
   const loggedInUser = authVar()
   const company_id = loggedInUser?.company?.id as string;
 
@@ -116,4 +116,4 @@ const CheckInCheckOut = (props: IProps) => {
   )
 }
 
-export default CheckInCheckOut;
+export default CheckInForm;

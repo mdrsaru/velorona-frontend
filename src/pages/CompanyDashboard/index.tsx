@@ -10,7 +10,7 @@ const CompanyDashboard = () => {
   const authData = authVar()
   const roles = authData?.user?.roles;
 
-  if(roles.includes(constants.roles.CompanyAdmin) ){
+  if(roles.includes(constants.roles.CompanyAdmin) ||roles.includes(constants.roles.SuperAdmin)  ){
 	return <CompanyAdminDashboard/>
   }
   else if (roles.includes(constants.roles.TaskManager) ){
