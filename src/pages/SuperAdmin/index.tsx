@@ -180,7 +180,9 @@ const SuperAdmin =() =>{
       archived?: boolean,
       role?: string,
       search?: string
-    } = {}
+    } = {
+		role: RoleName.SuperAdmin,
+	}
 
     if (values.status) {
       if (values.status === 'Active' || values.status === 'Inactive') {
@@ -226,7 +228,9 @@ const SuperAdmin =() =>{
       archived?: boolean,
       role?: string,
       search?: string
-    } = {}
+    } = {
+		role: RoleName.SuperAdmin,
+	}
 
 
     if (keys === 'archived') {
