@@ -503,6 +503,33 @@ const _Routes = () => {
             }
           />
 
+		<Route
+            path={routes.privacyPolicy.childPath}
+            element={
+              <Suspense fallback={<RouteLoader />}>
+                <routes.privacyPolicy.component />
+              </Suspense>
+            }
+          />
+
+		<Route
+            path={routes.cookiePolicy.childPath}
+            element={
+              <Suspense fallback={<RouteLoader />}>
+                <routes.cookiePolicy.component />
+              </Suspense>
+            }
+          />	
+		  
+		<Route
+		  path={routes.termsAndCondition.childPath}
+		  element={
+			<Suspense fallback={<RouteLoader />}>
+			  <routes.termsAndCondition.component />
+			</Suspense>
+		  }
+		/>
+
           <Route path="*" element={<NotFound />} />
         </Route>
       </Routes>
