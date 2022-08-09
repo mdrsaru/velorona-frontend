@@ -139,7 +139,8 @@ const TimeTracker = () => {
 			input: {
 				query: {
 					company_id,
-					client_id: ''
+					client_id: '',
+					user_id:authData.user.id
 				},
 				paging: {
 					order: ['updatedAt:DESC']
