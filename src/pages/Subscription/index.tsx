@@ -53,13 +53,14 @@ const Subscription = () => {
     onCompleted(response) {
       const company = response.CompanyById;
       const plan = company?.plan as 'Starter' | 'Professional';
+      const subscriptionStatus = company?.subscriptionStatus ?? (company?.plan === 'Starter' ? 'active' : 'inactive');
 
       const currentPlan: IPlan = {
         name: company?.plan as string,
         description: company?.plan ? subscription.description[plan] : '',
         price: subscription.price[plan] as string,
         features: subscription.features[plan] as string[] ?? [],
-        subscriptionStatus: company?.subscriptionStatus as string,
+        subscriptionStatus,
       }
       const plans = getPlans(currentPlan);
       plansVar(plans);
@@ -114,7 +115,7 @@ function getPlans(currentPlan: IPlan) {
       name: 'Starter',
       description: subscription.description.Starter,
       price: subscription.price.Starter,
-      subscriptionStatus: 'inactive',
+      subscriptionStatus: currentPlan.name === 'Starter' ? 'active' : 'inactive',
       features: subscription.features.Starter,
     },
     {

@@ -54,6 +54,9 @@ const Payment = (props: IProps) => {
             _plan.subscriptionStatus = 'active';
 
             currentPlan = _plan;
+          } else if(plan.name === 'Starter') {
+            _plan.subscriptionStatus = 'inactive';
+            currentPlan =  _plan;
           }
 
           return _plan;

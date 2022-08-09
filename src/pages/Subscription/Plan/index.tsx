@@ -65,6 +65,18 @@ const Plan = (props: IProps) => {
     setSubscriptionData(null);
   }
 
+  const getBtnText = () => {
+    if(plan.subscriptionStatus === 'inactive' && plan.name === 'Starter') {
+      return 'Inactive';
+    }
+
+    if(plan.subscriptionStatus === 'active') {
+      return 'Active';
+    }
+
+    return 'Upgrade'
+  } 
+
   return (
     <div className={styles['container']}>
       <div className={styles['header']}>
@@ -74,15 +86,14 @@ const Plan = (props: IProps) => {
         <h1 className={styles['price']}>{plan.price}</h1>
       </div>
 
+      {/* Need downgrade functionality */}
       <Button
-        type="primary"
-        disabled={isPlanActive(plan)}
+        type={plan.name === 'Starter' && plan.subscriptionStatus === 'inactive' ? undefined : 'primary'}
+        disabled={plan.subscriptionStatus === 'active'}
         loading={creatingSubscription}
         onClick={createIncompleteSubscription}
       >
-        {
-          isPlanActive(plan) ? 'Active' : 'Upgrade'
-        }
+        { getBtnText() }
       </Button>
 
       <ul>
@@ -112,13 +123,7 @@ const Plan = (props: IProps) => {
 }
 
 function isPlanActive(plan: IPlan): boolean {
-  if(plan.name === 'Professional') {
-    return plan.subscriptionStatus === 'active';
-  } else if(plan.name === 'Starter') {
-    return true;
-  }
-
-  return false;
+  return plan.subscriptionStatus === 'active';
 }
 
 
