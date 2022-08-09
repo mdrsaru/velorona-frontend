@@ -1,26 +1,25 @@
-import { useQuery, gql, useMutation } from '@apollo/client';
+import moment from 'moment';
+import { debounce } from 'lodash';
 import { useEffect, useState } from 'react';
-
-import { Card, Row, Col, Table, Menu, Dropdown, Form, Select, Button, Input } from 'antd';
-import { MoreOutlined,SearchOutlined} from '@ant-design/icons';
-
 import { Link, useNavigate } from 'react-router-dom';
+import { useQuery, gql, useMutation } from '@apollo/client';
+import { MoreOutlined,SearchOutlined} from '@ant-design/icons';
+import { Card, Row, Col, Table, Menu, Dropdown, Form, Select, Button, Input } from 'antd';
+
 import routes from '../../config/routes';
+import constants, { company_status } from '../../config/constants';
+import { notifyGraphqlError } from '../../utils/error';
+import { GraphQLResponse } from '../../interfaces/graphql.interface';
+import { Company as ICompany,CompanyPagingResult, CompanyStatus, MutationCompanyUpdateArgs, QueryCompanyArgs } from '../../interfaces/generated';
+
+import Status from '../../components/Status';
+import ModalConfirm from '../../components/Modal';
 
 import deleteImg from './../../assets/images/delete_btn.svg';
 import archiveImg from './../../assets/images/archive_btn.svg';
-import ModalConfirm from '../../components/Modal';
-import constants, { company_status } from '../../config/constants';
-
-import { notifyGraphqlError } from '../../utils/error';
-import moment from 'moment';
-import styles from './style.module.scss';
-import { GraphQLResponse } from '../../interfaces/graphql.interface';
-import { Company as ICompany,CompanyPagingResult, CompanyStatus, MutationCompanyUpdateArgs, QueryCompanyArgs } from '../../interfaces/generated';
-import { debounce } from 'lodash';
-
-
 import filterImg from "../../assets/images/filter.svg"
+
+import styles from './style.module.scss';
 
 const { SubMenu } = Menu;
 export const COMPANY = gql`
@@ -289,11 +288,9 @@ const Company = () => {
     {
       title: 'Status',
       dataIndex: 'status',
-      key: 'status',
-      render: (status: string) =>
-        <span className={status === 'Active' ? styles['active-status'] : styles['inactive-status']}>
-          {status}
-        </span>
+      render: (status: string) => (
+        <Status status={status} />
+      )
     },
     {
       title: 'Created At',

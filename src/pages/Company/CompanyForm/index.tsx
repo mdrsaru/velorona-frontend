@@ -22,7 +22,7 @@ import styles from './style.module.scss';
 import constants from '../../../config/constants';
 import { authVar } from '../../../App/link';
 import { GraphQLResponse } from '../../../interfaces/graphql.interface';
-import { Company, CompanyCreateInput, CompanyUpdateInput, MutationCompanyCreateArgs, MutationCompanyUpdateArgs } from '../../../interfaces/generated';
+import { Company, CompanyCreateInput, CompanyUpdateInput, MutationCompanyCreateArgs, MutationCompanyUpdateArgs, CompanyStatus } from '../../../interfaces/generated';
 import routes from '../../../config/routes';
 
 const { Option } = Select;
@@ -253,8 +253,9 @@ const CompanyForm = (props: IProps) => {
             ]}
           >
             <Select placeholder="Company Status">
-              <Option value="Active">Active</Option>
-              <Option value="Inactive">In Active</Option>
+              <Option value={CompanyStatus.Active}>Active</Option>
+              <Option value={CompanyStatus.Inactive}>In Active</Option>
+              <Option value={CompanyStatus.Unapproved}>Not approved</Option>
             </Select>
           </Form.Item>
         </Col>
