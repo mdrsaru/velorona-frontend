@@ -377,6 +377,27 @@ const routes = {
     key: 'subscriptions',
     allowedRoles: [CompanyAdmin, SuperAdmin],
   },
+  privacyPolicy: {
+    childPath: 'privacy-policy',
+    path : `/privacy-policy`,
+    component: lazy(() => import('../pages/Policy/PrivacyPolicy')),
+    name: 'Privacy Policy',
+    key: 'policy',
+  },
+  cookiePolicy: {
+    childPath: 'cookie-policy',
+    path : `/cookie-policy`,
+    component: lazy(() => import('../pages/Policy/CookiePolicy')),
+    name: 'Cookie Policy',
+    key: 'policy',
+  },
+  termsAndCondition: {
+    childPath: 'terms-and-conditions',
+    path : `/terms-and-conditions`,
+    component: lazy(() => import('../pages/Policy/TermsAndCondition')),
+    name: 'Terms and condition',
+    key: 'policy',
+  },
 };
 
 export default routes;

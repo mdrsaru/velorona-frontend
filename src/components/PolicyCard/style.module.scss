@@ -1,0 +1,25 @@
+.policy-header-card {
+  padding: 126px 80px;
+  color: white;
+  border-radius: 25px;
+  background: var(--primary-gradient);
+}
+
+.policy-title {
+  font-weight: 700;
+  font-size: 36px;
+  line-height: 44px;
+}
+.policy-date {
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 22px;
+}
+@media screen and (max-width: 550px) {
+  .policy-header-card {
+    padding: 126px 20px;
+    p {
+      text-align: center;
+    }
+  }
+}
