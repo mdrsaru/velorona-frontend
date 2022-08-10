@@ -244,7 +244,7 @@ const AddTimeInterval = (props: IProps) => {
     if (Date.parse(values?.endTime) < Date.parse(values?.startTime)) {
       return message.error('End time cannot be less than start time')
     }
-    const date = moment(workschedule?.date).format('YYYY-MM-DD')
+    const date = moment(workschedule?.schedule_date).format('YYYY-MM-DD')
     const startTime = date + 'T' + moment(values?.startTime).format('HH:mm:ss');
     const endTime = date + 'T' + moment(values?.endTime).format('HH:mm:ss');
     form.resetFields()
@@ -266,13 +266,13 @@ const AddTimeInterval = (props: IProps) => {
     <>
       <Modal
         centered
-        width={1000}
+        width={800}
         footer={null}
         visible={props?.visibility}
         onCancel={() => props?.setVisibility(false)}
       >
         <p className={styles.fullName}>{workschedule?.user?.fullName}</p>
-        <p>{moment(workschedule?.date).format('MMM DD,YYYY')}</p>
+        <p>{moment(workschedule?.schedule_date).format('MMM DD,YYYY')}</p>
 
         <p className={styles.title}>Work schedule</p>
         <Table
@@ -304,7 +304,7 @@ const AddTimeInterval = (props: IProps) => {
               xs={24}
               sm={24}
               md={24}
-              lg={12}>
+              lg={11}>
               <Label label={'Select end time'} />
               <Form.Item name='endTime'
                 rules={[{
@@ -317,7 +317,7 @@ const AddTimeInterval = (props: IProps) => {
             </Col>
           </Row>
           <Row justify="end">
-            <Col style={{ padding: '0 1rem 1rem 0' }}>
+            <Col style={{ padding: '1rem 1rem 1rem 0' }}>
               <Form.Item>
                 <Space>
                   <Button

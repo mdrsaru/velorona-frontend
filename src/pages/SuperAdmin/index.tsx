@@ -381,8 +381,7 @@ const SuperAdmin =() =>{
                 </Col>
                 <Col>
                   <Link
-                    to={routes.editEmployee.path(
-                      loggedInUser?.company?.code ?? "1",
+                    to={routes.editSuperAdmin.path(
                       record?.id ?? "1"
                     )}
                     className={`${styles["table-icon"]} ${styles["table-edit-icon"]}`}

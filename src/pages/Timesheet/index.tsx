@@ -153,14 +153,11 @@ const Timesheet = () => {
         <TimeDuration duration = {record.duration}/>
     },
     {
-      title: 'Invoiced Time',
-      render: (timesheet: ITimesheet) => {
-        if (timesheet.invoicedDuration) {
-          return timesheet.invoicedDurationFormat;
-        }
-
-        return '-';
-      }
+      title: 'Status',
+      render: (timesheet: ITimesheet) => 
+		<div>
+			{timesheet?.status}
+		</div>
     },
     {
       title: 'Total Expense',

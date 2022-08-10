@@ -9,3 +9,11 @@
   font-weight: 600;
   font-size: 18px;
 }
+
+.workschedule-table {
+    :global {
+      .ant-empty-normal {
+       margin:10px 0;
+      }
+    }
+  }

@@ -1,7 +1,7 @@
 import moment from 'moment';
 import { useState } from 'react';
 import { gql, useMutation } from '@apollo/client';
-import { Space, message } from 'antd';
+import { Space, message, Popconfirm } from 'antd';
 import {
   CloseCircleOutlined,
   CheckCircleOutlined,
@@ -226,25 +226,40 @@ const TimeEntryDetails = (props: IProps) => {
                         <Space>
                           {
                             canApproveReject && ['Pending', 'Approved'].includes(props.status) && props.isTimesheetSubmitted &&(
-                              <CloseCircleOutlined
+								<Popconfirm
+								placement="top"
+								title="Reject timesheet?"
+								onConfirm={() => {
+								 onApproveRejectTimeEntriesClick('Rejected', group)
+							   }}
+								okText="Yes" cancelText="No"
+							  >
+							  <CloseCircleOutlined
+							  title='Reject timesheet'
                                 className={styles['reject-entry']}
-                                onClick={() => {
-                                  onApproveRejectTimeEntriesClick('Rejected', group)
-                                }}
                               />
+							  </Popconfirm>
                             )
                           }
 
                           {
                             canApproveReject && ['Pending', 'Rejected'].includes(props.status) && props.isTimesheetSubmitted && (
-                              <Space>
+							<Space>
+								 <Popconfirm
+                           placement="top"
+                           title="Accept timesheet?"
+                           onConfirm={() => {
+							onApproveRejectTimeEntriesClick('Approved', group)
+						  }}
+                           okText="Yes" cancelText="No"
+                         >
                                 <CheckCircleOutlined
+								title='Accept timesheet'
                                   style={{ color: 'var(--primary-green)' }}
                                   className={styles['approve-entry']}
-                                  onClick={() => {
-                                    onApproveRejectTimeEntriesClick('Approved', group)
-                                  }}
+                                 
                                 />
+								</Popconfirm>
                               </Space>
 
                             )

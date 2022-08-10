@@ -28,7 +28,7 @@ import constants from "../../../config/constants";
 import { CHANGE_PROFILE_IMAGE } from "../NewEmployee";
 import { notifyGraphqlError } from "../../../utils/error";
 import { GraphQLResponse, UserPayRatePagingData } from "../../../interfaces/graphql.interface";
-import { MutationChangeProfilePictureArgs, QueryUserArgs, QueryUserClientArgs, RoleName, User, UserClientPagingResult, UserPagingResult } from "../../../interfaces/generated";
+import { MutationChangeProfilePictureArgs, QueryUserArgs, QueryUserClientArgs, RoleName, User, UserClientPagingResult, UserPagingResult,Role } from "../../../interfaces/generated";
 import Loader from "../../../components/Loader";
 import moment from "moment";
 import Status from "../../../components/Status";
@@ -303,7 +303,10 @@ const DetailEmployee = () => {
             </Col>
 
 
-            <Col xs={24} sm={24} md={12} lg={8}>
+			{
+              userData?.User?.data[0]?.roles?.[0].name === RoleName.Employee &&
+		  <>
+		   <Col xs={24} sm={24} md={12} lg={8}>
 
               <div>
                 <div>Entry Type</div>
@@ -323,6 +326,8 @@ const DetailEmployee = () => {
               </div>
 
             </Col>
+			</>
+			}
             <Col xs={24} sm={24} md={24} lg={24}>
               <div className={styles['header-div']}>Employment Status</div>
             </Col>
@@ -338,7 +343,10 @@ const DetailEmployee = () => {
               </div>
 
             </Col>
-            <Col xs={24} sm={24} md={12} lg={12}>
+			{
+              userData?.User?.data[0]?.roles?.[0].name === RoleName.Employee &&
+		  <>
+		  <Col xs={24} sm={24} md={12} lg={12}>
               <div>
                 <div>Employee Start Date</div>
                 <span className={styles.detailValue}>
@@ -362,9 +370,6 @@ const DetailEmployee = () => {
                 View Payrate
               </p>
             </Col>
-            {
-              userData?.User?.data[0]?.roles?.[0].name === RoleName.Employee &&
-              <>
                 {userClientData?.UserClient?.data?.length  &&
                   <>
                     <Col xs={24} sm={24} md={24} lg={24}>
