@@ -1,4 +1,4 @@
-import { useState, FormEvent } from 'react';
+import { useState } from 'react';
 import {
   CardElement,
   useStripe,
@@ -19,7 +19,6 @@ interface IProps {
 
 const Payment = (props: IProps) => {
   const clientSecret = props.clientSecret;
-  const subscriptionId = props.subscriptionId;
   const [loading, setLoading] = useState(false);
 
   const stripe = useStripe();
@@ -79,12 +78,6 @@ const Payment = (props: IProps) => {
     } finally {
       setLoading(false);
     }
-  }
-
-  const inputStyle = {
-    backgroundColor: '#F2F2F2',
-    padding: '16px',
-    fontFamily: 'Montserrat',
   }
 
   return (

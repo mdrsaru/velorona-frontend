@@ -109,6 +109,15 @@ const _Routes = () => {
           />
           </Route>
 
+          <Route 
+            path={routes.demoRequest.path}
+            element={
+              <Suspense fallback={<RouteLoader />}>
+                <routes.demoRequest.component />
+              </Suspense>
+            }
+          />
+
           <Route path={routes.invoicePaymentConfig.path}>
             <Route
               index

@@ -16,6 +16,7 @@ import {
   FundProjectionScreenOutlined,
   ProfileOutlined,
   SettingOutlined,
+  PullRequestOutlined,
 } from '@ant-design/icons';
 
 import constants from '../../config/constants';
@@ -172,6 +173,14 @@ const Sidebar = (props: any) => {
       route: routes.subscription.path(loggedInUser?.company?.code ?? ''),
       accessRoles: [constants.roles.CompanyAdmin],
       viewAsAdmin: true,
+    },
+    {
+      key: routes.demoRequest.key,
+      name: routes.demoRequest.name,
+      icon: <PullRequestOutlined />,
+      route: routes.demoRequest.path,
+      accessRoles: [constants.roles.SuperAdmin],
+      viewAsAdmin: false,
     },
     {
       key: routes.payments.key,

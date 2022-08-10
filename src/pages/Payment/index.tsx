@@ -102,7 +102,6 @@ const Payment = () => {
   return (
     <div style={{ paddingTop: '2rem' }}>
       <Card bordered={false}>
-
         <PageHeader title="Payments" />
 
         <Table

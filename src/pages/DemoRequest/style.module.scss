@@ -1,0 +1,20 @@
+:global {
+  :local(.status) {
+    .ant-select-selection-item {
+      font-weight: 400;
+      font-size: 15px;
+    }
+  }
+}
+.Pending {
+  color: var(--primary-orange);
+}
+
+.Approved {
+  color: var(--primary-green);
+}
+
+.Rejected {
+  color: var(--primary-red);
+}
+

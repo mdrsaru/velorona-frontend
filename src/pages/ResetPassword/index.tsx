@@ -40,7 +40,6 @@ const ResetPassword = () => {
       }
     }).then((response) => {
       if(response.errors) {
-        console.log('Reset Password Error');
         return notifyGraphqlError((response?.errors))
       }
       navigate(routes?.login?.path)

@@ -122,9 +122,4 @@ const Plan = (props: IProps) => {
   )
 }
 
-function isPlanActive(plan: IPlan): boolean {
-  return plan.subscriptionStatus === 'active';
-}
-
-
 export default Plan;

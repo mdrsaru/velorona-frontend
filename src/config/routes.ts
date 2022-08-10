@@ -21,6 +21,14 @@ const routes = {
     key: 'company',
     allowedRoles: [SuperAdmin],
   },
+  demoRequest: {
+    childPath: 'demo-requests',
+    path: '/demo-requests',
+    component: lazy(() => import('../pages/DemoRequest')),
+    name: 'Demo Request',
+    key: 'demo-requests',
+    allowedRoles: [SuperAdmin],
+  },
   payments: {
     childPath: 'payments',
     path: '/payments',
