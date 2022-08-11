@@ -949,7 +949,7 @@ const DetailTimesheet = () => {
                   <>
                     <p className={styles['attach-new-timesheet']} onClick={attachNewTimesheet}>
                       <PlusCircleFilled />
-                      <span style={{ marginLeft: '1rem' }}> Add New Timesheet
+                      <span style={{ marginLeft: '1rem' }}> Add New Attachment
                       </span>
                     </p>
                   </>

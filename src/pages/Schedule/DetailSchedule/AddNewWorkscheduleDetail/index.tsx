@@ -227,7 +227,7 @@ const AddNewWorkscheduleDetail = (props: IProps) => {
     <>
       <Modal
         centered
-        width={1000}
+        width={800}
         footer={null}
         visible={props?.visibility}
         onCancel={() => props?.setVisibility(false)}
@@ -241,8 +241,8 @@ const AddNewWorkscheduleDetail = (props: IProps) => {
           dataSource={workscheduleTimeDetail?.WorkscheduleTimeDetail?.data}
           columns={columns}
           pagination={false}
+		  className={styles['workschedule-table']}
         />
-        <br />
         <Form onFinish={handleSubmit}>
         <Form.Item name='startTime'>
                 {/* <Input placeholder={'Enter time'} value='' /> */}
@@ -269,7 +269,7 @@ const AddNewWorkscheduleDetail = (props: IProps) => {
               xs={24}
               sm={24}
               md={24}
-              lg={12}>
+              lg={11}>
               <Label label={'Select end time'} />
               <Form.Item name='endTime'
                 rules={[{
@@ -282,7 +282,7 @@ const AddNewWorkscheduleDetail = (props: IProps) => {
             </Col>
           </Row>
           <Row justify="end">
-            <Col style={{ padding: '0 1rem 1rem 0' }}>
+            <Col style={{ padding: '1rem 1rem 1rem 0' }}>
               <Form.Item>
                 <Space>
                   <Button

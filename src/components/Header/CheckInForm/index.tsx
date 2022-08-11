@@ -7,6 +7,7 @@ import { ProjectPagingResult, QueryProjectArgs, MutationTimeEntryCreateArgs, Tim
 import { authVar } from "../../../App/link"
 
 import styles from './style.module.scss';
+import { notifyGraphqlError } from '../../../utils/error';
 
 const PROJECT = gql`
   query Projects($input: ProjectQueryInput!) {
@@ -65,7 +66,8 @@ const CheckInForm = (props: IProps) => {
         startTime = moment(startTime).utc().format('YYYY-MM-DDTHH:mm:ss')
         props.startTimer(id, startTime);
         props.hideCheckInModal();
-      }
+      },
+	  onError:notifyGraphqlError,
     });
 
   const checkIn = (values: any) => {

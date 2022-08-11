@@ -10,7 +10,7 @@ import constants, { employee_timesheet_status } from '../../config/constants';
 import routes from '../../config/routes';
 import { notifyGraphqlError } from '../../utils/error';
 import { TimesheetPagingData } from '../../interfaces/graphql.interface';
-import { TimesheetQueryInput, Timesheet } from '../../interfaces/generated';
+import { TimesheetQueryInput, Timesheet, RoleName } from '../../interfaces/generated';
 import PageHeader from '../../components/PageHeader';
 import Status from '../../components/Status';
 
@@ -244,16 +244,6 @@ const EmployeeTimesheet = () => {
         <TimeDuration duration={record.duration} />
     },
     {
-      title: 'Invoiced Time',
-      render: (timesheet: Timesheet) => {
-        if (timesheet.invoicedDuration) {
-          return timesheet.invoicedDurationFormat;
-        }
-
-        return '-';
-      }
-    },
-    {
       title: 'Last Approved',
       dataIndex: 'lastApprovedAt',
       render: (lastApprovedAt: any) => {
@@ -361,6 +351,7 @@ const EmployeeTimesheet = () => {
             }}
           />
           {
+			!authData.user?.roles?.includes(RoleName.TaskManager) && 
             !!dataSource?.length && (
               <div className={styles['download-report']}>
                 <Button

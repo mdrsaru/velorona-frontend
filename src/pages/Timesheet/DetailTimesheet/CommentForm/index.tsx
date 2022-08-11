@@ -185,7 +185,11 @@ const CommentForm = (props: IProps) => {
         layout="vertical"
         onFinish={onFinish}
       >
-        <Form.Item label="Comment" name="comment">
+        <Form.Item label="Comment" name="comment" 
+		rules={[{
+			required: true,
+			message: 'Please enter comment'
+		}]}>
           <Input.TextArea rows={4} />
         </Form.Item>
 
