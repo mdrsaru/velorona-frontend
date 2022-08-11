@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { useRef, useState } from 'react';
+import { useRef, useState, useMemo } from 'react';
 import { gql, useLazyQuery, useQuery, useMutation, NetworkStatus } from '@apollo/client';
 import {
   useParams,
@@ -222,7 +222,7 @@ const DetailTimesheet = () => {
   const { Panel } = Collapse;
 
   const authData = authVar()
-  const roles = authData?.user?.roles ?? []
+  const roles = authData?.user?.roles;
   const [form] = Form.useForm()
   const [commentDetails, setCommentDetails] = useState<{
     showModal: boolean;
@@ -260,22 +260,30 @@ const DetailTimesheet = () => {
 
   const [submitTimesheet, { loading: submittingTimesheet }] = useMutation(TIMESHEET_SUBMIT)
 
+  const managerLvlRole = useMemo(() => {
+    let _roles = roles ?? [];
+    return checkRoles({
+      expectedRoles: [constants.roles.SuperAdmin, constants.roles.CompanyAdmin, constants.roles.TaskManager],
+      userRoles: _roles,
+    });
+  }, [roles])
 
+  const adminLvlRole = useMemo(() => {
+    let _roles = roles ?? [];
+    return checkRoles({
+      expectedRoles: [constants.roles.SuperAdmin, constants.roles.CompanyAdmin],
+      userRoles: _roles,
+    });
+  }, [roles])
 
-  const canApproveReject = checkRoles({
-    expectedRoles: [constants.roles.SuperAdmin, constants.roles.CompanyAdmin, constants.roles.TaskManager],
-    userRoles: roles,
-  });
+  const isEmployee = useMemo(() => {
+    let _roles = roles ?? [];
+    return checkRoles({
+      expectedRoles: [constants.roles.Employee],
+      userRoles: _roles,
+    });
+  }, [roles])
 
-  const canAddAttachedTimesheet = checkRoles({
-    expectedRoles: [constants.roles.Employee],
-    userRoles: roles,
-  });
-
-  const canViewAttachedTimesheet = checkRoles({
-    expectedRoles: [constants.roles.Employee, constants.roles.CompanyAdmin, constants.roles.TaskManager],
-    userRoles: roles,
-  });
   const [approveRejectTimeEntries] = useMutation<
     GraphQLResponse<'TimeEntriesApproveReject', boolean>,
     MutationTimeEntriesApproveRejectArgs
@@ -545,12 +553,7 @@ const DetailTimesheet = () => {
   }
 
   const exit = () => {
-    const admin = checkRoles({
-      expectedRoles: [constants.roles.CompanyAdmin, constants.roles.SuperAdmin, constants.roles.TaskManager],
-      userRoles: roles,
-    })
-
-    if (admin) {
+    if (managerLvlRole) {
       navigate(routes.employeeTimesheet.path(authData?.company?.code as string))
     } else {
       navigate(routes.timesheet.path(authData?.company?.code as string))
@@ -655,7 +658,7 @@ const DetailTimesheet = () => {
           className={styles["dropdown-menu"]}
           onClick={(event) => event.stopPropagation()}
         >
-          {canAddAttachedTimesheet &&
+          {isEmployee &&
             (<Dropdown
               overlay={menu(attachedTimesheet)}
               trigger={["click"]}
@@ -737,10 +740,7 @@ const DetailTimesheet = () => {
                       </div>
 
                       {
-                        timesheetDetail?.isSubmitted && checkRoles({
-                          expectedRoles: [constants.roles.CompanyAdmin, constants.roles.TaskManager],
-                          userRoles: roles,
-                        }) && (
+                        timesheetDetail?.isSubmitted && managerLvlRole && (
                           <div className={styles['action']}>
                             <span 
                               onClick={() => setCommentDetails({
@@ -769,7 +769,7 @@ const DetailTimesheet = () => {
                     />
 
                     {
-                      canApproveReject && isSubmitted && (
+                      managerLvlRole && isSubmitted && (
                         <Row justify="end" style={{ margin: '36px 0' }}>
                           <Space>
                             <Button onClick={() => { approveRejectAll('Approved') }} >
@@ -788,10 +788,7 @@ const DetailTimesheet = () => {
                 }
 
                 {
-                  checkRoles({
-                    expectedRoles: [constants.roles.CompanyAdmin],
-                    userRoles: roles,
-                  }) && invoicedTimeEntries.map((invoiced) => (
+                  adminLvlRole && invoicedTimeEntries.map((invoiced) => (
                     <div key={invoiced.invoice_id} className={styles['timesheet-section']}>
                       <div
                         className={
@@ -840,10 +837,7 @@ const DetailTimesheet = () => {
                       </div>
 
                       {
-                        checkRoles({
-                          expectedRoles: [constants.roles.CompanyAdmin, constants.roles.TaskManager],
-                          userRoles: roles,
-                        }) && (
+                        managerLvlRole && (
                           <div className={styles['action']}>
                             <span 
                               onClick={() => setCommentDetails({
@@ -854,13 +848,18 @@ const DetailTimesheet = () => {
                               Unlock
                             </span>
 
-                            <Link
-                              className={styles['invoice-link']}
-                              to={routes.timesheetInvoice.path(authData?.company?.code as string, params?.id as string)}
-                              state={{ from: 'timesheet' }}
-                            >
-                              Generate Invoice
-                            </Link>
+                            {
+                              adminLvlRole && (
+                                <Link
+                                  className={styles['invoice-link']}
+                                  to={routes.timesheetInvoice.path(authData?.company?.code as string, params?.id as string)}
+                                  state={{ from: 'timesheet' }}
+                                >
+                                  Generate Invoice
+                                </Link>
+                              )
+
+                            }
                           </div>
                         )
                       }
@@ -893,10 +892,7 @@ const DetailTimesheet = () => {
                       </div>
 
                       {
-                        checkRoles({
-                          expectedRoles: [constants.roles.CompanyAdmin, constants.roles.TaskManager],
-                          userRoles: roles,
-                        }) && (
+                        managerLvlRole && (
                           <div className={styles['action']}>
                             <span 
                               onClick={() => setCommentDetails({
@@ -935,8 +931,7 @@ const DetailTimesheet = () => {
 
 {timesheetDetail?.user.timesheet_attachment &&  
       (
-		canViewAttachedTimesheet &&
-        (<div className={styles['site-card-wrapper']}>
+        <div className={styles['site-card-wrapper']}>
           <Card className={styles['attach-approved-timesheet']}>
             <Collapse accordion defaultActiveKey={['2']}>
               <Panel header="Attachments" key="2" className={styles['attachApprovedTitle']}>
@@ -945,7 +940,7 @@ const DetailTimesheet = () => {
                   columns={columns}
                   pagination={false}
                 />
-                {canAddAttachedTimesheet &&
+                {isEmployee &&
                   <>
                     <p className={styles['attach-new-timesheet']} onClick={attachNewTimesheet}>
                       <PlusCircleFilled />
@@ -959,7 +954,6 @@ const DetailTimesheet = () => {
             </Collapse>
           </Card>
         </div>
-        )
 	)}
 
 		{(!timeSheetDetail?.Timesheet?.data[0]?.entriesGroup?.byStatus?.length &&
@@ -977,10 +971,7 @@ const DetailTimesheet = () => {
                      </Button>
  
                      {
-                       checkRoles({
-                         expectedRoles: [constants.roles.Employee],
-                         userRoles: roles,
-                       }) && (
+                       isEmployee && (
                          <Button
                            type="default"
                            htmlType="button"
