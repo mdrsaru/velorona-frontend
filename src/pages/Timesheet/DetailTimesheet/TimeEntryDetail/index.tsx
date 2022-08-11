@@ -226,42 +226,40 @@ const TimeEntryDetails = (props: IProps) => {
                         <Space>
                           {
                             canApproveReject && ['Pending', 'Approved'].includes(props.status) && props.isTimesheetSubmitted &&(
-								<Popconfirm
-								placement="top"
-								title="Reject timesheet?"
-								onConfirm={() => {
-								 onApproveRejectTimeEntriesClick('Rejected', group)
-							   }}
-								okText="Yes" cancelText="No"
-							  >
-							  <CloseCircleOutlined
-							  title='Reject timesheet'
-                                className={styles['reject-entry']}
-                              />
-							  </Popconfirm>
+                              <Popconfirm
+                                placement="left"
+                                title="Are you sure you want to reject timesheet?"
+                                onConfirm={() => {
+                                  onApproveRejectTimeEntriesClick('Rejected', group)
+                                }}
+                                okText="Yes" cancelText="No"
+                              >
+                                <CloseCircleOutlined
+                                  title='Reject timesheet'
+                                  className={styles['reject-entry']}
+                                />
+                              </Popconfirm>
                             )
                           }
 
                           {
                             canApproveReject && ['Pending', 'Rejected'].includes(props.status) && props.isTimesheetSubmitted && (
-							<Space>
-								 <Popconfirm
-                           placement="top"
-                           title="Approve timesheet?"
-                           onConfirm={() => {
-							onApproveRejectTimeEntriesClick('Approved', group)
-						  }}
-                           okText="Yes" cancelText="No"
-                         >
-                                <CheckCircleOutlined
-								title='Approve timesheet'
-                                  style={{ color: 'var(--primary-green)' }}
-                                  className={styles['approve-entry']}
-                                 
-                                />
-								</Popconfirm>
+                              <Space>
+                                <Popconfirm
+                                  placement="left"
+                                  title="Are you sure you want to approve timesheet?"
+                                  onConfirm={() => {
+                                    onApproveRejectTimeEntriesClick('Approved', group)
+                                  }}
+                                  okText="Yes" cancelText="No"
+                                >
+                                  <CheckCircleOutlined
+                                    title='Approve timesheet'
+                                    style={{ color: 'var(--primary-green)' }}
+                                    className={styles['approve-entry']}
+                                  />
+                                </Popconfirm>
                               </Space>
-
                             )
                           }
                         </Space>
