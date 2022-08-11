@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
 import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client'
 
-import { Button, Card, Col, Dropdown, Form, Input, Menu, message, Row, Select, Table } from 'antd'
+import { Avatar, Button, Card, Col, Dropdown, Form, Input, Menu, message, Row, Select, Table } from 'antd'
 import { Link, useNavigate } from 'react-router-dom'
 import routes from '../../config/routes'
-import { SearchOutlined, DownloadOutlined, FormOutlined, CheckCircleFilled,CloseCircleFilled, DeleteOutlined } from "@ant-design/icons"
+import { SearchOutlined, DownloadOutlined, FormOutlined, CheckCircleFilled,CloseCircleFilled, DeleteOutlined , UserOutlined} from "@ant-design/icons"
 
 import { authVar } from '../../App/link';
 import ModalConfirm from '../../components/Modal';
@@ -41,6 +41,11 @@ export const PROJECT = gql`
         }
         status
         archived
+		users{
+			id
+			fullName
+			email
+		}
       }
     }
   }
@@ -363,6 +368,18 @@ const ProjectPage = () => {
     </Menu>
   );
 
+  const assignedMenu = (record: any) => (
+	    <Menu>
+	      <p className={styles.employeeTitle}>
+	        Employee List ({record.users.length}){" "}
+	      </p>
+	      {record.users?.map((user: any, index: number) => (
+	        <div key={index}>
+	          <Menu.Item className={styles.list}>{user?.fullName}</Menu.Item>
+			 </div>
+		  ))}
+		  </Menu>
+		)
   const columns = [
     {
       title: "Project Name",
@@ -406,6 +423,25 @@ const ProjectPage = () => {
           </Dropdown>
         </div> */}
           <Row style={{ marginTop: '11px' }}>
+		  <Col>
+			<div
+                className={styles["table-icon"]}
+                onClick={(event) => event.stopPropagation()}
+              >
+			<Dropdown
+            overlay={assignedMenu(record)}
+            trigger={["click"]}
+            placement="bottomRight"
+          >
+            <div
+              onClick={(e) => e.preventDefault()}
+              title="Assigned User"
+            >
+             <Avatar size={28} icon={<UserOutlined />}  />
+			</div>
+          </Dropdown>
+		  </div>
+		  </Col>
             <Col>
               <div
                 className={styles["table-icon"]}
