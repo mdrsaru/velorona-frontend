@@ -1,7 +1,7 @@
 import moment from 'moment'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { gql, useQuery } from '@apollo/client'
+import { gql, useMutation, useQuery } from '@apollo/client'
 import {
   Card,
   Col,
@@ -10,6 +10,9 @@ import {
   Table,
   Form,
   Select,
+  message,
+  Input,
+  Collapse,
 } from 'antd'
 import {
   CloseOutlined,
@@ -19,11 +22,20 @@ import { authVar } from '../../App/link'
 import constants from '../../config/constants'
 import routes from "../../config/routes"
 import { TIME_ENTRY_FIELDS } from '../../gql/time-entries.gql';
-import { Timesheet as ITimesheet } from '../../interfaces/generated';
+import { Timesheet as ITimesheet, TimeEntry as ITimeEntry, EntryType, TimeEntryPagingResult, } from '../../interfaces/generated';
 
 import TimeDuration from '../../components/TimeDuration'
 
 import styles from './style.module.scss'
+import { useStopwatch } from 'react-timer-hook'
+import { PROJECT } from '../Project'
+import { UPDATE_TIME_ENTRY } from './EditTimesheet'
+import { notifyGraphqlError } from '../../utils/error'
+import _, { findIndex } from 'lodash'
+import TimerCard from '../../components/TimerCard'
+import NoContent from '../../components/NoContent'
+import TimeEntry from './TimeEntry'
+import { GraphQLResponse } from '../../interfaces/graphql.interface'
 
 
 export const CREATE_TIME_ENTRY = gql`
@@ -112,6 +124,28 @@ export const getTimeFormat = (seconds: any) => {
 //   return Math.floor(sec_num / 3600);
 // }
 
+
+type ITodayGroupedEntries = {
+	description: string | null | undefined;
+	project_id: string;
+	entries: ITimeEntry[];
+};
+
+
+const { Panel } = Collapse;
+
+export const getTotalTimeForADay = (entries: any) => {
+	let sum = 0;
+	if (entries) {
+		const durations = entries.map((data: any) => data?.duration)
+		sum = durations.reduce((entry1: any, entry2: any) => {
+			return entry1 + entry2;
+		}, 0);
+	};
+	return sum
+}
+
+
 const Timesheet = () => {
   const { Option } = Select
   const authData = authVar()
@@ -127,7 +161,268 @@ const Timesheet = () => {
     skip: 0,
     currentPage: 1,
   });
+
   const company_id = authData?.company?.id;
+
+
+	const [timeEntryForm] = Form.useForm()
+	let stopwatchOffset = new Date()
+
+	const entryType = authData?.user?.entryType;
+	const afterStart = moment().startOf('day').format('YYYY-MM-DDTHH:mm:ss');
+
+
+	const [showDetailTimeEntry, setDetailVisible] = useState<boolean>(false)
+	const {
+		seconds,
+		minutes,
+		hours,
+		isRunning,
+		reset
+	} = useStopwatch({
+		autoStart: showDetailTimeEntry,
+		offsetTimestamp: new Date()
+	});
+
+	const [newTimeEntry, setTimeEntry] = useState({
+		id: '',
+		name: '',
+		project: '',
+		description: '',
+		client: ''
+	});
+
+	/* eslint-disable no-template-curly-in-string */
+	const validateMessages = {
+		required: '${label} is required!',
+		types: {
+			email: '${label} is not a valid email!',
+			number: '${label} is not a valid number!',
+		},
+		number: {
+			range: '${label} must be between ${min} and ${max}',
+		},
+	};
+
+	const startTimer = (id: string, date: string) => {
+		const offset = new Date();
+		const now = moment();
+		const diff = now.diff(moment(date), 'seconds');
+		const time = offset.setSeconds(offset.getSeconds() + diff)
+		reset(new Date(time))
+	}
+
+	const {  data: timeEntryData } = useQuery<GraphQLResponse<'TimeEntry', TimeEntryPagingResult>>(TIME_ENTRY, {
+		fetchPolicy: "network-only",
+		nextFetchPolicy: "cache-first",
+		variables: {
+			input: {
+				query: {
+					company_id,
+					afterStart,
+					entryType,
+				},
+				paging: {
+					order: ['startTime:DESC']
+				}
+			}
+		},
+		onCompleted: (timeEntry) => {
+			if (timeEntry?.TimeEntry?.activeEntry) {
+				setDetailVisible(true)
+				stopwatchOffset.setSeconds(stopwatchOffset.getSeconds() + computeDiff(timeEntry?.TimeEntry?.activeEntry?.startTime))
+				setTimeEntry({
+					id: timeEntry?.TimeEntry?.activeEntry?.id,
+					name: timeEntry?.TimeEntry?.activeEntry?.company?.name,
+					project: timeEntry?.TimeEntry?.activeEntry?.project?.name,
+					description: timeEntry?.TimeEntry?.activeEntry?.description ?? '',
+					client: timeEntry?.TimeEntry?.activeEntry?.project?.client?.name
+				})
+				// reset(stopwatchOffset)
+				if (timeEntry.TimeEntry.activeEntry) {
+					let startTime = timeEntry.TimeEntry.activeEntry?.startTime;
+					if (startTime) {
+						startTime = moment(startTime).utc().format('YYYY-MM-DDTHH:mm:ss');
+						startTimer(timeEntry.TimeEntry.activeEntry.id, startTime);
+					}
+				}
+			}
+		},
+	});
+
+	const { data: projectData } = useQuery(PROJECT, {
+		fetchPolicy: "network-only",
+		nextFetchPolicy: "cache-first",
+		variables: {
+			input: {
+				query: {
+					company_id,
+					client_id: ''
+				},
+				paging: {
+					order: ['updatedAt:DESC']
+				}
+			}
+		}
+	});
+
+	const {
+		refetch: refetchTimeWeekly 
+	  } = useQuery(TIME_WEEKLY, {
+		fetchPolicy: "network-only",
+		nextFetchPolicy: "cache-first",
+		variables: {
+		  input: {
+			query: {
+			  company_id,
+			},
+			paging: {
+			  order: ['weekStartDate:DESC']
+			}
+		  }
+		}
+	  });
+	  
+	const todayGroupedEntries: ITodayGroupedEntries[] = useMemo(() => {
+		const entries = timeEntryData?.TimeEntry?.data ?? [];
+		return groupByDescriptionAndProject(entries)
+	}, [timeEntryData?.TimeEntry?.data]);
+
+	const [createTimeEntry, { loading: creatingTimeEntry }] = useMutation(CREATE_TIME_ENTRY, {
+		onCompleted: (response: any) => {
+			// start();
+			const id = response.TimeEntryCreate.id;
+			let startTime = response.TimeEntryCreate.startTime;
+			startTime = moment(startTime).utc().format('YYYY-MM-DDTHH:mm:ss')
+			startTimer(id, startTime);
+
+			setTimeEntry({
+				id: response?.TimeEntryCreate?.id,
+				name: response?.TimeEntryCreate?.company?.name,
+				project: response?.TimeEntryCreate?.project?.name,
+				description: response?.TimeEntryCreate?.description,
+				client: response?.TimeEntryCreate?.project?.client?.name
+			});
+			setDetailVisible(true)
+		}
+	});
+
+	const [updateTimeEntry, { loading: updatingTimeEntry }] = useMutation(UPDATE_TIME_ENTRY, {
+		update: (cache, result: any) => {
+			const data: any = cache.readQuery({
+				query: TIME_ENTRY,
+				variables: {
+					input: {
+						query: {
+							company_id,
+							afterStart,
+							entryType,
+						},
+						paging: {
+							order: ['startTime:DESC']
+						}
+					}
+				},
+			});
+
+			const entries = data?.TimeEntry?.data ?? [];
+			const newEntry = result.data.TimeEntryUpdate;
+
+			cache.writeQuery({
+				query: TIME_ENTRY,
+				variables: {
+					input: {
+						query: {
+							company_id,
+							entryType,
+							afterStart,
+						},
+						paging: {
+							order: ['startTime:DESC']
+						}
+					}
+				},
+				data: {
+					TimeEntry: {
+						activeEntry: null,
+						data: [...entries, newEntry]
+					}
+				}
+			});
+		},
+		onCompleted: () => {
+			reset(undefined, false)
+			setDetailVisible(false);
+			refetchTimeWeekly({
+				input: {
+					query: {
+						company_id,
+					},
+					paging: {
+						order: ['weekStartDate:DESC']
+					}
+				}
+			})
+			form.resetFields();
+			message.success({
+				content: `Time Entry is updated successfully!`,
+				className: 'custom-message'
+			});
+		},
+		onError: notifyGraphqlError,
+	});
+
+
+	const createTimeEntries = (values: any) => {
+		stopwatchOffset = new Date()
+		createTimeEntry({
+			variables: {
+				input: {
+					startTime: moment().format('YYYY-MM-DD HH:mm:ss'),
+					description: values.description,
+					project_id: values.project,
+					company_id,
+				}
+			}
+		}).then((response) => {
+			if (response.errors) {
+				return notifyGraphqlError((response.errors))
+			}
+		}).catch(notifyGraphqlError)
+	}
+
+	const submitStopTimer = () => {
+		stopwatchOffset = new Date()
+		updateTimeEntry({
+			variables: {
+				input: {
+					id: newTimeEntry?.id,
+					endTime: moment().format('YYYY-MM-DD HH:mm:ss'),
+					company_id,
+				}
+			}
+		})
+	}
+
+
+	const getStartTime = (entries: any): any => {
+		const minStartDate = entries.map((entry: any) => { return entry?.startTime })
+		return _.min(minStartDate)
+	}
+
+	const getEndTime = (entries: any): any => {
+		const maxEndDate = entries.map((entry: any) => { return entry?.endTime })
+		return _.max(maxEndDate)
+	}
+
+	const clickPlayButton = (entry: ITimeEntry) => {
+		form.resetFields()
+		!isRunning ? createTimeEntries({ description: entry.description, project: entry?.project?.id }) : submitStopTimer();
+	}
+
+	const onSubmitForm = (values: any) => {
+		!isRunning ? createTimeEntries(values) : submitStopTimer();
+	}
 
   const columns = [
     {
@@ -215,7 +510,9 @@ const Timesheet = () => {
     <>
         <div className={styles['site-card-wrapper']}>
           {/* TimeEntry Form */}
-          {/* {
+       {authData?.user?.entryType !== 'Timesheet' && (
+		<> 
+	      {
             authData?.user?.entryType !== 'CICO' && (
               <Card
                 bordered={false}
@@ -295,12 +592,12 @@ const Timesheet = () => {
                 </Form>
               </Card>
             )
-          } */}
+          }
 
           <br />
 
           {/* Today's TimeEntries Listing */}
-          {/* <Card
+          <Card
             bordered={false}
             className={styles['task-card']}>
             <Row>
@@ -440,8 +737,10 @@ const Timesheet = () => {
                 }
               </div>
             </Form>
-          </Card> */}
-
+          </Card>
+		</>
+		)
+	   }
           <br />
 
           {/* Weekly's Timesheet Listing */}
@@ -562,6 +861,32 @@ const Timesheet = () => {
         </div>
     </>
   )
+}
+
+function groupByDescriptionAndProject(entries: ITimeEntry[]) {
+	const grouped: ITodayGroupedEntries[] = [];
+
+	for (let entry of entries) {
+		const project_id = entry.project_id;
+		const description = entry.description;
+
+		const foundIndex = findIndex(grouped, {
+			description,
+			project_id,
+		});
+
+		if (foundIndex >= 0) {
+			grouped[foundIndex].entries.push(entry);
+		} else {
+			grouped.push({
+				description,
+				project_id,
+				entries: [entry],
+			});
+		}
+	}
+
+	return grouped;
 }
 
 
