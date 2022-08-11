@@ -247,14 +247,14 @@ const TimeEntryDetails = (props: IProps) => {
 							<Space>
 								 <Popconfirm
                            placement="top"
-                           title="Accept timesheet?"
+                           title="Approve timesheet?"
                            onConfirm={() => {
 							onApproveRejectTimeEntriesClick('Approved', group)
 						  }}
                            okText="Yes" cancelText="No"
                          >
                                 <CheckCircleOutlined
-								title='Accept timesheet'
+								title='Approve timesheet'
                                   style={{ color: 'var(--primary-green)' }}
                                   className={styles['approve-entry']}
                                  

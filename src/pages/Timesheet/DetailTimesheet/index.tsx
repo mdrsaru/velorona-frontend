@@ -8,7 +8,7 @@ import {
 } from 'react-router-dom';
 import groupBy from 'lodash/groupBy';
 import find from 'lodash/find';
-import { Card, Col, Row, Button, Space, message, Modal, Form, Select, Spin, Popconfirm, Collapse, Dropdown, Menu } from 'antd';
+import { Card, Col, Row, Button, Space, message, Modal, Form, Select, Spin, Collapse, Dropdown, Menu } from 'antd';
 import {
   CloseOutlined,
   PlusCircleFilled,
@@ -981,22 +981,15 @@ const DetailTimesheet = () => {
                          expectedRoles: [constants.roles.Employee],
                          userRoles: roles,
                        }) && (
-                         <Popconfirm
-                           placement="top"
-                           title="Submit timesheet?"
-                           onConfirm={onSubmitTimesheet}
-                           okText="Yes" cancelText="No"
+                         <Button
+                           type="default"
+                           htmlType="button"
+                           loading={submittingTimesheet}
                            disabled={isSubmitted}
+                           onClick={onSubmitTimesheet}
                          >
-                           <Button
-                             type="default"
-                             htmlType="button"
-                             loading={submittingTimesheet}
-                             disabled={isSubmitted}
-                           >
-                             Submit
-                           </Button>
-                         </Popconfirm>
+                           Submit
+                         </Button>
  
                        )
                      }

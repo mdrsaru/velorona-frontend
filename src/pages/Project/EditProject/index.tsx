@@ -7,7 +7,6 @@ import { authVar } from "../../../App/link";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { notifyGraphqlError } from "../../../utils/error";
 
-import constants from "../../../config/constants";
 import { PROJECT } from "../index";
 import { USER } from "../../Employee";
 

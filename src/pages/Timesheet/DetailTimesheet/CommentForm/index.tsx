@@ -7,10 +7,11 @@ import { GraphQLResponse } from '../../../../interfaces/graphql.interface';
 import {
   TimesheetComment,
   MutationTimesheetCommentCreateArgs,
-  MutationTimeEntriesUnlockArgs,
   TimesheetCommentPagingResult,
   Timesheet,
   MutationTimesheetSubmitUndoArgs,
+  TimesheetSubmitInput,
+  TimeEntryUnlockInput,
 } from '../../../../interfaces/generated';
 
 const COMMENT = gql`
@@ -36,8 +37,14 @@ const COMMENT_CREATE = gql`
 `;
 
 const TIME_ENTRIES_UNLOCK = gql`
-  mutation TimeEntriesUnlock($input: TimeEntryUnlockInput!) {
-    TimeEntriesUnlock(input: $input) 
+  mutation TimeEntriesUnlockAndUndoSubmint(
+    $unlockInput: TimeEntryUnlockInput!, 
+    $undoSubmitInput: TimesheetSubmitInput!,
+  ) {
+    TimeEntriesUnlock(input: $unlockInput) 
+    TimesheetSubmitUndo(input: $undoSubmitInput) {
+      id
+    }
   }
 `;
 
@@ -48,6 +55,17 @@ const TIMESHEET_SUBMIT_UNDO = gql`
     }
   }
 `;
+
+type UnlockTimeEntries = {
+  TimeEntriesUnlock: boolean;
+  TimesheetSubmitUndo: Timesheet;
+}
+
+type UnlockTimeEntriesArgs = {
+  unlockInput: TimeEntryUnlockInput;
+  undoSubmitInput: TimesheetSubmitInput;
+}
+
 
 interface IProps {
   timesheet_id: string;
@@ -105,12 +123,12 @@ const CommentForm = (props: IProps) => {
   })
 
   const [unlockTimeEntries, { loading: unlockingTimeEntries }] = useMutation<
-    GraphQLResponse<'TimeEntriesUnlock', boolean>,
-    MutationTimeEntriesUnlockArgs
+    UnlockTimeEntries,
+    UnlockTimeEntriesArgs
   >(TIME_ENTRIES_UNLOCK, {
     onError: notifyGraphqlError,
     onCompleted(response) {
-      if(response.TimeEntriesUnlock) {
+      if(response.TimeEntriesUnlock && response.TimesheetSubmitUndo) {
         props.refetchTimesheet();
       }
     }
@@ -139,12 +157,16 @@ const CommentForm = (props: IProps) => {
     if(statusToUnlock) {
       unlockTimeEntries({
         variables: {
-          input: {
+          undoSubmitInput: {
+            id: props.timesheet_id,
+            company_id: props.company_id,
+          },
+          unlockInput: {
             company_id: props.company_id,
             timesheet_id: props.timesheet_id,
             statusToUnlock,
             user_id: props.user_id
-          }
+          },
         }
       }).then((response) => {
         if(response.data?.TimeEntriesUnlock) {

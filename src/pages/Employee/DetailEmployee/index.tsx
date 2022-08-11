@@ -9,7 +9,6 @@ import {
   message,
   Upload,
   Collapse,
-  Space
 } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 
@@ -28,7 +27,7 @@ import constants from "../../../config/constants";
 import { CHANGE_PROFILE_IMAGE } from "../NewEmployee";
 import { notifyGraphqlError } from "../../../utils/error";
 import { GraphQLResponse, UserPayRatePagingData } from "../../../interfaces/graphql.interface";
-import { MutationChangeProfilePictureArgs, QueryUserArgs, QueryUserClientArgs, RoleName, User, UserClientPagingResult, UserPagingResult,Role } from "../../../interfaces/generated";
+import { MutationChangeProfilePictureArgs, QueryUserArgs, QueryUserClientArgs, RoleName, User, UserClientPagingResult, UserPagingResult } from "../../../interfaces/generated";
 import Loader from "../../../components/Loader";
 import moment from "moment";
 import Status from "../../../components/Status";

@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client'
 
 import { Avatar, Button, Card, Col, Dropdown, Form, Input, Menu, message, Row, Select, Table } from 'antd'
-import { Link, useNavigate } from 'react-router-dom'
+import { Link } from 'react-router-dom'
 import routes from '../../config/routes'
 import { SearchOutlined, DownloadOutlined, FormOutlined, CheckCircleFilled,CloseCircleFilled, DeleteOutlined , UserOutlined} from "@ant-design/icons"
 
@@ -102,7 +102,6 @@ const { Option } = Select;
 
 const ProjectPage = () => {
   const loggedInUser = authVar();
-  const navigate = useNavigate();
   const [visibility, setVisibility] = useState<boolean>(false);
   const [showArchive, setArchiveModal] = useState<boolean>(false);
   const [project, setProject] = useState<Project>();
