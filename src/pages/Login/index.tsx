@@ -149,11 +149,6 @@ const Login = () => {
         userType: constants?.userType?.Company,
         companyCode: values?.code
       }
-    message.loading({
-      content: `Sending reset link to user's email..`,
-      key,
-      className: 'custom-message'
-    });
     forgotPassword({
       variables: {
         input: formData

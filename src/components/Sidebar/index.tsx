@@ -111,14 +111,6 @@ const Sidebar = (props: any) => {
       viewAsAdmin: true,
     },
     {
-      key: routes.timeTracker.key,
-      name: routes.timeTracker.name,
-      icon: <FieldTimeOutlined />,
-      route: routes.timeTracker.path(loggedInUser?.company?.code ?? ''),
-      accessRoles: [constants.roles.Employee],
-      viewAsAdmin: false,
-    },
-    {
       key: routes.timesheet.key,
       name: routes.timesheet.name,
       icon: <FieldTimeOutlined />,

@@ -303,7 +303,7 @@ const loggedInUser = authVar()
                                                         <td>
 															{groups[key]?.[0]?.user?.fullName}
 															<br/>
-															<span>({groups[key]?.[0]?.user?.designation})</span>
+															<span>{groups[key]?.[0]?.user?.designation && `(${groups[key]?.[0]?.user?.designation})`}</span>
 															</td>
 													    {weekDays.map((day: any, index: number) => (
                                                             <td key={index}>
