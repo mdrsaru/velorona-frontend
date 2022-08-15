@@ -128,7 +128,14 @@ const routes = {
     key: 'add',
     allowedRoles: [SuperAdmin],
   },
-
+  viewSuperAdmin: {
+	childPath: ':id/view',
+    path:(id: string) => `/super-admin/${id}/view`,
+    component: lazy(() => import('../pages/SuperAdmin/ViewSuperAdmin')),
+    name: 'Add super admin',
+    key: 'add',
+    allowedRoles: [SuperAdmin],
+  },
   user: {
     childPath: 'users',
     path: (id: string) => `/${id}/users`,
