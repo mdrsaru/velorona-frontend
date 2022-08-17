@@ -8,29 +8,26 @@ import {
   UploadProps,
   message,
   Upload,
-  Collapse,
 } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 
-import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import { Link, useLocation, useNavigate, useParams } from "react-router-dom";
 import routes from "../../../config/routes";
 import { authVar } from "../../../App/link";
 
 import image from "../../../assets/images/default_pp.png";
 import camera from "../../../assets/images/camera.svg";
-import { USER } from "../index";
+import { USER } from "../../Employee/index";
 
-import styles from "../style.module.scss";
-import ViewUserPayRate, { USER_PAY_RATE } from "../../../components/ViewUserPayRate";
+import styles from "../../Employee/style.module.scss";
 import constants from "../../../config/constants";
-import { CHANGE_PROFILE_IMAGE } from "../NewEmployee";
+import { CHANGE_PROFILE_IMAGE } from "../../Employee/NewEmployee";
 import { notifyGraphqlError } from "../../../utils/error";
-import { GraphQLResponse, UserPayRatePagingData } from "../../../interfaces/graphql.interface";
-import { MutationChangeProfilePictureArgs, QueryUserArgs, QueryUserClientArgs, RoleName, User, UserClientPagingResult, UserPagingResult } from "../../../interfaces/generated";
+import { GraphQLResponse } from "../../../interfaces/graphql.interface";
+import { MutationChangeProfilePictureArgs, QueryUserArgs, RoleName, User, UserPagingResult } from "../../../interfaces/generated";
 import Loader from "../../../components/Loader";
 import moment from "moment";
-import Status from "../../../components/Status";
 
 export const USERCLIENT = gql`
   query UserClient($input: UserClientQueryInput!) {
@@ -53,31 +50,17 @@ export const USERCLIENT = gql`
   }
 `;
 
-const DetailEmployee = () => {
+const ViewSuperAdmin = () => {
   const navigate = useNavigate();
   const loggedInUser = authVar();
 
   let params = useParams();
   let location = useLocation();
-  const [showViewUserPayRate, setViewUserPayRateVisibility] =
-    useState<boolean>(false);
 
   const profile = location.pathname.includes("profile");
 
   const [isImageLoading, setIsImageLoading] = useState<boolean>(false);
 
-  const [getUserPayRate, { data: userPayRate }] = useLazyQuery<UserPayRatePagingData>(USER_PAY_RATE,
-    {
-      fetchPolicy: "network-only",
-      nextFetchPolicy: 'cache-first',
-      variables: {
-        input: {
-          query: {
-            user_id: params?.eid,
-          }
-        }
-      }
-    })
 
   const [changeProfilePictureInput, loading] = useMutation<
     GraphQLResponse<'ChangeProfilePicture', User>,
@@ -108,25 +91,9 @@ const DetailEmployee = () => {
     variables: {
       input: {
         query: {
-          id: params?.eid,
+          id: params?.id,
+		  role:RoleName.SuperAdmin
         },
-      },
-    },
-  });
-
-  const { data: userClientData } = useQuery<
-    GraphQLResponse<'UserClient', UserClientPagingResult>,
-    QueryUserClientArgs
-  >(USERCLIENT, {
-    fetchPolicy: "network-only",
-    variables: {
-      input: {
-        query: {
-          user_id: params?.eid,
-        },
-		paging:{
-			order: ['updatedAt:DESC']
-		}
       },
     },
   });
@@ -156,21 +123,6 @@ const DetailEmployee = () => {
     },
   };
 
-  const handleViewPayRate = () => {
-    getUserPayRate({
-      variables: {
-        input: {
-          query: {
-            user_id: params?.eid,
-          },
-          paging: {
-            order: ["updatedAt:DESC"],
-          },
-        },
-      }
-    })
-    setViewUserPayRateVisibility(!showViewUserPayRate);
-  };
   return (
     <div className={styles["main-div"]}>
       {userData?.User?.data[0] && (
@@ -179,7 +131,7 @@ const DetailEmployee = () => {
             <Col span={12} className={styles["employee-col"]}>
               <h1>
                 <ArrowLeftOutlined onClick={() => navigate(-1)} /> &nbsp;
-                {profile ? "My Profile" : "User"}
+                {profile ? "My Profile" : "Super Admin"}
               </h1>
             </Col>
           </Row>
@@ -304,32 +256,6 @@ const DetailEmployee = () => {
               </div>
             </Col>
 
-
-			{
-              userData?.User?.data[0]?.roles?.[0].name === RoleName.Employee &&
-		  <>
-		   <Col xs={24} sm={24} md={12} lg={8}>
-
-              <div>
-                <div>Entry Type</div>
-                <span className={styles.detailValue}>
-                  {userData?.User?.data[0]?.entryType ?? 'N/A'}
-                </span>
-              </div>
-
-            </Col>
-            <Col xs={24} sm={24} md={12} lg={8}>
-
-              <div>
-                <div>Timesheet Attachment Type</div>
-                <span className={styles.detailValue}>
-                  {userData?.User?.data[0]?.timesheet_attachment ? 'Mandatory' : 'Optional'}
-                </span>
-              </div>
-
-            </Col>
-			</>
-			}
             <Col xs={24} sm={24} md={24} lg={24}>
               <div className={styles['header-div']}>Employment Status</div>
             </Col>
@@ -338,75 +264,13 @@ const DetailEmployee = () => {
             <Col xs={24} sm={24} md={12} lg={12}>
 
               <div>
-                <div>Employment Status</div>
+                <div> Status</div>
                 <span className={styles.detailValue}>
                   {userData?.User?.data[0]?.status}
                 </span>
               </div>
 
             </Col>
-			{
-              userData?.User?.data[0]?.roles?.[0].name === RoleName.Employee &&
-		  <>
-		  <Col xs={24} sm={24} md={12} lg={12}>
-              <div>
-                <div>Employee Start Date</div>
-                <span className={styles.detailValue}>
-                  {userData?.User?.data[0]?.startDate ? moment(userData?.User?.data[0]?.startDate).format('L') : 'N/A'}
-                </span>
-              </div>
-            </Col>
-            <Col xs={24} sm={24} md={12} lg={12}>
-              <div>
-                <div>Employee End Date</div>
-                <span className={styles.detailValue}>
-                  {userData?.User?.data[0]?.startDate ? moment(userData?.User?.data[0]?.startDate).format('L') : 'N/A'}
-                </span>
-              </div>
-            </Col>
-            <Col xs={24} sm={24} md={24} lg={12}>
-              <p
-                className={styles["view-pay-rate"]}
-                onClick={handleViewPayRate}
-              >
-                View Payrate
-              </p>
-            </Col>
-                {userClientData?.UserClient?.data?.length  &&
-                  <>
-                    <Col xs={24} sm={24} md={24} lg={24}>
-                      <div className={styles['header-div']}>Client Assigned</div>
-                    </Col>
-
-                    <Col xs={24} sm={24} md={24} lg={24} style={{ marginBottom: '1rem' }}>
-                      {userClientData?.UserClient?.data?.map((userClient, index) => {
-                        return (
-                          <Collapse defaultActiveKey={index} key={index} style={{ border: 0 }}>
-                            <Collapse.Panel header={userClient?.client?.name} key={index}  >
-                              <Row>
-                                <Col xs={24} sm={24} md={12} lg={12}>
-                                  <div>Client Email Address</div>
-                                  <span className={styles.detailValue}>
-                                    {userClient?.client?.email}
-                                  </span>
-                                </Col>
-                                <Col xs={24} sm={24} md={12} lg={12}>
-                                  <div>Client Status</div>
-                                  <span className={`${styles.detailValue} ${styles.userClientStatus}`}>
-                                    <Status status={userClient?.status} />
-                                  </span>
-                                </Col>
-                              </Row>
-                            </Collapse.Panel>
-                          </Collapse>
-                        )
-                      })}
-
-                    </Col>
-                  </>
-                }
-              </>
-            }
           </Row>
           <Row>
             <Col>
@@ -426,25 +290,18 @@ const DetailEmployee = () => {
                   <Link to={routes.editProfile.path(params?.eid ?? "1")}>
                     Edit Profile
                   </Link> :
-                  <Link to={routes.editEmployee.path(
-                    loggedInUser?.company?.code ?? "1",
-                    params?.eid ?? "1"
+                  <Link to={routes.editSuperAdmin.path(
+                    params?.id ?? "1"
                   )}>
-                    Edit User
+                    Edit Super Admin
                   </Link>}
               </Button>
             </Col>
           </Row>
         </Card>
       )}
-      <ViewUserPayRate
-        visibility={showViewUserPayRate}
-        setVisibility={setViewUserPayRateVisibility}
-        data={userData?.User?.data[0]}
-        userPayRate={userPayRate}
-      />
     </div>
   );
 };
 
-export default DetailEmployee;
+export default ViewSuperAdmin;

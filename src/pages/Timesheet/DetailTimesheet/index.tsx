@@ -375,7 +375,8 @@ const DetailTimesheet = () => {
       input: {
         query: {
           company_id: authData?.company?.id,
-          client_id: ''
+          client_id: '',
+		  user_id : authData?.user?.id,
         },
         paging: {
           order: ['updatedAt:DESC']
@@ -447,6 +448,7 @@ const DetailTimesheet = () => {
             query: {
               company_id: authData?.company?.id,
               client_id: response?.Timesheet?.data[0]?.client?.id,
+			  user_id:authData?.user?.id,
             },
             paging: {
               order: ['updatedAt:DESC']
@@ -699,8 +701,10 @@ const DetailTimesheet = () => {
             <br />
 
             <Card bordered={false} className={styles['time-entries']}>
-              <Row className={styles['timesheet-detail']}>
-                <PageHeader
+			{!timesheetDetail?.isSubmitted && 
+			  <Row className={styles['timesheet-detail']}>
+         
+			    <PageHeader
                   title="Time Entry Details"
                   extra={[
                     <span key="new-entry">
@@ -721,6 +725,7 @@ const DetailTimesheet = () => {
                   ]}
                 />
               </Row>
+}
  			 {(!timeSheetDetail?.Timesheet?.data[0]?.entriesGroup?.byStatus.length &&
                 !timeSheetDetail?.Timesheet?.data[0]?.entriesGroup?.byInvoice.length) ?
                 <NoContent title={'No Time Entry added'} subtitle={'There are no entries added at the moment'} /> 

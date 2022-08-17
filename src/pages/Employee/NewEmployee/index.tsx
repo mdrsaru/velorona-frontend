@@ -239,9 +239,16 @@ const NewEmployee = () => {
   }
 
   const [role, setRole] = useState('')
+  const [manager, setManager] = useState('')
   const handleChange = (value: any) => {
       setRole(value)
   }
+
+  const handleManagerChange = (value: any) => {
+	setManager(value)
+   }
+
+ console.log(manager)
 
   return (
     <div className={styles['main-div']}>
@@ -352,6 +359,10 @@ const NewEmployee = () => {
               <Form.Item
                 label="Designation"
                 name='designation'
+				rules= {[{
+					required:true,
+					message:"Please enter the designation"
+				}]}
 				>
                 <Input placeholder="Enter designation" autoComplete="off" />
               </Form.Item>
@@ -507,11 +518,15 @@ const NewEmployee = () => {
                     name="manager_id"
                     label="Task Manager"
                   >
-                    <Select placeholder="Select manager">
+                    <Select placeholder="Select manager" onChange={handleManagerChange}>
                       {managerData?.User?.data?.map((manager, index) => (
                         <Option key={index} value={manager?.id}> {`${manager?.fullName} / ${manager?.email}`}</Option>
                       ))}
                     </Select>
+					{form.getFieldValue('manager_id')}
+					{!manager &&
+					<p>Please add task manager first to assign manager for this user.</p>
+					}
                   </Form.Item>
                 </Col>
 

@@ -107,6 +107,16 @@ const _Routes = () => {
               </CheckRoles>
             }
           />
+		   <Route
+            path={routes.viewSuperAdmin.childPath}
+            element={
+              <CheckRoles allowedRoles={routes.addSuperAdmin.allowedRoles}>
+                <Suspense fallback={<RouteLoader />}>
+                  <routes.viewSuperAdmin.component />
+                </Suspense>
+              </CheckRoles>
+            }
+          />
           </Route>
 
           <Route 
