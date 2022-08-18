@@ -1,7 +1,7 @@
 import { Fragment, useState } from "react";
 import { useParams } from "react-router-dom";
 import {  Card, Col, message, Row, } from "antd";
-import { PlusCircleFilled, DeleteOutlined } from "@ant-design/icons";
+import { PlusCircleFilled, DeleteOutlined,CalendarOutlined } from "@ant-design/icons";
 import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import moment from "moment";
 import _ from "lodash";
@@ -9,6 +9,7 @@ import { getWeekDays } from "../../../utils/common";
 import PageHeader from "../../../components/PageHeader";
 import { WORKSCHEDULEDETAIL } from "../../EmployeeSchedule";
 import AddWorkscheduleEmployee from "../../../components/AddWorkscheduleEmployee";
+import SelectWorkscheduleDate from "../../../components/SelectWorkscheduleDate";
 import AddTimeInterval from "./AddTimeInterval";
 import styles from "./style.module.scss";
 import AddNewWorkscheduleDetail from "./AddNewWorkscheduleDetail";
@@ -60,9 +61,10 @@ export const WORKSCHEDULE_DETAIL_BULK_DELETE = gql`
 
 const ScheduleDetail = () => {
     const params = useParams();
-const loggedInUser = authVar()
+    const loggedInUser = authVar()
     const [showDeleteModal, setShowDeleteModal] = useState(false)
     const [showEmployee, setEmployeeShow] = useState(false)
+    const [showSelectSchedule, setSelectScheduleShow] = useState(false)
     const [addTimeInterval, setAddTimeInterval] = useState(false)
     const [showAddNewTimeInterval, setShowAddNewTimeInterval] = useState(false)
     const [addNewTimeInterval, setAddNewTimeInterval] = useState<any>({
@@ -75,10 +77,10 @@ const loggedInUser = authVar()
     const [employee, setEmployee] = useState('')
     const [employeeId, setEmployeeId] = useState('')
 
-    const { data: workscheduleData} = useQuery(
+    const { data: workscheduleData } = useQuery(
         WORKSCHEDULE,
         {
-          fetchPolicy: "network-only",
+         fetchPolicy: "network-only",
           nextFetchPolicy: "cache-first",
           variables: {
             input: {
@@ -92,8 +94,27 @@ const loggedInUser = authVar()
             },
           },
         }
-      );
-      
+    );
+
+
+    const { data: workschedule } = useQuery(
+        WORKSCHEDULE,
+        {
+            fetchPolicy: "network-only",
+            nextFetchPolicy: "cache-first",
+            variables: {
+                input: {
+                    paging: {
+                        order: ["updatedAt:DESC"],
+                    },
+                    query: {
+                        company_id: loggedInUser?.company?.id,
+                    }
+                },
+            },
+        }
+    );
+
     const { data: workscheduleDetailData, refetch: refetchWorkscheduleDetail } = useQuery(
         WORKSCHEDULEDETAIL,
         {
@@ -247,6 +268,10 @@ const loggedInUser = authVar()
 
     }
 
+    const handleCopySchedule = (id: any) => {
+        setEmployeeId(id)
+        setSelectScheduleShow(!showSelectSchedule)
+    }
     // const menu = (data: any) => (
     //     <Menu>
     //         <Menu.Item key="clear" onClick={() => handleDeleteClick(data)}>
@@ -301,11 +326,11 @@ const loggedInUser = authVar()
                                                 return (
                                                     <tr key={index}>
                                                         <td>
-															{groups[key]?.[0]?.user?.fullName}
-															<br/>
-															<span>{groups[key]?.[0]?.user?.designation && `(${groups[key]?.[0]?.user?.designation})`}</span>
-															</td>
-													    {weekDays.map((day: any, index: number) => (
+                                                        {groups[key]?.[0]?.user?.fullName}
+                                                            <br/>
+                                                            <span>{groups[key]?.[0]?.user?.designation && `(${groups[key]?.[0]?.user?.designation})`}</span>
+                                                        </td>
+                                                        {weekDays.map((day: any, index: number) => (
                                                             <td key={index}>
                                                                 {groups[key] && groups[key]?.map((data: any, index: number) =>
                                                                     <Fragment key={index}>
@@ -356,6 +381,16 @@ const loggedInUser = authVar()
                                                         -
                                                     </td>
                                                 )}
+                                                <td></td>
+                                                <td>
+                                                    <span
+                                                        title='Copy workschedule'
+                                                        className={`${styles["table-icon"]} ${styles["table-delete-icon"]}`}
+                                                        onClick={() => handleCopySchedule(employeeData?.User?.data?.[0]?.id)}
+                                                    >
+                                                        <CalendarOutlined />
+                                                    </span>
+                                                </td>
                                             </tr>
                                         )}
                                     </tbody>
@@ -379,7 +414,7 @@ const loggedInUser = authVar()
                     setVisibility={setAddTimeInterval}
                     workschedule={workscheduleDetailByIdData}
                     getWorkschedule={getWorkschedule}
-					setEmployee = {setEmployee}
+                    setEmployee = {setEmployee}
                 />
 
                 <AddNewWorkscheduleDetail
@@ -390,13 +425,23 @@ const loggedInUser = authVar()
                     employeeId={addNewTimeInterval?.employeeId}
                     providedData={addNewTimeInterval?.providedData}
                     refetch={refetchWorkscheduleDetail}
-					setEmployee = {setEmployee}
+                    setEmployee = {setEmployee}
                 />
 
                 <AddWorkscheduleEmployee
                     visibility={showEmployee}
                     setVisibility={setEmployeeShow}
                     setEmployee={setEmployee} />
+
+                <SelectWorkscheduleDate
+                    visibility={showSelectSchedule}
+                    setVisibility={setSelectScheduleShow}
+                    workschedule={workschedule?.Workschedule?.data}
+                    employeeId={employeeId}
+                    refetch={refetchWorkscheduleDetail}
+                    setEmployee={setEmployee}
+                    startDate={startDate} />
+
 
                 <ModalConfirm
                     visibility={showDeleteModal}
@@ -412,6 +457,7 @@ const loggedInUser = authVar()
                         />
                     }
                 />
+
             </div>
         </>
     )
