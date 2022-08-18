@@ -302,10 +302,9 @@ const SuperAdmin =() =>{
 			return {
 			  onClick: () => {
 				navigate(
-				  routes.detailEmployee.path(
-					loggedInUser?.company?.code ?? "",
-					record?.id ?? ""
-				  )
+			       routes.viewSuperAdmin.path(
+					  record?.id ?? ""
+					)
 				);
 			  },
 			};

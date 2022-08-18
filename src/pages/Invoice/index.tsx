@@ -191,21 +191,19 @@ const navigate = useNavigate();
     });
   }
 
-  const handleResendInvoiceClick = (invoice_id :string) =>{
-		const input: InvoiceUpdateInput = {
-		  id: invoice_id,
-		 status:InvoiceStatus.Sent,
-		 company_id:loggedInUser?.company?.id as string,
-		};
+  const handleResendInvoiceClick = (invoice_id: string) => {
+	const input: InvoiceUpdateInput = {
+		id: invoice_id,
+		status: InvoiceStatus.Sent,
+		company_id: loggedInUser?.company?.id as string,
+	};
 
-		updateInvoice({
-		  variables: {
+	updateInvoice({
+		variables: {
 			input,
-		  }
-		}).finally(() => {
-		//   setIsSendInvoiceClicked(false)
-		});
-  }
+		}
+	})
+}
 
   const handleViewInvoiceCancel = () => {
     setInvoiceViewer({
@@ -467,22 +465,20 @@ const navigate = useNavigate();
 			{
                 invoice.status === 'Sent' && (
 			<Col>
-			<Popconfirm
-                                placement="left"
-                                title="Are you sure you want to resend invoice?"
-                                onConfirm={() => handleResendInvoiceClick(invoice.id)}
-                                okText="Yes" cancelText="No">
-                              
-                  <div
-                   
-                    title='Resend Invoice'
-                    className={`${styles["table-icon"]} ${styles["table-view-icon"]}`}
-                  >
-                    <SendOutlined />
-                  </div>
-				  </Popconfirm>
-				</Col>
-				)
+			  <Popconfirm
+				placement="left"
+				title="Are you sure you want to resend invoice?"
+				onConfirm={() => handleResendInvoiceClick(invoice.id)}
+				okText="Yes" cancelText="No">        
+					<div     
+						title='Resend Invoice'
+						className={`${styles["table-icon"]} ${styles["table-view-icon"]}`}
+					>
+					 <SendOutlined />
+					</div>
+			  </Popconfirm>
+			</Col>
+			 )
 			}
           </Row>
         )

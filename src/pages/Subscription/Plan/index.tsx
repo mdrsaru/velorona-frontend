@@ -67,7 +67,7 @@ const Plan = (props: IProps) => {
 
   const getBtnText = () => {
     if(plan.subscriptionStatus === 'inactive' && plan.name === 'Starter') {
-      return 'Downgrade';
+      return 'Inactive';
     }
 
     if(plan.subscriptionStatus === 'active') {

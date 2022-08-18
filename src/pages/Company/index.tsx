@@ -123,11 +123,8 @@ const Company = () => {
   const [updateCompany] = useMutation<
   GraphQLResponse<'CompanyUpdate', ICompany>,
     MutationCompanyUpdateArgs
-  >(COMPANY_UPDATE,{
-	onCompleted(){
-		navigate(routes.companyAdmin.childPath)
-	}
-  })
+  >(COMPANY_UPDATE)
+
   const [visibility, setVisibility] = useState(false);
   const [showArchive, setArchiveModal] = useState(false);
   const setModalVisibility = (value: boolean) => {

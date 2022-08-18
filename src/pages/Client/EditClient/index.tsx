@@ -67,6 +67,7 @@ const EditClient = () => {
           company_id: authData?.company?.id as string,
           phone: values?.phone,
           invoiceSchedule: values.invoiceSchedule,
+		  invoicingEmail:values.invoicingEmail,
           invoice_payment_config_id: values.invoice_payment_config_id,
           address: {
             country: values?.country,
