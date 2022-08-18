@@ -2,8 +2,8 @@ import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { gql, useQuery, useMutation, useLazyQuery } from '@apollo/client';
-import { SearchOutlined, CheckCircleFilled, FormOutlined, EyeFilled, PlusCircleFilled } from '@ant-design/icons';
-import { Card, Col, Dropdown, Menu, Row, Table, message, Modal, Form, Select, Button, Input } from 'antd';
+import { SearchOutlined, CheckCircleFilled, FormOutlined, EyeFilled, PlusCircleFilled,SendOutlined } from '@ant-design/icons';
+import { Card, Col, Dropdown, Menu, Row, Table, message, Modal, Form, Select, Button, Input, Popconfirm } from 'antd';
 
 import filterImg from "../../assets/images/filter.svg"
 
@@ -19,6 +19,7 @@ import {
   InvoicePagingResult,
   MutationInvoiceUpdateArgs,
   QueryInvoiceArgs,
+  InvoiceUpdateInput,
 } from '../../interfaces/generated';
 import { GraphQLResponse } from '../../interfaces/graphql.interface';
 
@@ -30,6 +31,7 @@ import { debounce } from 'lodash';
 import AttachmentModal from '../../components/AttachmentsModal/index';
 import AttachNewTimesheetModal from '../../components/AddAttachedTimesheet';
 import { ATTACHED_TIMESHEET } from '../Timesheet/DetailTimesheet';
+import { useNavigate } from 'react-router-dom';
 
 const INVOICE = gql`
   query Invoice($input: InvoiceQueryInput!) {
@@ -61,9 +63,12 @@ const INVOICE_STATUS_UPDATE = gql`
     }
   }
 `;
+
 const { Option } = Select;
 const Invoice = () => {
   const loggedInUser = authVar();
+const navigate = useNavigate();
+  const companyCode = loggedInUser?.company?.code as string
 
   const [filterForm] = Form.useForm();
 
@@ -141,6 +146,23 @@ const Invoice = () => {
     },
   });
 
+  const [updateInvoice] = useMutation<
+  GraphQLResponse<'InvoiceUpdate', IInvoice>,
+  MutationInvoiceUpdateArgs
+>(
+  INVOICE_STATUS_UPDATE, {
+	onCompleted(data) {
+	  if(data.InvoiceUpdate) {
+		message.success('Invoice resend successfully');
+
+		navigate(routes.invoice.path(companyCode));
+	  }
+	},
+	onError: notifyGraphqlError,
+  }
+);
+
+
   const changeStatus = (id: string, status: InvoiceStatus) => {
     updateStatus({
       variables: {
@@ -167,6 +189,22 @@ const Invoice = () => {
       isVisible: true,
       invoice_id,
     });
+  }
+
+  const handleResendInvoiceClick = (invoice_id :string) =>{
+		const input: InvoiceUpdateInput = {
+		  id: invoice_id,
+		 status:InvoiceStatus.Sent,
+		 company_id:loggedInUser?.company?.id as string,
+		};
+
+		updateInvoice({
+		  variables: {
+			input,
+		  }
+		}).finally(() => {
+		//   setIsSendInvoiceClicked(false)
+		});
   }
 
   const handleViewInvoiceCancel = () => {
@@ -426,6 +464,26 @@ const Invoice = () => {
                 </Dropdown>
               </div>
             </Col>
+			{
+                invoice.status === 'Sent' && (
+			<Col>
+			<Popconfirm
+                                placement="left"
+                                title="Are you sure you want to resend invoice?"
+                                onConfirm={() => handleResendInvoiceClick(invoice.id)}
+                                okText="Yes" cancelText="No">
+                              
+                  <div
+                   
+                    title='Resend Invoice'
+                    className={`${styles["table-icon"]} ${styles["table-view-icon"]}`}
+                  >
+                    <SendOutlined />
+                  </div>
+				  </Popconfirm>
+				</Col>
+				)
+			}
           </Row>
         )
       }

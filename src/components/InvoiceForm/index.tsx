@@ -52,7 +52,7 @@ const INVOICE_CREATE = gql`
   }
 `;
 
-const INVOICE_UPDATE = gql`
+export const INVOICE_UPDATE = gql`
   mutation InvoiceUpdate($input: InvoiceUpdateInput!) {
     InvoiceUpdate(input: $input) {
       id
@@ -300,6 +300,7 @@ const InvoiceForm = (props: IProps) => {
       layout="vertical"
       initialValues={initialValues}
       onFinish={onSubmit}
+	  className={styles['invoice-form']}
     >
       <Row gutter={24}>
         <Col xs={24} sm={24} md={12} lg={12}>
