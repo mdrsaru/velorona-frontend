@@ -51,10 +51,21 @@
   width: 100%;
   padding: 0 2rem 0 1.2rem;
 
+
   @media screen and (max-width: 1436px) {
     padding: 0 1rem 0 0.5rem;
   }
 }
+
+
+.invoice-form{
+	:global {
+		.ant-input , .ant-picker-input input, .ant-input-number-input,.ant-select-selection-item, .ant-select-selection-placeholder{
+			font-size: 14px;
+		}
+	  }
+	
+  }
 
 .add-project {
   font-weight: 600;
