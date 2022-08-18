@@ -27,8 +27,13 @@ const INVOICE = gql`
         notes
         subtotal
         taxPercent
+        taxAmount
         totalAmount
         totalQuantity
+        discount
+        discountAmount
+        needProject
+        shipping
         items {
           id
           quantity

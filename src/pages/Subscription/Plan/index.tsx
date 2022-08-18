@@ -67,7 +67,7 @@ const Plan = (props: IProps) => {
 
   const getBtnText = () => {
     if(plan.subscriptionStatus === 'inactive' && plan.name === 'Starter') {
-      return 'Inactive';
+      return 'Downgrade';
     }
 
     if(plan.subscriptionStatus === 'active') {
@@ -88,7 +88,7 @@ const Plan = (props: IProps) => {
 
       {/* Need downgrade functionality */}
       <Button
-        type={plan.name === 'Starter' && plan.subscriptionStatus === 'inactive' ? undefined : 'primary'}
+        type="primary"
         disabled={plan.subscriptionStatus === 'active'}
         loading={creatingSubscription}
         onClick={createIncompleteSubscription}

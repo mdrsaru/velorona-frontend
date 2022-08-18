@@ -63,6 +63,10 @@ export interface IInvoiceInput {
   totalAmount: number;
   subtotal: number;
   taxPercent: number;
+  discount: number;
+  taxAmount?: number;
+  discountAmount?: number;
+  shipping?: number;
   notes: string;
   totalQuantity: number;
   items: IInvoiceItemInput[];
