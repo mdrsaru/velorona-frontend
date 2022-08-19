@@ -1,0 +1,348 @@
+:global {
+  .ant-modal-close {
+    //padding: 1rem;
+  }
+
+  .ant-modal-close-x {
+    padding-top: 0.3rem;
+  }
+
+  .ant-modal-footer {
+    border: none;
+    padding-bottom: 2rem;
+    padding-right: 3rem;
+  }
+
+  :local(.site-card-wrapper) {
+    .ant-card-body {
+      padding: 0;
+    }
+
+    .ant-collapse > .ant-collapse-item > .ant-collapse-header {
+      padding: 0;
+    }
+
+    .ant-collapse-ghost
+      > .ant-collapse-item
+      > .ant-collapse-content
+      > .ant-collapse-content-box {
+      padding: 0;
+    }
+
+    .ant-collapse-content > .ant-collapse-content-box {
+      padding: 0;
+    }
+
+    .ant-form-item {
+      margin-bottom: 0;
+    }
+
+    .ant-card-grid {
+      padding-left: 7px;
+      padding-right: 7px;
+    }
+
+    .ant-table-wrapper {
+      padding: 1rem;
+      font-size: 30px;
+    }
+
+    .anticon svg {
+      //color: var(--primary-blue);
+    }
+
+    .anticon-left,
+    .anticon-right {
+      font-size: 16px;
+      font-weight: 800;
+    }
+
+    .anticon-close-circle {
+      cursor: pointer;
+      //background: var(--gray-2);
+    }
+
+    .anticon-close-circle svg {
+      //color: var(--gray-secondary);
+
+      &:hover {
+        color: var(--primary-blue);
+      }
+    }
+
+    .ant-picker {
+      .ant-picker-input input::placeholder {
+        font-weight: 600;
+        font-size: 18px;
+        line-height: 22px;
+        color: var(--gray-secondary);
+      }
+    }
+  }
+}
+
+.card-col-timesheet {
+  overflow-x: auto;
+  overflow-y: auto;
+}
+
+.site-card-wrapper {
+  padding-top: 2rem;
+  font-style: normal;
+
+  .time-entries {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+
+    .add-entry {
+      font-weight: 600;
+      font-size: 18px;
+      line-height: 22px;
+      cursor: pointer;
+      color: var(--primary-blue);
+    }
+  }
+
+  .timesheet {
+    padding: 1rem;
+    font-weight: 600;
+    font-size: 28px;
+    line-height: 29px;
+
+    @media screen and (max-width: 1282px) {
+      font-size: 20px;
+    }
+  }
+
+  .add-time-stamp {
+    font-weight: 600;
+    padding: 1rem;
+    font-size: 20px;
+    float: right;
+
+    @media screen and (max-width: 1281px) {
+      font-size: 14px;
+    }
+
+    line-height: 22px;
+    cursor: pointer;
+    color: var(--primary-blue);
+  }
+}
+
+.timesheet-detail {
+  padding-top: 1.5rem;
+  padding-right: 0.5rem;
+}
+
+.total-row {
+  padding-left: 3rem;
+  padding-top: 0.6rem;
+  padding-right: 1rem;
+
+  span {
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 22px;
+  }
+
+  .total-count {
+    float: right;
+  }
+}
+
+.data-picker {
+  padding: 1rem;
+}
+
+.next-icon {
+  text-align: center;
+  height: 54px;
+  display: flex;
+  margin-top: 1rem;
+  margin-right: 1rem;
+  justify-content: center;
+  align-items: center;
+  background: var(--gray-2);
+  cursor: pointer;
+}
+
+.dropdown-menu {
+  cursor: pointer;
+
+  span {
+    font-weight: 600;
+    font-size: 14px;
+    line-height: 17px;
+    color: var(--primary-blue);
+  }
+}
+
+.timesheet-section {
+  margin-bottom: 48px;
+  .timesheet-status {
+    background: var(--gray-2);
+    padding: 9px 24px;
+    font-weight: 600;
+    font-size: 18px;
+  }
+
+  .unapproved-status,
+  .rejected-status,
+  .approved-status {
+    display: flex;
+    justify-content: space-between;
+
+    .action {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      color: var(--primary-blue);
+
+      .invoice-link {
+        border-left: 1px solid var(--gray-secondary);
+        padding: 8px;
+        line-height: 1px;
+      }
+    }
+  }
+}
+
+.resp-table-header,
+.resp-table-body {
+  display: flex;
+}
+
+.resp-table-header {
+  background: var(--gray-secondary);
+  font-weight: 600;
+  font-size: 14px;
+  line-height: 17px;
+  color: var(--white);
+}
+
+.resp-table-body {
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 17px;
+}
+
+.table-header-cell,
+.table-body-cell {
+  width: 15%;
+  padding: 1rem;
+}
+
+.table-body-cell {
+  display: flex;
+  align-items: center;
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 17px;
+}
+
+.table-attachment {
+  color: var(--primary-blue);
+  cursor: pointer;
+}
+
+.modal-title {
+  font-weight: 600;
+  font-size: 24px;
+  line-height: 29px;
+  padding: 1rem;
+}
+
+.form-modal {
+  padding: 2rem;
+}
+
+.form-body {
+  padding: 1rem;
+}
+
+.form-footer {
+  padding: 0 2rem 0 2rem;
+  text-align: end;
+}
+
+.close-icon-div {
+  padding: 5px;
+  border-radius: 50px;
+  background: var(--gray-2);
+}
+
+.timesheet-task {
+  background-color: var(--gray-2);
+  font-weight: 600;
+  font-size: 18px;
+  line-height: 22px;
+  padding: 1rem;
+}
+
+.timer-div {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  div {
+    width: 50%;
+  }
+}
+
+/*** Modal CSS ***/
+
+.modal-message {
+  padding: 3rem 0 0 0;
+  text-align: center;
+
+  img {
+    height: 200px;
+    padding: 1rem;
+  }
+
+  p {
+    font-weight: 400;
+    font-size: 17px;
+    line-height: 17px;
+  }
+
+  .warning-text {
+    color: var(--primary-red);
+  }
+}
+
+.weekly-timesheet-card {
+  padding: 2rem 1rem 2rem 1rem;
+}
+
+.attachApprovedTitle {
+  font-weight: 600;
+  font-size: 24px;
+  padding: 1.5rem;
+}
+
+.attach-approved-timesheet {
+  :global {
+    .ant-collapse {
+      background-color: var(--white);
+    }
+    .ant-collapse-content {
+      border-top: 0px;
+    }
+  }
+}
+
+.attach-new-timesheet {
+  font-weight: 600;
+  color: var(--primary-blue);
+  font-size: 16px;
+  padding-left: 1rem;
+  cursor: pointer;
+}
+
+.button-row{
+	margin-top: 1.5rem;
+}
