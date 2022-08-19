@@ -1,5 +1,5 @@
 import { Card, Row, Col, Table, Dropdown, Menu, message, Input, Button, Select, Form, Avatar, Tabs } from "antd"
-import { SearchOutlined, DownloadOutlined, DollarCircleFilled, FormOutlined, CheckCircleFilled, DeleteOutlined, UserOutlined, FileSyncOutlined, CloseCircleFilled } from "@ant-design/icons"
+import { SearchOutlined, DownloadOutlined, DollarCircleFilled, FormOutlined, CheckCircleFilled, DeleteOutlined, UserOutlined, FileSyncOutlined, CloseCircleFilled, MailOutlined } from "@ant-design/icons"
 
 import { Link, useNavigate } from "react-router-dom"
 import routes from "../../config/routes"
@@ -61,6 +61,7 @@ export const USER = gql`
         entryType
         startDate
         endDate
+        loggedIn
         timesheet_attachment
         avatar {
           id
@@ -126,6 +127,11 @@ export const USER_ARCHIVE = gql`
   }
 `;
 
+export const RESEND_INVITATION = gql`
+  mutation ResendInvitation($input: ResendInvitationInput!) {
+    ResendInvitation(input: $input)
+  }
+`;
 const csvHeader: Array<{ label: string, key: string, subKey?: string }> = [
   { label: "FullName", key: "fullName" },
   { label: "Email", key: "email" },
@@ -151,6 +157,14 @@ const Employee = () => {
     },
   });
 
+  const [resendInvitation] = useMutation(RESEND_INVITATION, {
+    onCompleted: () => {
+      message.success('Resend invitation successful')
+    },
+    onError(err) {
+      notifyGraphqlError(err)
+    },
+  });
   const [pagingInput, setPagingInput] = useState<{
     skip: number;
     currentPage: number;
@@ -499,6 +513,17 @@ const Employee = () => {
     };
   });
 
+  const handleResendInvitation = (record: any) => {
+    console.log(record.id)
+    resendInvitation({
+      variables: {
+        input: {
+          user_id: record?.id,
+          company_id: loggedInUser?.company?.id,
+        },
+      },
+    })
+  }
   const menu = (data: any) => {
     return (
       <Menu>
@@ -508,7 +533,7 @@ const Employee = () => {
         <Menu.Item
           key="active"
           onClick={() => {
-            if (data?.status === "Inactive") {
+            if (data?.status === "Inactive" || data?.status === 'InvitationSent') {
               changeStatus("Active", data?.id);
             }
           }}
@@ -520,7 +545,7 @@ const Employee = () => {
         <Menu.Item
           key="inactive"
           onClick={() => {
-            if (data?.status === "Active") {
+            if (data?.status === "Active" || data?.status === 'InvitationSent') {
               changeStatus("Inactive", data?.id);
             }
           }}
@@ -693,6 +718,16 @@ const Employee = () => {
                   </Col>
                 }
 
+                {!record.loggedIn && <Col>
+                  <div
+                    onClick={() => handleResendInvitation(record)}
+                    className={`${styles["table-icon"]} ${styles["table-unarchive-icon"]}`}
+                    title='Resend Invitation'
+                  >
+                    <MailOutlined />
+                  </div>
+                </Col>
+                }
                 <Col>
                   {
                     record?.id !== loggedInUser?.user?.id && (<div
