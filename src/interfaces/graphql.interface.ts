@@ -69,5 +69,6 @@ export interface IInvoiceInput {
   shipping?: number;
   notes: string;
   totalQuantity: number;
+  needProject?: boolean;
   items: IInvoiceItemInput[];
 };
