@@ -44,14 +44,14 @@ export const status = [{
   value: 'Inactive',
   name: 'In Active'
 },
-{
-  value: 'Archived',
-  name: 'Archived'
-},
-{
-  value: 'Unarchived',
-  name: 'UnArchived'
-}
+// {
+//   value: 'Archived',
+//   name: 'Archived'
+// },
+// {
+//   value: 'Unarchived',
+//   name: 'UnArchived'
+// }
 ]
 
 export const invoice_status = [{

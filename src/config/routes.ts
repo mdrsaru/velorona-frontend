@@ -405,6 +405,14 @@ const routes = {
     name: 'Terms and condition',
     key: 'policy',
   },
+  reports: {
+    childPath: 'reports',
+    path: (id: string) => `/${id}/reports`,
+    component: lazy(() => import('../pages/Reports')),
+    name: 'Reports',
+    key: 'reports',
+    allowedRoles: [Employee],
+  },
 };
 
 export default routes;

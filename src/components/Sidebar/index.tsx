@@ -17,6 +17,7 @@ import {
   ProfileOutlined,
   SettingOutlined,
   PullRequestOutlined,
+  FileTextOutlined 
 } from '@ant-design/icons';
 
 import constants from '../../config/constants';
@@ -163,6 +164,14 @@ const Sidebar = (props: any) => {
       name: routes.subscription.name,
       icon: <img src={subscriptionImg} style={{ width: 14 }} alt="subscription" />,
       route: routes.subscription.path(loggedInUser?.company?.code ?? ''),
+      accessRoles: [constants.roles.CompanyAdmin],
+      viewAsAdmin: true,
+    },
+    {
+      key: routes.reports.key,
+      name: routes.reports.name,
+      icon: <FileTextOutlined/>,
+      route: routes.reports.path(loggedInUser?.company?.code ?? ''),
       accessRoles: [constants.roles.CompanyAdmin],
       viewAsAdmin: true,
     },

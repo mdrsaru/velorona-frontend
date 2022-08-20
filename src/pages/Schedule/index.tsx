@@ -117,7 +117,7 @@ const Schedule = () => {
       title: "Time Period",
       key: 'date',
       render: (schedule: any) => {
-        return <span className={styles.date}>
+        return <span key={schedule?.data?.id} className={styles.date}>
           {`${moment(schedule?.startDate).format('ddd,MMM DD')} - ${moment(schedule?.endDate).format('ddd,MMM DD')}`}
         </span>
 
@@ -160,7 +160,7 @@ const Schedule = () => {
       key: "actions",
       render: (record: Workschedule) => (
         <>
-          <span
+          <span key={record?.id}
             title='Delete schedule'
             className={`${styles["table-icon"]} ${styles["table-delete-icon"]}`}
             onClick={() => {

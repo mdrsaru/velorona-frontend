@@ -2,15 +2,15 @@ import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { gql, useQuery, useMutation, useLazyQuery } from '@apollo/client';
-import { SearchOutlined, CheckCircleFilled, FormOutlined, EyeFilled, PlusCircleFilled,SendOutlined } from '@ant-design/icons';
+import { SearchOutlined } from '@ant-design/icons';
 import { Card, Col, Dropdown, Menu, Row, Table, message, Modal, Form, Select, Button, Input, Popconfirm, Typography } from 'antd';
 
-import filterImg from "../../assets/images/filter.svg"
+import filterImg from "../../../assets/images/filter.svg"
 
-import { authVar } from '../../App/link';
-import constants, { invoice_status } from '../../config/constants';
-import routes from '../../config/routes';
-import { notifyGraphqlError } from '../../utils/error';
+import { authVar } from '../../../App/link';
+import constants, { invoice_status } from '../../../config/constants';
+import routes from '../../../config/routes';
+import { notifyGraphqlError } from '../../../utils/error';
 
 import {
   Invoice as IInvoice,
@@ -20,50 +20,21 @@ import {
   MutationInvoiceUpdateArgs,
   QueryInvoiceArgs,
   InvoiceUpdateInput,
-} from '../../interfaces/generated';
-import { GraphQLResponse } from '../../interfaces/graphql.interface';
+} from '../../../interfaces/generated';
+import { GraphQLResponse } from '../../../interfaces/graphql.interface';
 
-import PageHeader from '../../components/PageHeader';
-import Status from '../../components/Status';
-import InvoiceViewer from '../../components/InvoiceViewer';
-import styles from './style.module.scss';
+import PageHeader from '../../../components/PageHeader';
+import Status from '../../../components/Status';
+import InvoiceViewer from '../../../components/InvoiceViewer';
 import { debounce } from 'lodash';
-import AttachmentModal from '../../components/AttachmentsModal/index';
-import AttachNewTimesheetModal from '../../components/AddAttachedTimesheet';
-import { ATTACHED_TIMESHEET } from '../Timesheet/DetailTimesheet';
+import AttachmentModal from '../../../components/AttachmentsModal/index';
+import AttachNewTimesheetModal from '../../../components/AddAttachedTimesheet';
+import { ATTACHED_TIMESHEET } from '../../Timesheet/DetailTimesheet';
 import { useNavigate } from 'react-router-dom';
-import { downloadCSV } from '../../utils/common';
+import { downloadCSV } from '../../../utils/common';
+import { INVOICE_STATUS_UPDATE, INVOICE } from '../../Invoice';
 
-export const INVOICE = gql`
-  query Invoice($input: InvoiceQueryInput!) {
-    Invoice(input: $input) {
-      paging {
-        total
-      }
-      data {
-        id
-        issueDate 
-        totalAmount
-        status
-        invoiceNumber
-        timesheet_id
-        client {
-          name
-          invoicingEmail
-        }
-      }
-    }
-  }
-`;
 
-export const INVOICE_STATUS_UPDATE = gql`
-  mutation InvoiceUpdate($input: InvoiceUpdateInput!) {
-    InvoiceUpdate(input: $input) {
-      id
-      status
-    }
-  }
-`;
 
 const csvHeader: Array<{ label: string, key: string, subKey?: string }>  = [
 
@@ -94,7 +65,8 @@ const csvHeader: Array<{ label: string, key: string, subKey?: string }>  = [
 ];
 
 const { Option } = Select;
-const Invoice = () => {
+
+const InvoiceReport = () => {
   const loggedInUser = authVar();
 const navigate = useNavigate();
   const companyCode = loggedInUser?.company?.code as string
@@ -405,156 +377,25 @@ const navigate = useNavigate();
 
   const dataSource = invoiceData?.Invoice?.data ?? [];
 
-  const columns = [
-    {
-      title: 'Invoice Number',
-      dataIndex: 'invoiceNumber',
-      width: '10%',
-    },
-    {
-      title: 'Client Name',
-      render: (invoice: IInvoice) => {
-        return <>{invoice.client.name}</>
-      }
-    },
-    {
-      title: 'Email',
-      render: (invoice: IInvoice) => {
-        return <>{invoice.client.invoicingEmail}</>
-      }
-    },
-    {
-      title: 'Issued Date',
-      render: (invoice: IInvoice) => {
-        return <>{moment(invoice.issueDate).format('MM/DD/YYYY')}</>
-      }
-    },
-    {
-      title: 'Amount',
-      dataIndex: 'totalAmount',
-    },
-    {
-      title: 'Status',
-      dataIndex: 'status',
-      render: (status: string) => {
-        return <Status status={status} />
-      }
-    },
-
-    {
-      title: 'Attachments',
-      render: (invoice: IInvoice) => {
-        return (
-          <Row>
-            <Col>
-              {
-
-                <div
-                  onClick={() => handleViewAttachmentClick(invoice.id)}
-                  title='View Attachment'
-                  className={`${styles["table-icon"]} ${styles["table-view-attachment-icon"]}`}
-                >
-                  <EyeFilled />
-                </div>
-              }
-            </Col>
-            <Col>
-              {
-                invoice.status === 'Pending' && (
-                  <div
-                    onClick={() => handleAddAttachment(invoice.id)}
-                    title='Add Attachment'
-                    className={`${styles["table-icon"]} ${styles["table-add-icon"]}`}
-                  >
-                    <PlusCircleFilled />
-                  </div>
-                )
-              }</Col>
-          </Row>
-        )
-      }
-    },
-    {
-      title: 'Actions',
-      render: (invoice: IInvoice) => {
-        return (
-          <Row>
-            <Col>
-              {
-                invoice.status === 'Pending' ? (
-                  <Link
-                    to={routes.editInvoice.path(loggedInUser?.company?.code as string, invoice.id)}
-                    title='Edit Invoice'
-                    className={`${styles["table-icon"]} ${styles["table-view-icon"]}`}
-                  >
-                    <FormOutlined />
-                  </Link>
-                ) : (
-                  <div
-                    onClick={() => handleViewInvoiceClick(invoice.id)}
-                    title='View Invoice'
-                    className={`${styles["table-icon"]} ${styles["table-view-icon"]}`}
-                  >
-                    <EyeFilled />
-                  </div>
-                )
-              }
-            </Col>
-            <Col>
-              <div
-                className={`${styles["table-icon"]} ${styles["table-status-icon"]}`}
-                onClick={(event) => event.stopPropagation()}
-              >
-                <Dropdown
-                  overlay={menu(invoice)}
-                  trigger={["click"]}
-                  placement="bottomRight"
-                >
-                  <div
-                    className="ant-dropdown-link"
-                    onClick={(e) => e.preventDefault()}
-                    title='Change Status'
-                  >
-                    <CheckCircleFilled />
-                  </div>
-                </Dropdown>
-              </div>
-            </Col>
-			{
-                invoice.status === 'Sent' && (
-			<Col>
-			  <Popconfirm
-				placement="left"
-				title="Are you sure you want to resend invoice?"
-				onConfirm={() => handleResendInvoiceClick(invoice.id)}
-				okText="Yes" cancelText="No">        
-					<div     
-						title='Resend Invoice'
-						className={`${styles["table-icon"]} ${styles["table-view-icon"]}`}
-					>
-					 <SendOutlined />
-					</div>
-			  </Popconfirm>
-			</Col>
-			 )
-			}
-          </Row>
-        )
-      }
-    },
-  ];
 
   return (
-    <div className={styles['container']}>
+    <div >
       <Card bordered={false}>
         <PageHeader
           title="Invoice History"
           extra={[
-            <div className={styles['new-invoice']} key="new-invoice">
-              <Link to={routes.addInvoice.path(loggedInUser?.company?.code ?? '')}>
-                Add Invoice
-              </Link>
-            </div>
+            <Button
+            key="btn-filter"
+
+            type="text"
+            onClick={openFilterRow}
+            icon={<img
+              src={filterImg}
+              alt="filter"
+               />}>
+            &nbsp; &nbsp;
+            {filterProperty?.filter ? 'Reset' : 'Filter'}
+          </Button>
           ]}
         />
         <Form
@@ -563,33 +404,9 @@ const navigate = useNavigate();
           onFinish={() => { }}
           autoComplete="off"
           name="filter-form">
-          <Row gutter={[32, 0]}>
-            <Col xs={24} sm={24} md={16} lg={17} xl={20}>
-              <Form.Item name="search" label="">
-                <Input
-                  prefix={<SearchOutlined className="site-form-item-icon" />}
-                  placeholder="Search by Client name or email"
-                  onChange={debouncedResults}
-                />
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={24} md={8} lg={7} xl={4}>
-              <div className={styles['filter-col']}>
-                <Button
-                  type="text"
-                  onClick={openFilterRow}
-                  icon={<img
-                    src={filterImg}
-                    alt="filter"
-                    className={styles['filter-image']} />}>
-                  &nbsp; &nbsp;
-                  {filterProperty?.filter ? 'Reset' : 'Filter'}
-                </Button>
-              </div>
-            </Col>
-          </Row>
+
           {filterProperty?.filter &&
-            <Row gutter={[32, 0]} className={styles["role-status-col"]}>
+            <Row gutter={[32, 0]} >
 
               <Col span={5}>
                 <Form.Item name="status" label="">
@@ -606,22 +423,7 @@ const navigate = useNavigate();
               </Col>
             </Row>}
         </Form>
-        <Row className='container-row'>
-          <Col span={24}>
-            <Table
-              loading={loading || updateLoading}
-              dataSource={dataSource}
-              columns={columns}
-              rowKey={(record => record.id)}
-              pagination={{
-                current: pagingInput.currentPage,
-                onChange: changePage,
-                total: invoiceData?.Invoice?.paging?.total,
-                pageSize: constants.paging.perPage
-              }}
-            />
-          </Col>
-        </Row>
+        
         <Row>
           <Col span={24}>
             {
@@ -666,4 +468,4 @@ const navigate = useNavigate();
   )
 }
 
-export default Invoice;
+export default InvoiceReport;

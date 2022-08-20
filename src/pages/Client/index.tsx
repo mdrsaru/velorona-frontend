@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button, Card, Col, Dropdown, Form, Input, Menu, message, Row, Select, Table } from "antd";
 import { Link, useNavigate } from "react-router-dom";
-import { gql, useMutation, useQuery } from "@apollo/client";
+import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import {  SearchOutlined,FormOutlined, CheckCircleFilled, DeleteOutlined,CloseCircleFilled } from "@ant-design/icons"
 
 // import SubMenu from "antd/lib/menu/SubMenu";
@@ -25,6 +25,7 @@ import ArchiveBody from "../../components/Archive";
 import { GraphQLResponse } from "../../interfaces/graphql.interface";
 import PageHeader from "../../components/PageHeader";
 import { debounce } from "lodash";
+import { downloadCSV } from "../../utils/common";
 
 export interface UserData {
   User: {
@@ -78,6 +79,14 @@ export const CLIENT_UPDATE = gql`
 `;
 
 const {Option} = Select;
+
+const csvHeader: Array<{ label: string, key: string, subKey?: string }> = [
+  { label: "Client Name", key: "name" },
+  { label: "Email Address", key: "email" },
+  { label: "Invoicing Email", key: "invoicingEmail"},
+  { label: "Status", key: "status" },
+]
+
 const Client = () => {
   const loggedInUser = authVar();
   const navigate = useNavigate();
@@ -127,6 +136,25 @@ const Client = () => {
     },
   });
 
+  const [fetchDownloadData, { data: clientDownloadData }] = useLazyQuery<GraphQLResponse<'Client', ClientPagingResult>, QueryClientArgs>(CLIENT, {
+    fetchPolicy: "network-only",
+    nextFetchPolicy: "cache-first",
+    variables: {
+      input: {
+        query: {
+          company_id: loggedInUser?.company?.id as string,
+        },
+        paging: {
+          order: ["updatedAt:DESC"],
+        },
+      },
+    },
+    onCompleted: () => {
+      downloadCSV(clientDownloadData?.Client?.data, csvHeader, 'Client.csv')
+    }
+  });
+
+
   const [clientUpdate, { loading: updateLoading }] = useMutation<
     GraphQLResponse<'ClientUpdate', IClient>,
     MutationClientUpdateArgs
@@ -157,6 +185,22 @@ const Client = () => {
       },
     }
   );
+
+  const downloadReport = () => {
+    fetchDownloadData({
+      variables: {
+        input: {
+          query: {
+            company_id: loggedInUser?.company?.id ?? '',
+          },
+          paging: {
+            order: ["updatedAt:DESC"],
+          },
+        },
+      }
+    })
+  };
+
   const refetchClients = () => {
     let values = filterForm.getFieldsValue(['search', 'role', 'status'])
     let input: {
@@ -506,6 +550,21 @@ const Client = () => {
               }}
             />
           </Col>
+        </Row>
+        <Row>
+          <Col span={24}>
+            {
+              !!clientData?.Client?.data?.length && (
+                <div className={styles['download-report']}>
+                  <Button
+                    type="link"
+                    onClick={downloadReport}
+                  >
+                    Download Report
+                  </Button>
+                </div>
+              )
+            }</Col>
         </Row>
       </Card>
 

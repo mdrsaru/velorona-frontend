@@ -934,7 +934,7 @@ const Employee = () => {
                 />
               </Col>
             </Row>
-            <Row>
+            {/* <Row>
               <Col>
                 {
                   !!employeeData?.User?.data?.length && (
@@ -950,7 +950,7 @@ const Employee = () => {
                   )
                 }
               </Col>
-            </Row>
+            </Row> */}
           </Card>
           <ModalConfirm
             visibility={visibility}

@@ -1,54 +1,28 @@
 import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { gql, useLazyQuery, useQuery } from '@apollo/client';
-import { Card, Table, Button, Form, Row, Select, Col, Input, DatePicker } from 'antd';
+import {  useLazyQuery, useQuery } from '@apollo/client';
+import { Card,  Button, Form, Row, Select, Col,  DatePicker, Typography } from 'antd';
 import { DownloadOutlined, SearchOutlined,EyeFilled } from '@ant-design/icons';
 
-import { authVar } from '../../App/link';
-import constants, { employee_timesheet_status } from '../../config/constants';
-import routes from '../../config/routes';
-import { notifyGraphqlError } from '../../utils/error';
-import { TimesheetPagingData } from '../../interfaces/graphql.interface';
-import { TimesheetQueryInput, Timesheet, RoleName } from '../../interfaces/generated';
-import PageHeader from '../../components/PageHeader';
-import Status from '../../components/Status';
+import constants, { employee_timesheet_status } from '../../../config/constants';
 
+import PageHeader from '../../../components/PageHeader';
 
-import filterImg from "../../assets/images/filter.svg"
+import filterImg from "../../../assets/images/filter.svg"
 
-import styles from './style.module.scss';
-import { downloadCSV } from '../../utils/common';
 import { debounce } from 'lodash';
-import TimeDuration from '../../components/TimeDuration';
+import { authVar } from '../../../App/link';
+import Status from '../../../components/Status';
+import TimeDuration from '../../../components/TimeDuration';
+import routes from '../../../config/routes';
+import { TimesheetQueryInput, RoleName, Timesheet } from '../../../interfaces/generated';
+import { TimesheetPagingData } from '../../../interfaces/graphql.interface';
+import { downloadCSV } from '../../../utils/common';
+import { notifyGraphqlError } from '../../../utils/error';
+import { EMPLOYEE_TIMESHEET } from '../../EmployeeTimesheet';
 const { Option } = Select;
-export const EMPLOYEE_TIMESHEET = gql`
-  query EmployeeTimesheet($input: TimesheetQueryInput!) {
-    Timesheet(input: $input) {
-      paging {
-        total
-      }
-      data {
-        id
-        durationFormat
-        duration
-        invoicedDuration
-        invoicedDurationFormat
-        totalExpense
-        lastApprovedAt
-        weekStartDate
-        weekEndDate
-        status
-        user {
-          fullName
-        }
-        client {
-          name
-        }
-      }
-    }
-  }
-`;
+
 
 const csvHeader: Array<{ label: string, key: string, subKey?: string }> = [
   { label: "Employee Name", key: "client", subKey: "name" },
@@ -58,7 +32,7 @@ const csvHeader: Array<{ label: string, key: string, subKey?: string }> = [
   { label: "Last Approved", key: "lastApprovedAt" }
 ]
 const { RangePicker } = DatePicker;
-const EmployeeTimesheet = () => {
+const EmployeeTimesheetReport = () => {
   const authData = authVar();
   const company_id = authData.company?.id as string
   const [pagingInput, setPagingInput] = useState<{
@@ -219,103 +193,30 @@ const EmployeeTimesheet = () => {
   });
 
   const dataSource = timesheetData?.Timesheet?.data ?? [];
-  const columns = [
-    {
-      title: 'Date',
-      width: '20%',
-
-      render: (timesheet: any) => {
-        return <>{moment(timesheet?.weekStartDate).format('YYYY/MM/DD')}-{moment(timesheet?.weekEndDate).format('YYYY/MM/DD')}</>
-      }
-    },
-
-    {
-      title: 'Employee Name',
-      dataIndex: ['user', 'fullName'],
-    },
-    {
-      title: 'Client',
-      dataIndex: ['client', 'name'],
-    },
-    {
-      title: 'Total Hours',
-      key: 'duration',
-      render: (record: any) =>
-        <TimeDuration duration={record.duration} />
-    },
-    {
-      title: 'Last Approved',
-      dataIndex: 'lastApprovedAt',
-      render: (lastApprovedAt: any) => {
-        return <span>{lastApprovedAt ? moment(lastApprovedAt).format('LL') : 'N/A'}</span>
-      }
-    },
-    {
-      title: 'Expense',
-      dataIndex: 'totalExpense',
-      render: (totalExpense: number) => {
-        return `$${totalExpense}`
-      }
-    },
-    {
-      title: 'Status',
-      dataIndex: 'status',
-      render: (status: string) => {
-        return <Status status={status} />
-      }
-    },
-    {
-      title: 'Action',
-      render: (timesheet: Timesheet) => {
-        return (
-          <Link
-            className={styles['invoice-link']}
-            title='View Detail'
-            to={routes.detailTimesheet.path(authData?.company?.code as string, timesheet.id)}>
-            <EyeFilled  className={`${styles["table-icon"]} ${styles["table-view-icon"]}`}/>
-          </Link>
-        )
-      }
-    },
-  ];
 
   return (
-    <div className={styles['container']}>
+    <div >
       <Card bordered={false}>
-        <PageHeader title="Employee Timesheet" />
+        <PageHeader title="Employee Timesheet Report" extra={[<Button 
+                      key="btn-filter"
+                  type="text" 
+                  onClick={openFilterRow}
+                  icon={<img
+                    src={filterImg}
+                    alt="filter"
+                    />}>
+                  &nbsp; &nbsp;
+                  {filterProperty?.filter ? 'Reset' : 'Filter'}
+                </Button>]} />
         <Form
           form={filterForm}
           layout="vertical"
           onFinish={() => { }}
           autoComplete="off"
           name="filter-form">
-          <Row gutter={[32, 0]}>
-            <Col xs={24} sm={24} md={16} lg={17} xl={20}>
-              <Form.Item name="search" label="">
-                <Input
-                  prefix={<SearchOutlined className="site-form-item-icon" />}
-                  placeholder="Search by employee first name or client"
-                  onChange={debouncedResults}
-                />
-              </Form.Item>
-            </Col>
-            <Col xs={24} sm={24} md={8} lg={7} xl={4}>
-              <div className={styles['filter-col']}>
-                <Button
-                  type="text"
-                  onClick={openFilterRow}
-                  icon={<img
-                    src={filterImg}
-                    alt="filter"
-                    className={styles['filter-image']} />}>
-                  &nbsp; &nbsp;
-                  {filterProperty?.filter ? 'Reset' : 'Filter'}
-                </Button>
-              </div>
-            </Col>
-          </Row>
+         
           {filterProperty?.filter &&
-            <Row gutter={[32, 0]} className={styles["role-status-col"]}>
+            <Row gutter={[32, 0]} >
 
               <Col xs={24} xl={6}>
                 <Form.Item name="status" label="">
@@ -338,22 +239,10 @@ const EmployeeTimesheet = () => {
             </Row>}
         </Form>
         <div className='container-row'>
-          <Table
-            loading={timesheetLoading}
-            dataSource={dataSource}
-            columns={columns}
-            rowKey={(record => record.id)}
-            pagination={{
-              current: pagingInput.currentPage,
-              onChange: changePage,
-              total: timesheetData?.Timesheet?.paging?.total,
-              pageSize: constants.paging.perPage
-            }}
-          />
+  
           {
 			!authData.user?.roles?.includes(RoleName.TaskManager) && 
-            !!dataSource?.length && (
-              <div className={styles['download-report']}>
+            (!!dataSource?.length ? 
                 <Button
                   type="link"
                   onClick={downloadReport}
@@ -361,8 +250,8 @@ const EmployeeTimesheet = () => {
                 >
                   Download Report
                 </Button>
-              </div>
-            )
+            :
+            <Typography.Text type="secondary" >No files to Download</Typography.Text>)
           }
         </div>
       </Card>
@@ -371,5 +260,5 @@ const EmployeeTimesheet = () => {
   )
 }
 
-export default EmployeeTimesheet;
+export default EmployeeTimesheetReport;
 

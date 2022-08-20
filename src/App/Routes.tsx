@@ -305,6 +305,14 @@ const _Routes = () => {
               }
             />
 
+          <Route
+                path={routes.reports.childPath}
+                element={
+                <Suspense fallback={<RouteLoader />}>
+                  <routes.reports.component />
+                </Suspense>
+                }
+              />
             <Route
               path={routes.projects.childPath}
               element={<CheckRoles allowedRoles={routes.projects.allowedRoles} />}
