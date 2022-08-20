@@ -1,7 +1,10 @@
-import { Fragment, useState } from "react";
+import { Fragment, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import {  Card, Col, message, Row, } from "antd";
-import { PlusCircleFilled, DeleteOutlined } from "@ant-design/icons";
+
+import ReactToPrint from 'react-to-print';
+
+import {  Button, Card, Col, message, Row, } from "antd";
+import { PlusCircleFilled, DeleteOutlined ,PrinterOutlined } from "@ant-design/icons";
 import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import moment from "moment";
 import _ from "lodash";
@@ -19,7 +22,7 @@ import { notifyGraphqlError } from "../../../utils/error";
 import ModalConfirm from "../../../components/Modal";
 import Delete from "../../../components/Delete";
 
-
+import './styles.css'
 import deleteImg from '../../../assets/images/delete_btn.svg';
 import { WORKSCHEDULE } from "..";
 import { authVar } from '../../../App/link';
@@ -59,6 +62,8 @@ export const WORKSCHEDULE_DETAIL_BULK_DELETE = gql`
 `;
 
 const ScheduleDetail = () => {
+    const componentRef = useRef()  as React.MutableRefObject<HTMLInputElement>;
+
     const params = useParams();
 const loggedInUser = authVar()
     const [showDeleteModal, setShowDeleteModal] = useState(false)
@@ -279,7 +284,7 @@ const loggedInUser = authVar()
                     />
                     <Row className='container-row'>
                         <Col span={24}>
-                            <div className={styles['detail-table']}>
+                              <div ref={componentRef}  className={styles['detail-table']}>
                                 <table className={styles['main-table']}>
                                     <thead>
                                         <tr className={styles['table-header']}>
@@ -360,6 +365,7 @@ const loggedInUser = authVar()
                                         )}
                                     </tbody>
                                 </table>
+                                </div>
                                 <p
                                     onClick={() => setEmployeeShow(!showEmployee)}
                                     className={styles.addEmployee}>
@@ -368,7 +374,17 @@ const loggedInUser = authVar()
                                     </span>
                                     Add Employee
                                 </p>
-                            </div>
+
+                                <ReactToPrint
+                                    trigger={() =>
+                                        <Button
+                                            type="link"
+                                            icon={<PrinterOutlined />}
+                                        >
+                                            Print Schedule
+                                        </Button>}
+                                    content={() => componentRef.current}
+                                />
 
                         </Col>
                     </Row>
