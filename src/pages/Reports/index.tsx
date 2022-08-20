@@ -1,5 +1,6 @@
 import React from 'react'
 import { Col, Row } from 'antd'
+
 import EmployeeReport from './EmployeeReport'
 import ProjectReport from './ProjectReport'
 import EmployeeTimesheetReport from './EmployeeTimesheetReport'
@@ -8,7 +9,6 @@ import InvoiceReport from './InvoiceReport'
 
   const Reports = () => {
   return (
-    <div>
     <Row gutter={[10,10]}>
     <Col span={24} >
       <EmployeeReport />
@@ -26,7 +26,6 @@ import InvoiceReport from './InvoiceReport'
       <InvoiceReport />
       </Col>
     </Row>
-    </div>
   )
 }
 

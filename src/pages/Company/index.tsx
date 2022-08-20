@@ -2,29 +2,37 @@ import moment from 'moment';
 import { debounce } from 'lodash';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { useQuery, gql, useMutation } from '@apollo/client';
-import { MoreOutlined,SearchOutlined} from '@ant-design/icons';
+import { useQuery, gql, useMutation, useLazyQuery } from '@apollo/client';
+import { MoreOutlined, SearchOutlined, DownloadOutlined } from '@ant-design/icons';
 import { Card, Row, Col, Table, Menu, Dropdown, Form, Select, Button, Input } from 'antd';
 
 import routes from '../../config/routes';
 import constants, { company_status } from '../../config/constants';
 import { notifyGraphqlError } from '../../utils/error';
 import { GraphQLResponse } from '../../interfaces/graphql.interface';
-import { Company as ICompany,CompanyPagingResult, CompanyStatus, MutationCompanyUpdateArgs, QueryCompanyArgs } from '../../interfaces/generated';
+import {
+  Company as ICompany,
+  CompanyPagingResult,
+  CompanyStatus,
+  MutationCompanyUpdateArgs,
+  QueryCompanyArgs,
+} from '../../interfaces/generated';
 
 import Status from '../../components/Status';
 import ModalConfirm from '../../components/Modal';
 
 import deleteImg from './../../assets/images/delete_btn.svg';
 import archiveImg from './../../assets/images/archive_btn.svg';
-import filterImg from "../../assets/images/filter.svg"
+import filterImg from '../../assets/images/filter.svg';
 
 import styles from './style.module.scss';
+import { downloadCSV } from '../../utils/common';
 
 const { SubMenu } = Menu;
+
 export const COMPANY = gql`
-  query Company($input:CompanyQueryInput) {
-    Company(input:$input) {
+  query Company($input: CompanyQueryInput) {
+    Company(input: $input) {
       paging {
         total
       }
@@ -32,7 +40,7 @@ export const COMPANY = gql`
         id
         name
         status
-        createdAt 
+        createdAt
         companyCode
         logo {
           id
@@ -42,7 +50,7 @@ export const COMPANY = gql`
       }
     }
   }
-`
+`;
 
 export const COMPANY_UPDATE = gql`
   mutation ClientUpdate($input: CompanyUpdateInput!) {
@@ -51,103 +59,137 @@ export const COMPANY_UPDATE = gql`
       name
       status
       companyCode
-      createdAt 
-      logo{
-      id
-      name 
-      url 
+      createdAt
+      logo {
+        id
+        name
+        url
       }
     }
   }
-`
+`;
+const csvHeader: Array<{ label: string; key: string; subKey?: string }> = [
+  { label: 'Company Name', key: 'name' },
+  { label: 'Status', key: 'status' },
+  { label: 'Created At', key: 'createdAt' },
+];
+
 const DeleteBody = () => {
   return (
     <div className={styles['modal-message']}>
       <div>
-        <img src={deleteImg} alt="confirm" />
+        <img src={deleteImg} alt='confirm' />
       </div>
       <br />
       <p>
         Are you sure you want to delete <strong>Insight Workshop Pvt. Ltd?</strong>
       </p>
-      <p className={styles['warning-text']}>
-        All the data associated with the company will be deleted permanently.
-      </p>
+      <p className={styles['warning-text']}>All the data associated with the company will be deleted permanently.</p>
     </div>
-  )
-}
+  );
+};
 
 const ArchiveBody = () => {
   return (
     <div className={styles['modal-message']}>
       <div>
-        <img src={archiveImg} alt="archive-confirm" />
+        <img src={archiveImg} alt='archive-confirm' />
       </div>
       <br />
       <p>
         Are you sure you want to archive <strong>Insight Workshop Pvt. Ltd?</strong>
       </p>
-      <p className={styles['archive-text']}>
-        Company will not be able to login to the system.
-      </p>
+      <p className={styles['archive-text']}>Company will not be able to login to the system.</p>
     </div>
-  )
-}
+  );
+};
 
-const {Option} = Select;
+const { Option } = Select;
 const Company = () => {
   const navigate = useNavigate();
   const [filterForm] = Form.useForm();
 
-  const { data: companyData, loading: dataLoading, refetch:refetchCompany } = useQuery<
+  const {
+    data: companyData,
+    loading: dataLoading,
+    refetch: refetchCompany,
+  } = useQuery<GraphQLResponse<'Company', CompanyPagingResult>, QueryCompanyArgs>(COMPANY, {
+    fetchPolicy: 'network-only',
+    nextFetchPolicy: 'cache-only',
+  });
+
+  const [fetchDownloadData, { data: companyDownloadData }] = useLazyQuery<
     GraphQLResponse<'Company', CompanyPagingResult>,
     QueryCompanyArgs
   >(COMPANY, {
     fetchPolicy: 'network-only',
-    nextFetchPolicy: 'cache-only'
+    nextFetchPolicy: 'cache-first',
+    variables: {
+      input: {
+        query: {},
+        paging: {
+          order: ['updatedAt:DESC'],
+        },
+      },
+    },
+    onCompleted: () => {
+      downloadCSV(companyDownloadData?.Company?.data, csvHeader, 'Company.csv');
+    },
   });
-  
+
+  const downloadReport = () => {
+    fetchDownloadData({
+      variables: {
+        input: {
+          query: {},
+          paging: {
+            order: ['updatedAt:DESC'],
+          },
+        },
+      },
+    });
+  };
+
   const [pagingInput, setPagingInput] = useState<{
-    skip: number,
-    currentPage: number,
+    skip: number;
+    currentPage: number;
   }>({
     skip: 0,
     currentPage: 1,
   });
-  
+
   const [filterProperty, setFilterProperty] = useState<any>({
     filter: false,
   });
 
-
-  const [updateCompany] = useMutation<
-  GraphQLResponse<'CompanyUpdate', ICompany>,
-    MutationCompanyUpdateArgs
-  >(COMPANY_UPDATE)
+  const [updateCompany] = useMutation<GraphQLResponse<'CompanyUpdate', ICompany>, MutationCompanyUpdateArgs>(
+    COMPANY_UPDATE
+  );
 
   const [visibility, setVisibility] = useState(false);
   const [showArchive, setArchiveModal] = useState(false);
   const setModalVisibility = (value: boolean) => {
-    setVisibility(value)
-  }
+    setVisibility(value);
+  };
   const setArchiveVisibility = (value: boolean) => {
-    setArchiveModal(value)
+    setArchiveModal(value);
   };
 
   const changeStatus = (value: string, id: string) => {
-
     updateCompany({
       variables: {
         input: {
           status: value as CompanyStatus,
-          id: id
+          id: id,
+        },
+      },
+    })
+      .then((response) => {
+        if (response.errors) {
+          return notifyGraphqlError(response.errors);
         }
-      }
-    }).then((response) => {
-      if (response.errors) {
-        return notifyGraphqlError((response.errors))
-      };
-    }).catch(notifyGraphqlError)
+      })
+      .catch(notifyGraphqlError);
   };
 
   const changePage = (page: number) => {
@@ -160,66 +202,63 @@ const Company = () => {
   };
 
   const refetchCompanies = () => {
-
-    let values = filterForm.getFieldsValue(['search', 'role', 'status'])
+    let values = filterForm.getFieldsValue(['search', 'role', 'status']);
 
     let input: {
-      paging?: any,
-      query: any
+      paging?: any;
+      query: any;
     } = {
       paging: {
-        order: ["updatedAt:DESC"],
+        order: ['updatedAt:DESC'],
       },
 
-      query: {}
-
-    }
+      query: {},
+    };
 
     let query: {
-      status?: string,
-      search?:boolean,
-    } = {
-    }
-
+      status?: string;
+      search?: boolean;
+    } = {};
 
     if (values.status) {
       query['status'] = values.status;
-    } 
-
-    if (values.search) {
-      query['search'] = values?.search
     }
 
-    input['query'] = query
+    if (values.search) {
+      query['search'] = values?.search;
+    }
+
+    input['query'] = query;
 
     refetchCompany({
-      input: input
-    })
-  }
+      input: input,
+    });
+  };
 
   const onChangeFilter = () => {
-    refetchCompanies()
-  }
+    refetchCompanies();
+  };
 
   const openFilterRow = () => {
     if (filterProperty?.filter) {
       refetchCompany({
         input: {
           paging: {
-            order: ["updatedAt:DESC"],
+            order: ['updatedAt:DESC'],
           },
-          query: { }
-        }
-      })
+          query: {},
+        },
+      });
     }
-    filterForm.resetFields()
+    filterForm.resetFields();
     setFilterProperty({
-      filter: !filterProperty?.filter
-    })
-  }
+      filter: !filterProperty?.filter,
+    });
+  };
 
-
-  const debouncedResults = debounce(() => { onChangeFilter() }, 600);
+  const debouncedResults = debounce(() => {
+    onChangeFilter();
+  }, 600);
 
   useEffect(() => {
     return () => {
@@ -229,39 +268,40 @@ const Company = () => {
 
   const menu = (data: any) => (
     <Menu>
-      <Menu.Item key="1">
-        <a href={`/${data.companyCode}`} target="_blank" rel="noreferrer">
+      <Menu.Item key='1'>
+        <a href={`/${data.companyCode}`} target='_blank' rel='noreferrer'>
           Login To Company
         </a>
       </Menu.Item>
 
       <Menu.Divider />
 
-      <Menu.Item key="2">
-        <div onClick={() => navigate(routes.editCompany.path(data?.id ?? '1'))}>
-          Edit Company
-        </div>
+      <Menu.Item key='2'>
+        <div onClick={() => navigate(routes.editCompany.path(data?.id ?? '1'))}>Edit Company</div>
       </Menu.Item>
 
       <Menu.Divider />
 
-      <SubMenu title="Change status" key="3">
-        <Menu.Item key="active"
+      <SubMenu title='Change status' key='3'>
+        <Menu.Item
+          key='active'
           onClick={() => {
             if (data?.status === 'Inactive') {
-              changeStatus('Active', data?.id)
+              changeStatus('Active', data?.id);
             }
-          }}>
+          }}
+        >
           Active
         </Menu.Item>
         <Menu.Divider />
         <Menu.Item
-          key="inactive"
+          key='inactive'
           onClick={() => {
             if (data?.status === 'Active') {
-              changeStatus('Inactive', data?.id)
+              changeStatus('Inactive', data?.id);
             }
-          }}>
+          }}
+        >
           Inactive
         </Menu.Item>
       </SubMenu>
@@ -285,71 +325,49 @@ const Company = () => {
     {
       title: 'Status',
       dataIndex: 'status',
-      render: (status: string) => (
-        <Status status={status} />
-      )
+      render: (status: string) => <Status status={status} />,
     },
     {
       title: 'Created At',
       dataIndex: 'createdAt',
       key: 'createdAt',
-      render: (createdAt: string) =>
-        <span>
-          {moment(createdAt).format('YYYY/MM/DD')}
-        </span>
+      render: (createdAt: string) => <span>{moment(createdAt).format('YYYY/MM/DD')}</span>,
     },
     {
       title: 'Actions',
       key: 'actions',
-      render: (record: any) =>
+      render: (record: any) => (
         <div className={styles['dropdown-menu']}>
-          <Dropdown
-            overlay={menu(record)}
-            trigger={['click']}
-            placement="bottomRight">
-            <div
-              className="ant-dropdown-link"
-              onClick={e => e.preventDefault()}
-              style={{ paddingLeft: '1rem' }}>
+          <Dropdown overlay={menu(record)} trigger={['click']} placement='bottomRight'>
+            <div className='ant-dropdown-link' onClick={(e) => e.preventDefault()} style={{ paddingLeft: '1rem' }}>
               <MoreOutlined />
             </div>
           </Dropdown>
-        </div>,
+        </div>
+      ),
     },
   ];
 
   return (
-
     <div className={styles['company-main-div']}>
       <Card bordered={false}>
         <Row>
-          <Col
-            span={12}
-            className={styles['form-col']}>
+          <Col span={12} className={styles['form-col']}>
             <h1>Companies</h1>
           </Col>
-          <Col
-            span={12}
-            className={styles['form-col']}>
+          <Col span={12} className={styles['form-col']}>
             <div className={styles['add-new-company']}>
-              <Link to={routes.addCompany.path}>
-                Add new company
-              </Link>
+              <Link to={routes.addCompany.path}>Add new company</Link>
             </div>
           </Col>
         </Row>
-        <Form
-          form={filterForm}
-          layout="vertical"
-          onFinish={() => { }}
-          autoComplete="off"
-          name="filter-form">
+        <Form form={filterForm} layout='vertical' onFinish={() => {}} autoComplete='off' name='filter-form'>
           <Row gutter={[32, 0]}>
             <Col xs={24} sm={24} md={16} lg={17} xl={20}>
-              <Form.Item name="search" label="">
+              <Form.Item name='search' label=''>
                 <Input
-                  prefix={<SearchOutlined className="site-form-item-icon" />}
-                  placeholder="Search by company name"
+                  prefix={<SearchOutlined className='site-form-item-icon' />}
+                  placeholder='Search by company name'
                   onChange={debouncedResults}
                 />
               </Form.Item>
@@ -357,35 +375,31 @@ const Company = () => {
             <Col xs={24} sm={24} md={8} lg={7} xl={4}>
               <div className={styles['filter-col']}>
                 <Button
-                  type="text"
+                  type='text'
                   onClick={openFilterRow}
-                  icon={<img
-                    src={filterImg}
-                    alt="filter"
-                    className={styles['filter-image']} />}>
+                  icon={<img src={filterImg} alt='filter' className={styles['filter-image']} />}
+                >
                   &nbsp; &nbsp;
                   {filterProperty?.filter ? 'Reset' : 'Filter'}
                 </Button>
               </div>
             </Col>
           </Row>
-          {filterProperty?.filter &&
-            <Row gutter={[32, 0]} className={styles["role-status-col"]}>
-
+          {filterProperty?.filter && (
+            <Row gutter={[32, 0]} className={styles['role-status-col']}>
               <Col span={5}>
-                <Form.Item name="status" label="">
-                  <Select
-                    placeholder="Select status"
-                    onChange={onChangeFilter}
-                  >
-                    {company_status?.map((status: any) =>
+                <Form.Item name='status' label=''>
+                  <Select placeholder='Select status' onChange={onChangeFilter}>
+                    {company_status?.map((status: any) => (
                       <Option value={status?.value} key={status?.name}>
                         {status?.name}
-                      </Option>)}
+                      </Option>
+                    ))}
                   </Select>
                 </Form.Item>
               </Col>
-            </Row>}
+            </Row>
+          )}
         </Form>
         <Row className='container-row'>
           <Col span={24}>
@@ -393,15 +407,19 @@ const Company = () => {
               loading={dataLoading}
               dataSource={companyData?.Company?.data}
               columns={columns}
-              rowKey={(record => record?.id)}
+              rowKey={(record) => record?.id}
               pagination={{
                 current: pagingInput.currentPage,
                 onChange: changePage,
                 total: companyData?.Company?.paging?.total,
-                pageSize: constants.paging.perPage
-              }} />
+                pageSize: constants.paging.perPage,
+              }}
+            />
           </Col>
         </Row>
+        <Button type='link' onClick={downloadReport} icon={<DownloadOutlined />}>
+          Download
+        </Button>
       </Card>
       <ModalConfirm
         visibility={visibility}
@@ -415,9 +433,10 @@ const Company = () => {
         setModalVisibility={setArchiveVisibility}
         imgSrc={archiveImg}
         okText={'Archive'}
-        modalBody={<ArchiveBody />} />
+        modalBody={<ArchiveBody />}
+      />
     </div>
-  )
-}
+  );
+};
 
 export default Company;

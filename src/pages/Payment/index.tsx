@@ -7,14 +7,14 @@ import constants from '../../config/constants';
 import { GraphQLResponse } from '../../interfaces/graphql.interface';
 import { SubscriptionPaymentPagingResult, QuerySubscriptionPaymentArgs, Company } from '../../interfaces/generated';
 
-import PageHeader from '../../components/PageHeader'
+import PageHeader from '../../components/PageHeader';
 
-const SUBSCRIPTION_PAYMENT = gql`
+export const SUBSCRIPTION_PAYMENT = gql`
   query SubscriptionPayment($input: SubscriptionPaymentQueryInput!) {
     SubscriptionPayment(input: $input) {
       paging {
         total
-        startIndex 
+        startIndex
       }
       data {
         id
@@ -29,11 +29,10 @@ const SUBSCRIPTION_PAYMENT = gql`
   }
 `;
 
-
 const Payment = () => {
   const [pagingInput, setPagingInput] = useState<{
-    skip: number,
-    currentPage: number,
+    skip: number;
+    currentPage: number;
   }>({
     skip: 0,
     currentPage: 1,
@@ -52,8 +51,8 @@ const Payment = () => {
           take: constants.paging.perPage,
           order: ['paymentDate:DESC'],
         },
-      }
-    }
+      },
+    },
   });
 
   const columns = [
@@ -61,28 +60,28 @@ const Payment = () => {
       title: 'S.N',
       render: (_: any, __: any, index: number) => {
         return (data?.SubscriptionPayment?.paging?.startIndex ?? 0) + index + 1;
-      }
+      },
     },
     {
       title: 'Company',
       dataIndex: 'company',
       render: (company: Company) => {
         return company.name;
-      }
+      },
     },
     {
       title: 'Date of Payment',
       dataIndex: 'paymentDate',
       render: (date: string) => {
         return moment(date).format('MM/DD/YYYY');
-      }
+      },
     },
     {
       title: 'Payment Amount',
       dataIndex: 'amount',
       render: (amount: number) => {
-        return `$${amount}`
-      }
+        return `$${amount}`;
+      },
     },
     {
       title: 'Status',
@@ -102,24 +101,23 @@ const Payment = () => {
   return (
     <div style={{ paddingTop: '2rem' }}>
       <Card bordered={false}>
-        <PageHeader title="Payments" />
+        <PageHeader title='Payments' />
 
         <Table
           loading={loading}
           dataSource={data?.SubscriptionPayment?.data}
           columns={columns}
-          rowKey={((record: any) => record.id)} 
+          rowKey={(record: any) => record.id}
           pagination={{
             current: pagingInput.currentPage,
-              onChange: changePage,
-              total: data?.SubscriptionPayment?.paging?.total,
-              pageSize: constants.paging.perPage,
+            onChange: changePage,
+            total: data?.SubscriptionPayment?.paging?.total,
+            pageSize: constants.paging.perPage,
           }}
         />
-
       </Card>
     </div>
-  )
-}
+  );
+};
 
 export default Payment;

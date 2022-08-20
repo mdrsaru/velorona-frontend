@@ -413,6 +413,15 @@ const routes = {
     key: 'reports',
     allowedRoles: [Employee],
   },
+  reportsAdmin: {
+    childPath: 'reportsAdmin',
+    path: '/reportsAdmin',
+    component: lazy(() => import('../pages/ReportsAdmin')),
+    name: 'Reports',
+    key: 'reports',
+    allowedRoles: [SuperAdmin],
+
+  },
 };
 
 export default routes;

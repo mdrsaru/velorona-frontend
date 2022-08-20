@@ -1,5 +1,6 @@
 import moment from 'moment';
-import { ChangeEvent, useState } from 'react';
+import isNil from 'lodash/isNil';
+import { ChangeEvent, useState, useEffect } from 'react';
 import { gql, useQuery, useMutation } from '@apollo/client';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Button, Col, Form, Input, Row, Select, Image, DatePicker, InputNumber, Space, message, Popover, Checkbox } from 'antd';
@@ -74,6 +75,12 @@ const InvoiceForm = (props: IProps) => {
   const companyCode = loggedInUser?.company?.code as string
   const isTimesheet = !!props.timesheet_id; 
 
+  useEffect(() => {
+    if(!isNil(props.invoice?.needProject)) {
+      setNeedProject(props.invoice?.needProject as boolean);
+    }
+  }, [props.invoice?.needProject])
+
   const [createInvoice, { loading: creatingInvoice }] = useMutation<
     GraphQLResponse<'InvoiceCreate', Invoice>,
     MutationInvoiceCreateArgs
@@ -142,7 +149,7 @@ const InvoiceForm = (props: IProps) => {
     discountAmount: invoice?.discountAmount ?? 0,
     notes: invoice?.notes ?? '',
     totalQuantity: invoice?.totalQuantity ?? 0,
-    needProject,
+    needProject: invoice?.needProject ?? needProject,
     shipping: invoice?.shipping ?? 0,
     items: invoice?.items?.map((item) => ({
       id: item.id,

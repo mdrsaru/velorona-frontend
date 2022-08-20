@@ -2,10 +2,32 @@ import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { gql, useQuery, useMutation, useLazyQuery } from '@apollo/client';
-import { SearchOutlined, CheckCircleFilled, FormOutlined, EyeFilled, PlusCircleFilled,SendOutlined } from '@ant-design/icons';
-import { Card, Col, Dropdown, Menu, Row, Table, message, Modal, Form, Select, Button, Input, Popconfirm, Typography } from 'antd';
+import {
+  SearchOutlined,
+  CheckCircleFilled,
+  FormOutlined,
+  EyeFilled,
+  PlusCircleFilled,
+  SendOutlined,
+} from '@ant-design/icons';
+import {
+  Card,
+  Col,
+  Dropdown,
+  Menu,
+  Row,
+  Table,
+  message,
+  Modal,
+  Form,
+  Select,
+  Button,
+  Input,
+  Popconfirm,
+  Typography,
+} from 'antd';
 
-import filterImg from "../../assets/images/filter.svg"
+import filterImg from '../../assets/images/filter.svg';
 
 import { authVar } from '../../App/link';
 import constants, { invoice_status } from '../../config/constants';
@@ -23,6 +45,7 @@ import {
 } from '../../interfaces/generated';
 import { GraphQLResponse } from '../../interfaces/graphql.interface';
 
+import { ATTACHED_TIMESHEET_FIELDS } from '../../gql/timesheet.gql';
 import PageHeader from '../../components/PageHeader';
 import Status from '../../components/Status';
 import InvoiceViewer from '../../components/InvoiceViewer';
@@ -30,9 +53,9 @@ import styles from './style.module.scss';
 import { debounce } from 'lodash';
 import AttachmentModal from '../../components/AttachmentsModal/index';
 import AttachNewTimesheetModal from '../../components/AddAttachedTimesheet';
-import { ATTACHED_TIMESHEET } from '../Timesheet/DetailTimesheet';
 import { useNavigate } from 'react-router-dom';
 import { downloadCSV } from '../../utils/common';
+import { ATTACHED_TIMESHEET } from '../Timesheet/DetailTimesheet/Attachments';
 
 export const INVOICE = gql`
   query Invoice($input: InvoiceQueryInput!) {
@@ -42,7 +65,7 @@ export const INVOICE = gql`
       }
       data {
         id
-        issueDate 
+        issueDate
         totalAmount
         status
         invoiceNumber
@@ -65,23 +88,20 @@ export const INVOICE_STATUS_UPDATE = gql`
   }
 `;
 
-const csvHeader: Array<{ label: string, key: string, subKey?: string }>  = [
-
+const csvHeader: Array<{ label: string; key: string; subKey?: string }> = [
   {
     label: 'Client Name',
-    key:'client',
-    subKey:'name',
+    key: 'client',
+    subKey: 'name',
   },
   {
     label: 'Email',
-    key:'client',
-    subKey:'invoicingEmail',
-    
+    key: 'client',
+    subKey: 'invoicingEmail',
   },
   {
     label: 'Issued Date',
-    key:'issueDate'
-    
+    key: 'issueDate',
   },
   {
     label: 'Amount',
@@ -90,39 +110,39 @@ const csvHeader: Array<{ label: string, key: string, subKey?: string }>  = [
   {
     label: 'Status',
     key: 'status',
-  }  
+  },
 ];
 
 const { Option } = Select;
 const Invoice = () => {
   const loggedInUser = authVar();
-const navigate = useNavigate();
-  const companyCode = loggedInUser?.company?.code as string
+  const navigate = useNavigate();
+  const companyCode = loggedInUser?.company?.code as string;
 
   const [filterForm] = Form.useForm();
 
   const [pagingInput, setPagingInput] = useState<{
-    skip: number,
-    currentPage: number,
+    skip: number;
+    currentPage: number;
   }>({
     skip: 0,
     currentPage: 1,
   });
 
   const [invoiceViewer, setInvoiceViewer] = useState<{
-    isVisible: boolean,
+    isVisible: boolean;
     invoice_id: string | undefined;
   }>({
     isVisible: false,
     invoice_id: undefined,
-  })
+  });
 
   const [filterProperty, setFilterProperty] = useState<any>({
     filter: false,
   });
 
   const [invoiceId, setInvoiceId] = useState('');
-  const [showAttachment, setShowAttachment] = useState(false)
+  const [showAttachment, setShowAttachment] = useState(false);
 
   const [showAttachTimeEntry, setAttachTimeEntry] = useState(false);
   const [updateStatus, { loading: updateLoading }] = useMutation<
@@ -130,13 +150,12 @@ const navigate = useNavigate();
     MutationInvoiceUpdateArgs
   >(INVOICE_STATUS_UPDATE, {
     onCompleted(data) {
-      if(data.InvoiceUpdate) {
-        message.success({ content: 'Invoice status updated', key: 'updatable' })
+      if (data.InvoiceUpdate) {
+        message.success({ content: 'Invoice status updated', key: 'updatable' });
       }
     },
     onError: notifyGraphqlError,
   });
-
 
   const input: InvoiceQueryInput = {
     paging: {
@@ -149,7 +168,19 @@ const navigate = useNavigate();
     },
   };
 
-  const { data: invoiceData, loading , refetch:refetchInvoice } = useQuery<
+  const {
+    data: invoiceData,
+    loading,
+    refetch: refetchInvoice,
+  } = useQuery<GraphQLResponse<'Invoice', InvoicePagingResult>, QueryInvoiceArgs>(INVOICE, {
+    fetchPolicy: 'network-only',
+    nextFetchPolicy: 'cache-first',
+    variables: {
+      input,
+    },
+  });
+
+  const [fetchDownloadData, { data: invoiceDownloadData }] = useLazyQuery<
     GraphQLResponse<'Invoice', InvoicePagingResult>,
     QueryInvoiceArgs
   >(INVOICE, {
@@ -157,53 +188,42 @@ const navigate = useNavigate();
     nextFetchPolicy: 'cache-first',
     variables: {
       input,
-    }
-  });
-
-  const [fetchDownloadData, { data: invoiceDownloadData }] = useLazyQuery<GraphQLResponse<'Invoice', InvoicePagingResult>, QueryInvoiceArgs>(INVOICE, {
-    fetchPolicy: "network-only",
-    nextFetchPolicy: "cache-first",
-    variables: {
-      input,
     },
     onCompleted: () => {
-      console.log(invoiceDownloadData)
-      downloadCSV(invoiceDownloadData?.Invoice?.data, csvHeader, 'Invoice.csv')
-    }
+      console.log(invoiceDownloadData);
+      downloadCSV(invoiceDownloadData?.Invoice?.data, csvHeader, 'Invoice.csv');
+    },
   });
 
-  const [ attachments,{ data: attachmentsData }] = useLazyQuery(ATTACHED_TIMESHEET, {
-    fetchPolicy: "network-only",
-    nextFetchPolicy: "cache-first",
+  const [attachments, { data: attachmentsData }] = useLazyQuery(ATTACHED_TIMESHEET, {
+    fetchPolicy: 'network-only',
+    nextFetchPolicy: 'cache-first',
     variables: {
       input: {
         query: {
           company_id: loggedInUser?.company?.id,
-          invoice_id: invoiceId
+          invoice_id: invoiceId,
         },
         paging: {
-          order: ["updatedAt:DESC"],
+          order: ['updatedAt:DESC'],
         },
       },
     },
   });
 
-  const [updateInvoice] = useMutation<
-  GraphQLResponse<'InvoiceUpdate', IInvoice>,
-  MutationInvoiceUpdateArgs
->(
-  INVOICE_STATUS_UPDATE, {
-	onCompleted(data) {
-	  if(data.InvoiceUpdate) {
-		message.success('Invoice resend successfully');
+  const [updateInvoice] = useMutation<GraphQLResponse<'InvoiceUpdate', IInvoice>, MutationInvoiceUpdateArgs>(
+    INVOICE_STATUS_UPDATE,
+    {
+      onCompleted(data) {
+        if (data.InvoiceUpdate) {
+          message.success('Invoice resend successfully');
 
-		navigate(routes.invoice.path(companyCode));
-	  }
-	},
-	onError: notifyGraphqlError,
-  }
-);
-
+          navigate(routes.invoice.path(companyCode));
+        }
+      },
+      onError: notifyGraphqlError,
+    }
+  );
 
   const changeStatus = (id: string, status: InvoiceStatus) => {
     updateStatus({
@@ -212,10 +232,10 @@ const navigate = useNavigate();
           id,
           company_id: loggedInUser?.company?.id as string,
           status,
-        }
-      }
-    })
-  }
+        },
+      },
+    });
+  };
 
   const changePage = (page: number) => {
     const newSkip = (page - 1) * constants.paging.perPage;
@@ -231,119 +251,114 @@ const navigate = useNavigate();
       isVisible: true,
       invoice_id,
     });
-  }
+  };
 
   const handleResendInvoiceClick = (invoice_id: string) => {
-	const input: InvoiceUpdateInput = {
-		id: invoice_id,
-		status: InvoiceStatus.Sent,
-		company_id: loggedInUser?.company?.id as string,
-	};
+    const input: InvoiceUpdateInput = {
+      id: invoice_id,
+      status: InvoiceStatus.Sent,
+      company_id: loggedInUser?.company?.id as string,
+    };
 
-	updateInvoice({
-		variables: {
-			input,
-		}
-	})
-}
+    updateInvoice({
+      variables: {
+        input,
+      },
+    });
+  };
 
   const handleViewInvoiceCancel = () => {
     setInvoiceViewer({
       isVisible: false,
       invoice_id: undefined,
     });
-  }
+  };
 
   const handleViewAttachmentClick = (invoice_id: string) => {
-    setShowAttachment(!showAttachment)
-    setInvoiceId(invoice_id)
+    setShowAttachment(!showAttachment);
+    setInvoiceId(invoice_id);
 
     attachments({
       variables: {
         input: {
-            query: {
-                company_id: loggedInUser?.company?.id as string,
-                invoice_id: invoice_id as string,
-            },
-            paging: {
-                order: ['updatedAt:DESC']
-            }
-        }
-    }
-    })
-  }
+          query: {
+            company_id: loggedInUser?.company?.id as string,
+            invoice_id: invoice_id as string,
+          },
+          paging: {
+            order: ['updatedAt:DESC'],
+          },
+        },
+      },
+    });
+  };
   const handleAddAttachment = (invoice_id: string) => {
-    setAttachTimeEntry(!showAttachTimeEntry)
-    setInvoiceId(invoice_id)
-  }
-
-
+    setAttachTimeEntry(!showAttachTimeEntry);
+    setInvoiceId(invoice_id);
+  };
 
   const refetchInvoices = () => {
-
-    let values = filterForm.getFieldsValue(['search', 'role', 'status'])
+    let values = filterForm.getFieldsValue(['search', 'role', 'status']);
 
     let input: {
-      paging?: any,
-      query: any
+      paging?: any;
+      query: any;
     } = {
       paging: {
-        order: ["updatedAt:DESC"],
+        order: ['updatedAt:DESC'],
       },
 
       query: {
-        company_id: loggedInUser?.company?.id
-      }
-
-    }
+        company_id: loggedInUser?.company?.id,
+      },
+    };
 
     let query: {
-      status?: string,
-      archived?: boolean,
-      search?:boolean,
+      status?: string;
+      archived?: boolean;
+      search?: boolean;
       company_id: string;
     } = {
-      company_id: loggedInUser?.company?.id as string
-    }
-
+      company_id: loggedInUser?.company?.id as string,
+    };
 
     if (values.status) {
       query['status'] = values.status;
     }
 
     if (values.search) {
-      query['search'] = values?.search
+      query['search'] = values?.search;
     }
 
-    input['query'] = query
+    input['query'] = query;
 
     refetchInvoice({
-      input: input
-    })
-  }
+      input: input,
+    });
+  };
 
   const onChangeFilter = () => {
-    refetchInvoices()
-  }
+    refetchInvoices();
+  };
 
   const openFilterRow = () => {
     if (filterProperty?.filter) {
       refetchInvoice({
         input: {
           paging: {
-            order: ["updatedAt:DESC"],
+            order: ['updatedAt:DESC'],
           },
           query: {
             company_id: loggedInUser?.company?.id as string,
-          }
-        }
-      })
+          },
+        },
+      });
     }
-    filterForm.resetFields()
+    filterForm.resetFields();
     setFilterProperty({
-      filter: !filterProperty?.filter
-    })
-  }
+      filter: !filterProperty?.filter,
+    });
+  };
 
   const downloadReport = () => {
     fetchDownloadData({
@@ -353,15 +368,16 @@ const navigate = useNavigate();
             company_id: loggedInUser?.company?.id ?? '',
           },
           paging: {
-            order: ["updatedAt:DESC"],
+            order: ['updatedAt:DESC'],
           },
         },
-      }
-    })
+      },
+    });
   };
 
-
-  const debouncedResults = debounce(() => { onChangeFilter() }, 600);
+  const debouncedResults = debounce(() => {
+    onChangeFilter();
+  }, 600);
 
   useEffect(() => {
     return () => {
@@ -371,37 +387,25 @@ const navigate = useNavigate();
 
   const menu = (invoice: IInvoice) => (
     <Menu>
-
-      <Menu.Item
-        key="Pending"
-        onClick={() => changeStatus(invoice.id, InvoiceStatus.Pending)}
-      >
+      <Menu.Item key='Pending' onClick={() => changeStatus(invoice.id, InvoiceStatus.Pending)}>
         Pending
       </Menu.Item>
 
       <Menu.Divider />
 
-      <Menu.Item
-        key="Received"
-        onClick={() => changeStatus(invoice.id, InvoiceStatus.Received)}
-      >
+      <Menu.Item key='Received' onClick={() => changeStatus(invoice.id, InvoiceStatus.Received)}>
         Received
       </Menu.Item>
 
       <Menu.Divider />
 
-      {
-        invoice.status === InvoiceStatus.Pending && (
-          <Menu.Item
-            key="Sent"
-            onClick={() => changeStatus(invoice.id, InvoiceStatus.Sent)}
-          >
-            Sent
-          </Menu.Item>
-        )
-      }
+      {invoice.status === InvoiceStatus.Pending && (
+        <Menu.Item key='Sent' onClick={() => changeStatus(invoice.id, InvoiceStatus.Sent)}>
+          Sent
+        </Menu.Item>
+      )}
     </Menu>
-  )
+  );
 
   const dataSource = invoiceData?.Invoice?.data ?? [];
 
@@ -414,20 +418,20 @@ const navigate = useNavigate();
     {
       title: 'Client Name',
       render: (invoice: IInvoice) => {
-        return <>{invoice.client.name}</>
-      }
+        return <>{invoice.client.name}</>;
+      },
     },
     {
       title: 'Email',
       render: (invoice: IInvoice) => {
-        return <>{invoice.client.invoicingEmail}</>
-      }
+        return <>{invoice.client.invoicingEmail}</>;
+      },
     },
     {
       title: 'Issued Date',
       render: (invoice: IInvoice) => {
-        return <>{moment(invoice.issueDate).format('MM/DD/YYYY')}</>
-      }
+        return <>{moment(invoice.issueDate).format('MM/DD/YYYY')}</>;
+      },
     },
     {
       title: 'Amount',
@@ -437,8 +441,8 @@ const navigate = useNavigate();
       title: 'Status',
       dataIndex: 'status',
       render: (status: string) => {
-        return <Status status={status} />
-      }
+        return <Status status={status} />;
+      },
     },
 
     {
@@ -448,31 +452,29 @@ const navigate = useNavigate();
           <Row>
             <Col>
               {
-
                 <div
                   onClick={() => handleViewAttachmentClick(invoice.id)}
                   title='View Attachment'
-                  className={`${styles["table-icon"]} ${styles["table-view-attachment-icon"]}`}
+                  className={`${styles['table-icon']} ${styles['table-view-attachment-icon']}`}
                 >
                   <EyeFilled />
                 </div>
               }
             </Col>
             <Col>
-              {
-                invoice.status === 'Pending' && (
-                  <div
-                    onClick={() => handleAddAttachment(invoice.id)}
-                    title='Add Attachment'
-                    className={`${styles["table-icon"]} ${styles["table-add-icon"]}`}
-                  >
-                    <PlusCircleFilled />
-                  </div>
-                )
-              }</Col>
+              {invoice.status === 'Pending' && (
+                <div
+                  onClick={() => handleAddAttachment(invoice.id)}
+                  title='Add Attachment'
+                  className={`${styles['table-icon']} ${styles['table-add-icon']}`}
+                >
+                  <PlusCircleFilled />
+                </div>
+              )}
+            </Col>
           </Row>
-        )
-      }
+        );
+      },
     },
     {
       title: 'Actions',
@@ -480,67 +482,54 @@ const navigate = useNavigate();
         return (
           <Row>
             <Col>
-              {
-                invoice.status === 'Pending' ? (
-                  <Link
-                    to={routes.editInvoice.path(loggedInUser?.company?.code as string, invoice.id)}
-                    title='Edit Invoice'
-                    className={`${styles["table-icon"]} ${styles["table-view-icon"]}`}
-                  >
-                    <FormOutlined />
-                  </Link>
-                ) : (
-                  <div
-                    onClick={() => handleViewInvoiceClick(invoice.id)}
-                    title='View Invoice'
-                    className={`${styles["table-icon"]} ${styles["table-view-icon"]}`}
-                  >
-                    <EyeFilled />
-                  </div>
-                )
-              }
+              {invoice.status === 'Pending' ? (
+                <Link
+                  to={routes.editInvoice.path(loggedInUser?.company?.code as string, invoice.id)}
+                  title='Edit Invoice'
+                  className={`${styles['table-icon']} ${styles['table-view-icon']}`}
+                >
+                  <FormOutlined />
+                </Link>
+              ) : (
+                <div
+                  onClick={() => handleViewInvoiceClick(invoice.id)}
+                  title='View Invoice'
+                  className={`${styles['table-icon']} ${styles['table-view-icon']}`}
+                >
+                  <EyeFilled />
+                </div>
+              )}
             </Col>
             <Col>
               <div
-                className={`${styles["table-icon"]} ${styles["table-status-icon"]}`}
+                className={`${styles['table-icon']} ${styles['table-status-icon']}`}
                 onClick={(event) => event.stopPropagation()}
               >
-                <Dropdown
-                  overlay={menu(invoice)}
-                  trigger={["click"]}
-                  placement="bottomRight"
-                >
-                  <div
-                    className="ant-dropdown-link"
-                    onClick={(e) => e.preventDefault()}
-                    title='Change Status'
-                  >
+                <Dropdown overlay={menu(invoice)} trigger={['click']} placement='bottomRight'>
+                  <div className='ant-dropdown-link' onClick={(e) => e.preventDefault()} title='Change Status'>
                     <CheckCircleFilled />
                   </div>
                 </Dropdown>
               </div>
             </Col>
-			{
-                invoice.status === 'Sent' && (
-			<Col>
-			  <Popconfirm
-				placement="left"
-				title="Are you sure you want to resend invoice?"
-				onConfirm={() => handleResendInvoiceClick(invoice.id)}
-				okText="Yes" cancelText="No">        
-					<div     
-						title='Resend Invoice'
-						className={`${styles["table-icon"]} ${styles["table-view-icon"]}`}
-					>
-					 <SendOutlined />
-					</div>
-			  </Popconfirm>
-			</Col>
-			 )
-			}
+            {invoice.status === 'Sent' && (
+              <Col>
+                <Popconfirm
+                  placement='left'
+                  title='Are you sure you want to resend invoice?'
+                  onConfirm={() => handleResendInvoiceClick(invoice.id)}
+                  okText='Yes'
+                  cancelText='No'
+                >
+                  <div title='Resend Invoice' className={`${styles['table-icon']} ${styles['table-view-icon']}`}>
+                    <SendOutlined />
+                  </div>
+                </Popconfirm>
+              </Col>
+            )}
           </Row>
-        )
-      }
+        );
+      },
     },
   ];
 
@@ -548,27 +537,20 @@ const navigate = useNavigate();
     <div className={styles['container']}>
       <Card bordered={false}>
         <PageHeader
-          title="Invoice History"
+          title='Invoice History'
           extra={[
-            <div className={styles['new-invoice']} key="new-invoice">
-              <Link to={routes.addInvoice.path(loggedInUser?.company?.code ?? '')}>
-                Add Invoice
-              </Link>
-            </div>
+            <div className={styles['new-invoice']} key='new-invoice'>
+              <Link to={routes.addInvoice.path(loggedInUser?.company?.code ?? '')}>Add Invoice</Link>
+            </div>,
           ]}
         />
-        <Form
-          form={filterForm}
-          layout="vertical"
-          onFinish={() => { }}
-          autoComplete="off"
-          name="filter-form">
+        <Form form={filterForm} layout='vertical' onFinish={() => {}} autoComplete='off' name='filter-form'>
           <Row gutter={[32, 0]}>
             <Col xs={24} sm={24} md={16} lg={17} xl={20}>
-              <Form.Item name="search" label="">
+              <Form.Item name='search' label=''>
                 <Input
-                  prefix={<SearchOutlined className="site-form-item-icon" />}
-                  placeholder="Search by Client name or email"
+                  prefix={<SearchOutlined className='site-form-item-icon' />}
+                  placeholder='Search by Client name or email'
                   onChange={debouncedResults}
                 />
               </Form.Item>
@@ -576,35 +558,31 @@ const navigate = useNavigate();
             <Col xs={24} sm={24} md={8} lg={7} xl={4}>
               <div className={styles['filter-col']}>
                 <Button
-                  type="text"
+                  type='text'
                   onClick={openFilterRow}
-                  icon={<img
-                    src={filterImg}
-                    alt="filter"
-                    className={styles['filter-image']} />}>
+                  icon={<img src={filterImg} alt='filter' className={styles['filter-image']} />}
+                >
                   &nbsp; &nbsp;
                   {filterProperty?.filter ? 'Reset' : 'Filter'}
                 </Button>
               </div>
             </Col>
           </Row>
-          {filterProperty?.filter &&
-            <Row gutter={[32, 0]} className={styles["role-status-col"]}>
-
+          {filterProperty?.filter && (
+            <Row gutter={[32, 0]} className={styles['role-status-col']}>
               <Col span={5}>
-                <Form.Item name="status" label="">
-                  <Select
-                    placeholder="Select status"
-                    onChange={onChangeFilter}
-                  >
-                    {invoice_status?.map((status: any) =>
+                <Form.Item name='status' label=''>
+                  <Select placeholder='Select status' onChange={onChangeFilter}>
+                    {invoice_status?.map((status: any) => (
                       <Option value={status?.value} key={status?.name}>
                         {status?.name}
-                      </Option>)}
+                      </Option>
+                    ))}
                   </Select>
                 </Form.Item>
               </Col>
-            </Row>}
+            </Row>
+          )}
         </Form>
         <Row className='container-row'>
           <Col span={24}>
@@ -612,17 +590,17 @@ const navigate = useNavigate();
               loading={loading || updateLoading}
               dataSource={dataSource}
               columns={columns}
-              rowKey={(record => record.id)}
+              rowKey={(record) => record.id}
               pagination={{
                 current: pagingInput.currentPage,
                 onChange: changePage,
                 total: invoiceData?.Invoice?.paging?.total,
-                pageSize: constants.paging.perPage
+                pageSize: constants.paging.perPage,
               }}
             />
           </Col>
         </Row>
-        <Row>
+        {/* <Row>
           <Col span={24}>
             {
               !!invoiceData?.Invoice?.data?.length ? (
@@ -635,35 +613,27 @@ const navigate = useNavigate();
               ) :
               <Typography.Text type="secondary" >No files to Download</Typography.Text>
             }</Col>
-        </Row>
+        </Row> */}
       </Card>
 
-      <Modal
-        centered
-        width={1000}
-        footer={null}
-        visible={invoiceViewer.isVisible}
-        onCancel={handleViewInvoiceCancel}
-      >
-        {
-          invoiceViewer.invoice_id && <InvoiceViewer id={invoiceViewer.invoice_id} />
-        }
+      <Modal centered width={1000} footer={null} visible={invoiceViewer.isVisible} onCancel={handleViewInvoiceCancel}>
+        {invoiceViewer.invoice_id && <InvoiceViewer id={invoiceViewer.invoice_id} />}
       </Modal>
 
       <AttachmentModal
         visibility={showAttachment}
         setVisibility={setShowAttachment}
-        attachment ={attachmentsData?.AttachedTimesheet?.data}
+        attachment={attachmentsData?.AttachedTimesheet?.data}
       />
-
 
       <AttachNewTimesheetModal
         visibility={showAttachTimeEntry}
         setVisibility={setAttachTimeEntry}
-        invoice_id={invoiceId} 
-        refetch = {attachments}/>
+        invoice_id={invoiceId}
+        refetch={attachments}
+      />
     </div>
-  )
-}
+  );
+};
 
 export default Invoice;
