@@ -713,7 +713,7 @@ const DetailTimesheet = () => {
           <div className={styles['site-card-wrapper']}>
             <Card className={styles['attach-approved-timesheet']}>
               <Collapse accordion defaultActiveKey={['2']}>
-                <Panel header="Attachments" key="2" className={styles['attachApprovedTitle']}>
+                <Panel header="Expense" key="2" className={styles['attachApprovedTitle']}>
                   <Attachments
                     isEmployee={isEmployee}
                     timesheet_id={timesheet_id}
