@@ -11,6 +11,7 @@ const config = {
     Employee: 'Employee',
     TaskManager: 'TaskManager',
     Vendor: 'Vendor',
+    BookKeeper : 'BookKeeper',
   },
   userType: {
     SystemAdmin: 'SystemAdmin',
@@ -33,6 +34,10 @@ export const roles_user = [{
 {
   value: 'TaskManager',
   name: 'Task Manager'
+},
+{
+  value: 'BookKeeper',
+  name: 'Book Keeper'
 }
 ]
 
