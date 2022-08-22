@@ -8,7 +8,7 @@ import { DownloadOutlined } from '@ant-design/icons';
 
 import { authVar } from '../../../App/link';
 
-import { status } from '../../../config/constants';
+import { archived, status } from '../../../config/constants';
 
 import filterImg from '../../../assets/images/filter.svg';
 
@@ -100,7 +100,7 @@ const ClientReport = () => {
   };
 
   const refetchClients = () => {
-    let values = filterForm.getFieldsValue(['search', 'role', 'status']);
+    let values = filterForm.getFieldsValue(['search', 'role', 'status', 'archived']);
     let input: {
       paging?: any;
       query: any;
@@ -124,13 +124,12 @@ const ClientReport = () => {
       query['search'] = values?.search;
     }
     if (values.status) {
-      if (values.status === 'Active' || values.status === 'Inactive') {
-        query['status'] = values.status;
-      } else {
-        query['archived'] = values.status === 'Archived' ? true : false;
-      }
+      if (values.status === 'Active' || values.status === 'Inactive') query['status'] = values.status;
     }
 
+    if (values.archived) query['archived'] = values.archived;
+
+    console.log(values);
     input['query'] = query;
 
     refetchClient({
@@ -176,11 +175,22 @@ const ClientReport = () => {
 
         <Form form={filterForm} layout='vertical' onFinish={() => {}} autoComplete='off' name='filter-form'>
           {filterProperty?.filter && (
-            <Row gutter={[32, 0]}>
-              <Col span={5}>
+            <Row gutter={[20, 20]}>
+              <Col xs={24} sm={12} md={10} lg={8} xl={5}>
                 <Form.Item name='status' label=''>
                   <Select placeholder='Select status' onChange={onChangeFilter}>
                     {status?.map((status: any) => (
+                      <Option value={status?.value} key={status?.name}>
+                        {status?.name}
+                      </Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={12} md={10} lg={8} xl={5}>
+                <Form.Item name='archived' label=''>
+                  <Select placeholder='Archive Status' onChange={onChangeFilter}>
+                    {archived?.map((status: any) => (
                       <Option value={status?.value} key={status?.name}>
                         {status?.name}
                       </Option>

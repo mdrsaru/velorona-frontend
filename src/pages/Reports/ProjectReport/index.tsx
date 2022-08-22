@@ -8,7 +8,7 @@ import { authVar } from '../../../App/link';
 import { downloadCSV } from '../../../utils/common';
 import PageHeader from '../../../components/PageHeader';
 import { PROJECT } from '../../Project';
-import { status } from '../../../config/constants';
+import { archived, status } from '../../../config/constants';
 import { GraphQLResponse } from '../../../interfaces/graphql.interface';
 import { ProjectPagingResult, QueryProjectArgs, Project } from '../../../interfaces/generated';
 
@@ -26,11 +26,7 @@ const { Option } = Select;
 
 const ProjectReport = () => {
   const loggedInUser = authVar();
-
-  const [project, setProject] = useState<Project>();
-
   const [filterForm] = Form.useForm();
-
   const [filterProperty, setFilterProperty] = useState<any>({
     filter: false,
   });
@@ -90,7 +86,7 @@ const ProjectReport = () => {
   };
 
   const refetchProjects = () => {
-    let values = filterForm.getFieldsValue(['search', 'role', 'status']);
+    let values = filterForm.getFieldsValue(['role', 'status', 'archived']);
 
     let input: {
       paging?: any;
@@ -99,7 +95,6 @@ const ProjectReport = () => {
       paging: {
         order: ['updatedAt:DESC'],
       },
-
       query: {
         company_id: loggedInUser?.company?.id,
       },
@@ -116,19 +111,12 @@ const ProjectReport = () => {
 
     if (values.status === 'Active' || values.status === 'Inactive') {
       query['status'] = values.status;
-    } else {
-      query['archived'] = values.status === 'Archived' ? true : false;
     }
-
-    if (values.search) {
-      query['search'] = values?.search;
-    }
+    if (values.archived) query['archived'] = values.archived;
+    if (values.search) query['search'] = values?.search;
 
     input['query'] = query;
-
-    refetchProject({
-      input: input,
-    });
+    refetchProject({ input: input });
   };
 
   const onChangeFilter = () => {
@@ -168,7 +156,7 @@ const ProjectReport = () => {
     <div>
       <Card bordered={false}>
         <PageHeader
-          title='Projects'
+          title='Projects Report'
           extra={[
             <Button key='btn-filter' type='text' onClick={openFilterRow} icon={<img src={filterImg} alt='filter' />}>
               &nbsp; &nbsp;
@@ -179,11 +167,22 @@ const ProjectReport = () => {
 
         <Form form={filterForm} layout='vertical' onFinish={() => {}} autoComplete='off' name='filter-form'>
           {filterProperty?.filter && (
-            <Row gutter={[32, 0]}>
-              <Col sm={12} md={10} lg={5}>
+            <Row gutter={[20, 20]}>
+              <Col xs={24} sm={12} md={10} lg={8} xl={5}>
                 <Form.Item name='status' label=''>
                   <Select placeholder='Select status' onChange={onChangeFilter}>
                     {status?.map((status: any) => (
+                      <Option value={status?.value} key={status?.name}>
+                        {status?.name}
+                      </Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={12} md={10} lg={8} xl={5}>
+                <Form.Item name='archived' label=''>
+                  <Select placeholder='Archive Status' onChange={onChangeFilter}>
+                    {archived?.map((status: any) => (
                       <Option value={status?.value} key={status?.name}>
                         {status?.name}
                       </Option>

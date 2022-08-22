@@ -6,7 +6,7 @@ import PaymentReport from './PaymentReport';
 const ReportsAdmin = () => {
   return (
     <div>
-      <Row gutter={[10, 20]}>
+      <Row gutter={[20, 20]}>
         <Col span={24}>
           <CompanyReport />
         </Col>

@@ -8,7 +8,7 @@ import { USER } from '../../Employee';
 import { authVar } from '../../../App/link';
 import { downloadCSV } from '../../../utils/common';
 import PageHeader from '../../../components/PageHeader';
-import { roles_user, status } from '../../../config/constants';
+import { roles_user, status, archived } from '../../../config/constants';
 import { GraphQLResponse } from '../../../interfaces/graphql.interface';
 import { UserPagingResult, QueryUserArgs } from '../../../interfaces/generated';
 
@@ -49,7 +49,7 @@ const EmployeeReport = () => {
     },
   });
   const refetchEmployees = () => {
-    let values = filterForm.getFieldsValue(['search', 'role', 'status']);
+    let values = filterForm.getFieldsValue(['search', 'role', 'status', 'archived']);
     let input: {
       paging: any;
       query?: any;
@@ -68,10 +68,10 @@ const EmployeeReport = () => {
     if (values.status) {
       if (values.status === 'Active' || values.status === 'Inactive') {
         query['status'] = values.status;
-      } else {
-        query['archived'] = values.status === 'Archived' ? true : false;
       }
     }
+
+    if (values.archived) query['archived'] = values.archived;
 
     if (values.role) {
       query['role'] = values?.role;
@@ -160,8 +160,8 @@ const EmployeeReport = () => {
         />
         <Form form={filterForm} layout='vertical' onFinish={() => {}} autoComplete='off' name='filter-form'>
           {filterProperty?.filter && (
-            <Row gutter={[32, 0]}>
-              <Col span={5}>
+            <Row gutter={[20, 20]}>
+              <Col xs={24} sm={12} md={10} lg={8} xl={5}>
                 <Form.Item name='role' label=''>
                   <Select placeholder='Role' onChange={onChangeFilter}>
                     {roles_user?.map((role: any) => (
@@ -172,10 +172,21 @@ const EmployeeReport = () => {
                   </Select>
                 </Form.Item>
               </Col>
-              <Col span={6}>
+              <Col xs={24} sm={12} md={10} lg={8} xl={5}>
                 <Form.Item name='status' label=''>
                   <Select placeholder='Select status' onChange={onChangeFilter}>
                     {status?.map((status: any) => (
+                      <Option value={status?.value} key={status?.name}>
+                        {status?.name}
+                      </Option>
+                    ))}
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={12} md={10} lg={8} xl={5}>
+                <Form.Item name='archived' label=''>
+                  <Select placeholder='Archive Status' onChange={onChangeFilter}>
+                    {archived?.map((status: any) => (
                       <Option value={status?.value} key={status?.name}>
                         {status?.name}
                       </Option>

@@ -147,8 +147,8 @@ const CompanyReport = () => {
         />
         <Form form={filterForm} layout='vertical' onFinish={() => {}} autoComplete='off' name='filter-form'>
           {filterProperty?.filter && (
-            <Row gutter={[32, 0]}>
-              <Col span={5}>
+            <Row gutter={[20, 20]}>
+              <Col xs={24} sm={12} md={10} lg={8} xl={5}>
                 <Form.Item name='status' label=''>
                   <Select placeholder='Select status' onChange={onChangeFilter}>
                     {company_status?.map((status: any) => (

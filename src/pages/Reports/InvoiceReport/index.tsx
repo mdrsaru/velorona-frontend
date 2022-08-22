@@ -1,10 +1,10 @@
 import { debounce } from 'lodash';
 import { useEffect, useState } from 'react';
-import { gql, useQuery, useLazyQuery } from '@apollo/client';
-import { Card, Col, Form, Select, Button, Row, Typography } from 'antd';
-import { DownloadOutlined } from '@ant-design/icons';
+import { useQuery, useLazyQuery } from '@apollo/client';
+import { Card, Col, Form, Select, Button, Row, Typography, DatePicker, Input } from 'antd';
+import { DownloadOutlined, SearchOutlined } from '@ant-design/icons';
 
-import { InvoiceQueryInput, InvoicePagingResult, QueryInvoiceArgs } from '../../../interfaces/generated';
+import { InvoiceQueryInput, InvoicePagingResult, QueryInvoiceArgs, InvoiceQuery } from '../../../interfaces/generated';
 import { authVar } from '../../../App/link';
 import { downloadCSV } from '../../../utils/common';
 import { GraphQLResponse } from '../../../interfaces/graphql.interface';
@@ -38,6 +38,8 @@ const csvHeader: Array<{ label: string; key: string; subKey?: string }> = [
     key: 'status',
   },
 ];
+
+const { RangePicker } = DatePicker;
 
 const { Option } = Select;
 
@@ -96,7 +98,7 @@ const InvoiceReport = () => {
   });
 
   const refetchInvoices = () => {
-    let values = filterForm.getFieldsValue(['search', 'role', 'status']);
+    let values = filterForm.getFieldsValue(['date', 'status', 'search']);
 
     let input: {
       paging?: any;
@@ -111,17 +113,17 @@ const InvoiceReport = () => {
       },
     };
 
-    let query: {
-      status?: string;
-      archived?: boolean;
-      search?: boolean;
-      company_id: string;
-    } = {
+    let query: InvoiceQuery = {
       company_id: loggedInUser?.company?.id as string,
     };
 
     if (values.status) {
       query['status'] = values.status;
+    }
+
+    if (values.date) {
+      query['startDate'] = values?.date[0];
+      query['endDate'] = values?.date[1];
     }
 
     if (values.search) {
@@ -187,7 +189,7 @@ const InvoiceReport = () => {
     <div>
       <Card bordered={false}>
         <PageHeader
-          title='Invoice History'
+          title='Invoice Report'
           extra={[
             <Button key='btn-filter' type='text' onClick={openFilterRow} icon={<img src={filterImg} alt='filter' />}>
               &nbsp; &nbsp;
@@ -197,8 +199,17 @@ const InvoiceReport = () => {
         />
         <Form form={filterForm} layout='vertical' onFinish={() => {}} autoComplete='off' name='filter-form'>
           {filterProperty?.filter && (
-            <Row gutter={[32, 0]}>
-              <Col span={5}>
+            <Row gutter={[20, 20]}>
+              <Col xs={24} sm={12} md={10} lg={8} xl={5}>
+                <Form.Item name='search' label=''>
+                  <Input
+                    prefix={<SearchOutlined className='site-form-item-icon' />}
+                    placeholder='Search by Client name or email'
+                    onChange={debouncedResults}
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={12} md={10} lg={8} xl={5}>
                 <Form.Item name='status' label=''>
                   <Select placeholder='Select status' onChange={onChangeFilter}>
                     {invoice_status?.map((status: any) => (
@@ -207,6 +218,11 @@ const InvoiceReport = () => {
                       </Option>
                     ))}
                   </Select>
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={12} md={10} lg={8} xl={5}>
+                <Form.Item name='date' label=''>
+                  <RangePicker size='large' onChange={onChangeFilter} />
                 </Form.Item>
               </Col>
             </Row>

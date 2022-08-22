@@ -1,6 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 import { useQuery } from '@apollo/client';
-import { Link, useLocation, useParams } from 'react-router-dom';
+import {
+  Link,
+  useLocation,
+  useParams
+} from 'react-router-dom';
 import { Menu, Layout } from 'antd';
 import {
   BankOutlined,
@@ -13,8 +17,7 @@ import {
   ProfileOutlined,
   SettingOutlined,
   PullRequestOutlined,
-  FileTextOutlined,
-  UserOutlined,
+  FileTextOutlined
 } from '@ant-design/icons';
 
 import constants from '../../config/constants';
@@ -23,19 +26,21 @@ import { authVar } from '../../App/link';
 import { AUTH } from '../../gql/auth.gql';
 
 import styles from './style.module.scss';
+
 import subscriptionImg from '../../assets/images/subscription.png';
+import { UserOutlined } from '@ant-design/icons';
 
 const { Sider } = Layout;
 
 const Sidebar = (props: any) => {
-  const { collapsed, onCollapse } = props;
-  const [selectedMenuKey, setMenuKey] = useState('');
+  const { collapsed, onCollapse } = props
+  const [selectedMenuKey, setMenuKey] = useState('')
   const location = useLocation();
   const params = useParams();
   const loggedInUser = authVar();
   const userRoles = loggedInUser?.user?.roles ?? [];
 
-  /**
+  /** 
    * Using useQuery here, as the company id changes with the reactive variables triggered by CompanySet component.
    * Check src/components/CompanySet/index.tsx
    * Reference: https://www.apollographql.com/docs/react/local-state/reactive-variables/
@@ -44,18 +49,18 @@ const Sidebar = (props: any) => {
   const company_id = authData?.AuthUser?.company?.id;
 
   useEffect(() => {
-    let path = '';
+    let path = ''
     if (location?.pathname === '/' + params?.id) {
-      path = routes.company.key;
+      path = routes.company.key
     } else if (params?.id && location?.pathname !== '/' + params?.id) {
-      path = location?.pathname?.split('/').slice(2, 3).toString();
+      path = location?.pathname?.split('/').slice(2, 3).toString()
     } else if (!params.id && location?.pathname !== routes.home.path) {
-      path = location?.pathname?.split('/').slice(1, 2).toString();
+      path = location?.pathname?.split('/').slice(1, 2).toString()
     } else {
-      path = routes.home.key;
+      path = routes.home.key
     }
-    setMenuKey(path);
-  }, [location, params?.id, params?.company]);
+    setMenuKey(path)
+  }, [location, params?.id, params?.company])
 
   const menuItems = [
     {
@@ -63,7 +68,7 @@ const Sidebar = (props: any) => {
       name: routes.company.name,
       icon: <DashboardOutlined />,
       route: routes.company.path(loggedInUser?.company?.code ?? ''),
-      accessRoles: [constants.roles.CompanyAdmin, constants.roles.Employee, constants.roles.TaskManager],
+      accessRoles: [ constants.roles.CompanyAdmin, constants.roles.Employee, constants.roles.TaskManager],
       viewAsAdmin: true,
     },
     {
@@ -71,7 +76,7 @@ const Sidebar = (props: any) => {
       name: routes.dashboard.name,
       icon: <DashboardOutlined />,
       route: routes.dashboard.path,
-      accessRoles: [constants.roles.SuperAdmin],
+      accessRoles: [ constants.roles.SuperAdmin ],
       viewAsAdmin: false,
     },
     {
@@ -157,7 +162,7 @@ const Sidebar = (props: any) => {
     {
       key: routes.subscription.key,
       name: routes.subscription.name,
-      icon: <img src={subscriptionImg} style={{ width: 14 }} alt='subscription' />,
+      icon: <img src={subscriptionImg} style={{ width: 14 }} alt="subscription" />,
       route: routes.subscription.path(loggedInUser?.company?.code ?? ''),
       accessRoles: [constants.roles.CompanyAdmin],
       viewAsAdmin: true,
@@ -170,7 +175,6 @@ const Sidebar = (props: any) => {
       accessRoles: [constants.roles.CompanyAdmin],
       viewAsAdmin: true,
     },
-
     {
       key: routes.demoRequest.key,
       name: routes.demoRequest.name,
@@ -182,7 +186,7 @@ const Sidebar = (props: any) => {
     {
       key: routes.payments.key,
       name: routes.payments.name,
-      icon: <img src={subscriptionImg} style={{ width: 14 }} alt='subscription' />,
+      icon: <img src={subscriptionImg} style={{ width: 14 }} alt="subscription" />,
       route: routes.payments.path,
       accessRoles: [constants.roles.SuperAdmin],
       viewAsAdmin: false,
@@ -203,14 +207,14 @@ const Sidebar = (props: any) => {
       accessRoles: [constants.roles.SuperAdmin],
       viewAsAdmin: false,
     },
-  ];
+  ]
 
-  let menuArray = menuItems.filter((menu) => {
-    return loggedInUser?.user?.roles?.some((role) => menu.accessRoles.includes(role));
+  let menuArray = menuItems.filter(menu => {
+    return loggedInUser?.user?.roles?.some(role => menu.accessRoles.includes(role));
   });
 
-  if (company_id && userRoles.includes(constants.roles.SuperAdmin)) {
-    menuArray = menuItems.filter((menu) => menu.viewAsAdmin);
+  if(company_id && userRoles.includes(constants.roles.SuperAdmin)) {
+    menuArray = menuItems.filter(menu => menu.viewAsAdmin);
   }
 
   return (
@@ -222,30 +226,24 @@ const Sidebar = (props: any) => {
       collapsed={collapsed}
       onCollapse={onCollapse}
       trigger={null}
-      breakpoint='lg'
+      breakpoint="lg"
     >
       <Menu
-        mode='inline'
+        mode="inline"
         defaultSelectedKeys={['1']}
         defaultOpenKeys={['sub1']}
         style={{ height: '100%', borderRight: 0 }}
         selectedKeys={[selectedMenuKey]}
       >
-        {menuArray &&
-          menuArray.map((menu) => (
-            <Menu.Item
-              key={menu?.key}
-              icon={menu?.icon}
-              onClick={(e: any) => {
-                setMenuKey(e.key);
-              }}
-            >
-              <Link to={menu.route}>{menu.name}</Link>
-            </Menu.Item>
-          ))}
+        {menuArray && menuArray.map((menu) => (
+          <Menu.Item key={menu?.key} icon={menu?.icon} onClick={(e: any) => { setMenuKey(e.key) }}>
+            <Link to={menu.route}>{menu.name}</Link>
+          </Menu.Item>
+        ))}
       </Menu>
     </Sider>
   );
 };
 
 export default Sidebar;
+

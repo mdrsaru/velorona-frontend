@@ -1,39 +1,37 @@
-import { debounce } from 'lodash';
-import React, { useState } from 'react';
-import { Button, Card, Col, Dropdown, Form, Input, Menu, message, Row, Select, Table } from 'antd';
-import { Link, useNavigate } from 'react-router-dom';
-import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client';
-import { SearchOutlined, FormOutlined, CheckCircleFilled, DeleteOutlined, CloseCircleFilled } from '@ant-design/icons';
+import React, { useState } from "react";
+import { Button, Card, Col, Dropdown, Form, Input, Menu, message, Row, Select, Table } from "antd";
+import { Link, useNavigate } from "react-router-dom";
+import { gql, useMutation, useQuery } from "@apollo/client";
+import {  SearchOutlined,FormOutlined, CheckCircleFilled, DeleteOutlined,CloseCircleFilled } from "@ant-design/icons"
 
-import routes from '../../config/routes';
-import { authVar } from '../../App/link';
-import Status from '../../components/Status';
-import ModalConfirm from '../../components/Modal';
-import ArchiveBody from '../../components/Archive';
-import PageHeader from '../../components/PageHeader';
+// import SubMenu from "antd/lib/menu/SubMenu";
+
+import routes from "../../config/routes";
+import { authVar } from "../../App/link";
+
+import Status from "../../components/Status";
+import ModalConfirm from "../../components/Modal";
 import constants, { status } from '../../config/constants';
-import { downloadCSV } from '../../utils/common';
-import { notifyGraphqlError } from '../../utils/error';
-import { GraphQLResponse } from '../../interfaces/graphql.interface';
-import {
-  Client as IClient,
-  ClientPagingResult,
-  ClientStatus,
-  MutationClientUpdateArgs,
-  QueryClientArgs,
-  User,
-} from '../../interfaces/generated';
 
-import styles from './style.module.scss';
-import archiveImg from '../../assets/images/archive_btn.svg';
-import filterImg from '../../assets/images/filter.svg';
+import archiveImg from "../../assets/images/archive_btn.svg";
+import filterImg from "../../assets/images/filter.svg"
+
+import { notifyGraphqlError } from "../../utils/error";
+
+import { Client as IClient, ClientPagingResult, ClientStatus, MutationClientUpdateArgs, QueryClientArgs, User } from "../../interfaces/generated";
+
+import styles from "./style.module.scss";
+import ArchiveBody from "../../components/Archive";
+import { GraphQLResponse } from "../../interfaces/graphql.interface";
+import PageHeader from "../../components/PageHeader";
+import { debounce } from "lodash";
 
 export interface UserData {
   User: {
     data: User[];
     paging: {
       total: number;
-    };
+    }
   };
 }
 
@@ -79,23 +77,15 @@ export const CLIENT_UPDATE = gql`
   }
 `;
 
-const { Option } = Select;
-
-const csvHeader: Array<{ label: string; key: string; subKey?: string }> = [
-  { label: 'Client Name', key: 'name' },
-  { label: 'Email Address', key: 'email' },
-  { label: 'Invoicing Email', key: 'invoicingEmail' },
-  { label: 'Status', key: 'status' },
-];
-
+const {Option} = Select;
 const Client = () => {
   const loggedInUser = authVar();
   const navigate = useNavigate();
   const [client, setClient] = useState<any>();
   const [showArchive, setArchiveModal] = useState<boolean>(false);
   const [pagingInput, setPagingInput] = useState<{
-    skip: number;
-    currentPage: number;
+    skip: number,
+    currentPage: number,
   }>({
     skip: 0,
     currentPage: 1,
@@ -123,130 +113,96 @@ const Client = () => {
     GraphQLResponse<'Client', ClientPagingResult>,
     QueryClientArgs
   >(CLIENT, {
-    fetchPolicy: 'network-only',
-    nextFetchPolicy: 'cache-first',
+    fetchPolicy: "network-only",
+    nextFetchPolicy: "cache-first",
     variables: {
       input: {
         query: {
           company_id: loggedInUser?.company?.id as string,
         },
         paging: {
-          order: ['updatedAt:DESC'],
+          order: ["updatedAt:DESC"],
         },
       },
-    },
-  });
-
-  const [fetchDownloadData, { data: clientDownloadData }] = useLazyQuery<
-    GraphQLResponse<'Client', ClientPagingResult>,
-    QueryClientArgs
-  >(CLIENT, {
-    fetchPolicy: 'network-only',
-    nextFetchPolicy: 'cache-first',
-    variables: {
-      input: {
-        query: {
-          company_id: loggedInUser?.company?.id as string,
-        },
-        paging: {
-          order: ['updatedAt:DESC'],
-        },
-      },
-    },
-    onCompleted: () => {
-      downloadCSV(clientDownloadData?.Client?.data, csvHeader, 'Client.csv');
     },
   });
 
   const [clientUpdate, { loading: updateLoading }] = useMutation<
     GraphQLResponse<'ClientUpdate', IClient>,
     MutationClientUpdateArgs
-  >(CLIENT_UPDATE, {
-    onCompleted() {
-      message.success({
-        content: `Client is updated successfully!`,
-        className: 'custom-message',
-        type: 'success',
-      });
-      setArchiveVisibility(false);
-    },
-
-    onError(err) {
-      setArchiveVisibility(false);
-      notifyGraphqlError(err);
-    },
-
-    update(cache) {
-      const normalizedId = cache.identify({
-        id: client?.id,
-        __typename: 'Client',
-      });
-      cache.evict({ id: normalizedId });
-      cache.gc();
-    },
-  });
-
-  const downloadReport = () => {
-    fetchDownloadData({
-      variables: {
-        input: {
-          query: {
-            company_id: loggedInUser?.company?.id ?? '',
-          },
-          paging: {
-            order: ['updatedAt:DESC'],
-          },
-        },
+  >(
+    CLIENT_UPDATE,
+    {
+      onCompleted() {
+        message.success({
+          content: `Client is updated successfully!`,
+          className: "custom-message",
+          type: 'success',
+        });
+        setArchiveVisibility(false);
       },
-    });
-  };
 
+      onError(err) {
+        setArchiveVisibility(false);
+        notifyGraphqlError(err);
+      },
+
+      update(cache) {
+        const normalizedId = cache.identify({
+          id: client?.id,
+          __typename: "Client",
+        });
+        cache.evict({ id: normalizedId });
+        cache.gc();
+      },
+    }
+  );
   const refetchClients = () => {
-    let values = filterForm.getFieldsValue(['search', 'role', 'status']);
+    let values = filterForm.getFieldsValue(['search', 'role', 'status'])
     let input: {
-      paging?: any;
-      query: any;
+      paging?: any,
+      query: any
     } = {
       paging: {
-        order: ['updatedAt:DESC'],
+        order: ["updatedAt:DESC"],
       },
       query: {
-        company_id: loggedInUser?.company?.id,
-      },
-    };
+        company_id: loggedInUser?.company?.id
+      }
+    }
     let query: {
-      status?: string;
-      archived?: boolean;
+      status?: string,
+      archived?: boolean,
       company_id: string;
       search?: string;
     } = {
-      company_id: loggedInUser?.company?.id as string,
-    };
+      company_id: loggedInUser?.company?.id as string
+
+    }
     if (values.search) {
-      query['search'] = values?.search;
+      query['search'] = values?.search
     }
     if (values.status) {
       if (values.status === 'Active' || values.status === 'Inactive') {
         query['status'] = values.status;
       } else {
         query['archived'] = values.status === 'Archived' ? true : false;
+
       }
     }
 
-    input['query'] = query;
+    input['query'] = query
 
     refetchClient({
-      input: input,
-    });
-  };
+      input: input
+    })
+  }
 
-  const debouncedResults = debounce(() => {
-    onChangeFilter();
-  }, 600);
+  const debouncedResults = debounce(() => { onChangeFilter() }, 600);
 
   const onChangeFilter = () => {
-    refetchClients();
-  };
+    refetchClients()
+  }
   const changeStatus = (value: string, id: string) => {
     clientUpdate({
       variables: {
@@ -257,27 +213,28 @@ const Client = () => {
         },
       },
     });
-    refetchClient();
+    refetchClient()
   };
+
 
   const openFilterRow = () => {
     if (filterProperty?.filter) {
       refetchClient({
         input: {
           paging: {
-            order: ['updatedAt:DESC'],
+            order: ["updatedAt:DESC"],
           },
           query: {
             company_id: loggedInUser?.company?.id as string,
-          },
-        },
-      });
+          }
+        }
+      })
     }
-    filterForm.resetFields();
+    filterForm.resetFields()
     setFilterProperty({
-      filter: !filterProperty?.filter,
-    });
-  };
+      filter: !filterProperty?.filter
+    })
+  }
 
   const archiveClient = () => {
     clientUpdate({
@@ -297,10 +254,10 @@ const Client = () => {
     <Menu>
       {/* <SubMenu title="Change status" key="mainMenu"> */}
       <Menu.Item
-        key='active'
+        key="active"
         onClick={() => {
-          if (data?.status === 'Inactive') {
-            changeStatus('Active', data?.id);
+          if (data?.status === "Inactive") {
+            changeStatus("Active", data?.id);
           }
         }}
       >
@@ -309,10 +266,10 @@ const Client = () => {
       <Menu.Divider />
 
       <Menu.Item
-        key='inactive'
+        key="inactive"
         onClick={() => {
-          if (data?.status === 'Active') {
-            changeStatus('Inactive', data?.id);
+          if (data?.status === "Active") {
+            changeStatus("Inactive", data?.id);
           }
         }}
       >
@@ -350,38 +307,41 @@ const Client = () => {
 
   const columns = [
     {
-      title: 'Client Name',
-      dataIndex: 'name',
-      key: 'name',
+      title: "Client Name",
+      dataIndex: "name",
+      key: "name",
       onCell: (data: any) => {
         return {
           onClick: () => {
-            navigate(routes.viewClient.path(loggedInUser?.company?.code ?? '1', data?.id ?? '1'));
+            navigate(routes.viewClient.path(
+              loggedInUser?.company?.code ?? "1",
+              data?.id ?? "1"
+            ))
           },
         };
       },
-      className: styles['client-name'],
+      className: styles["client-name"]
     },
     {
-      title: 'Email Address',
-      dataIndex: 'email',
-      key: 'email',
+      title: "Email Address",
+      dataIndex: "email",
+      key: "email",
     },
     {
-      title: 'Invoicing Email',
-      dataIndex: 'invoicingEmail',
-      key: 'invoicingEmail',
+      title: "Invoicing Email",
+      dataIndex: "invoicingEmail",
+      key: "invoicingEmail",
     },
     {
-      title: 'Status',
-      dataIndex: 'status',
-      key: 'status',
+      title: "Status",
+      dataIndex: "status",
+      key: "status",
 
       render: (status: string) => <Status status={status} />,
     },
     {
-      title: 'Actions',
-      key: 'actions',
+      title: "Actions",
+      key: "actions",
       render: (record: any) => (
         // <div
         //   className={styles["dropdown-menu"]}
@@ -403,42 +363,59 @@ const Client = () => {
         // </div>
         <Row style={{ marginTop: '11px' }}>
           <Col>
-            <div className={styles['table-icon']} onClick={(event) => event.stopPropagation()}>
-              <Dropdown overlay={menu(record)} trigger={['click']} placement='bottomRight'>
-                <div className='ant-dropdown-link' onClick={(e) => e.preventDefault()} title='Change Status'>
-                  {record?.status === 'Active' ? (
-                    <div className={styles['table-inactive-status-icon']}>
-                      <CloseCircleFilled />
-                    </div>
-                  ) : (
-                    <div className={styles['table-active-status-icon']}>
-                      <CheckCircleFilled />
-                    </div>
-                  )}
+            <div
+              className={styles["table-icon"]}
+              onClick={(event) => event.stopPropagation()}
+            >
+              <Dropdown
+                overlay={menu(record)}
+                trigger={["click"]}
+                placement="bottomRight"
+              >
+                <div
+                  className="ant-dropdown-link"
+                  onClick={(e) => e.preventDefault()}
+                  title='Change Status'
+                >
+                   {record?.status === 'Active' ?
+                            <div className={styles["table-inactive-status-icon"]} >
+                            <CloseCircleFilled />
+                            </div>
+                            :
+                            <div className={styles["table-active-status-icon"]}>
+                              
+                              <CheckCircleFilled />
+                            </div>
+                          }
                 </div>
               </Dropdown>
             </div>
           </Col>
           <Col>
             <Link
-              to={routes.editClient.path(loggedInUser?.company?.code ?? '1', record?.id ?? '1')}
-              className={`${styles['table-icon']} ${styles['table-edit-icon']}`}
+               to={routes.editClient.path(
+                loggedInUser?.company?.code ?? "1",
+                record?.id ?? "1"
+              )}
+              className={`${styles["table-icon"]} ${styles["table-edit-icon"]}`}
               title='Edit Client'
             >
               <FormOutlined />
             </Link>
           </Col>
           <Col>
-            <div
-              onClick={() => {
-                setClient(record);
-                setArchiveVisibility(true);
-              }}
-              className={`${styles['table-icon']} ${styles['table-archive-icon']}`}
-              title='Archive Client'
-            >
-              <DeleteOutlined />
-            </div>
+           
+                <div
+                    onClick={() => {
+                      setClient(record);
+                      setArchiveVisibility(true);
+                    }}
+                    className={`${styles["table-icon"]} ${styles["table-archive-icon"]}`}
+                  title='Archive Client'
+                >
+                  <DeleteOutlined />
+                </div>
+             
           </Col>
         </Row>
       ),
@@ -446,26 +423,37 @@ const Client = () => {
   ];
 
   return (
-    <div className={styles['main-div']}>
+    <div className={styles["main-div"]}>
       <Card bordered={false}>
         <PageHeader
-          title='Clients'
+          title="Clients"
           extra={[
-            <div className={styles['add-new-client']} key='new-client'>
-              <Link to={routes.addClient.path(loggedInUser?.company?.code ? loggedInUser?.company?.code : '')}>
+            <div className={styles["add-new-client"]} key="new-client">
+              <Link
+                to={routes.addClient.path(
+                  loggedInUser?.company?.code
+                    ? loggedInUser?.company?.code
+                    : ""
+                )}
+              >
                 Add New Client
               </Link>
-            </div>,
+            </div>
           ]}
         />
 
-        <Form form={filterForm} layout='vertical' onFinish={() => {}} autoComplete='off' name='filter-form'>
+        <Form
+          form={filterForm}
+          layout="vertical"
+          onFinish={() => { }}
+          autoComplete="off"
+          name="filter-form">
           <Row gutter={[32, 0]}>
             <Col xs={24} sm={24} md={16} lg={17} xl={20}>
-              <Form.Item name='search' label=''>
+              <Form.Item name="search" label="">
                 <Input
-                  prefix={<SearchOutlined className='site-form-item-icon' />}
-                  placeholder='Search by Client name'
+                  prefix={<SearchOutlined className="site-form-item-icon" />}
+                  placeholder="Search by Client name"
                   onChange={debouncedResults}
                 />
               </Form.Item>
@@ -473,31 +461,35 @@ const Client = () => {
             <Col xs={24} sm={24} md={8} lg={7} xl={4}>
               <div className={styles['filter-col']}>
                 <Button
-                  type='text'
+                  type="text"
                   onClick={openFilterRow}
-                  icon={<img src={filterImg} alt='filter' className={styles['filter-image']} />}
-                >
+                  icon={<img
+                    src={filterImg}
+                    alt="filter"
+                    className={styles['filter-image']} />}>
                   &nbsp; &nbsp;
                   {filterProperty?.filter ? 'Reset' : 'Filter'}
                 </Button>
               </div>
             </Col>
           </Row>
-          {filterProperty?.filter && (
-            <Row gutter={[32, 0]} className={styles['role-status-col']}>
-              <Col span={5}>
-                <Form.Item name='status' label=''>
-                  <Select placeholder='Select status' onChange={onChangeFilter}>
-                    {status?.map((status: any) => (
+          {filterProperty?.filter &&
+            <Row gutter={[32, 0]} className={styles["role-status-col"]}>
+
+              <Col xs={24} sm={12} md={10} lg={8} xl={5}>
+                <Form.Item name="status" label="">
+                  <Select
+                    placeholder="Select status"
+                    onChange={onChangeFilter}
+                  >
+                    {status?.map((status: any) =>
                       <Option value={status?.value} key={status?.name}>
                         {status?.name}
-                      </Option>
-                    ))}
+                      </Option>)}
                   </Select>
                 </Form.Item>
               </Col>
-            </Row>
-          )}
+            </Row>}
         </Form>
         <Row className='container-row'>
           <Col span={24}>
@@ -510,38 +502,28 @@ const Client = () => {
                 current: pagingInput.currentPage,
                 onChange: changePage,
                 total: clientData?.Client?.paging?.total,
-                pageSize: constants.paging.perPage,
+                pageSize: constants.paging.perPage
               }}
             />
           </Col>
         </Row>
-        {/* <Row>
-          <Col span={24}>
-            {!!clientData?.Client?.data?.length && (
-              <div className={styles['download-report']}>
-                <Button type='link' onClick={downloadReport}>
-                  Download Report
-                </Button>
-              </div>
-            )}
-          </Col>
-        </Row> */}
       </Card>
 
       <ModalConfirm
         visibility={showArchive}
         setModalVisibility={setArchiveVisibility}
         imgSrc={archiveImg}
-        okText={client?.archived ? 'Unarchive' : 'Archive'}
+        okText={client?.archived ? "Unarchive" : "Archive"}
         modalBody={
           <ArchiveBody
             title={
               <>
-                Are you sure you want to {client?.archived ? 'unarchive' : 'archive'}
+                Are you sure you want to{" "}
+                {client?.archived ? "unarchive" : "archive"}
                 <strong> {client?.name}?</strong>
               </>
             }
-            subText={`Client will ${client?.archived ? '' : 'not'} be able to login to the system`}
+            subText={`Client will ${client?.archived ? "" : "not"} be able to login to the system`}
           />
         }
         onOkClick={archiveClient}

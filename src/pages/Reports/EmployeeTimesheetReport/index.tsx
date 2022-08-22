@@ -1,11 +1,11 @@
 import { debounce } from 'lodash';
 import { useEffect, useState } from 'react';
 import { useLazyQuery, useQuery } from '@apollo/client';
-import { Card, Button, Form, Row, Select, Col, DatePicker, Typography } from 'antd';
-import { DownloadOutlined } from '@ant-design/icons';
+import { Card, Button, Form, Row, Select, Col, DatePicker, Typography, Input } from 'antd';
+import { DownloadOutlined, SearchOutlined } from '@ant-design/icons';
 
 import { authVar } from '../../../App/link';
-import { TimesheetQueryInput, RoleName } from '../../../interfaces/generated';
+import { TimesheetQueryInput, RoleName, Timesheet } from '../../../interfaces/generated';
 import { TimesheetPagingData } from '../../../interfaces/graphql.interface';
 import { downloadCSV } from '../../../utils/common';
 import { notifyGraphqlError } from '../../../utils/error';
@@ -184,8 +184,17 @@ const EmployeeTimesheetReport = () => {
         />
         <Form form={filterForm} layout='vertical' onFinish={() => {}} autoComplete='off' name='filter-form'>
           {filterProperty?.filter && (
-            <Row gutter={[32, 0]}>
-              <Col xs={24} xl={6}>
+            <Row gutter={[20, 20]}>
+              <Col xs={24} sm={12} md={10} lg={8} xl={5}>
+                <Form.Item name='search' label=''>
+                  <Input
+                    prefix={<SearchOutlined className='site-form-item-icon' />}
+                    placeholder='Search by name or client'
+                    onChange={debouncedResults}
+                  />
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={12} md={10} lg={8} xl={5}>
                 <Form.Item name='status' label=''>
                   <Select placeholder='Select status' onChange={onChangeFilter}>
                     {employee_timesheet_status?.map((status: any) => (
@@ -196,7 +205,7 @@ const EmployeeTimesheetReport = () => {
                   </Select>
                 </Form.Item>
               </Col>
-              <Col xs={24} xl={8}>
+              <Col xs={24} sm={12} md={10} lg={8} xl={5}>
                 <Form.Item name='date' label=''>
                   <RangePicker bordered={false} onChange={onChangeFilter} />
                 </Form.Item>

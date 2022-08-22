@@ -1,15 +1,15 @@
 import React, { useState } from "react";
-import { Card, Col, message, Row, Table, Button } from "antd";
-import { DeleteOutlined, DownloadOutlined } from '@ant-design/icons';
+import { Card, Col, message, Row, Table } from "antd";
+import { DeleteOutlined } from '@ant-design/icons';
 import styles from "./style.module.scss";
 import PageHeader from "../../components/PageHeader";
 import { useNavigate } from "react-router-dom";
 import routes from "../../config/routes";
 import { authVar } from "../../App/link";
-import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
+import { gql, useMutation, useQuery } from "@apollo/client";
 import moment from "moment";
 import AddSchedule from "../../components/AddSchedule";
-import { MutationWorkscheduleDeleteArgs, Workschedule, WorkscheduleDetail } from "../../interfaces/generated";
+import { MutationWorkscheduleDeleteArgs, Workschedule } from "../../interfaces/generated";
 import ModalConfirm from "../../components/Modal";
 
 
@@ -17,7 +17,6 @@ import deleteImg from '../../assets/images/delete_btn.svg';
 import DeleteBody from "../../components/Delete";
 import { GraphQLResponse } from "../../interfaces/graphql.interface";
 import { notifyGraphqlError } from "../../utils/error";
-import { downloadCSV } from "../../utils/common";
 
 export const WORKSCHEDULE = gql`
 query Workschedule($input: WorkscheduleQueryInput!) {
@@ -53,14 +52,6 @@ export const WORKSCHEDULE_DELETE = gql`
   }
 `;
 
-const csvHeader: Array<{ label: string, key: string, subKey?: string }> = [
-  { label: "Start Date", key: "startDate" },
-  { label: "End Date", key: "endDate" },
-  { label: "Payroll Allocated", key: "payrollAllocatedHours" },
-  { label: "Payroll Usage Hours", key: "payrollUsageHours" },
-  { label: "Status", key: "status" },
-]
-
 const Schedule = () => {
   const loggedInUser = authVar()
   const navigate = useNavigate()
@@ -85,29 +76,6 @@ const Schedule = () => {
       },
     }
   );
-
-  const [fetchDownloadData, { data: scheduleDownloadData }] = useLazyQuery(
-      WORKSCHEDULE,
-      {
-        fetchPolicy: "network-only",
-        nextFetchPolicy: "cache-first",
-        variables: {
-          input: {
-            paging: {
-              order: ["updatedAt:DESC"],
-            },
-            query: {
-              company_id: loggedInUser?.company?.id
-            }
-          },
-        },
-        onCompleted: () => {
-          downloadCSV(scheduleDownloadData?.Workschedule?.data, csvHeader, 'Schedule.csv')
-          console.log(scheduleDownloadData)
-          
-        }
-      }
-    );
 
   const [workscheduleDelete] = useMutation<GraphQLResponse<'WorkscheduleDelete', Workschedule>, MutationWorkscheduleDeleteArgs>(WORKSCHEDULE_DELETE, {
     onCompleted() {
@@ -144,21 +112,6 @@ const Schedule = () => {
     });
   };
   
-  const downloadReport = () => {
-    fetchDownloadData({
-      variables: {
-        input: {
-          paging: {
-            order: ["updatedAt:DESC"],
-          },
-          query: {
-            company_id: loggedInUser?.company?.id
-          }
-        }
-      }
-    })
-  }
-
   const columns = [
     {
       title: "Time Period",
@@ -245,15 +198,6 @@ const Schedule = () => {
               />
             </Col>
           </Row>
-          {/* {!!workscheduleData?.User?.data?.length ? */}
-           <Button
-                        type="link"
-                        onClick={downloadReport}
-                        icon={<DownloadOutlined />}
-                      >
-                        Download Report
-                      </Button> 
-                      {/* :              <Typography.Text type="secondary" >No files to Download</Typography.Text>} */}
         </Card>
       </div >
       <AddSchedule

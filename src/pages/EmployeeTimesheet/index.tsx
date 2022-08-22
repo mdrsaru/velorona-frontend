@@ -104,37 +104,12 @@ const EmployeeTimesheet = () => {
     },
   );
 
-  const [fetchDownloadData, { data: timesheetDownloadData }] = useLazyQuery<TimesheetPagingData,
-    { input: TimesheetQueryInput }>(
-      EMPLOYEE_TIMESHEET,
-      {
-        fetchPolicy: 'network-only',
-        nextFetchPolicy: 'cache-first',
-        onError: notifyGraphqlError,
-        onCompleted: () => {
-          downloadCSV(timesheetDownloadData?.Timesheet?.data, csvHeader, 'EmployeeTimesheet.csv')
-        }
-      },
-    );
-
   const changePage = (page: number) => {
     const newSkip = (page - 1) * constants.paging.perPage;
     setPagingInput({
       ...pagingInput,
       skip: newSkip,
       currentPage: page,
-    })
-  };
-
-  const downloadReport = () => {
-    fetchDownloadData({
-      variables: {
-        input: {
-          query: {
-            company_id: company_id,
-          }
-        }
-      }
     })
   };
 
@@ -314,10 +289,11 @@ const EmployeeTimesheet = () => {
               </div>
             </Col>
           </Row>
+          <br />
           {filterProperty?.filter &&
             <Row gutter={[32, 0]} className={styles["role-status-col"]}>
 
-              <Col xs={24} xl={6}>
+              <Col xs={24} sm={12} md={10} lg={8} xl={5}>
                 <Form.Item name="status" label="">
                   <Select
                     placeholder="Select status"
@@ -330,7 +306,7 @@ const EmployeeTimesheet = () => {
                   </Select>
                 </Form.Item>
               </Col>
-              <Col xs={24} xl={8}>
+              <Col xs={24} sm={12} md={10} lg={8} xl={5}>
                 <Form.Item name="date" label="">
                   <RangePicker bordered={false} onChange={onChangeFilter} />
                 </Form.Item>
@@ -350,20 +326,6 @@ const EmployeeTimesheet = () => {
               pageSize: constants.paging.perPage
             }}
           />
-          {
-			!authData.user?.roles?.includes(RoleName.TaskManager) && 
-            !!dataSource?.length && (
-              <div className={styles['download-report']}>
-                <Button
-                  type="link"
-                  onClick={downloadReport}
-                  icon={<DownloadOutlined />}
-                >
-                  Download Report
-                </Button>
-              </div>
-            )
-          }
         </div>
       </Card>
     </div>
