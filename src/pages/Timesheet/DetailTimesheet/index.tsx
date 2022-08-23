@@ -8,20 +8,17 @@ import {
 } from 'react-router-dom';
 import groupBy from 'lodash/groupBy';
 import find from 'lodash/find';
-import { Card, Col, Row, Button, Space, message, Modal, Form, Select, Spin, Collapse, Dropdown, Menu } from 'antd';
+import { Card, Col, Row, Button, Space, message, Modal, Form, Select, Spin, Collapse } from 'antd';
 import {
   CloseOutlined,
-  PlusCircleFilled,
-  MoreOutlined,
 } from '@ant-design/icons';
-import { Table } from 'antd';
 
 import { authVar } from '../../../App/link';
 import { _cs, checkRoles } from '../../../utils/common';
 import routes from '../../../config/routes';
 import { notifyGraphqlError } from "../../../utils/error";
 import constants from "../../../config/constants";
-import { TimeEntry, QueryTimesheetArgs, TimeSheetPagingResult, MutationTimeEntriesApproveRejectArgs, AttachedTimesheet, MutationAttachedTimesheetDeleteArgs } from '../../../interfaces/generated';
+import { TimeEntry, QueryTimesheetArgs, TimeSheetPagingResult, MutationTimeEntriesApproveRejectArgs } from '../../../interfaces/generated';
 import { GraphQLResponse } from '../../../interfaces/graphql.interface';
 import { PROJECT } from '../../Project';
 import { IGroupedTimeEntries } from '../../../interfaces/common.interface';
@@ -32,16 +29,12 @@ import PageHeader from '../../../components/PageHeader';
 import TimeEntryDetail from './TimeEntryDetail';
 import InvoiceViewer from '../../../components/InvoiceViewer';
 import NoContent from '../../../components/NoContent';
-import AttachNewTimesheetModal from '../../../components/AddAttachedTimesheet';
-import DeleteBody from '../../../components/Delete/index';
 import ModalConfirm from '../../../components/Modal';
-import EditAttachedTimesheet from '../../../components/EditAttachedTimesheet';
-import ApprovedTimesheetAttachment from "../../../components/ApprovedTimesheetAttachment";
 import CommentForm from './CommentForm';
 import Comment from './Comment';
+import Attachments from './Attachments';
 
 import archiveImg from "../../../assets/images/archive_btn.svg";
-import deleteImg from '../../../assets/images/delete_btn.svg';
 import styles from './style.module.scss';
 import TimesheetConfirmation from '../../../components/TimesheetConfirmation/index';
 
@@ -160,48 +153,6 @@ export const TIMESHEET_SUBMIT = gql`
   }
 `
 
-export const ATTACHED_TIMESHEET = gql`
-  query AttachedTimesheet($input: AttachedTimesheetQueryInput!) {
-    AttachedTimesheet(input: $input){
-      data {
-        id 
-        description
-        createdAt
-        company{
-          id
-          name
-        }
-        attachments {
-          id
-          url
-          name
-        }
-        timesheet {
-          id 
-          duration 
-        }
-		amount
-		type
-		date 
-      }
-      paging {
-        total
-        startIndex
-        endIndex
-        hasNextPage
-      }     
-    }
-  }
-`;
-
-export const ATTACHED_TIMESHEET_DELETE = gql`
-  mutation AttachedTimesheetDelete($input: DeleteInput!) {
-    AttachedTimesheetDelete(input: $input) {
-      id
-    }
-  }
-`;
-
 export const getTotalTimeForADay = (entries: any) => {
   let sum = 0;
   if (entries) {
@@ -239,10 +190,6 @@ const DetailTimesheet = () => {
     invoice_id: undefined,
   })
 
-  const [showAttachTimeEntry, setAttachTimeEntry] = useState(false);
-  const [viewAttachment, setViewAttachment] = useState(false);
-  const [attachedTimesheetAttachment, setAttachedTimesheetAttachment] = useState<any>();
-
   const entriesByStatusRef = useRef<any>({});
   const [invoicedTimeEntries, setInvoicedTimeEntries] = useState<InvoicedTimeEntries[]>([])
   const [entriesByStatus, setEntriesByStatus] = useState<EntriesByStatus>({
@@ -253,9 +200,6 @@ const DetailTimesheet = () => {
 
   /** Modal Visibility **/
   const [showAddNewEntry, setShowAddNewEntry] = useState<boolean>(false);
-  const [deleteVisibility, setDeleteVisibility] = useState<boolean>(false);
-  const [editAttachedVisibility, setEditAttachedVisibility] = useState<boolean>(false);
-  const [attachedTimesheet, setAttachedTimesheet] = useState<any>()
   const [confirmShow, setConfirmShow] = useState(false)
 
   const [submitTimesheet, { loading: submittingTimesheet }] = useMutation(TIMESHEET_SUBMIT)
@@ -294,80 +238,6 @@ const DetailTimesheet = () => {
     onError: notifyGraphqlError,
   });
 
-  const onSubmitNewTimeEntry = (values: any) => {
-    const project = projectData?.Project?.data?.filter((data: any) =>
-      data?.id === values?.project
-    );
-    const timeEntry = {
-      entries: {},
-      id: project[0]?.id,
-      name: project[0]?.name,
-      project: project[0]?.name,
-      project_id: project[0]?.id,
-    }
-
-    const ids = entriesByStatus.pending?.map((timesheet: any) => {
-      return timesheet?.id
-    })
-
-    if (!ids.includes(project[0]?.id)) {
-      setEntriesByStatus({ ...entriesByStatus, pending: [...entriesByStatus.pending, timeEntry] });
-    };
-
-    setShowAddNewEntry(false);
-    form.resetFields();
-  }
-
-  const [fileData, setFile] = useState({
-	id: "",
-	name: "",
-	url:""
- });
-  
-  const { data: attachedTimesheetData ,refetch:refetchAttachedTimesheet} = useQuery(ATTACHED_TIMESHEET, {
-	fetchPolicy: "network-only",
-	nextFetchPolicy: "cache-first",
-	variables: {
-	  input: {
-		query: {
-		  company_id: authData?.company?.id,
-		  // created_by: authData?.user?.id,
-		  timesheet_id: timesheet_id
-		},
-		paging: {
-		  order: ["updatedAt:DESC"],
-		},
-	  },
-	},
-	onCompleted(response){
-		setFile({
-			id:  response?.AttachedTimesheet?.data[0]?.attachments?.id,
-			name: response?.AttachedTimesheet?.data[0]?.attachments?.name as string,
-			url: response?.AttachedTimesheet?.data[0]?.attachments?.url as string,
-		  });
-	}
-  });
- 
-  const [attachedTimesheetDelete] = useMutation<GraphQLResponse<'AttachedTimesheetDelete', AttachedTimesheet>, MutationAttachedTimesheetDeleteArgs>(ATTACHED_TIMESHEET_DELETE, {
-    onCompleted() {
-      message.success({
-        content: `Attached Timesheet is deleted successfully!`,
-        className: "custom-message",
-      });
-      setDeleteVisibility(false);
-    },
-    onError(err) {
-      setDeleteVisibility(false);
-      notifyGraphqlError(err);
-    },
-
-    update(cache) {
-      const normalizedId = cache.identify({ id: attachedTimesheet?.id, __typename: "AttachedTimesheet" });
-      cache.evict({ id: normalizedId });
-      cache.gc();
-    },
-  });
-
   const [getProject, { data: projectData }] = useLazyQuery(PROJECT, {
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
@@ -385,13 +255,7 @@ const DetailTimesheet = () => {
     }
   })
 
-  const onChangeProjectSelect = (value: string) => {
-    if (form.getFieldValue(['task'])) {
-      form.resetFields(['task']);
-    }
-  }
-
-  const { data: timeSheetDetail, loading: timesheetLoading, refetch: refetchTimeSheet, networkStatus } = useQuery<
+  const { data: timeSheetDetailData, loading: timesheetLoading, refetch: refetchTimeSheet, networkStatus } = useQuery<
     GraphQLResponse<'Timesheet', TimeSheetPagingResult>,
     QueryTimesheetArgs
   >(TIME_SHEET, {
@@ -459,6 +323,38 @@ const DetailTimesheet = () => {
     }
   })
 
+  const timesheetDetail = timeSheetDetailData?.Timesheet?.data[0];
+
+  const onChangeProjectSelect = (value: string) => {
+    if (form.getFieldValue(['task'])) {
+      form.resetFields(['task']);
+    }
+  }
+
+  const onSubmitNewTimeEntry = (values: any) => {
+    const project = projectData?.Project?.data?.filter((data: any) =>
+      data?.id === values?.project
+    );
+    const timeEntry = {
+      entries: {},
+      id: project[0]?.id,
+      name: project[0]?.name,
+      project: project[0]?.name,
+      project_id: project[0]?.id,
+    }
+
+    const ids = entriesByStatus.pending?.map((timesheet: any) => {
+      return timesheet?.id
+    })
+
+    if (!ids.includes(project[0]?.id)) {
+      setEntriesByStatus({ ...entriesByStatus, pending: [...entriesByStatus.pending, timeEntry] });
+    };
+
+    setShowAddNewEntry(false);
+    form.resetFields();
+  }
+
   const checkDate = (today: any, weekEndDate: any) => {
     return today.getFullYear() === weekEndDate.getFullYear() &&
       today.getDate() <= weekEndDate.getDate() &&
@@ -466,7 +362,7 @@ const DetailTimesheet = () => {
   }
 
   const onSubmitTimesheet = () => {
-    const weekEndDate: any = new Date(timeSheetDetail?.Timesheet?.data?.[0]?.weekEndDate as any);
+    const weekEndDate: any = new Date(timesheetDetail?.weekEndDate as any);
     const today = new Date();
 
     const result = checkDate(today, weekEndDate)
@@ -484,7 +380,7 @@ const DetailTimesheet = () => {
     submitTimesheet({
       variables: {
         input: {
-          id: timeSheetDetail?.Timesheet?.data[0]?.id,
+          id: timesheetDetail?.id,
           company_id: authData?.company?.id
         }
       }
@@ -501,15 +397,6 @@ const DetailTimesheet = () => {
     setConfirmShow(false)
   }
 
-
-  const attachNewTimesheet = () => {
-    setAttachTimeEntry(!showAttachTimeEntry)
-  }
-
-  const handleAttachmentView = (data: any) => {
-    setViewAttachment(!viewAttachment);
-    setAttachedTimesheetAttachment(data);
-  }
 
   const approveRejectAll = (status: string) => {
     const ids: string[] = [];
@@ -567,119 +454,6 @@ const DetailTimesheet = () => {
     setEntriesByStatus({ ...entriesByStatus, pending: filteredPendingArray });
   }
 
-  const timesheetDetail = timeSheetDetail?.Timesheet?.data[0];
-  const deleteAttachedTimesheet = () => {
-    attachedTimesheetDelete({
-      variables: {
-        input: {
-          id: attachedTimesheet?.id
-        }
-      }
-    })
-  }
-
-  const menu = (data: any) => (
-    <Menu>
-      <Menu.Item key="edit">
-        <div onClick={() => {
-          setEditAttachedVisibility(true);
-          setAttachedTimesheet(data);
-        }}>
-          Edit Attachments
-        </div>
-      </Menu.Item>
-      <Menu.Divider />
-      <Menu.Item key="4">
-        <div onClick={() => {
-          setDeleteVisibility(true);
-          setAttachedTimesheet(data);
-        }}
-        >
-          Delete Attachments
-        </div>
-      </Menu.Item>
-
-    </Menu>
-  );
-
-  const columns = [
-    {
-      title: 'Description',
-      dataIndex: 'description',
-      width: '30%',
-    },
-    {
-      title: 'Created At',
-      dataIndex: 'createdAt',
-      render: (date: any) => {
-        return (
-          <span>{date.split('T')?.[0]}</span>
-        )
-      }
-    },
-	{
-		title: 'Attachment Type',
-		dataIndex: 'type',
-	  },
-	  {
-		title: 'Amount',
-		dataIndex: 'amount',
-		render: (amount: any) => {
-			return (
-			  <span>{amount ?? '-' }</span>
-			)
-		  }
-	  },
-	  {
-		title: 'Date',
-		dataIndex: 'date',
-		render: (date: any) => {
-			return (
-			  <span>{date?.split('T')?.[0] ?? '-' }</span>
-			)
-		  }
-	  }, 
-    {
-      title: 'Attachment',
-      key: 'attachments',
-      dataIndex: 'attachments',
-      render: (attachments: any) => {
-        return (
-          <span className={styles['table-attachment']}
-                onClick={() => handleAttachmentView(attachments)}>
-            {attachments?.name}
-          </span>
-        )
-      }
-    },
-    {
-      title: '',
-      key: "actions",
-      render: (attachedTimesheet: any) => (
-        <div
-          className={styles["dropdown-menu"]}
-          onClick={(event) => event.stopPropagation()}
-        >
-          {isEmployee &&
-            (<Dropdown
-              overlay={menu(attachedTimesheet)}
-              trigger={["click"]}
-              placement="bottomRight"
-            >
-              <div
-                className="ant-dropdown-link"
-                onClick={(e) => e.preventDefault()}
-                style={{ paddingLeft: "1rem" }}
-              >
-                <MoreOutlined />
-              </div>
-            </Dropdown>
-            )}
-        </div>
-      ),
-    },
-  ];
-
   const onCommentFormCancel = () => {
     setCommentDetails({
       showModal: false,
@@ -687,7 +461,7 @@ const DetailTimesheet = () => {
     })
   }
 
-  const isSubmitted:any = timeSheetDetail?.Timesheet?.data?.[0]?.isSubmitted;
+  const isSubmitted:any = timesheetDetail?.isSubmitted;
 
   return (
     <>
@@ -701,12 +475,13 @@ const DetailTimesheet = () => {
             <br />
 
             <Card bordered={false} className={styles['time-entries']}>
-			{!timesheetDetail?.isSubmitted && 
-			  <Row className={styles['timesheet-detail']}>
-         
-			    <PageHeader
-                  title="Time Entry Details"
-                  extra={[
+              {
+                !timesheetDetail?.isSubmitted && 
+                <Row className={styles['timesheet-detail']}>
+
+                  <PageHeader
+                    title="Time Entry Details"
+                    extra={[
                     <span key="new-entry">
                       {
                         roles.includes(constants.roles.Employee) &&
@@ -722,12 +497,11 @@ const DetailTimesheet = () => {
                         </span>
                       }
                     </span>
-                  ]}
-                />
-              </Row>
-}
- 			 {(!timeSheetDetail?.Timesheet?.data[0]?.entriesGroup?.byStatus.length &&
-                !timeSheetDetail?.Timesheet?.data[0]?.entriesGroup?.byInvoice.length) ?
+                    ]}
+                  />
+                </Row>
+              }
+ 			 {(!timesheetDetail?.entriesGroup?.byStatus.length && !timesheetDetail?.entriesGroup?.byInvoice.length) ?
                 <NoContent title={'No Time Entry added'} subtitle={'There are no entries added at the moment'} /> 
 				:
               <>
@@ -761,7 +535,7 @@ const DetailTimesheet = () => {
                     </div>
 
                     <TimeEntryDetail
-                      startDate={timeSheetDetail?.Timesheet?.data[0]?.weekStartDate as string}
+                      startDate={timesheetDetail?.weekStartDate as string}
                       groupedTimeEntries={entriesByStatus.pending}
                       durationMap={timesheetDetail?.durationMap?.['Pending']}
                       client_id={timesheetDetail?.client?.id as string}
@@ -817,7 +591,7 @@ const DetailTimesheet = () => {
                       </div>
 
                       <TimeEntryDetail
-                        startDate={timeSheetDetail?.Timesheet?.data[0]?.weekStartDate as string}
+                        startDate={timesheetDetail?.weekStartDate as string}
                         groupedTimeEntries={invoiced.group}
                         durationMap={timesheetDetail?.durationMap?.[invoiced.invoice_id]}
                         client_id={timesheetDetail?.client?.id as string}
@@ -871,7 +645,7 @@ const DetailTimesheet = () => {
                     </div>
 
                     <TimeEntryDetail
-                      startDate={timeSheetDetail?.Timesheet?.data[0]?.weekStartDate as string}
+                      startDate={timesheetDetail?.weekStartDate as string}
                       groupedTimeEntries={entriesByStatus.approved}
                       durationMap={timesheetDetail?.durationMap?.['Approved']}
                       client_id={timesheetDetail?.client?.id as string}
@@ -913,7 +687,7 @@ const DetailTimesheet = () => {
                     </div>
 
                     <TimeEntryDetail
-                      startDate={timeSheetDetail?.Timesheet?.data[0]?.weekStartDate as string}
+                      startDate={timesheetDetail?.weekStartDate as string}
                       groupedTimeEntries={entriesByStatus.rejected}
                       durationMap={timesheetDetail?.durationMap?.['Rejected']}
                       client_id={timesheetDetail?.client?.id as string}
@@ -934,35 +708,24 @@ const DetailTimesheet = () => {
         </Spin>
       } 
 
-{timesheetDetail?.user.timesheet_attachment &&  
-      (
-        <div className={styles['site-card-wrapper']}>
-          <Card className={styles['attach-approved-timesheet']}>
-            <Collapse accordion defaultActiveKey={['2']}>
-              <Panel header="Attachments" key="2" className={styles['attachApprovedTitle']}>
-                <Table
-                  dataSource={attachedTimesheetData?.AttachedTimesheet?.data}
-                  columns={columns}
-                  pagination={false}
-                />
-                {isEmployee &&
-                  <>
-                    <p className={styles['attach-new-timesheet']} onClick={attachNewTimesheet}>
-                      <PlusCircleFilled />
-                      <span style={{ marginLeft: '1rem' }}> Add New Attachment
-                      </span>
-                    </p>
-                  </>
-                }
-                <br />
-              </Panel>
-            </Collapse>
-          </Card>
-        </div>
-	)}
+    {timesheetDetail?.user.timesheet_attachment &&  
+        (
+          <div className={styles['site-card-wrapper']}>
+            <Card className={styles['attach-approved-timesheet']}>
+              <Collapse accordion defaultActiveKey={['2']}>
+                <Panel header="Attachments" key="2" className={styles['attachApprovedTitle']}>
+                  <Attachments
+                    isEmployee={isEmployee}
+                    timesheet_id={timesheet_id}
+                  />
+                </Panel>
+              </Collapse>
+            </Card>
+          </div>
+      )}
 
-		{(!timeSheetDetail?.Timesheet?.data[0]?.entriesGroup?.byStatus?.length &&
-               !timeSheetDetail?.Timesheet?.data[0]?.entriesGroup?.byInvoice?.length ) ?
+		{(!timesheetDetail?.entriesGroup?.byStatus?.length &&
+               !timesheetDetail?.entriesGroup?.byInvoice?.length ) ?
                "" :
                <Row justify={"end"} className={styles['button-row']}>
                  <Col className={styles['form-col']}>
@@ -1073,48 +836,6 @@ const DetailTimesheet = () => {
         }
       </Modal>
 
-      <AttachNewTimesheetModal
-        visibility={showAttachTimeEntry}
-        setVisibility={setAttachTimeEntry}
-        timesheet_id={timesheet_id}
-        refetch={refetchAttachedTimesheet} />
-
-
-      <EditAttachedTimesheet
-        visibility={editAttachedVisibility}
-        setVisibility={setEditAttachedVisibility}
-        data={attachedTimesheet}
-		setFile={setFile}
-		fileData = {fileData}
-		refetch= {refetchAttachedTimesheet}
-      />
-
-      <ApprovedTimesheetAttachment
-        visible={viewAttachment}
-        setVisible={setViewAttachment}
-        attachment={attachedTimesheetAttachment}
-      />
-
-      <ModalConfirm
-        visibility={deleteVisibility}
-        setModalVisibility={setDeleteVisibility}
-        imgSrc={deleteImg}
-        okText={'Delete'}
-        closable
-        modalBody={
-          <DeleteBody
-            title={
-              <>
-                Are you sure you want to delete it?{" "}
-                {/* <strong> {project?.name}</strong> */}
-              </>
-            }
-            subText={`All the data associated with this will be deleted permanently.`}
-          />
-        }
-        onOkClick={deleteAttachedTimesheet}
-      />
-
       <Modal
         centered
         width={800}
@@ -1126,7 +847,7 @@ const DetailTimesheet = () => {
       >
         <CommentForm 
           timesheet_id={timesheet_id}
-          user_id={timeSheetDetail?.Timesheet?.data[0]?.user?.id as string}
+          user_id={timesheetDetail?.user?.id as string}
           commentType={commentDetails.commentType}
           company_id={authData?.company?.id as string}
           onHideModal={onCommentFormCancel}

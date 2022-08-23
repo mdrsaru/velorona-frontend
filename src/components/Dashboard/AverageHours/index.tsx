@@ -13,7 +13,6 @@ import { Empty, Typography } from "antd";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import styles from "./style.module.scss";
 import { IBarChart } from "../../../interfaces/IDashboard";
-import NoContent from "../../NoContent";
 
 ChartJS.register(
   CategoryScale,
@@ -31,7 +30,7 @@ interface IProps {
 }
 
 const Index = (props: IProps) => {
-  const { averageHoursData, caption, title } = props;
+  const { averageHoursData,  title } = props;
   const options: ChartOptions<any> = {
     indexAxis: 'y' as const,
     scales: {

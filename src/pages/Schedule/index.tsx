@@ -207,7 +207,7 @@ const Schedule = () => {
 
       <ModalConfirm
         visibility={visibility}
-        setModalVisibility={visibility}
+        setModalVisibility={setVisibility}
         imgSrc={deleteImg}
         okText={'Delete'}
         closable

@@ -1,9 +1,12 @@
 import moment from 'moment';
-import { ChangeEvent, useState } from 'react';
+import isNil from 'lodash/isNil';
+import { ChangeEvent, useState, useEffect } from 'react';
 import { gql, useQuery, useMutation } from '@apollo/client';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Button, Col, Form, Input, Row, Select, Image, DatePicker, InputNumber, Space, message, Popover } from 'antd';
+import { Button, Col, Form, Input, Row, Select, Image, DatePicker, InputNumber, Space, message, Popover, Checkbox } from 'antd';
 import { CloseCircleOutlined } from '@ant-design/icons';
+import { CheckboxChangeEvent } from 'antd/es/checkbox';
+
 
 import { round } from '../../utils/common';
 import { notifyGraphqlError } from '../../utils/error';
@@ -66,10 +69,17 @@ const InvoiceForm = (props: IProps) => {
   const loggedInUser = authVar();
   const [form] = Form.useForm();
   const [isSendInvoiceClicked, setIsSendInvoiceClicked] = useState(false);
+  const [needProject, setNeedProject] = useState(true);
 
   const company_id = loggedInUser?.company?.id as string
   const companyCode = loggedInUser?.company?.code as string
   const isTimesheet = !!props.timesheet_id; 
+
+  useEffect(() => {
+    if(!isNil(props.invoice?.needProject)) {
+      setNeedProject(props.invoice?.needProject as boolean);
+    }
+  }, [props.invoice?.needProject])
 
   const [createInvoice, { loading: creatingInvoice }] = useMutation<
     GraphQLResponse<'InvoiceCreate', Invoice>,
@@ -122,6 +132,10 @@ const InvoiceForm = (props: IProps) => {
     }
   });
 
+  const onNeedProjectChange = (e: CheckboxChangeEvent) => {
+    setNeedProject(e.target.checked);
+  }
+
   const invoice = props.invoice;
   const initialValues = {
     issueDate: moment(invoice?.issueDate),
@@ -130,9 +144,13 @@ const InvoiceForm = (props: IProps) => {
     totalAmount: invoice?.totalAmount ?? 0,
     subtotal: invoice?.subtotal ?? 0,
     taxPercent: invoice?.taxPercent ?? 0,
+    taxAmount: invoice?.taxAmount ?? 0,
+    discount: invoice?.discount ?? 0,
+    discountAmount: invoice?.discountAmount ?? 0,
     notes: invoice?.notes ?? '',
     totalQuantity: invoice?.totalQuantity ?? 0,
-    taxAmount: (0.01 * (invoice?.taxPercent ?? 0) * (invoice?.subtotal ?? 0)),
+    needProject: invoice?.needProject ?? needProject,
+    shipping: invoice?.shipping ?? 0,
     items: invoice?.items?.map((item) => ({
       id: item.id,
       project_id: item.project_id,
@@ -148,8 +166,9 @@ const InvoiceForm = (props: IProps) => {
     }],
   }
 
+
   const onHourRateChange = (index: number) => {
-    let { items, totalAmount, taxPercent = 0, taxAmount = 0 } = form.getFieldsValue();
+    let { items, totalAmount, taxPercent = 0, taxAmount = 0, discount = 0, discountAmount = 0, shipping = 0 } = form.getFieldsValue();
 
     const quantity = items?.[index]?.quantity;
     const rate = items?.[index]?.rate;
@@ -165,25 +184,35 @@ const InvoiceForm = (props: IProps) => {
         return acc + current.quantity;
       }, 0) 
 
+      totalAmount = subtotal;
+
+      if(discount >= 0) {
+        discountAmount = discount * 0.01 * subtotal;
+        totalAmount = subtotal - discountAmount;
+      }
+
       if(taxPercent >= 0) {
-        taxAmount = taxPercent * 0.01 * subtotal;
-        totalAmount = subtotal + taxAmount;
-      } else {
-        totalAmount = subtotal;
+        taxAmount = taxPercent * 0.01 * totalAmount;
+        totalAmount += taxAmount;
+      }
+
+      if(shipping >= 0) {
+        totalAmount += shipping;
       }
 
       form.setFieldsValue({
         items,
         totalQuantity,
         subtotal: round(subtotal, 2),
-        totalAmount: round(totalAmount, 2),
         taxAmount: round(taxAmount, 2),
+        discountAmount: round(discountAmount, 2),
+        totalAmount: round(totalAmount, 2),
       });
     }
   }
 
   const onItemRowRemove = (index: number, remove: (key: number) => void) => {
-    let { items, totalQuantity, totalAmount, subtotal }= form.getFieldsValue();
+    let { items, totalQuantity, totalAmount, subtotal, taxPercent = 0, taxAmount = 0, discount = 0, discountAmount = 0, shipping = 0 }= form.getFieldsValue();
 
     const quantity = items?.[index]?.quantity ?? 0;
     const amount = items?.[index]?.amount ?? 0;
@@ -192,9 +221,25 @@ const InvoiceForm = (props: IProps) => {
     totalQuantity -= quantity;
     totalAmount -= amount;
 
+    if(discount >= 0) {
+      discountAmount = discount * 0.01 * subtotal;
+      totalAmount = subtotal - discountAmount;
+    }
+
+    if(taxPercent >= 0) {
+      taxAmount = taxPercent * 0.01 * totalAmount;
+      totalAmount += taxAmount;
+    }
+
+    if(shipping >= 0) {
+      totalAmount += shipping;
+    }
+
     form.setFieldsValue({
       totalQuantity,
       subtotal: round(subtotal, 2),
+      discountAmount: round(discountAmount, 2),
+      taxAmount: round(taxAmount, 2),
       totalAmount: round(totalAmount, 2),
     });
 
@@ -203,14 +248,48 @@ const InvoiceForm = (props: IProps) => {
 
   const onTaxPercentChange = (e: ChangeEvent<HTMLInputElement>) => {
     const subtotal = form.getFieldValue('subtotal') 
+    const discountAmount = parseFloat(form.getFieldValue('discountAmount') || 0) 
     const value = parseFloat(e.target.value || '0');
+    const subtotalWithDiscount = subtotal - discountAmount;
 
     if(value >= 0) {
-      const taxAmount = value * 0.01 * subtotal;
-      const totalAmount = (1 + value * 0.01) * subtotal;
+      const taxAmount = value * 0.01 * (subtotalWithDiscount);
+      const totalAmount = (1 + value * 0.01) * subtotalWithDiscount;
       form.setFieldsValue({
         totalAmount: round(totalAmount, 2),
         taxAmount: round(taxAmount, 2),
+      });
+    }
+  }
+
+  const onDiscountPercentChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const subtotal = form.getFieldValue('subtotal') 
+    const value = parseFloat(e.target.value || '0');
+    const taxPercent = parseFloat(form.getFieldValue('taxPercent') || 0);
+
+    if(value >= 0) {
+      const discount = value * 0.01 * subtotal;
+      let totalAmount = subtotal - discount;
+      const taxAmount = taxPercent * 0.01 * totalAmount;
+      totalAmount += taxAmount;
+      form.setFieldsValue({
+        discountAmount: round(discount, 2),
+        totalAmount: round(totalAmount, 2),
+        taxAmount: round(taxAmount, 2),
+      });
+    }
+  }
+
+  const onShippingChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const subtotal = form.getFieldValue('subtotal') 
+    const discountAmount = parseFloat(form.getFieldValue('discountAmount') || 0) 
+    const taxAmount = parseFloat(form.getFieldValue('taxAmount') || 0) 
+    const value = parseFloat(e.target.value || '0');
+
+    if(value >= 0) {
+      const totalAmount = subtotal - discountAmount + taxAmount;
+      form.setFieldsValue({
+        totalAmount: round(totalAmount + value, 2),
       });
     }
   }
@@ -227,6 +306,9 @@ const InvoiceForm = (props: IProps) => {
       totalAmount: parseFloat(values.totalAmount),
       subtotal: parseFloat(values.subtotal),
       totalQuantity: values.totalQuantity,
+      discount: parseFloat(values.discount),
+      needProject: values.needProject,
+      shipping: parseFloat(values.shipping || 0)
     };
 
     if(props.invoice?.id) {
@@ -235,7 +317,7 @@ const InvoiceForm = (props: IProps) => {
         ...commonData,
         items: values.items.map((item: any) => ({
           id: item.id,
-          project_id: item.project_id,
+          project_id: item.project_id || null,
           description: item.description,
           quantity: parseFloat(item.quantity),
           rate: parseFloat(item.rate),
@@ -358,12 +440,25 @@ const InvoiceForm = (props: IProps) => {
         </Col>
       </Row>
 
+      <Row gutter={24}>
+        <Col xs={24} sm={24} md={12} lg={12}>
+          <Form.Item
+            name="needProject"
+            valuePropName="checked"
+          >
+            <Checkbox onChange={onNeedProjectChange}>
+              <h3>Need project for the invoice</h3>
+            </Checkbox>
+          </Form.Item>
+        </Col>
+      </Row>
+
       <div>
         <table className={styles['items-table']}>
           <thead>
             <tr>
-              <th>Project Name</th>
-              <th></th>
+              <th>Description</th>
+              { needProject && <th></th> }
               <th>Quantity</th>
               <th>Rates</th>
               <th>Amount</th>
@@ -379,25 +474,29 @@ const InvoiceForm = (props: IProps) => {
                     {
                       fields.map(({ key, name, ...restField }) => (
                         <tr key={key}>
-                          <td>
-                            <Form.Item
-                              className={styles['td-input']}
-                              name={[name, 'project_id']}
-                              rules={[{
-                                required: true,
-                                message: 'Please select project'
-                              }]}
-                              {...restField}
-                            >
-                              <Select placeholder="Select Project" loading={projectLoading} disabled={isTimesheet}>
-                                {
-                                  projectData?.Project?.data?.map((project) => (
-                                    <Select.Option key={project.id} value={project.id}>{project.name}</Select.Option>
-                                  ))
-                                }
-                              </Select>
-                            </Form.Item>
-                          </td>
+                          {
+                            needProject && (
+                              <td>
+                                <Form.Item
+                                  className={styles['td-input']}
+                                  name={[name, 'project_id']}
+                                  rules={[{
+                                    required: true,
+                                    message: 'Please select project'
+                                  }]}
+                                  {...restField}
+                                >
+                                  <Select placeholder="Select Project" loading={projectLoading} disabled={isTimesheet}>
+                                    {
+                                      projectData?.Project?.data?.map((project) => (
+                                        <Select.Option key={project.id} value={project.id}>{project.name}</Select.Option>
+                                      ))
+                                    }
+                                  </Select>
+                                </Form.Item>
+                              </td>
+                            )
+                          }
 
                           <td>
                             <Form.Item
@@ -486,7 +585,7 @@ const InvoiceForm = (props: IProps) => {
                     }
 
                     <tr>
-                      <td className={styles['horizontal']} colSpan={5}></td>
+                      <td className={styles['horizontal']} colSpan={needProject ? 5 : 4}></td>
                     </tr>
 
                   </tbody>
@@ -498,7 +597,7 @@ const InvoiceForm = (props: IProps) => {
           <tfoot>
             <tr>
 
-              <td colSpan={2}>
+              <td colSpan={needProject ? 2 : 1}>
               </td>
 
               <td>
@@ -526,9 +625,31 @@ const InvoiceForm = (props: IProps) => {
             </tr>
 
             <tr>
-              <td></td>
-              <td></td>
-              <td></td>
+              <td colSpan={ needProject ? 3 : 2 }></td>
+
+              <td>
+                <Form.Item 
+                  name="discount" 
+                  className={styles['td-input']}
+                  label="Discount Percentage"
+                >
+                  <Input type="number" placeholder="Enter Discount %" onChange={onDiscountPercentChange} suffix="%" />
+                </Form.Item>
+              </td>
+
+              <td>
+                <Form.Item 
+                  className={styles['td-input']}
+                  label="Discount Amount"
+                  name="discountAmount"
+                >
+                  <Input type="number" prefix="$" disabled />
+                </Form.Item>
+              </td>
+            </tr>
+
+            <tr>
+              <td colSpan={ needProject ? 3 : 2 }></td>
 
               <td>
                 <Form.Item 
@@ -552,11 +673,26 @@ const InvoiceForm = (props: IProps) => {
             </tr>
 
             <tr>
-              <td className={styles['horizontal']} colSpan={4}></td>
+              <td colSpan={ needProject ? 4 : 3 }></td>
+
+              <td>
+                <Form.Item 
+                  className={styles['td-input']}
+                  label="Shipping"
+                  name="shipping"
+                >
+                  <Input type="number" prefix="$" onChange={onShippingChange} />
+                </Form.Item>
+              </td>
+            </tr>
+
+
+            <tr>
+              <td className={styles['horizontal']} colSpan={ needProject ? 5 : 4 }></td>
             </tr>
 
             <tr>
-              <td></td>
+              { needProject && <td></td> }
               <td></td>
               <td></td>
               <td> </td>
@@ -570,8 +706,9 @@ const InvoiceForm = (props: IProps) => {
                 </Form.Item>
               </td>
             </tr>
+
             <tr>
-              <td colSpan={2}></td>
+              <td colSpan={needProject ? 2 : 1}></td>
               <td colSpan={3}>
                 <Form.Item
                   name='notes'

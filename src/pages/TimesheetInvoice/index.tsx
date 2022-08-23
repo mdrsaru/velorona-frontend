@@ -102,8 +102,12 @@ const TimesheetInvoice = (props: any) => {
             totalAmount,
             subtotal: totalAmount,
             taxPercent: 0,
+            taxAmount: 0,
+            discount: 0,
+            discountAmount: 0,
             notes: '',
             totalQuantity: round(totalQuantity, 2),
+            shipping: 0,
             items,
           }
 

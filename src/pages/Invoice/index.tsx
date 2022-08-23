@@ -23,6 +23,7 @@ import {
 } from '../../interfaces/generated';
 import { GraphQLResponse } from '../../interfaces/graphql.interface';
 
+import { ATTACHED_TIMESHEET_FIELDS } from '../../gql/timesheet.gql'
 import PageHeader from '../../components/PageHeader';
 import Status from '../../components/Status';
 import InvoiceViewer from '../../components/InvoiceViewer';
@@ -30,8 +31,25 @@ import styles from './style.module.scss';
 import { debounce } from 'lodash';
 import AttachmentModal from '../../components/AttachmentsModal/index';
 import AttachNewTimesheetModal from '../../components/AddAttachedTimesheet';
-import { ATTACHED_TIMESHEET } from '../Timesheet/DetailTimesheet';
 import { useNavigate } from 'react-router-dom';
+
+const ATTACHED_TIMESHEET = gql`
+  ${ATTACHED_TIMESHEET_FIELDS}
+  query AttachedTimesheet($input: AttachedTimesheetQueryInput!) {
+    AttachedTimesheet(input: $input){
+      data {
+        ...attachedTimesheetFields
+      }
+      paging {
+        total
+        startIndex
+        endIndex
+        hasNextPage
+      }     
+    }
+  }
+`;
+
 
 const INVOICE = gql`
   query Invoice($input: InvoiceQueryInput!) {

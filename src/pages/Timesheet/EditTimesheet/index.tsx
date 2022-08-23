@@ -9,9 +9,19 @@ import { CREATE_TIME_ENTRY, getTimeFormat } from '..'
 import { notifyGraphqlError } from '../../../utils/error'
 import { authVar } from '../../../App/link'
 import { TimeEntry } from '../../../interfaces/generated'
-import { getTotalTimeForADay } from '../DetailTimesheet'
 
 import styles from "./style.module.scss"
+
+const getTotalTimeForADay = (entries: any) => {
+  let sum = 0;
+  if (entries) {
+    const durations = entries.map((data: any) => data?.duration)
+    sum = durations.reduce((entry1: any, entry2: any) => {
+      return entry1 + entry2;
+    }, 0);
+  };
+  return sum
+}
 
 
 export const UPDATE_TIME_ENTRY = gql`
