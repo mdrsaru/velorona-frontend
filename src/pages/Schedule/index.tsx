@@ -67,7 +67,7 @@ const Schedule = () => {
       variables: {
         input: {
           paging: {
-            order: ["updatedAt:DESC"],
+            order: ["startDate:DESC"],
           },
           query: {
             company_id: loggedInUser?.company?.id
@@ -111,7 +111,7 @@ const Schedule = () => {
       },
     });
   };
-  
+
   const columns = [
     {
       title: "Time Period",
@@ -207,7 +207,7 @@ const Schedule = () => {
 
       <ModalConfirm
         visibility={visibility}
-        setModalVisibility={visibility}
+        setModalVisibility={setVisibility}
         imgSrc={deleteImg}
         okText={'Delete'}
         closable

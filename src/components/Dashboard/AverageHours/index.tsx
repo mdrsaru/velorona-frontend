@@ -40,7 +40,7 @@ const Index = (props: IProps) => {
           display: false,
         },
         suggestedMin: 0,
-        suggestedMax: 60,
+        suggestedMax: 120,
       },
       y: {
         grid: {
