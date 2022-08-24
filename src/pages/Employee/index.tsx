@@ -1,4 +1,4 @@
-import { Card, Row, Col, Table, Dropdown, Menu, message, Input, Button, Select, Form, Avatar, Tabs } from "antd"
+import { Card, Row, Col, Table, Dropdown, Menu, message, Input, Button, Select, Form, Avatar, Tabs, Popconfirm } from "antd"
 import { SearchOutlined, DownloadOutlined, DollarCircleFilled, FormOutlined, CheckCircleFilled, DeleteOutlined, UserOutlined, FileSyncOutlined, CloseCircleFilled, MailOutlined } from "@ant-design/icons"
 
 import { Link, useNavigate } from "react-router-dom"
@@ -719,13 +719,19 @@ const Employee = () => {
                 }
 
                 {!record.loggedIn && <Col>
-                  <div
-                    onClick={() => handleResendInvitation(record)}
-                    className={`${styles["table-icon"]} ${styles["table-unarchive-icon"]}`}
-                    title='Resend Invitation'
+                  <Popconfirm
+                    placement="left"
+                    title={`Are you sure you want to resend invitation to ${record.fullName}?`}
+                    onConfirm={() => handleResendInvitation(record)}
+                    okText="Yes" cancelText="No"
                   >
-                    <MailOutlined />
-                  </div>
+                    <div
+                      className={`${styles["table-icon"]} ${styles["table-unarchive-icon"]}`}
+                      title='Resend Invitation'
+                    >
+                      <MailOutlined />
+                    </div>
+                  </Popconfirm>
                 </Col>
                 }
                 <Col>

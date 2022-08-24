@@ -214,7 +214,7 @@ const NewEmployee = () => {
           middleName: values.middleName,
           lastName: values.lastName,
           designation:values.designation,
-          status: values.status,
+          status: UserStatus.InvitationSent,
           manager_id: values.manager_id,
           company_id: authData?.company?.id as string,
           roles: [values?.roles],
@@ -486,7 +486,7 @@ const NewEmployee = () => {
               </Form.Item>
             </Col>
 
-            <Col
+            {/* <Col
               xs={24}
               sm={24}
               md={12}
@@ -504,7 +504,7 @@ const NewEmployee = () => {
                   <Option value={UserStatus.Inactive}>{UserStatus.Inactive}</Option>
                 </Select>
               </Form.Item>
-            </Col>
+            </Col> */}
             {role === constants.roles.Employee &&
               <>
                 <Col

@@ -39,7 +39,8 @@ export const UPDATE_TIME_ENTRY = gql`
 `;
 
 interface IProps{
-  refetch?:any
+  refetch?:any;
+  refetchTimesheet?:any;
 }
 const CheckInCheckOut = (props:IProps) => {
   const [activeEntry_id, setActiveEntry_id] = useState<string | null>(null)
@@ -155,6 +156,16 @@ const CheckInCheckOut = (props:IProps) => {
           }
         }
       })
+      props?.refetchTimesheet({
+				input: {
+					query: {
+						company_id,
+					},
+					paging: {
+						order: ['weekStartDate:DESC']
+					}
+				}
+			})
     },
     onError: notifyGraphqlError,
   });

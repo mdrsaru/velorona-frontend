@@ -510,7 +510,7 @@ const Timesheet = () => {
           {/* TimeEntry Form */}
        { authData?.user?.entryType === 'CICO' &&
           <div className={styles['checkIn-checkOut-div']}>
-          <CheckInCheckOut refetch = {refetchTimeEntry}/> 
+          <CheckInCheckOut refetch = {refetchTimeEntry} refetchTimesheet = {refetchTimeWeekly}/> 
           </div>    
        } 
        {authData?.user?.entryType !== 'Timesheet' && (
