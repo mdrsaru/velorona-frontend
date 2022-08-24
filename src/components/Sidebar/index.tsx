@@ -139,7 +139,7 @@ const Sidebar = (props: any) => {
       name: routes.invoice.name,
       icon: <ProfileOutlined />,
       route: routes.invoice.path(loggedInUser?.company?.code ?? ''),
-      accessRoles: [constants.roles.CompanyAdmin],
+      accessRoles: [constants.roles.CompanyAdmin,constants.roles.BookKeeper],
       viewAsAdmin: true,
     },
     {
@@ -147,7 +147,7 @@ const Sidebar = (props: any) => {
       name: routes.employeeTimesheet.name,
       icon: <FieldTimeOutlined />,
       route: routes.employeeTimesheet.path(loggedInUser?.company?.code ?? ''),
-      accessRoles: [constants.roles.CompanyAdmin, constants.roles.TaskManager],
+      accessRoles: [constants.roles.CompanyAdmin, constants.roles.TaskManager,constants.roles.BookKeeper],
       viewAsAdmin: true,
     },
     {
