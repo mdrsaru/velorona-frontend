@@ -95,6 +95,13 @@ const AttachNewTimesheetModal = (props: IProps) => {
             'authorization': authData?.token ? `Bearer ${authData?.token}` : '',
         },
         onChange(info) {
+            form.setFieldsValue({ attachment: fileData as any })
+            form.setFields([
+                {
+                  name: 'upload',
+                  errors: []
+                }
+              ]);
             if (info.file.status === 'done') {
                 setFile({
                     name: info?.file?.name,
@@ -107,6 +114,15 @@ const AttachNewTimesheetModal = (props: IProps) => {
     };
 
     const onSubmitForm = (values: any) => {
+        if(fileData?.id===null){
+            form.setFields([
+                {
+                  name: 'upload',
+                  errors: ["Please upload attachment"],
+                },
+              ]);
+              return
+        }
         form.resetFields()
         const data: any = {
             company_id: authData?.company?.id,
@@ -121,7 +137,10 @@ const AttachNewTimesheetModal = (props: IProps) => {
         if (fileData?.id) {
             data.attachment_id = fileData?.id
         }
-
+        setFile({
+            id: null,
+            name: ''
+        })
         createAttachedTimesheet({
             variables: {
                 input: data
@@ -159,7 +178,7 @@ const AttachNewTimesheetModal = (props: IProps) => {
             <div className={styles["modal-body"]}>
                 <div className={styles['title-div']}>
                     <span className={styles["title"]}>
-                        Attach Approved Timesheet
+                        Attach Expense
                     </span>
                 </div>
 
@@ -175,13 +194,13 @@ const AttachNewTimesheetModal = (props: IProps) => {
                             md={24}
                             lg={24}>
                             <Form.Item
-                                label="Attachment Type"
+                                label="Expense Type"
                                 name="type"
                                 rules={[{
                                     required: true,
-                                    message: 'Please enter attachment type'
+                                    message: 'Please enter expense type'
                                 }]}                                >
-                              <Select placeholder='Select attachment type' onChange={handleTypeChange}>
+                              <Select placeholder='Select expense type' onChange={handleTypeChange}>
 								{attachment_type.map((type,index)=>(
 									<Option value={type.value} key={index}>{type.name}</Option>
 								))}
@@ -241,7 +260,7 @@ const AttachNewTimesheetModal = (props: IProps) => {
                         <Col xs={24} sm={24} md={24} lg={24}>
                             <Form.Item
                                 name="upload"
-                                label="Attachment"
+                                label={<span ><span className={styles['asterisk-icon']} style={{ color: '#ff4d4f', fontSize: '14px' }}> * </span>Attachment</span>} 
                                 valuePropName="filelist"
                                 getValueFromEvent={normFile}
                                 style={{ position: "relative" }}
