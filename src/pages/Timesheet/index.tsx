@@ -36,6 +36,7 @@ import TimerCard from '../../components/TimerCard'
 import NoContent from '../../components/NoContent'
 import TimeEntry from './TimeEntry'
 import { GraphQLResponse } from '../../interfaces/graphql.interface'
+import CheckInCheckOut from '../../components/Header/CheckInCheckOut'
 
 
 export const CREATE_TIME_ENTRY = gql`
@@ -212,7 +213,7 @@ const Timesheet = () => {
 		reset(new Date(time))
 	}
 
-	const {  data: timeEntryData } = useQuery<GraphQLResponse<'TimeEntry', TimeEntryPagingResult>>(TIME_ENTRY, {
+	const {  data: timeEntryData ,refetch:refetchTimeEntry } = useQuery<GraphQLResponse<'TimeEntry', TimeEntryPagingResult>>(TIME_ENTRY, {
 		fetchPolicy: "network-only",
 		nextFetchPolicy: "cache-first",
 		variables: {
@@ -507,6 +508,11 @@ const Timesheet = () => {
     <>
         <div className={styles['site-card-wrapper']}>
           {/* TimeEntry Form */}
+       { authData?.user?.entryType === 'CICO' &&
+          <div className={styles['checkIn-checkOut-div']}>
+          <CheckInCheckOut refetch = {refetchTimeEntry}/> 
+          </div>    
+       } 
        {authData?.user?.entryType !== 'Timesheet' && (
 		<> 
 	      {
