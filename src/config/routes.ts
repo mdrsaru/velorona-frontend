@@ -2,7 +2,7 @@ import { lazy } from 'react';
 
 import constants from '../config/constants';
 
-const { SuperAdmin, CompanyAdmin, Employee, TaskManager } = constants.roles;
+const { SuperAdmin, CompanyAdmin, Employee, TaskManager,BookKeeper } = constants.roles;
 
 const routes = {
   dashboard: {
@@ -232,7 +232,7 @@ const routes = {
     component: lazy(() => import('../pages/EmployeeTimesheet')),
     name: 'Employee Timesheet',
     key: 'timesheet',
-    allowedRoles: [CompanyAdmin, SuperAdmin, TaskManager],
+    allowedRoles: [CompanyAdmin, SuperAdmin, TaskManager, BookKeeper],
   },
   timesheetInvoice: {
     childPath: 'timesheet/employee/:timesheetId/add-invoice',
@@ -316,7 +316,7 @@ const routes = {
     component: lazy(() => import('../pages/Invoice')),
     name: 'Invoices',
     key: 'invoices',
-    allowedRoles: [CompanyAdmin, SuperAdmin],
+    allowedRoles: [CompanyAdmin, SuperAdmin,BookKeeper],
   },
   addInvoice: {
     childPath: 'add',
@@ -374,7 +374,7 @@ const routes = {
     component: lazy(() => import('../pages/Timesheet/DetailTimesheet')),
     name: 'Detail Timesheet',
     key: 'timesheet',
-    allowedRoles: [CompanyAdmin, SuperAdmin, Employee, TaskManager],
+    allowedRoles: [CompanyAdmin, SuperAdmin, Employee, TaskManager,BookKeeper],
   },
   subscription: {
     childPath: 'subscriptions',

@@ -38,8 +38,10 @@ export const UPDATE_TIME_ENTRY = gql`
   }
 `;
 
-
-const CheckInCheckOut = () => {
+interface IProps{
+  refetch?:any
+}
+const CheckInCheckOut = (props:IProps) => {
   const [activeEntry_id, setActiveEntry_id] = useState<string | null>(null)
   const [isCheckInVisible, setIsCheckInVisible] = useState(false)
 
@@ -141,6 +143,18 @@ const CheckInCheckOut = () => {
       if (response.TimeEntryUpdate) {
         reset(undefined, false);
       }
+      props?.refetch({
+        input: {
+          query: {
+            company_id,
+            afterStart,
+            entryType,
+          },
+          paging: {
+            order: ['startTime:DESC']
+          }
+        }
+      })
     },
     onError: notifyGraphqlError,
   });

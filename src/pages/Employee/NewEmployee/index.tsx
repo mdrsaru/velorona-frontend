@@ -11,7 +11,7 @@ import { notifyGraphqlError } from "../../../utils/error";
 import { authVar } from "../../../App/link";
 
 import routes from "../../../config/routes";
-import { MutationChangeProfilePictureArgs, MutationUserCreateArgs, User, UserPagingResult, EntryType, RoleName, QueryUserArgs } from "../../../interfaces/generated";
+import { MutationChangeProfilePictureArgs, MutationUserCreateArgs, User, UserPagingResult, EntryType, RoleName, QueryUserArgs, UserStatus } from "../../../interfaces/generated";
 import { USER } from "../index";
 
 import styles from "../style.module.scss";
@@ -213,7 +213,7 @@ const NewEmployee = () => {
           firstName: values.firstName,
           middleName: values.middleName,
           lastName: values.lastName,
-		  designation:values.designation,
+          designation:values.designation,
           status: values.status,
           manager_id: values.manager_id,
           company_id: authData?.company?.id as string,
@@ -241,14 +241,12 @@ const NewEmployee = () => {
   const [role, setRole] = useState('')
   const [manager, setManager] = useState('')
   const handleChange = (value: any) => {
-      setRole(value)
+    setRole(value)
   }
 
   const handleManagerChange = (value: any) => {
-	setManager(value)
-   }
-
- console.log(manager)
+    setManager(value)
+  }
 
   return (
     <div className={styles['main-div']}>
@@ -350,7 +348,7 @@ const NewEmployee = () => {
                 <Input placeholder="Enter your phone number" autoComplete="off" />
               </Form.Item>
             </Col>
-			<Col
+            <Col
               xs={24}
               sm={24}
               md={8}
@@ -359,11 +357,11 @@ const NewEmployee = () => {
               <Form.Item
                 label="Designation"
                 name='designation'
-				rules= {[{
-					required:true,
-					message:"Please enter the designation"
-				}]}
-				>
+                rules={[{
+                  required:true,
+                  message:"Please enter the designation"
+                }]}
+              >
                 <Input placeholder="Enter designation" autoComplete="off" />
               </Form.Item>
             </Col>
@@ -501,9 +499,9 @@ const NewEmployee = () => {
                   message: 'Please select the status'
                 }]}>
                 <Select placeholder="Select status">
-                  <Option value="Active">Active</Option>
-                  <Option value="Inactive">In Active</Option>
-
+                  <Option value={UserStatus.InvitationSent}>{UserStatus.InvitationSent}</Option>
+                  <Option value={UserStatus.Active}>{UserStatus.Active}</Option>
+                  <Option value={UserStatus.Inactive}>{UserStatus.Inactive}</Option>
                 </Select>
               </Form.Item>
             </Col>
@@ -523,10 +521,10 @@ const NewEmployee = () => {
                         <Option key={index} value={manager?.id}> {`${manager?.fullName} / ${manager?.email}`}</Option>
                       ))}
                     </Select>
-					{form.getFieldValue('manager_id')}
-					{!manager &&
-					<p>Please add task manager first to assign manager for this user.</p>
-					}
+                    {form.getFieldValue('manager_id')}
+                    {!manager &&
+                      <p>Please add task manager first to assign manager for this user.</p>
+                    }
                   </Form.Item>
                 </Col>
 

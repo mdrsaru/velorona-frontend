@@ -5,6 +5,7 @@ import CompanyAdminDashboard from './CompanyAdminDashboard';
 import TaskManagerDashboard from './TaskManagerDashboard';
 import EmployeeDashboard from './EmployeeDashboard';
 import Home from '../Home';
+import Invoice from '../Invoice/index';
 
 const CompanyDashboard = () => {
   const authData = authVar()
@@ -19,6 +20,10 @@ const CompanyDashboard = () => {
 
   else if (roles.includes(constants.roles.Employee) ){
 	return <EmployeeDashboard/>
+  }
+  
+  else if (roles.includes(constants.roles.BookKeeper) ){
+    return <Invoice/>
   }
 
   else {

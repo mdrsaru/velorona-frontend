@@ -148,7 +148,7 @@ const TopHeader = (props: any) => {
       </div>
 
       <div className={styles['header-right']}>
-        { loggedInUser?.user?.entryType === 'CICO' && <CheckInCheckOut /> }
+        {/* { loggedInUser?.user?.entryType === 'CICO' && <CheckInCheckOut /> } */}
 
         {/* <div className={styles['notification']}>
           <img

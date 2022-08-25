@@ -420,6 +420,7 @@ const navigate = useNavigate();
                 </div>
               }
             </Col>
+            {!loggedInUser?.user?.roles.includes(constants.roles.BookKeeper) &&
             <Col>
               {
                 invoice.status === 'Pending' && (
@@ -432,6 +433,7 @@ const navigate = useNavigate();
                   </div>
                 )
               }</Col>
+            }
           </Row>
         )
       }
@@ -441,7 +443,19 @@ const navigate = useNavigate();
       render: (invoice: IInvoice) => {
         return (
           <Row>
-            <Col>
+            {loggedInUser?.user?.roles.includes(constants.roles.BookKeeper) ?
+           <Col>
+            <div
+                    onClick={() => handleViewInvoiceClick(invoice.id)}
+                    title='View Invoice'
+                    className={`${styles["table-icon"]} ${styles["table-view-icon"]}`}
+                  >
+                    <EyeFilled />
+                  </div>
+          </Col>
+          :
+           <> 
+           <Col>
               {
                 invoice.status === 'Pending' ? (
                   <Link
@@ -500,6 +514,8 @@ const navigate = useNavigate();
 			</Col>
 			 )
 			}
+      </>
+      }
           </Row>
         )
       }
@@ -509,7 +525,12 @@ const navigate = useNavigate();
   return (
     <div className={styles['container']}>
       <Card bordered={false}>
+      {loggedInUser?.user?.roles.includes(constants.roles.BookKeeper) ?
         <PageHeader
+        title="Invoice History"
+      />
+      :
+       <PageHeader
           title="Invoice History"
           extra={[
             <div className={styles['new-invoice']} key="new-invoice">
@@ -519,6 +540,7 @@ const navigate = useNavigate();
             </div>
           ]}
         />
+      }
         <Form
           form={filterForm}
           layout="vertical"

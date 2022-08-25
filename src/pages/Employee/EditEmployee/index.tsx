@@ -26,7 +26,7 @@ import { useState } from 'react'
 import styles from '../style.module.scss'
 import { authVar } from '../../../App/link'
 import RouteLoader from '../../../components/Skeleton/RouteLoader'
-import { EntryType, MutationChangeProfilePictureArgs, MutationUserUpdateArgs, QueryUserArgs, RoleName, User, UserPagingResult } from "../../../interfaces/generated";
+import { EntryType, MutationChangeProfilePictureArgs, MutationUserUpdateArgs, QueryUserArgs, RoleName, User, UserPagingResult, UserStatus } from "../../../interfaces/generated";
 import { GraphQLResponse } from "../../../interfaces/graphql.interface";
 
 const dateFormat = "YYYY-MM-DD HH:mm:ss";
@@ -209,7 +209,7 @@ const EditEmployee = () => {
       middleName: user?.middleName ?? "",
       lastName: user?.lastName ?? "",
       phone: user?.phone ?? "",
-	  designation:user?.designation ?? "",
+      designation:user?.designation ?? "",
       roles: user?.roles[0]?.name ?? "",
       status: user?.status ?? "",
       manager_id: user?.manager_id ?? "",
@@ -338,19 +338,19 @@ const EditEmployee = () => {
                   />
                 </Form.Item>
               </Col>
-			  <Col
-              xs={24}
-              sm={24}
-              md={8}
-              lg={8}
-              className={styles.formCol}>
-              <Form.Item
-                label="Designation"
-                name='designation'
-				>
-                <Input placeholder="Enter designation" autoComplete="off" />
-              </Form.Item>
-            </Col>
+              <Col
+                xs={24}
+                sm={24}
+                md={8}
+                lg={8}
+                className={styles.formCol}>
+                <Form.Item
+                  label="Designation"
+                  name='designation'
+                >
+                  <Input placeholder="Enter designation" autoComplete="off" />
+                </Form.Item>
+              </Col>
               <Col className={styles["form-header"]}>
                 <p>Address</p>
               </Col>
@@ -467,8 +467,9 @@ const EditEmployee = () => {
                       ]}
                     >
                       <Select placeholder="Select status" disabled={authData?.user?.id === params.eid ? true : false}>
-                        <Option value="Active">Active</Option>
-                        <Option value="Inactive">InActive</Option>
+                        <Option value={UserStatus.InvitationSent}>{UserStatus.InvitationSent}</Option>
+                        <Option value={UserStatus.Active}>{UserStatus.Active}</Option>
+                        <Option value={UserStatus.Inactive}>{UserStatus.Inactive}</Option>
                       </Select>
                     </Form.Item>
                   </Col>

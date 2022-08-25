@@ -1,7 +1,7 @@
 import { Fragment, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import ReactToPrint from 'react-to-print';
-import { Button, Card, Col, message, Row } from 'antd';
+import { Button, Card, Col,  Row } from 'antd';
 import { DownloadOutlined, PrinterOutlined } from '@ant-design/icons';
 import { useLazyQuery, useQuery } from '@apollo/client';
 import moment from 'moment';
@@ -308,10 +308,10 @@ const ScheduleDetailReport = () => {
                                     content={() => componentRef.current}
                                 /> */}
             </Col>
-            <Col>
+            {/* <Col>
             <br />
               <Button icon={<DownloadOutlined />} onClick={downloadReport}> Download</Button>
-            </Col>
+            </Col> */}
           </Row>
         </Card>
 

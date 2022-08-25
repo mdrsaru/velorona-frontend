@@ -136,7 +136,7 @@ const Attachments = (props: IProps) => {
           setEditAttachedVisibility(true);
           setAttachedTimesheet(data);
         }}>
-          Edit Attachments
+          Edit Expense
         </div>
       </Menu.Item>
       <Menu.Divider />
@@ -146,7 +146,7 @@ const Attachments = (props: IProps) => {
           setAttachedTimesheet(data);
         }}
         >
-          Delete Attachments
+          Delete Expense
         </div>
       </Menu.Item>
 
@@ -169,7 +169,7 @@ const Attachments = (props: IProps) => {
       }
     },
     {
-      title: 'Attachment Type',
+      title: 'Expense Type',
       dataIndex: 'type',
     },
     {
@@ -244,7 +244,7 @@ const Attachments = (props: IProps) => {
         <>
           <p className={styles['attach-new-timesheet']} onClick={attachNewTimesheet}>
             <PlusCircleFilled />
-            <span style={{ marginLeft: '1rem' }}> Add New Attachment
+            <span style={{ marginLeft: '1rem' }}> Add New Expense
             </span>
           </p>
         </>
