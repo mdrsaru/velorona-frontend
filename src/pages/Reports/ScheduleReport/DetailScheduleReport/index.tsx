@@ -1,20 +1,23 @@
-import _ from 'lodash';
-import moment from 'moment';
 import { Fragment, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import ReactToPrint from 'react-to-print';
-import { Button, Card, Col, Row } from 'antd';
-import { PrinterOutlined } from '@ant-design/icons';
+import { Button, Card, Col, message, Row } from 'antd';
+import { DownloadOutlined, PrinterOutlined } from '@ant-design/icons';
 import { useLazyQuery, useQuery } from '@apollo/client';
+import moment from 'moment';
+import _ from 'lodash';
 
-import { getWeekDays } from '../../../../utils/common';
+import { downloadCSV, getWeekDays } from '../../../../utils/common';
 import PageHeader from '../../../../components/PageHeader';
-import { WORKSCHEDULEDETAIL } from '../../../EmployeeSchedule';
-import { GraphQLResponse } from '../../../../interfaces/graphql.interface';
-import { QueryUserArgs, UserPagingResult } from '../../../../interfaces/generated';
-import { USER } from '../../../Employee';
-import { WORKSCHEDULE } from '../../../Schedule';
+import AddWorkscheduleEmployee from '../../../../components/AddWorkscheduleEmployee';
 import { authVar } from '../../../../App/link';
+import { USER } from '../../../Employee';
+import { GraphQLResponse } from '../../../../interfaces/graphql.interface';
+import { WORKSCHEDULEDETAIL } from '../../../EmployeeSchedule';
+import { WORKSCHEDULE } from '../../../Schedule';
+import { QueryUserArgs, UserPagingResult } from '../../../../interfaces/generated';
+import AddNewWorkscheduleDetail from '../../../Schedule/DetailSchedule/AddNewWorkscheduleDetail';
+import AddTimeInterval from '../../../Schedule/DetailSchedule/AddTimeInterval';
 
 import styles from './style.module.scss';
 
@@ -23,6 +26,7 @@ const ScheduleDetailReport = () => {
 
   const params = useParams();
   const loggedInUser = authVar();
+  const [showEmployee, setEmployeeShow] = useState(false);
   const [addTimeInterval, setAddTimeInterval] = useState(false);
   const [showAddNewTimeInterval, setShowAddNewTimeInterval] = useState(false);
   const [addNewTimeInterval, setAddNewTimeInterval] = useState<any>({
@@ -135,6 +139,7 @@ const ScheduleDetailReport = () => {
     });
   };
 
+
   const getTotalSchedule = (group: any) => {
     let count = 0;
     if (group?.length > 0) {
@@ -146,6 +151,63 @@ const ScheduleDetailReport = () => {
     return hour;
   };
 
+  const tableHeader = () => {
+    let title: Array<{ label: string; key: string; subKey?: string }> = [
+      { label: 'Employee Name', key: 'username' },
+      { label: 'Designation', key: 'designation' },
+    ];
+
+    weekDays.map((day: any, index: number) =>
+      title.push({
+        label: `${moment(day).format('ddd, MMM D').replace(',', '-')}`,
+        key: 'timeSheetBody',
+        subKey: `${index}`,
+      })
+    );
+    title.push({ label: 'Total', key: 'total' });
+
+    return title;
+  };
+
+  const tableBody = () => {
+    const tableRows = [];
+
+    for (const property in groups) {
+      const username = groups && groups[property][0]?.user?.fullName;
+      const designation = groups && (groups[property][0]?.user?.designation ?? '-');
+      const total = getTotalSchedule(groups[property]);
+      const timeSheetBodyPart =
+        groups &&
+        Object.keys(groups).map((key) => {
+          return weekDays.map(
+            (day) =>
+              groups[property] &&
+              groups[property]?.map((data: any) => {
+                return (
+                  day === moment(data?.schedule_date).format('YYYY-MM-DD') &&
+                  data?.workscheduleTimeDetail?.length > 0 &&
+                  data?.workscheduleTimeDetail?.map(
+                    (timeData: any) => `${moment(timeData?.startTime).utc().format('HH:mm') || ''}-${
+                        moment(timeData?.endTime).utc().format('HH:mm') || ''
+                      }`
+                  )[0]
+                );
+              })[0]
+          );
+        }); 
+      const timeSheetBody = timeSheetBodyPart[0]?.map((item:string)=>item || '-');
+      tableRows.push({ username, designation, total, timeSheetBody: Object.assign({}, timeSheetBody) });
+    }
+    return tableRows;
+  };
+
+  const downloadReport = () => {
+    const csvHeader = tableHeader();
+    const csvBody = tableBody();
+    // console.log(csvBody);
+    downloadCSV(csvBody, csvHeader, 'ScheduleTable.csv');
+  };
+
   return (
     <>
       <div className={styles['main-div']}>
@@ -155,13 +217,15 @@ const ScheduleDetailReport = () => {
               'MMM DD'
             )} -${moment(workscheduleData?.Workschedule?.data?.[0]?.endDate).format('MMM DD')} )`}
           />
-          <Row className='container-row' gutter={[10, 10]}>
+          <Row className='container-row'>
             <Col span={24}>
               <div ref={componentRef} className={styles['detail-table']}>
                 <table className={styles['main-table']}>
                   <thead>
                     <tr className={styles['table-header']}>
                       <th>Employee</th>
+                      <th>Designation</th>
+
                       {weekDays.map((day: any, index: number) => (
                         <th key={index}>{moment(day).format('ddd, MMM D')}</th>
                       ))}
@@ -173,13 +237,8 @@ const ScheduleDetailReport = () => {
                       Object.keys(groups).map(function (key, index) {
                         return (
                           <tr key={index}>
-                            <td>
-                              {groups[key]?.[0]?.user?.fullName}
-                              <br />
-                              <span>
-                                {groups[key]?.[0]?.user?.designation && `(${groups[key]?.[0]?.user?.designation})`}
-                              </span>
-                            </td>
+                            <td>{groups[key]?.[0]?.user?.fullName}</td>
+                            <td>{(groups[key]?.[0]?.user?.designation && `${groups[key]?.[0]?.user?.designation}`) ?? '-'}</td>
                             {weekDays.map((day: any, index: number) => (
                               <td key={index}>
                                 {groups[key] &&
@@ -238,19 +297,44 @@ const ScheduleDetailReport = () => {
                   </tbody>
                 </table>
               </div>
+              {/* <ReactToPrint
+                                    trigger={() =>
+                                        <Button
+                                            type="link"
+                                            icon={<PrinterOutlined />}
+                                        >
+                                            Print Schedule
+                                        </Button>}
+                                    content={() => componentRef.current}
+                                /> */}
             </Col>
-            <Col span={24}>
-              <ReactToPrint
-                trigger={() => (
-                  <Button type='link' icon={<PrinterOutlined />}>
-                    Print Schedule
-                  </Button>
-                )}
-                content={() => componentRef.current}
-              />
+            <Col>
+            <br />
+              <Button icon={<DownloadOutlined />} onClick={downloadReport}> Download</Button>
             </Col>
           </Row>
         </Card>
+
+        <AddTimeInterval
+          visibility={addTimeInterval}
+          setVisibility={setAddTimeInterval}
+          workschedule={workscheduleDetailByIdData}
+          getWorkschedule={getWorkschedule}
+          setEmployee={setEmployee}
+        />
+
+        <AddNewWorkscheduleDetail
+          visibility={showAddNewTimeInterval}
+          setVisibility={setShowAddNewTimeInterval}
+          getWorkschedule={getWorkschedule}
+          employeeName={addNewTimeInterval?.employeeName}
+          employeeId={addNewTimeInterval?.employeeId}
+          providedData={addNewTimeInterval?.providedData}
+          refetch={refetchWorkscheduleDetail}
+          setEmployee={setEmployee}
+        />
+
+        <AddWorkscheduleEmployee visibility={showEmployee} setVisibility={setEmployeeShow} setEmployee={setEmployee} />
       </div>
     </>
   );

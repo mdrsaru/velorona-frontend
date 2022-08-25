@@ -414,11 +414,11 @@ const routes = {
     allowedRoles: [Employee],
   },
   detailScheduleReport: {
-    childPath: ':reports/scheduleList/:sid',
+    childPath: 'reports/scheduleList/:sid',
     path: (id: string,sid:string) => `/${id}/reports/scheduleList/${sid}`,
     component: lazy(() => import('../pages/Reports/ScheduleReport/DetailScheduleReport/index')),
     name: 'DetailScheduleReport',
-    key: 'scheduleReportList',
+    key: 'scheduleListReport',
     allowedRoles: [CompanyAdmin, SuperAdmin],
   },
   reportsAdmin: {
