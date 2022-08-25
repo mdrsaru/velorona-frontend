@@ -106,6 +106,7 @@ const UserPayRateModal = (props: IProps) => {
           user_id: user.id,
           project_id: values.project_id,
           amount: values.payRate,
+          invoiceRate: values.invoiceRate,
           company_id: loggedInUser.company?.id as string
         }
       }
@@ -167,8 +168,24 @@ const UserPayRateModal = (props: IProps) => {
             <Col
               xs={24}
               sm={24}
-              md={24}
-              lg={24}>
+              md={12}
+              lg={12}>
+              <Form.Item
+                label="Invoice rate"
+                name="invoiceRate">
+                <InputNumber
+                  addonBefore="$ "
+                  addonAfter="Hr"
+                  placeholder="Enter invoice rate"
+                  autoComplete="off"
+                  style={{ width: '100%' }} />
+              </Form.Item>
+            </Col>
+            <Col
+              xs={24}
+              sm={24}
+              md={12}
+              lg={12}>
               <Form.Item
                 label="Payrate"
                 name="payRate">
