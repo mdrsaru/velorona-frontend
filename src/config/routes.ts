@@ -88,7 +88,7 @@ const routes = {
 		component: lazy(() => import('../pages/CompanyDashboard')),
     name: 'Dashboard',
     key: 'dashboard',
-    allowedRoles: [CompanyAdmin, SuperAdmin, TaskManager,Employee],
+    allowedRoles: [CompanyAdmin, SuperAdmin, TaskManager,Employee,BookKeeper],
   },
   addCompany: {
     childPath: ':add',

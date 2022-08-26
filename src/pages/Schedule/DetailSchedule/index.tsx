@@ -376,7 +376,10 @@ const ScheduleDetail = () => {
                                             })}
                                         {employeeData?.User?.data?.[0]?.fullName && (
                                             <tr>
-                                                <td>{employeeData?.User?.data?.[0]?.fullName}</td>
+                                                <td>{employeeData?.User?.data?.[0]?.fullName}
+                                                <br/>
+                                                            <span>{employeeData?.User?.data?.[0]?.designation && `(${employeeData?.User?.data?.[0]?.designation})`}</span>
+                                                            </td>
                                                 {Array.from(Array(7)).map((num: number, index) =>
                                                     <td
                                                         key={index}
