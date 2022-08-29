@@ -38,6 +38,7 @@ const UserPayRateModal = (props: IProps) => {
       input: {
         query: {
           company_id: loggedInUser?.company?.id,
+          user_id : user?.id,
         },
         paging: {
           order: ["updatedAt:DESC"],
