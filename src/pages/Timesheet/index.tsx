@@ -753,7 +753,7 @@ const Timesheet = () => {
             <Row>
               <Col span={12}>
                 <div className={styles['timesheet']}>
-                  My Timesheet
+                  Timelog
                 </div>
               </Col>
               <Col span={12}>
