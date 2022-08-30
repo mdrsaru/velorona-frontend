@@ -419,7 +419,7 @@ const DetailTimesheet = () => {
       variables: {
         input: {
           ids,
-          approvalStatus: 'Approved',
+          approvalStatus: status,
           company_id: authData?.company?.id as string,
           timesheet_id,
         },
