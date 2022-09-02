@@ -508,7 +508,7 @@ const DetailTimesheet = () => {
                 />
               </Row>
               }
- 			 {(!timesheetDetail?.entriesGroup?.byStatus.length && !timesheetDetail?.entriesGroup?.byInvoice.length) ?
+ 			 {(!entriesByStatus.pending.length && !timesheetDetail?.entriesGroup?.byInvoice.length) ?
                 <NoContent title={'No Time Entry added'} subtitle={'There are no entries added at the moment'} /> 
 				:
               <>
