@@ -46,6 +46,9 @@ WorkscheduleDetail(input:$input){
 const EmployeeSchedule = () => {
   const loggedInUser = authVar()
 
+  const today = moment().format('YYYY-MM-DD')
+  const weekStartDate = moment(today).startOf('isoWeek')
+  const weekEndDate = moment(today).endOf('isoWeek')
   const { loading: workscheduleDetailLoading, data: workscheduleDetailData } = useQuery(
     WORKSCHEDULEDETAIL,
     {
@@ -57,7 +60,9 @@ const EmployeeSchedule = () => {
             order: ["schedule_date:ASC"],
           },
           query: {
-            user_id: loggedInUser?.user?.id
+            user_id: loggedInUser?.user?.id,
+            weekStartDate,
+            weekEndDate
           }
         },
       },
