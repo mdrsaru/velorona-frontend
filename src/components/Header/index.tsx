@@ -22,7 +22,7 @@ import styles from './style.module.scss';
 
 const { Header } = Layout;
 
-const LOGOUT = gql`
+export const LOGOUT = gql`
   mutation Logout {
     Logout
   }

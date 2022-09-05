@@ -48,6 +48,7 @@ const CheckInForm = (props: IProps) => {
       input: {
         query: {
           company_id,
+          user_id:loggedInUser.user.id,
         },
         paging: {
           order: ['createdAt:DESC'],

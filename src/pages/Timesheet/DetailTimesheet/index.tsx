@@ -419,7 +419,7 @@ const DetailTimesheet = () => {
       variables: {
         input: {
           ids,
-          approvalStatus: 'Approved',
+          approvalStatus: status,
           company_id: authData?.company?.id as string,
           timesheet_id,
         },
@@ -476,7 +476,7 @@ const DetailTimesheet = () => {
 
             <Card bordered={false} className={styles['time-entries']}>
               {
-                !timesheetDetail?.isSubmitted && 
+                !timesheetDetail?.isSubmitted ?
                 <Row className={styles['timesheet-detail']}>
 
                   <PageHeader
@@ -500,8 +500,15 @@ const DetailTimesheet = () => {
                     ]}
                   />
                 </Row>
+                :
+                <Row className={styles['timesheet-detail']}>
+
+                <PageHeader
+                  title="Time Entry Details"
+                />
+              </Row>
               }
- 			 {(!timesheetDetail?.entriesGroup?.byStatus.length && !timesheetDetail?.entriesGroup?.byInvoice.length) ?
+ 			 {(!entriesByStatus.pending.length && !timesheetDetail?.entriesGroup?.byInvoice.length) ?
                 <NoContent title={'No Time Entry added'} subtitle={'There are no entries added at the moment'} /> 
 				:
               <>

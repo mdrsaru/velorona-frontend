@@ -47,7 +47,9 @@ const Sidebar = (props: any) => {
    */
   const { data: authData } = useQuery(AUTH);
   const company_id = authData?.AuthUser?.company?.id;
+ const entryType:any = authData?.AuthUser?.user?.entryType;
 
+ const [name,setName] = useState('')
   useEffect(() => {
     let path = ''
     if (location?.pathname === '/' + params?.id) {
@@ -60,6 +62,13 @@ const Sidebar = (props: any) => {
       path = routes.home.key
     }
     setMenuKey(path)
+
+    if(entryType === 'CICO'){
+      setName('Time Tracker')
+    }
+    else{
+      setName('Timesheet')
+    }
   }, [location, params?.id, params?.company])
 
   const menuItems = [
@@ -113,7 +122,8 @@ const Sidebar = (props: any) => {
     },
     {
       key: routes.timesheet.key,
-      name: routes.timesheet.name,
+      name:name,
+      // name: {` routes.timesheet.name`:'TimeTracker'},
       icon: <FieldTimeOutlined />,
       route: routes.timesheet.path(loggedInUser?.company?.code ?? ''),
       accessRoles: [constants.roles.Employee],

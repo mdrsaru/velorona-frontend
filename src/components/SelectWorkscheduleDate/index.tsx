@@ -34,7 +34,7 @@ const SelectWorkscheduleDate = (props: IProps) => {
   const [workscheduleDetailBulkCreate] = useMutation(WORKSCHEDULE_DETAIL_BULK_CREATE, {
     onCompleted() {
       message.success({
-        content: `Workschedule Detail is deleted successfully!`,
+        content: `Workschedule Detail is copied successfully!`,
         className: "custom-message",
       });
       props?.refetch({
@@ -102,14 +102,14 @@ const SelectWorkscheduleDate = (props: IProps) => {
             onFinish={onSubmitForm}>
 
             <Form.Item
-              label="Choose Project"
+ 
               name="project"
               rules={[{
                 required: true,
-                message: 'Choose the project'
+                message: 'Choose the schedule date'
               }]}
             >
-              <Select onChange={handleSelectChange}>
+              <Select onChange={handleSelectChange} placeholder='Select date'>
                 {props?.workschedule?.map((schedule: any, index: number) => {
                   return (
                     <Select.Option value={schedule?.id} key={index}>{schedule.startDate} - {schedule.endDate}</Select.Option>

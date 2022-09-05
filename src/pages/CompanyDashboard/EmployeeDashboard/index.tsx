@@ -171,7 +171,7 @@ const EmployeeDashboard = () => {
                                             <Fragment key={index}>
                                                 {workscheduleDetail?.workscheduleTimeDetail?.map((timeDetail: any, index: number) =>
 
-                                                    <div key={index} className={styles['hour-log']}>{`${moment(timeDetail.startTime).format('HH:mm')} - ${moment(timeDetail.endTime).format('HH:mm')}`}</div>
+                                                    <div key={index} className={styles['hour-log']}>{`${moment(timeDetail.startTime).utc().format('HH:mm')} - ${moment(timeDetail.endTime).utc().format('HH:mm')}`}</div>
 
                                                 )
                                                 }

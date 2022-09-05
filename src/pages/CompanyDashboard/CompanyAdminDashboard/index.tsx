@@ -88,7 +88,7 @@ const CompanyAdminDashboard = () => {
     })
     averageHoursData.push({
       label: startDate + ' - ' + endDate,
-      value: totalTimesheetHour
+      value: totalTimesheetHour.toFixed(2)
     })
 
     totalExpensesData.push({
