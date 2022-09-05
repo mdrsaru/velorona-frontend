@@ -26,9 +26,9 @@ const Reports = () => {
       <Col span={24}>
         <InvoiceReport />
       </Col>
-      <Col span={24}>
+      {/* <Col span={24}>
         <ScheduleReport />
-      </Col>
+      </Col> */}
     </Row>
   );
 };
