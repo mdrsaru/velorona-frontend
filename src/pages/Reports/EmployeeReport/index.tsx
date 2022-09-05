@@ -48,6 +48,7 @@ const EmployeeReport = () => {
       },
     },
   });
+
   const refetchEmployees = () => {
     let values = filterForm.getFieldsValue(['search', 'role', 'status', 'archived']);
     let input: {
@@ -136,13 +137,45 @@ const EmployeeReport = () => {
   };
 
   const downloadReport = () => {
+    let values = filterForm.getFieldsValue(['search', 'role', 'status', 'archived']);
+    let input: {
+      paging: any;
+      query?: any;
+    } = {
+      paging: {
+        order: ['updatedAt:DESC'],
+      },
+    };
+    let query: {
+      status?: string;
+      archived?: boolean;
+      role?: string;
+      search?: string;
+    } = {};
+
+    if (values.status) {
+      if (values.status === 'Active' || values.status === 'Inactive') {
+        query['status'] = values.status;
+      }
+    }
+
+    if (values.archived) query['archived'] = values.archived;
+
+    if (values.role) {
+      query['role'] = values?.role;
+    }
+
+    if (values.search) {
+      query['search'] = values?.search;
+    }
+
+    if (query) {
+      input['query'] = query;
+    }
+
     fetchDownloadData({
       variables: {
-        input: {
-          paging: {
-            order: ['updatedAt:DESC'],
-          },
-        },
+        input: input
       },
     });
   };

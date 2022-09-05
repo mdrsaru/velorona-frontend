@@ -161,16 +161,42 @@ const InvoiceReport = () => {
   };
 
   const downloadReport = () => {
+    let values = filterForm.getFieldsValue(['date', 'status', 'search']);
+
+    let input: {
+      paging?: any;
+      query: any;
+    } = {
+      paging: {
+        order: ['updatedAt:DESC'],
+      },
+
+      query: {
+        company_id: loggedInUser?.company?.id,
+      },
+    };
+
+    let query: InvoiceQuery = {
+      company_id: loggedInUser?.company?.id as string,
+    };
+
+    if (values.status) {
+      query['status'] = values.status;
+    }
+
+    if (values.date) {
+      query['startDate'] = values?.date[0];
+      query['endDate'] = values?.date[1];
+    }
+
+    if (values.search) {
+      query['search'] = values?.search;
+    }
+
+    input['query'] = query;
     fetchDownloadData({
       variables: {
-        input: {
-          query: {
-            company_id: loggedInUser?.company?.id ?? '',
-          },
-          paging: {
-            order: ['updatedAt:DESC'],
-          },
-        },
+        input: input
       },
     });
   };

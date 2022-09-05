@@ -71,16 +71,39 @@ const ProjectReport = () => {
   });
 
   const downloadReport = () => {
+    let values = filterForm.getFieldsValue(['role', 'status', 'archived']);
+
+    let input: {
+      paging?: any;
+      query: any;
+    } = {
+      paging: {
+        order: ['updatedAt:DESC'],
+      },
+      query: {
+        company_id: loggedInUser?.company?.id,
+      },
+    };
+
+    let query: {
+      status?: string;
+      archived?: boolean;
+      search?: boolean;
+      company_id: string;
+    } = {
+      company_id: loggedInUser?.company?.id as string,
+    };
+
+    if (values.status === 'Active' || values.status === 'Inactive') {
+      query['status'] = values.status;
+    }
+    if (values.archived) query['archived'] = values.archived;
+    if (values.search) query['search'] = values?.search;
+
+    input['query'] = query;
     fetchDownloadData({
       variables: {
-        input: {
-          query: {
-            company_id: loggedInUser?.company?.id ?? '',
-          },
-          paging: {
-            order: ['updatedAt:DESC'],
-          },
-        },
+        input:input
       },
     });
   };

@@ -85,16 +85,40 @@ const ClientReport = () => {
   });
 
   const downloadReport = () => {
+    let values = filterForm.getFieldsValue(['search', 'role', 'status', 'archived']);
+    let input: {
+      paging?: any;
+      query: any;
+    } = {
+      paging: {
+        order: ['updatedAt:DESC'],
+      },
+      query: {
+        company_id: loggedInUser?.company?.id,
+      },
+    };
+    let query: {
+      status?: string;
+      archived?: boolean;
+      company_id: string;
+      search?: string;
+    } = {
+      company_id: loggedInUser?.company?.id as string,
+    };
+    if (values.search) {
+      query['search'] = values?.search;
+    }
+    if (values.status) {
+      if (values.status === 'Active' || values.status === 'Inactive') query['status'] = values.status;
+    }
+
+    if (values.archived) query['archived'] = values.archived;
+
+    input['query'] = query;
+
     fetchDownloadData({
       variables: {
-        input: {
-          query: {
-            company_id: loggedInUser?.company?.id ?? '',
-          },
-          paging: {
-            order: ['updatedAt:DESC'],
-          },
-        },
+        input: input
       },
     });
   };
@@ -129,7 +153,6 @@ const ClientReport = () => {
 
     if (values.archived) query['archived'] = values.archived;
 
-    console.log(values);
     input['query'] = query;
 
     refetchClient({

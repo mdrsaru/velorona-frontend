@@ -72,7 +72,6 @@ const Payment = () => {
 
   const refetchPayments = () => {
     const values = filterForm.getFieldsValue(['date', 'status', 'search']);
-    console.log(values);
     let input: {
       paging?: any;
       query?: any;
