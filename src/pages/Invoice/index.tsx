@@ -3,15 +3,15 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { gql, useQuery, useMutation, useLazyQuery } from '@apollo/client';
 import { SearchOutlined, CheckCircleFilled, FormOutlined, EyeFilled, PlusCircleFilled,SendOutlined } from '@ant-design/icons';
-import { Card, Col, Dropdown, Menu, Row, Table, message, Modal, Form, Select, Button, Input, Popconfirm } from 'antd';
+import { Card, Col, Dropdown, Menu, Row, Table, message, Modal, Form, Select, Button, Input, Popconfirm, DatePicker } from 'antd';
+import { debounce } from 'lodash';
+import { useNavigate } from 'react-router-dom';
 
-import filterImg from "../../assets/images/filter.svg"
 
 import { authVar } from '../../App/link';
 import constants, { invoice_status } from '../../config/constants';
 import routes from '../../config/routes';
 import { notifyGraphqlError } from '../../utils/error';
-
 import {
   Invoice as IInvoice,
   InvoiceQueryInput,
@@ -20,20 +20,21 @@ import {
   MutationInvoiceUpdateArgs,
   QueryInvoiceArgs,
   InvoiceUpdateInput,
+  InvoiceQuery
 } from '../../interfaces/generated';
 import { GraphQLResponse } from '../../interfaces/graphql.interface';
-
 import { ATTACHED_TIMESHEET_FIELDS } from '../../gql/timesheet.gql'
 import PageHeader from '../../components/PageHeader';
 import Status from '../../components/Status';
 import InvoiceViewer from '../../components/InvoiceViewer';
-import styles from './style.module.scss';
-import { debounce } from 'lodash';
 import AttachmentModal from '../../components/AttachmentsModal/index';
 import AttachNewTimesheetModal from '../../components/AddAttachedTimesheet';
-import { useNavigate } from 'react-router-dom';
 
-const ATTACHED_TIMESHEET = gql`
+import filterImg from "../../assets/images/filter.svg"
+import styles from './style.module.scss';
+
+
+export const ATTACHED_TIMESHEET = gql`
   ${ATTACHED_TIMESHEET_FIELDS}
   query AttachedTimesheet($input: AttachedTimesheetQueryInput!) {
     AttachedTimesheet(input: $input){
@@ -51,7 +52,7 @@ const ATTACHED_TIMESHEET = gql`
 `;
 
 
-const INVOICE = gql`
+export const INVOICE = gql`
   query Invoice($input: InvoiceQueryInput!) {
     Invoice(input: $input) {
       paging {
@@ -73,7 +74,7 @@ const INVOICE = gql`
   }
 `;
 
-const INVOICE_STATUS_UPDATE = gql`
+export const INVOICE_STATUS_UPDATE = gql`
   mutation InvoiceUpdate($input: InvoiceUpdateInput!) {
     InvoiceUpdate(input: $input) {
       id
@@ -83,6 +84,8 @@ const INVOICE_STATUS_UPDATE = gql`
 `;
 
 const { Option } = Select;
+const { RangePicker } = DatePicker;
+
 const Invoice = () => {
   const loggedInUser = authVar();
 const navigate = useNavigate();
@@ -256,7 +259,7 @@ const navigate = useNavigate();
 
   const refetchInvoices = () => {
 
-    let values = filterForm.getFieldsValue(['search', 'role', 'status'])
+    let values = filterForm.getFieldsValue(['search', 'role', 'status', 'date'])
 
     let input: {
       paging?: any,
@@ -272,15 +275,14 @@ const navigate = useNavigate();
 
     }
 
-    let query: {
-      status?: string,
-      archived?: boolean,
-      search?:boolean,
-      company_id: string;
-    } = {
+    let query: InvoiceQuery = {
       company_id: loggedInUser?.company?.id as string
     }
 
+    if (values.date) {
+      query['startDate'] = values?.date[0];
+      query['endDate'] = values?.date[1];
+    }
 
     if (values.status) {
       query['status'] = values.status;
@@ -570,10 +572,10 @@ const navigate = useNavigate();
               </div>
             </Col>
           </Row>
+          <br />
           {filterProperty?.filter &&
             <Row gutter={[32, 0]} className={styles["role-status-col"]}>
-
-              <Col span={5}>
+              <Col xs={24} sm={12} md={10} lg={8} xl={5}>
                 <Form.Item name="status" label="">
                   <Select
                     placeholder="Select status"
@@ -584,6 +586,11 @@ const navigate = useNavigate();
                         {status?.name}
                       </Option>)}
                   </Select>
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={12} md={10} lg={8} xl={5}>
+                <Form.Item name='date' label=''>
+                  <RangePicker size='large' onChange={onChangeFilter} />
                 </Form.Item>
               </Col>
             </Row>}

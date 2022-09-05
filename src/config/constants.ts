@@ -42,23 +42,42 @@ export const roles_user = [{
 }
 ]
 
-export const status = [{
-  value: 'Active',
-  name: 'Active'
-},
-{
-  value: 'Inactive',
-  name: 'In Active'
-},
-{
-  value: 'Archived',
-  name: 'Archived'
-},
-{
-  value: 'Unarchived',
-  name: 'UnArchived'
-}
-]
+export const status = [
+  {
+    value: 'Active',
+    name: 'Active',
+  },
+  {
+    value: 'Inactive',
+    name: 'In Active',
+  },
+];
+
+export const payment_status = [
+  {
+    value: 'Paid',
+    name: 'Paid',
+  },
+  {
+    value: 'Pending',
+    name: 'In Pending',
+  },
+  {
+    value: 'RequiredAction',
+    name: 'RequiredAction',
+  },
+];
+
+export const archived = [
+  {
+    value: true,
+    name: 'Archived',
+  },
+  {
+    value: false,
+    name: 'Unarchive',
+  },
+];
 
 export const invoice_status = [{
   value: 'Sent',

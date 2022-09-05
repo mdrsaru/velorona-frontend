@@ -17,6 +17,7 @@ import {
   ProfileOutlined,
   SettingOutlined,
   PullRequestOutlined,
+  FileTextOutlined
 } from '@ant-design/icons';
 
 import constants from '../../config/constants';
@@ -177,6 +178,14 @@ const Sidebar = (props: any) => {
       viewAsAdmin: true,
     },
     {
+      key: routes.reports.key,
+      name: routes.reports.name,
+      icon: <FileTextOutlined />,
+      route: routes.reports.path(loggedInUser?.company?.code ?? ''),
+      accessRoles: [constants.roles.CompanyAdmin],
+      viewAsAdmin: true,
+    },
+    {
       key: routes.demoRequest.key,
       name: routes.demoRequest.name,
       icon: <PullRequestOutlined />,
@@ -197,6 +206,14 @@ const Sidebar = (props: any) => {
       name: routes.invoicePaymentConfig.name,
       icon: <SettingOutlined />,
       route: routes.invoicePaymentConfig.path,
+      accessRoles: [constants.roles.SuperAdmin],
+      viewAsAdmin: false,
+    },
+    {
+      key: routes.reportsAdmin.key,
+      name: routes.reportsAdmin.name,
+      icon: <FileTextOutlined />,
+      route: routes.reportsAdmin.path,
       accessRoles: [constants.roles.SuperAdmin],
       viewAsAdmin: false,
     },

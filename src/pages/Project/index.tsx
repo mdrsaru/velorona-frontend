@@ -89,14 +89,6 @@ const DeleteBody = () => {
   );
 };
 
-const csvHeader: Array<{ label: string, key: string, subKey?: string }> = [
-  { label: "Project Name", key: "name" },
-  { label: "Client", key: "client", subKey: "name" },
-  { label: "Client Email", key: "client", subKey: "email" },
-  { label: "Status", key: "status" },
-  { label: "Company", key: "company", subKey: "name" }
-]
-
 
 const { Option } = Select;
 
@@ -149,24 +141,6 @@ const ProjectPage = () => {
     },
   });
 
-  const [fetchDownloadData, { data: projectDownloadData }] = useLazyQuery<GraphQLResponse<'Project', ProjectPagingResult>, QueryProjectArgs>(PROJECT, {
-    fetchPolicy: "network-only",
-    nextFetchPolicy: "cache-first",
-    variables: {
-      input: {
-        query: {
-          company_id: loggedInUser?.company?.id ?? '',
-        },
-        paging: {
-          order: ["updatedAt:DESC"],
-        },
-      },
-    },
-    onCompleted: () => {
-      downloadCSV(projectDownloadData?.Project?.data, csvHeader, 'Projects.csv')
-    }
-  });
-
   const [projectUpdate, { loading: updateLoading }] = useMutation<GraphQLResponse<'ProjectUpdate', Project>, MutationProjectUpdateArgs>(
     PROJECT_UPDATE, {
     onCompleted() {
@@ -187,21 +161,6 @@ const ProjectPage = () => {
     },
   }
   );
-
-  const downloadReport = () => {
-    fetchDownloadData({
-      variables: {
-        input: {
-          query: {
-            company_id: loggedInUser?.company?.id ?? '',
-          },
-          paging: {
-            order: ["updatedAt:DESC"],
-          },
-        },
-      }
-    })
-  };
 
   const refetchProjects = () => {
 
@@ -557,7 +516,7 @@ const ProjectPage = () => {
           {filterProperty?.filter &&
             <Row gutter={[32, 0]} className={styles["role-status-col"]}>
 
-              <Col span={5}>
+              <Col xs={24} sm={12} md={10} lg={8} xl={5}>
                 <Form.Item name="status" label="">
                   <Select
                     placeholder="Select status"
@@ -587,22 +546,6 @@ const ProjectPage = () => {
               }}
             />
           </Col>
-        </Row>
-        <Row>
-          <Col span={24}>
-            {
-              !!projectData?.Project?.data?.length && (
-                <div className={styles['download-report']}>
-                  <Button
-                    type="link"
-                    onClick={downloadReport}
-                    icon={<DownloadOutlined />}
-                  >
-                    Download Report
-                  </Button>
-                </div>
-              )
-            }</Col>
         </Row>
       </Card>
 

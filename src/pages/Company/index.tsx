@@ -369,10 +369,11 @@ const Company = () => {
               </div>
             </Col>
           </Row>
+          <br />
           {filterProperty?.filter &&
             <Row gutter={[32, 0]} className={styles["role-status-col"]}>
 
-              <Col span={5}>
+              <Col xs={24} sm={12} md={10} lg={8} xl={5}>
                 <Form.Item name="status" label="">
                   <Select
                     placeholder="Select status"

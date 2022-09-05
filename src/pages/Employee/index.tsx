@@ -173,28 +173,6 @@ const Employee = () => {
     currentPage: 1,
   });
 
-  const [fetchDownloadData, { data: employeeDownloadData }] = useLazyQuery<
-    GraphQLResponse<'User', UserPagingResult>,
-    QueryUserArgs
-  >(
-    USER,
-    {
-      fetchPolicy: "network-only",
-      nextFetchPolicy: "cache-first",
-      variables: {
-        input: {
-          paging: {
-            order: ["updatedAt:DESC"],
-          },
-        },
-      },
-      onCompleted: () => {
-        downloadCSV(employeeDownloadData?.User?.data, csvHeader, 'Users.csv')
-      }
-    }
-  );
-
-
   const changePage = (page: number) => {
     const newSkip = (page - 1) * constants.paging.perPage;
     setPagingInput({
@@ -410,18 +388,6 @@ const Employee = () => {
     filterForm.resetFields()
     setFilterProperty({
       filter: !filterProperty?.filter
-    })
-  }
-
-  const downloadReport = () => {
-    fetchDownloadData({
-      variables: {
-        input: {
-          paging: {
-            order: ["updatedAt:DESC"],
-          }
-        }
-      }
     })
   }
 
@@ -921,7 +887,7 @@ const Employee = () => {
               </Row>
               {filterProperty?.filter &&
                 <Row gutter={[32, 0]} className={styles["role-status-col"]}>
-                  <Col span={5}>
+                  <Col xs={24} sm={12} md={10} lg={8} xl={5}>
                     <Form.Item name="role" label="">
                       <Select
                         placeholder="Role"
@@ -934,7 +900,7 @@ const Employee = () => {
                       </Select>
                     </Form.Item>
                   </Col>
-                  <Col span={5}>
+                  <Col xs={24} sm={12} md={10} lg={8} xl={5}>
                     <Form.Item name="status" label="">
                       <Select
                         placeholder="Select status"
@@ -974,24 +940,7 @@ const Employee = () => {
                   }}
                 />
               </Col>
-            </Row>
-            <Row>
-              <Col>
-                {
-                  !!employeeData?.User?.data?.length && (
-                    <div className={styles['download-report']}>
-                      <Button
-                        type="link"
-                        onClick={downloadReport}
-                        icon={<DownloadOutlined />}
-                      >
-                        Download Report
-                      </Button>
-                    </div>
-                  )
-                }
-              </Col>
-            </Row>
+            </Row>            
           </Card>
           <ModalConfirm
             visibility={visibility}

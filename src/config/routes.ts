@@ -405,6 +405,31 @@ const routes = {
     name: 'Terms and condition',
     key: 'policy',
   },
+  reports: {
+    childPath: 'reports',
+    path: (id: string) => `/${id}/reports`,
+    component: lazy(() => import('../pages/Reports')),
+    name: 'Reports',
+    key: 'reports',
+    allowedRoles: [Employee],
+  },
+  detailScheduleReport: {
+    childPath: 'reports/scheduleList/:sid',
+    path: (id: string,sid:string) => `/${id}/reports/scheduleList/${sid}`,
+    component: lazy(() => import('../pages/Reports/ScheduleReport/DetailScheduleReport/index')),
+    name: 'DetailScheduleReport',
+    key: 'scheduleListReport',
+    allowedRoles: [CompanyAdmin, SuperAdmin],
+  },
+  reportsAdmin: {
+    childPath: 'reportsAdmin',
+    path: '/reportsAdmin',
+    component: lazy(() => import('../pages/ReportsAdmin')),
+    name: 'Reports',
+    key: 'reports',
+    allowedRoles: [SuperAdmin],
+
+  },
 };
 
 export default routes;

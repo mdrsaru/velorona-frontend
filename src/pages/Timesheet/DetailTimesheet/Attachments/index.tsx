@@ -21,7 +21,7 @@ import ApprovedTimesheetAttachment from "../../../../components/ApprovedTimeshee
 import deleteImg from '../../../../assets/images/delete_btn.svg';
 import styles from './style.module.scss';
 
-const ATTACHED_TIMESHEET = gql`
+export const ATTACHED_TIMESHEET = gql`
   ${ATTACHED_TIMESHEET_FIELDS}
   query AttachedTimesheet($input: AttachedTimesheetQueryInput!) {
     AttachedTimesheet(input: $input){

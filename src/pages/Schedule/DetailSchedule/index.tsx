@@ -1,14 +1,13 @@
 import { Fragment, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-
 import ReactToPrint from 'react-to-print';
-
 import {  Button, Card, Col, message, Row, } from "antd";
-import { PlusCircleFilled, DeleteOutlined ,PrinterOutlined ,CalendarOutlined } from "@ant-design/icons";
+import { PlusCircleFilled, DeleteOutlined ,PrinterOutlined ,CalendarOutlined, DownloadOutlined } from "@ant-design/icons";
 import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import moment from "moment";
 import _ from "lodash";
-import { getWeekDays } from "../../../utils/common";
+
+import { downloadCSV, getWeekDays } from "../../../utils/common";
 import PageHeader from "../../../components/PageHeader";
 import { WORKSCHEDULEDETAIL } from "../../EmployeeSchedule";
 import AddWorkscheduleEmployee from "../../../components/AddWorkscheduleEmployee";
@@ -22,11 +21,11 @@ import { USER } from "../../Employee";
 import { notifyGraphqlError } from "../../../utils/error";
 import ModalConfirm from "../../../components/Modal";
 import Delete from "../../../components/Delete";
+import { authVar } from '../../../App/link';
+import { WORKSCHEDULE } from "..";
 
 import './styles.css'
 import deleteImg from '../../../assets/images/delete_btn.svg';
-import { WORKSCHEDULE } from "..";
-import { authVar } from '../../../App/link';
 
 export const WORKSCHEDULETIMEDETAIL = gql`
 query WorkscheduleTimeDetail($input: WorkscheduleTimeDetailQueryInput!) {
@@ -299,187 +298,264 @@ const ScheduleDetail = () => {
         let hour = (count / 3600).toFixed(2);
         return hour;
     }
+
+    const tableHeader = () => {
+      let title: Array<{ label: string; key: string; subKey?: string }> = [
+        { label: 'Employee Name', key: 'username' },
+        { label: 'Designation', key: 'designation' },
+      ];
+  
+      weekDays.map((day: any, index: number) =>
+        title.push({
+          label: `${moment(day).format('ddd, MMM D').replace(',', '-')}`,
+          key: 'timeSheetBody',
+          subKey: `${index}`,
+        })
+      );
+      title.push({ label: 'Total', key: 'total' });
+  
+      return title;
+    };
+
+    const tableBody = () => {
+      const tableRows = [];
+  
+      for (const property in groups) {
+        const username = groups && groups[property][0]?.user?.fullName;
+        const designation = groups && (groups[property][0]?.user?.designation ?? '-');
+        const total = getTotalSchedule(groups[property]);
+        const timeSheetBodyPart =
+          groups &&
+          Object.keys(groups).map((key) => {
+            return weekDays.map(
+              (day) =>
+                groups[property] &&
+                groups[property]?.map((data: any) => {
+                  return (
+                    day === moment(data?.schedule_date).format('YYYY-MM-DD') &&
+                    data?.workscheduleTimeDetail?.length > 0 &&
+                    data?.workscheduleTimeDetail?.map(
+                      (timeData: any) => `${moment(timeData?.startTime).utc().format('HH:mm') || ''}-${
+                          moment(timeData?.endTime).utc().format('HH:mm') || ''
+                        }`
+                    )[0]
+                  );
+                })[0]
+            );
+          }); 
+        const timeSheetBody = timeSheetBodyPart[0]?.map((item:string)=>item || '-');
+        tableRows.push({ username, designation, total, timeSheetBody: Object.assign({}, timeSheetBody) });
+      }
+      return tableRows;
+    };
+  
+    const downloadReport = () => {
+      const csvHeader = tableHeader();
+      const csvBody = tableBody();
+      // console.log(csvBody);
+      downloadCSV(csvBody, csvHeader, 'ScheduleTable.csv');
+    };
+
     return (
-        <>
-            <div className={styles['main-div']}>
-                <Card bordered={false}>
-                    <PageHeader
-                        title={`Scheduling ( ${moment(workscheduleData?.Workschedule?.data?.[0]?.startDate).format('MMM DD')} -${moment(workscheduleData?.Workschedule?.data?.[0]?.endDate).format('MMM DD')} )`}
-
-                    />
-                    <Row className='container-row'>
-                        <Col span={24}>
-                              <div ref={componentRef}  className={styles['detail-table']}>
-                                <table className={styles['main-table']}>
-                                    <thead>
-                                        <tr className={styles['table-header']}>
-                                            <th>Employee</th>
-                                            {
-                                                weekDays.map((day: any, index: number) => (
-                                                    <th key={index}>
-                                                        {moment(day).format('ddd, MMM D')}
-                                                    </th>
-                                                ))
-                                            }
-                                            <th>Total</th>
-                                            <th>Action</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {
-                                            groups && Object.keys(groups).map(function (key, index) {
-                                                return (
-                                                    <tr key={index}>
-                                                        <td>
-                                                        {groups[key]?.[0]?.user?.fullName}
-                                                            <br/>
-                                                            <span>{groups[key]?.[0]?.user?.designation && `(${groups[key]?.[0]?.user?.designation})`}</span>
-                                                        </td>
-                                                        {weekDays.map((day: any, index: number) => (
-                                                            <td key={index}>
-                                                                {groups[key] && groups[key]?.map((data: any, index: number) =>
-                                                                    <Fragment key={index}>
-                                                                        {day === moment(data?.schedule_date).format('YYYY-MM-DD') &&
-                                                                            data?.workscheduleTimeDetail?.length > 0 &&
-                                                                            data?.workscheduleTimeDetail?.map((timeData: any,
-                                                                                index: number) =>
-                                                                                <Fragment key={index} >
-                                                                                    <span onClick={() => handleChange(data?.id)} style={{ cursor: 'pointer' }}>
-                                                                                        {moment(timeData?.startTime).utc().format('HH:mm')} -
-                                                                                        {moment(timeData?.endTime).utc().format('HH:mm')}
-                                                                                    </span>
-                                                                                    <br />
-                                                                                </Fragment>
-                                                                            )}
-                                                                    </Fragment>
-                                                                )}
-                                                                {!groups[key]?.some((data: any, index: any) =>
-                                                                    moment(data?.schedule_date).format('YYYY-MM-DD') === day) &&
-                                                                    <span onClick={() => handleNewWorkschedule(groups[key]?.[0]?.user?.id, groups[key]?.[0]?.user?.fullName, day)}
-                                                                        style={{ cursor: 'pointer' }}
-                                                                    > - </span>}
-                                                            </td>
-                                                        ))}
-                                                        <td key={index}>
-                                                            {getTotalSchedule(groups[key])}
-                                                        </td>
-                                                        <td>
-                                                            <span 
-                                                            title='Clear all schedule' 
-                                                            className={`${styles["table-icon"]} ${styles["table-delete-icon"]}`}
-                                                            onClick={() => handleDeleteClick(groups[key])}
-                                                            >
-                                                                <DeleteOutlined />
-                                                            </span>
-                                                        </td>
-                                                    </tr>)
-                                            })}
-                                        {employeeData?.User?.data?.[0]?.fullName && (
-                                            <tr>
-                                                <td>{employeeData?.User?.data?.[0]?.fullName}
-                                                <br/>
-                                                            <span>{employeeData?.User?.data?.[0]?.designation && `(${employeeData?.User?.data?.[0]?.designation})`}</span>
-                                                            </td>
-                                                {Array.from(Array(7)).map((num: number, index) =>
-                                                    <td
-                                                        key={index}
-                                                        onClick={() => handleNewTimeIntervalAddition(index)}
-                                                        style={{ cursor: 'pointer' }}
-                                                    >
-                                                        -
-                                                    </td>
-                                                )}
-                                                <td></td>
-                                                <td>
-                                                    <span
-                                                        title='Copy workschedule'
-                                                        className={`${styles["table-icon"]} ${styles["table-delete-icon"]}`}
-                                                        onClick={() => handleCopySchedule(employeeData?.User?.data?.[0]?.id)}
-                                                    >
-                                                        <CalendarOutlined />
-                                                    </span>
-                                                </td>
-                                            </tr>
-                                        )}
-                                    </tbody>
-                                </table>
-                                </div>
-                                <p
-                                    onClick={() => setEmployeeShow(!showEmployee)}
-                                    className={styles.addEmployee}>
-                                    <span style={{ marginRight: '10px' }}>
-                                        <PlusCircleFilled />
+      <>
+        <div className={styles['main-div']}>
+          <Card bordered={false}>
+            <PageHeader
+              title={`Scheduling ( ${moment(workscheduleData?.Workschedule?.data?.[0]?.startDate).format(
+                'MMM DD'
+              )} -${moment(workscheduleData?.Workschedule?.data?.[0]?.endDate).format('MMM DD')} )`}
+            />
+            <Row className='container-row'>
+              <Col span={24}>
+                <div ref={componentRef} className={styles['detail-table']}>
+                  <table className={styles['main-table']}>
+                    <thead>
+                      <tr className={styles['table-header']}>
+                        <th>Employee</th>
+                        {weekDays.map((day: any, index: number) => (
+                          <th key={index}>{moment(day).format('ddd, MMM D')}</th>
+                        ))}
+                        <th>Total</th>
+                        <th>Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {groups &&
+                        Object.keys(groups).map(function (key, index) {
+                          return (
+                            <tr key={index}>
+                              <td>
+                                {groups[key]?.[0]?.user?.fullName}
+                                <br />
+                                <span>
+                                  {groups[key]?.[0]?.user?.designation && `(${groups[key]?.[0]?.user?.designation})`}
+                                </span>
+                              </td>
+                              {weekDays.map((day: any, index: number) => (
+                                <td key={index}>
+                                  {groups[key] &&
+                                    groups[key]?.map((data: any, index: number) => (
+                                      <Fragment key={index}>
+                                        {day === moment(data?.schedule_date).format('YYYY-MM-DD') &&
+                                          data?.workscheduleTimeDetail?.length > 0 &&
+                                          data?.workscheduleTimeDetail?.map((timeData: any, index: number) => (
+                                            <Fragment key={index}>
+                                              <span
+                                                onClick={() => handleChange(data?.id)}
+                                                style={{ cursor: 'pointer' }}
+                                              >
+                                                {moment(timeData?.startTime).utc().format('HH:mm')} -
+                                                {moment(timeData?.endTime).utc().format('HH:mm')}
+                                              </span>
+                                              <br />
+                                            </Fragment>
+                                          ))}
+                                      </Fragment>
+                                    ))}
+                                  {!groups[key]?.some(
+                                    (data: any, index: any) => moment(data?.schedule_date).format('YYYY-MM-DD') === day
+                                  ) && (
+                                    <span
+                                      onClick={() =>
+                                        handleNewWorkschedule(
+                                          groups[key]?.[0]?.user?.id,
+                                          groups[key]?.[0]?.user?.fullName,
+                                          day
+                                        )
+                                      }
+                                      style={{ cursor: 'pointer' }}
+                                    >
+                                      {' '}
+                                      -{' '}
                                     </span>
-                                    Add Employee
-                                </p>
+                                  )}
+                                </td>
+                              ))}
+                              <td key={index}>{getTotalSchedule(groups[key])}</td>
+                              <td>
+                                <span
+                                  title='Clear all schedule'
+                                  className={`${styles['table-icon']} ${styles['table-delete-icon']}`}
+                                  onClick={() => handleDeleteClick(groups[key])}
+                                >
+                                  <DeleteOutlined />
+                                </span>
+                              </td>
+                            </tr>
+                          );
+                        })}
+                      {employeeData?.User?.data?.[0]?.fullName && (
+                        <tr>
+                          <td>
+                            {employeeData?.User?.data?.[0]?.fullName}
+                            <br />
+                            <span>
+                              {employeeData?.User?.data?.[0]?.designation &&
+                                `(${employeeData?.User?.data?.[0]?.designation})`}
+                            </span>
+                          </td>
+                          {Array.from(Array(7)).map((num: number, index) => (
+                            <td
+                              key={index}
+                              onClick={() => handleNewTimeIntervalAddition(index)}
+                              style={{ cursor: 'pointer' }}
+                            >
+                              -
+                            </td>
+                          ))}
+                          <td></td>
+                          <td>
+                            <span
+                              title='Copy workschedule'
+                              className={`${styles['table-icon']} ${styles['table-delete-icon']}`}
+                              onClick={() => handleCopySchedule(employeeData?.User?.data?.[0]?.id)}
+                            >
+                              <CalendarOutlined />
+                            </span>
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+                <p onClick={() => setEmployeeShow(!showEmployee)} className={styles.addEmployee}>
+                  <span style={{ marginRight: '10px' }}>
+                    <PlusCircleFilled />
+                  </span>
+                  Add Employee
+                </p>
+{/* 
+                <ReactToPrint
+                  trigger={() => (
+                    <Button type='link' icon={<PrinterOutlined />}>
+                      Print Schedule
+                    </Button>
+                  )}
+                  content={() => componentRef.current}
+                /> */}
+              </Col>
+              <Col>
+                <br />
+                <Button icon={<DownloadOutlined />} onClick={downloadReport}>
+                  {' '}
+                  Download
+                </Button>
+              </Col>
+            </Row>
+          </Card>
 
-                                <ReactToPrint
-                                    trigger={() =>
-                                        <Button
-                                            type="link"
-                                            icon={<PrinterOutlined />}
-                                        >
-                                            Print Schedule
-                                        </Button>}
-                                    content={() => componentRef.current}
-                                />
+          <AddTimeInterval
+            visibility={addTimeInterval}
+            setVisibility={setAddTimeInterval}
+            workschedule={workscheduleDetailByIdData}
+            getWorkschedule={getWorkschedule}
+            setEmployee={setEmployee}
+          />
 
-                        </Col>
-                    </Row>
-                </Card>
+          <AddNewWorkscheduleDetail
+            visibility={showAddNewTimeInterval}
+            setVisibility={setShowAddNewTimeInterval}
+            getWorkschedule={getWorkschedule}
+            employeeName={addNewTimeInterval?.employeeName}
+            employeeId={addNewTimeInterval?.employeeId}
+            providedData={addNewTimeInterval?.providedData}
+            refetch={refetchWorkscheduleDetail}
+            setEmployee={setEmployee}
+          />
 
-                <AddTimeInterval
-                    visibility={addTimeInterval}
-                    setVisibility={setAddTimeInterval}
-                    workschedule={workscheduleDetailByIdData}
-                    getWorkschedule={getWorkschedule}
-                    setEmployee = {setEmployee}
-                />
+          <AddWorkscheduleEmployee
+            visibility={showEmployee}
+            setVisibility={setEmployeeShow}
+            setEmployee={setEmployee}
+          />
 
-                <AddNewWorkscheduleDetail
-                    visibility={showAddNewTimeInterval}
-                    setVisibility={setShowAddNewTimeInterval}
-                    getWorkschedule={getWorkschedule}
-                    employeeName={addNewTimeInterval?.employeeName}
-                    employeeId={addNewTimeInterval?.employeeId}
-                    providedData={addNewTimeInterval?.providedData}
-                    refetch={refetchWorkscheduleDetail}
-                    setEmployee = {setEmployee}
-                />
+          <SelectWorkscheduleDate
+            visibility={showSelectSchedule}
+            setVisibility={setSelectScheduleShow}
+            workschedule={workschedule?.Workschedule?.data}
+            employeeId={employeeId}
+            refetch={refetchWorkscheduleDetail}
+            setEmployee={setEmployee}
+            startDate={startDate}
+          />
 
-                <AddWorkscheduleEmployee
-                    visibility={showEmployee}
-                    setVisibility={setEmployeeShow}
-                    setEmployee={setEmployee} />
-
-                <SelectWorkscheduleDate
-                    visibility={showSelectSchedule}
-                    setVisibility={setSelectScheduleShow}
-                    workschedule={workschedule?.Workschedule?.data}
-                    employeeId={employeeId}
-                    refetch={refetchWorkscheduleDetail}
-                    setEmployee={setEmployee}
-                    startDate={startDate} />
-
-
-                <ModalConfirm
-                    visibility={showDeleteModal}
-                    setModalVisibility={setShowDeleteModal}
-                    imgSrc={deleteImg}
-                    okText="Delete"
-                    onOkClick={deleteWorkscheduleDetails}
-                    loading={deleting}
-                    modalBody={
-                        <Delete
-                            title="Are you sure you want to delete it?"
-                            subText="All the workschedule details will be deleted."
-                        />
-                    }
-                />
-
-            </div>
-        </>
-    )
+          <ModalConfirm
+            visibility={showDeleteModal}
+            setModalVisibility={setShowDeleteModal}
+            imgSrc={deleteImg}
+            okText='Delete'
+            onOkClick={deleteWorkscheduleDetails}
+            loading={deleting}
+            modalBody={
+              <Delete
+                title='Are you sure you want to delete it?'
+                subText='All the workschedule details will be deleted.'
+              />
+            }
+          />
+        </div>
+      </>
+    );
 }
 
 export default ScheduleDetail;

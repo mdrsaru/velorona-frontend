@@ -1,45 +1,51 @@
-import moment from 'moment';
 import { useState } from 'react';
-import { gql, useQuery } from '@apollo/client';
-import { Button, Card, Col, DatePicker, Form, Input, PageHeader, Row, Select, Table } from 'antd';
-import {SearchOutlined} from "@ant-design/icons"
+import { useLazyQuery, useQuery } from '@apollo/client';
+import { DownloadOutlined, SearchOutlined } from '@ant-design/icons';
+import { Button, Card, Col, DatePicker, Form, Input, Row, Select, Typography } from 'antd';
 
-import constants, { payment_status } from '../../config/constants';
-import { GraphQLResponse } from '../../interfaces/graphql.interface';
-import { SubscriptionPaymentPagingResult, QuerySubscriptionPaymentArgs, Company, SubscriptionPaymentQuery } from '../../interfaces/generated';
+import { GraphQLResponse } from '../../../interfaces/graphql.interface';
+import {
+  SubscriptionPaymentPagingResult,
+  QuerySubscriptionPaymentArgs,
+  InvoiceQuery,
+  SubscriptionPaymentQuery,
+} from '../../../interfaces/generated';
+import PageHeader from '../../../components/PageHeader';
+import { SUBSCRIPTION_PAYMENT } from '../../Payment';
+import { downloadCSV } from '../../../utils/common';
+import constants, { payment_status } from '../../../config/constants';
+import { authVar } from '../../../App/link';
 
-import filterImg from '../../assets/images/filter.svg';
-
-export const SUBSCRIPTION_PAYMENT = gql`
-  query SubscriptionPayment($input: SubscriptionPaymentQueryInput!) {
-    SubscriptionPayment(input: $input) {
-      paging {
-        total
-        startIndex
-      }
-      data {
-        id
-        amount
-        paymentDate
-        status
-        company {
-          name
-        }
-      }
-    }
-  }
-`;
+import filterImg from '../../../assets/images/filter.svg';
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
+const csvHeader: Array<{ label: string; key: string; subKey?: string }> = [
+  {
+    label: 'Company',
+    key: 'company',
+    subKey: 'name',
+  },
+  {
+    label: 'Date of Payment',
+    key: 'paymentDate',
+  },
+  {
+    label: 'Payment Amount',
+    key: 'amount',
+  },
+  {
+    label: 'Status',
+    key: 'status',
+  },
+];
 
-const Payment = () => {
+const PaymentReport = () => {
   const [filterForm] = Form.useForm();
-
+  const loggedInUser = authVar();
   const [filterPayment, setFilterPayment] = useState<any>({
     filter: false,
   });
-
   const [pagingInput, setPagingInput] = useState<{
     skip: number;
     currentPage: number;
@@ -69,6 +75,25 @@ const Payment = () => {
       },
     }
   );
+  const [fetchDownloadData, { data: DownloadPaymentData }] = useLazyQuery<
+    GraphQLResponse<'SubscriptionPayment', SubscriptionPaymentPagingResult>,
+    QuerySubscriptionPaymentArgs
+  >(SUBSCRIPTION_PAYMENT, {
+    fetchPolicy: 'network-only',
+    nextFetchPolicy: 'cache-first',
+    variables: {
+      input: {
+        query: {},
+        paging: {
+          order: ['paymentDate:DESC'],
+        },
+      },
+    },
+    onCompleted: () => {
+      // console.log(DownloadPaymentData);
+      downloadCSV(DownloadPaymentData?.SubscriptionPayment?.data, csvHeader, 'Payment.csv');
+    },
+  });
 
   const refetchPayments = () => {
     const values = filterForm.getFieldsValue(['date', 'status', 'search']);
@@ -98,7 +123,18 @@ const Payment = () => {
       input: input,
     });
   };
-
+  const downloadReport = () => {
+    fetchDownloadData({
+      variables: {
+        input: {
+          query: {},
+          paging: {
+            order: ['updatedAt:DESC'],
+          },
+        },
+      },
+    });
+  };
   const openFilterRow = () => {
     if (filterPayment?.filter) {
       refetchPayment({
@@ -114,60 +150,14 @@ const Payment = () => {
       filter: !filterPayment?.filter,
     });
   };
-
-  const columns = [
-    {
-      title: 'S.N',
-      render: (_: any, __: any, index: number) => {
-        return (data?.SubscriptionPayment?.paging?.startIndex ?? 0) + index + 1;
-      }
-    },
-    {
-      title: 'Company',
-      dataIndex: 'company',
-      render: (company: Company) => {
-        return company.name;
-      }
-    },
-    {
-      title: 'Date of Payment',
-      dataIndex: 'paymentDate',
-      render: (date: string) => {
-        return moment(date).format('MM/DD/YYYY');
-      }
-    },
-    {
-      title: 'Payment Amount',
-      dataIndex: 'amount',
-      render: (amount: number) => {
-        return `$${amount}`
-      }
-    },
-    {
-      title: 'Status',
-      dataIndex: 'status',
-    },
-  ];
-
-
-  const changePage = (page: number) => {
-    const newSkip = (page - 1) * constants.paging.perPage;
-    setPagingInput({
-      ...pagingInput,
-      skip: newSkip,
-      currentPage: page,
-    });
-  };
-
   const onChangeFilter = () => {
     refetchPayments();
   };
-
   return (
     <div style={{ paddingTop: '2rem' }}>
-      <Card bordered={false}>
+      <Card>
         <PageHeader
-          title="Payments"
+          title='Payments'
           extra={[
             <Button key='btn-filter' type='text' onClick={openFilterRow} icon={<img src={filterImg} alt='filter' />}>
               &nbsp; &nbsp;
@@ -198,7 +188,7 @@ const Payment = () => {
                   </Select>
                 </Form.Item>
               </Col>
-              <Col xs={24} sm={12} md={10} lg={8} xl={5}>
+              <Col xs={24} sm={12} md={8} lg={6} xl={5}>
                 <Form.Item name='date'>
                   <RangePicker onChange={onChangeFilter} />
                 </Form.Item>
@@ -206,23 +196,16 @@ const Payment = () => {
             </Row>
           )}
         </Form>
-        <Row className='container-row'>
-          <Table
-            loading={loading}
-            dataSource={data?.SubscriptionPayment?.data}
-            columns={columns}
-            rowKey={((record: any) => record.id)} 
-            pagination={{
-              current: pagingInput.currentPage,
-                onChange: changePage,
-                total: data?.SubscriptionPayment?.paging?.total,
-                pageSize: constants.paging.perPage,
-            }}
-          />
-        </Row>
+        {data && data?.SubscriptionPayment?.data?.length >= 1 ? (
+          <Button type='link' onClick={downloadReport} icon={<DownloadOutlined />}>
+            Download
+          </Button>
+        ) : (
+          <Typography.Text type='secondary'>No files to Download</Typography.Text>
+        )}
       </Card>
     </div>
   );
 };
 
-export default Payment;
+export default PaymentReport;
