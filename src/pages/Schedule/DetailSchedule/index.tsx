@@ -1,6 +1,7 @@
 import { Fragment, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import { Button, Card, Col, message, Row } from "antd";
+import ReactToPrint from 'react-to-print';
+import {  Button, Card, Col, message, Row, } from "antd";
 import { PlusCircleFilled, DeleteOutlined ,PrinterOutlined ,CalendarOutlined, DownloadOutlined } from "@ant-design/icons";
 import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import moment from "moment";
@@ -299,61 +300,61 @@ const ScheduleDetail = () => {
     }
 
     const tableHeader = () => {
-        let title: Array<{ label: string; key: string; subKey?: string }> = [
-          { label: 'Employee Name', key: 'username' },
-          { label: 'Designation', key: 'designation' },
-        ];
-    
-        weekDays.map((day: any, index: number) =>
-          title.push({
-            label: `${moment(day).format('ddd, MMM D').replace(',', '-')}`,
-            key: 'timeSheetBody',
-            subKey: `${index}`,
-          })
-        );
-        title.push({ label: 'Total', key: 'total' });
-    
-        return title;
-      };
-    
-    const tableBody = () => {
-        const tableRows = [];
-    
-        for (const property in groups) {
-          const username = groups && groups[property][0]?.user?.fullName;
-          const designation = groups && (groups[property][0]?.user?.designation ?? '-');
-          const total = getTotalSchedule(groups[property]);
-          const timeSheetBodyPart =
-            groups &&
-            Object.keys(groups).map((key) => {
-              return weekDays.map(
-                (day) =>
-                  groups[property] &&
-                  groups[property]?.map((data: any) => {
-                    return (
-                      day === moment(data?.schedule_date).format('YYYY-MM-DD') &&
-                      data?.workscheduleTimeDetail?.length > 0 &&
-                      data?.workscheduleTimeDetail?.map(
-                        (timeData: any) => `${moment(timeData?.startTime).utc().format('HH:mm') || ''}-${
-                            moment(timeData?.endTime).utc().format('HH:mm') || ''
-                          }`
-                      )[0]
-                    );
-                  })[0]
-              );
-            }); 
-          const timeSheetBody = timeSheetBodyPart[0]?.map((item:string)=>item || '-');
-          tableRows.push({ username, designation, total, timeSheetBody: Object.assign({}, timeSheetBody) });
-        }
-        return tableRows;
-      };
+      let title: Array<{ label: string; key: string; subKey?: string }> = [
+        { label: 'Employee Name', key: 'username' },
+        { label: 'Designation', key: 'designation' },
+      ];
+  
+      weekDays.map((day: any, index: number) =>
+        title.push({
+          label: `${moment(day).format('ddd, MMM D').replace(',', '-')}`,
+          key: 'timeSheetBody',
+          subKey: `${index}`,
+        })
+      );
+      title.push({ label: 'Total', key: 'total' });
+  
+      return title;
+    };
 
+    const tableBody = () => {
+      const tableRows = [];
+  
+      for (const property in groups) {
+        const username = groups && groups[property][0]?.user?.fullName;
+        const designation = groups && (groups[property][0]?.user?.designation ?? '-');
+        const total = getTotalSchedule(groups[property]);
+        const timeSheetBodyPart =
+          groups &&
+          Object.keys(groups).map((key) => {
+            return weekDays.map(
+              (day) =>
+                groups[property] &&
+                groups[property]?.map((data: any) => {
+                  return (
+                    day === moment(data?.schedule_date).format('YYYY-MM-DD') &&
+                    data?.workscheduleTimeDetail?.length > 0 &&
+                    data?.workscheduleTimeDetail?.map(
+                      (timeData: any) => `${moment(timeData?.startTime).utc().format('HH:mm') || ''}-${
+                          moment(timeData?.endTime).utc().format('HH:mm') || ''
+                        }`
+                    )[0]
+                  );
+                })[0]
+            );
+          }); 
+        const timeSheetBody = timeSheetBodyPart[0]?.map((item:string)=>item || '-');
+        tableRows.push({ username, designation, total, timeSheetBody: Object.assign({}, timeSheetBody) });
+      }
+      return tableRows;
+    };
+  
     const downloadReport = () => {
-        const csvHeader = tableHeader();
-        const csvBody = tableBody();
-        // console.log(csvBody);
-        downloadCSV(csvBody, csvHeader, 'ScheduleTable.csv');
-      };
+      const csvHeader = tableHeader();
+      const csvBody = tableBody();
+      // console.log(csvBody);
+      downloadCSV(csvBody, csvHeader, 'ScheduleTable.csv');
+    };
 
     return (
       <>
@@ -364,14 +365,13 @@ const ScheduleDetail = () => {
                 'MMM DD'
               )} -${moment(workscheduleData?.Workschedule?.data?.[0]?.endDate).format('MMM DD')} )`}
             />
-            <Row gutter={[10,20]} className='container-row'>
+            <Row className='container-row'>
               <Col span={24}>
                 <div ref={componentRef} className={styles['detail-table']}>
                   <table className={styles['main-table']}>
                     <thead>
                       <tr className={styles['table-header']}>
                         <th>Employee</th>
-                        <th>Designation</th>
                         {weekDays.map((day: any, index: number) => (
                           <th key={index}>{moment(day).format('ddd, MMM D')}</th>
                         ))}
@@ -384,10 +384,12 @@ const ScheduleDetail = () => {
                         Object.keys(groups).map(function (key, index) {
                           return (
                             <tr key={index}>
-                              <td>{groups[key]?.[0]?.user?.fullName}</td>
                               <td>
-                                {(groups[key]?.[0]?.user?.designation && `${groups[key]?.[0]?.user?.designation}`) ??
-                                  '-'}
+                                {groups[key]?.[0]?.user?.fullName}
+                                <br />
+                                <span>
+                                  {groups[key]?.[0]?.user?.designation && `(${groups[key]?.[0]?.user?.designation})`}
+                                </span>
                               </td>
                               {weekDays.map((day: any, index: number) => (
                                 <td key={index}>
@@ -444,7 +446,14 @@ const ScheduleDetail = () => {
                         })}
                       {employeeData?.User?.data?.[0]?.fullName && (
                         <tr>
-                          <td>{employeeData?.User?.data?.[0]?.fullName}</td>
+                          <td>
+                            {employeeData?.User?.data?.[0]?.fullName}
+                            <br />
+                            <span>
+                              {employeeData?.User?.data?.[0]?.designation &&
+                                `(${employeeData?.User?.data?.[0]?.designation})`}
+                            </span>
+                          </td>
                           {Array.from(Array(7)).map((num: number, index) => (
                             <td
                               key={index}
@@ -475,19 +484,18 @@ const ScheduleDetail = () => {
                   </span>
                   Add Employee
                 </p>
-
-                {/* <ReactToPrint
-                                    trigger={() =>
-                                        <Button
-                                            type="link"
-                                            icon={<PrinterOutlined />}
-                                        >
-                                            Print Schedule
-                                        </Button>}
-                                    content={() => componentRef.current}
-                                /> */}
+{/* 
+                <ReactToPrint
+                  trigger={() => (
+                    <Button type='link' icon={<PrinterOutlined />}>
+                      Print Schedule
+                    </Button>
+                  )}
+                  content={() => componentRef.current}
+                /> */}
               </Col>
               <Col>
+                <br />
                 <Button icon={<DownloadOutlined />} onClick={downloadReport}>
                   {' '}
                   Download

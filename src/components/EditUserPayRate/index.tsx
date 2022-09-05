@@ -1,3 +1,4 @@
+import { useEffect } from "react"
 import { Button, Col, Form, InputNumber, message, Modal, Row, Select, Space } from "antd"
 import { CloseOutlined } from "@ant-design/icons"
 
@@ -30,6 +31,7 @@ export const USER_PAYRATE_UPDATE = gql`
       }
       }
       amount
+      invoiceRate
       
     }
   }
@@ -47,6 +49,7 @@ const EditUserPayRateModal = (props: IProps) => {
       input: {
         query: {
           company_id: loggedInUser?.company?.id,
+          user_id: user?.id,
         },
         paging: {
           order: ["updatedAt:DESC"],
@@ -82,6 +85,7 @@ const EditUserPayRateModal = (props: IProps) => {
           id: props?.id as string,
           project_id: values.project_id,
           amount: values.amount,
+          invoiceRate: values.invoiceRate,
         }
       }
     })
@@ -91,10 +95,19 @@ const EditUserPayRateModal = (props: IProps) => {
     props.setVisibility(!props.visibility)
   }
 
-  if (!userPayRateData?.UserPayRate?.data) {
-    return null
+
+  let defaultValues: any;
+  if (userPayRateData) {
+    defaultValues = {
+      project_id: userPayRateData?.UserPayRate?.data?.[0]?.project?.id,
+      amount: userPayRateData?.UserPayRate?.data?.[0]?.amount ?? 0,
+      invoiceRate: userPayRateData?.UserPayRate?.data?.[0]?.invoiceRate
+    }
   }
 
+  useEffect(() => {
+    form.setFieldsValue(defaultValues)
+  }, [form, defaultValues])
   return (
     <Modal
       centered
@@ -126,10 +139,7 @@ const EditUserPayRateModal = (props: IProps) => {
           layout="vertical"
           name="user-payrate-form"
           onFinish={onSubmitForm}
-          initialValues={{
-            project_id: userPayRateData?.UserPayRate?.data?.[0]?.project?.id,
-            amount: userPayRateData?.UserPayRate?.data?.[0]?.amount
-          }}
+          initialValues={defaultValues}
         >
           <Row gutter={[24, 0]}>
             <Col
@@ -152,8 +162,24 @@ const EditUserPayRateModal = (props: IProps) => {
             <Col
               xs={24}
               sm={24}
-              md={24}
-              lg={24}>
+              md={12}
+              lg={12}>
+              <Form.Item
+                label="Invoice rate"
+                name="invoiceRate">
+                <InputNumber
+                  addonBefore="$ "
+                  addonAfter="Hr"
+                  placeholder="Enter invoice rate"
+                  autoComplete="off"
+                  style={{ width: '100%' }} />
+              </Form.Item>
+            </Col>
+            <Col
+              xs={24}
+              sm={24}
+              md={12}
+              lg={12}>
               <Form.Item
                 label="Payrate"
                 name="amount">

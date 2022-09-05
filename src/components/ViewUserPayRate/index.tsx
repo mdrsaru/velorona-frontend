@@ -8,6 +8,8 @@ import { UserPayRatePagingData } from "../../interfaces/graphql.interface";
 import EditUserPayRateModal from "../EditUserPayRate";
 
 import styles from "./styles.module.scss";
+import { authVar } from '../../App/link';
+import { useParams } from 'react-router-dom';
 
 interface IProps {
   visibility: boolean;
@@ -22,6 +24,7 @@ export const USER_PAY_RATE = gql`
       data {
         id
         amount
+        invoiceRate
         project {
           id
           name
@@ -45,7 +48,8 @@ const ViewUserPayRate = (props: IProps) => {
   const [userPayRateId, setUserPayRateId] = useState('')
   const [getUserPayRate, { data: userPayRateData }] = useLazyQuery<UserPayRatePagingData>(USER_PAY_RATE)
 
-
+  const authData = authVar()
+  const params = useParams()
   const handleEdit = (id: any, userId: string) => {
     setUserPayRateId(id)
     setVisibility(false);
@@ -54,7 +58,7 @@ const ViewUserPayRate = (props: IProps) => {
         input: {
           query: {
             user_id: userId,
-            id:id,
+            id: id,
           },
           paging: {
             order: ["updatedAt:DESC"],
@@ -64,31 +68,61 @@ const ViewUserPayRate = (props: IProps) => {
     })
     setEditVisibility(!editVisibility)
   }
-  const columns = [
-    {
-      title: "Project Name",
-      render: (payRate: any) => {
-        return <p>{payRate?.project?.name}</p>;
+  let columns;
+  if (authData?.user?.id === params?.eid) {
+    columns = [
+      {
+        title: "Project Name",
+        render: (payRate: any) => {
+          return <p>{payRate?.project?.name}</p>;
+        },
       },
-    },
-    {
-      title: "Client Name",
-      render: (payRate: any) => {
-        return <p>{payRate?.project?.client?.name}</p>;
+      {
+        title: "Client Name",
+        render: (payRate: any) => {
+          return <p>{payRate?.project?.client?.name}</p>;
+        },
       },
-    },
-    {
-      title: "Payrate(per hour)",
-      render: (payRate: any) => {
-        return <p>${payRate?.amount}</p>;
+      {
+        title: "Pay rate(per hour)",
+        render: (payRate: any) => {
+          return <p>${payRate?.amount}</p>;
+        },
+      }
+    ];
+  }
+  else {
+    columns = [
+      {
+        title: "Project Name",
+        render: (payRate: any) => {
+          return <p>{payRate?.project?.name}</p>;
+        },
       },
-    },
-    {
-      title: "Action",
-      render: (payRate: any) => <EditOutlined onClick={() => handleEdit(payRate?.id, payRate?.user?.id)} />
-    }
-  ];
-
+      {
+        title: "Client Name",
+        render: (payRate: any) => {
+          return <p>{payRate?.project?.client?.name}</p>;
+        },
+      },
+      {
+        title: "Pay rate(per hour)",
+        render: (payRate: any) => {
+          return <p>${payRate?.amount}</p>;
+        },
+      },
+      {
+        title: "Invoice rate(per hour)",
+        render: (payRate: any) => {
+          return <p>${payRate?.invoiceRate}</p>;
+        },
+      },
+      {
+        title: "Action",
+        render: (payRate: any) => <EditOutlined onClick={() => handleEdit(payRate?.id, payRate?.user?.id)} />
+      }
+    ];
+  }
   return (
     <>
       <Modal

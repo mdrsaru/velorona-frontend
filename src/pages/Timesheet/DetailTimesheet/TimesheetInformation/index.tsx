@@ -46,7 +46,7 @@ const TimesheetInformation = (props: IProps) => {
                 <ArrowLeftOutlined />
               </Link>
             }
-            &nbsp; My Timesheet
+            &nbsp; TimeLog
           </>
         }
       />

@@ -1,6 +1,7 @@
 const config = {
   apiUrl: process.env.REACT_APP_API_URL,
   graphqlEndpoint: process.env.REACT_APP_GRAPHQL_ENDPOINT,
+  accessTokenLife: process.env.REACT_APP_ACCESS_TOKEN_LIFE || '15m',
   paging: {
     perPage: 10,
   },
