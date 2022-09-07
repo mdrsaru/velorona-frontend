@@ -52,14 +52,37 @@ const CompanyReport = () => {
   });
 
   const downloadReport = () => {
+    let values = filterForm.getFieldsValue(['search', 'role', 'status']);
+
+    let input: {
+      paging?: any;
+      query: any;
+    } = {
+      paging: {
+        order: ['updatedAt:DESC'],
+      },
+
+      query: {},
+    };
+
+    let query: {
+      status?: string;
+      search?: boolean;
+    } = {};
+
+    if (values.status) {
+      query['status'] = values.status;
+    }
+
+    if (values.search) {
+      query['search'] = values?.search;
+    }
+
+    input['query'] = query;
+
     fetchDownloadData({
       variables: {
-        input: {
-          query: {},
-          paging: {
-            order: ['updatedAt:DESC'],
-          },
-        },
+        input: input
       },
     });
   };

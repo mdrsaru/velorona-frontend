@@ -90,14 +90,12 @@ const PaymentReport = () => {
       },
     },
     onCompleted: () => {
-      // console.log(DownloadPaymentData);
       downloadCSV(DownloadPaymentData?.SubscriptionPayment?.data, csvHeader, 'Payment.csv');
     },
   });
 
   const refetchPayments = () => {
     const values = filterForm.getFieldsValue(['date', 'status', 'search']);
-    console.log(values);
     let input: {
       paging?: any;
       query?: any;
@@ -124,15 +122,33 @@ const PaymentReport = () => {
     });
   };
   const downloadReport = () => {
+    const values = filterForm.getFieldsValue(['date', 'status', 'search']);
+    let input: {
+      paging?: any;
+      query?: any;
+    } = {
+      paging: {
+        order: ['updatedAt:DESC'],
+      },
+      query: {},
+    };
+
+    let query: SubscriptionPaymentQuery = {};
+
+    if (values.search) query['search'] = values?.search;
+    if (values.status) query['status'] = values?.status;
+
+    if (values.date) {
+      query['startDate'] = values?.date[0];
+      query['endDate'] = values?.date[1];
+    }
+
+    input['query'] = query;
+
     fetchDownloadData({
       variables: {
-        input: {
-          query: {},
-          paging: {
-            order: ['updatedAt:DESC'],
-          },
-        },
-      },
+        input: input
+      }
     });
   };
   const openFilterRow = () => {

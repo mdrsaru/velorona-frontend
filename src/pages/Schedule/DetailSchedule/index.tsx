@@ -352,7 +352,6 @@ const ScheduleDetail = () => {
     const downloadReport = () => {
       const csvHeader = tableHeader();
       const csvBody = tableBody();
-      // console.log(csvBody);
       downloadCSV(csvBody, csvHeader, 'ScheduleTable.csv');
     };
 

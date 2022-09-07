@@ -78,13 +78,49 @@ const EmployeeTimesheetReport = () => {
   });
 
   const downloadReport = () => {
+    let values = filterForm.getFieldsValue(['search', 'role', 'status', 'date']);
+
+    let input: {
+      paging?: any;
+      query: any;
+    } = {
+      paging: {
+        order: ['updatedAt:DESC'],
+      },
+
+      query: {
+        company_id: authData?.company?.id,
+      },
+    };
+
+    let query: {
+      status?: string;
+      archived?: boolean;
+      search?: boolean;
+      company_id: string;
+      weekStartDate?: Date;
+      weekEndDate?: Date;
+    } = {
+      company_id: authData?.company?.id as string,
+    };
+
+    if (values.status) {
+      query['status'] = values.status;
+    }
+
+    if (values.search) {
+      query['search'] = values?.search;
+    }
+
+    if (values?.date) {
+      query['weekStartDate'] = values?.date[0];
+      query['weekEndDate'] = values?.date[1];
+    }
+    input['query'] = query;
+
     fetchDownloadData({
       variables: {
-        input: {
-          query: {
-            company_id: company_id,
-          },
-        },
+        input: input
       },
     });
   };
