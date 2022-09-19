@@ -1,5 +1,8 @@
+import moment from 'moment';
+import { useState } from 'react';
+import { RangePickerProps } from 'antd/es/date-picker';
 import { gql, useQuery } from '@apollo/client';
-import { Button, Col, Form, Input, Row, Select, Space } from 'antd';
+import { Button, Col, Form, Input, Row, Select, Space, DatePicker } from 'antd';
 
 import { GraphQLResponse } from '../../../interfaces/graphql.interface';
 import {
@@ -29,6 +32,7 @@ export const INVOICE_PAYMENT_CONFIG = gql`
 
 const ClientForm = (props: any) => {
   const { id, loading, form, onSubmitForm, btnText, cancelAddClient, initialValues } = props;
+  const [schedule, setSchedule] = useState<string | undefined>(initialValues?.invoiceSchedule);
 
   const { data: paymentConfigData, loading: paymnentConfigLoading } = useQuery<
     GraphQLResponse<'InvoicePaymentConfig', InvoicePaymentConfigPagingResult>
@@ -42,6 +46,15 @@ const ClientForm = (props: any) => {
       },
     },
   });
+
+  const onScheduleChange = (value: string) => {
+    setSchedule(value);
+  }
+
+  const disabledDate: RangePickerProps['disabledDate'] = current => {
+    return moment(current).day() !== 1
+  };
+
 
   return (
     <div>
@@ -230,7 +243,10 @@ const ClientForm = (props: any) => {
               label="Invoice Schedule"
               name='invoiceSchedule'
             >
-              <Select placeholder="Invoice Schedule">
+              <Select 
+                placeholder="Invoice Schedule" 
+                onChange={onScheduleChange}
+              >
                 <Select.Option value={InvoiceSchedule.Weekly}>{InvoiceSchedule.Weekly}</Select.Option>
                 <Select.Option value={InvoiceSchedule.Biweekly}>{InvoiceSchedule.Biweekly}</Select.Option>
                 <Select.Option value={InvoiceSchedule.Monthly}>{InvoiceSchedule.Monthly}</Select.Option>
@@ -246,12 +262,27 @@ const ClientForm = (props: any) => {
               <Select placeholder="Invoice Payment" loading={paymnentConfigLoading}>
                 {
                   paymentConfigData?.InvoicePaymentConfig?.data?.map((config) => (
-                    <Select.Option value={config.id}>{config.name}</Select.Option>
+                    <Select.Option key={config.id} value={config.id}>{config.name}</Select.Option>
                   ))
                 }
               </Select>
             </Form.Item>
           </Col>
+
+          {
+            schedule === 'Biweekly' && (
+              <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
+                <Form.Item
+                  label="Biweekly start date"
+                  name='biweeklyStartDate'
+                >
+                  <DatePicker 
+                    disabledDate={disabledDate}
+                  />
+                </Form.Item>
+              </Col>
+            )
+          }
         </Row>
 
         <Row

@@ -1,14 +1,12 @@
 import moment from 'moment';
-import { useRef, useState, useMemo } from 'react';
-import { gql, useLazyQuery, useQuery, useMutation, NetworkStatus } from '@apollo/client';
+import { useRef, useState, useMemo, useEffect } from 'react'; import { gql, useQuery, useMutation } from '@apollo/client';
 import {
-  useParams,
   Link,
   useNavigate
 } from 'react-router-dom';
 import groupBy from 'lodash/groupBy';
 import find from 'lodash/find';
-import { Card, Col, Row, Button, Space, message, Modal, Form, Select, Spin, Collapse } from 'antd';
+import { Card, Col, Row, Button, Space, message, Modal, Form, Select, Collapse } from 'antd';
 import {
   CloseOutlined,
 } from '@ant-design/icons';
@@ -18,13 +16,11 @@ import { _cs, checkRoles } from '../../../utils/common';
 import routes from '../../../config/routes';
 import { notifyGraphqlError } from "../../../utils/error";
 import constants from "../../../config/constants";
-import { TimeEntry, QueryTimesheetArgs, TimeSheetPagingResult, MutationTimeEntriesApproveRejectArgs } from '../../../interfaces/generated';
+import { TimeEntry, MutationTimeEntriesApproveRejectArgs } from '../../../interfaces/generated';
 import { GraphQLResponse } from '../../../interfaces/graphql.interface';
 import { PROJECT } from '../../Project';
 import { IGroupedTimeEntries } from '../../../interfaces/common.interface';
 
-import TimeSheetLoader from '../../../components/Skeleton/TimeSheetLoader';
-import TimesheetInformation from './TimesheetInformation';
 import PageHeader from '../../../components/PageHeader';
 import TimeEntryDetail from './TimeEntryDetail';
 import InvoiceViewer from '../../../components/InvoiceViewer';
@@ -48,89 +44,6 @@ type EntriesByStatus = {
   pending: IGroupedTimeEntries[],
   rejected: IGroupedTimeEntries[],
 };
-
-export const TIME_SHEET = gql`
-  query Timesheet($input: TimesheetQueryInput!) {
-    Timesheet(input: $input) {
-      paging {
-        total
-        startIndex
-        endIndex
-        hasNextPage
-      }
-      data {
-        id
-        weekStartDate
-        weekEndDate
-        totalExpense
-        duration
-        durationFormat
-        lastApprovedAt
-        lastSubmittedAt
-        isSubmitted
-        status
-        user {
-          id
-          email
-		  timesheet_attachment
-        }
-        client {
-          id
-          name
-        }
-        company {
-          id
-          name
-        }
-        approver {
-          fullName
-        }
-        projectItems {
-          project_id
-          totalDuration
-          totalExpense
-          hourlyRate
-        }
-        durationMap
-        timeEntries {
-          ...timeEntry
-        }
-        entriesGroup {
-          byInvoice {
-            invoice_id
-            entries {
-              ...timeEntry
-            }
-          }
-          byStatus {
-            approvalStatus
-            entries {
-              ...timeEntry
-            }
-          }
-        }
-      }
-    }
-  }
-
-  fragment timeEntry on TimeEntry {
-    id
-    startTime
-    endTime
-    duration
-    description
-    approvalStatus
-    timesheet {
-      id
-    }
-    project_id
-    project {
-      id
-      name
-    }
-  }
-
-`
 
 export const APPROVE_REJECT_TIME_ENTRIES = gql`
   mutation TimeEntryApproveReject($input: TimeEntryApproveRejectInput!) {
@@ -164,17 +77,18 @@ export const getTotalTimeForADay = (entries: any) => {
   return sum
 }
 
-const DetailTimesheet = () => {
-  let params = useParams()
-  let navigate = useNavigate();
-  const timesheet_id = params?.id as string;
-  const { Option } = Select;
+const { Option } = Select;
+const { Panel } = Collapse;
 
-  const { Panel } = Collapse;
+const DetailTimesheet = (props: any) => {
+  let navigate = useNavigate();
+  const timesheet = props.timesheet;
+  const timesheet_id = timesheet.id;
 
   const authData = authVar()
   const roles = authData?.user?.roles;
   const [form] = Form.useForm()
+
   const [commentDetails, setCommentDetails] = useState<{
     showModal: boolean;
     commentType: 'Reject' | 'UnlockApproved' | 'UnlockRejected' | 'UndoSubmit' | undefined;
@@ -233,20 +147,55 @@ const DetailTimesheet = () => {
     MutationTimeEntriesApproveRejectArgs
   >(APPROVE_REJECT_TIME_ENTRIES, {
     onCompleted() {
-      refetchTimeSheet();
+      props.refetchTimeSheet();
     },
     onError: notifyGraphqlError,
   });
 
-  const [getProject, { data: projectData }] = useLazyQuery(PROJECT, {
+  useEffect(() => {
+    const byStatus = timesheet?.entriesGroup?.byStatus ?? [];
+    const byInvoice = timesheet?.entriesGroup?.byInvoice ?? [];
+
+    let approvedTimeEntries: TimeEntry[] = find(byStatus, { approvalStatus: 'Approved' })?.entries ?? [];
+    let pendingTimeEntries: TimeEntry[] = find(byStatus, { approvalStatus: 'Pending' })?.entries ?? [];
+    let rejectedTimeEntries: TimeEntry[] = find(byStatus, { approvalStatus: 'Rejected' })?.entries ?? [];
+
+    let invoiced: InvoicedTimeEntries[] = [];
+
+    byInvoice.forEach((byInv: any) => {
+      const _invoiced: InvoicedTimeEntries = {
+        invoice_id: byInv.invoice_id,
+        group: groupEntriesByProject(byInv.entries),
+      };
+
+      invoiced.push(_invoiced);
+    })
+
+    entriesByStatusRef.current = {
+      approved: approvedTimeEntries,
+      pending: pendingTimeEntries,
+      rejected: rejectedTimeEntries,
+    }
+
+    setInvoicedTimeEntries(invoiced);
+    setEntriesByStatus({
+      approved: groupEntriesByProject(approvedTimeEntries),
+      pending: groupEntriesByProject(pendingTimeEntries),
+      rejected: groupEntriesByProject(rejectedTimeEntries),
+    })
+
+  }, [timesheet])
+
+  const { data: projectData } = useQuery(PROJECT, {
+    skip: !timesheet?.client?.id,
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
     variables: {
       input: {
         query: {
           company_id: authData?.company?.id,
-          client_id: '',
-		  user_id : authData?.user?.id,
+          client_id: timesheet?.client?.id,
+          user_id : authData?.user?.id,
         },
         paging: {
           order: ['updatedAt:DESC']
@@ -255,75 +204,8 @@ const DetailTimesheet = () => {
     }
   })
 
-  const { data: timeSheetDetailData, loading: timesheetLoading, refetch: refetchTimeSheet, networkStatus } = useQuery<
-    GraphQLResponse<'Timesheet', TimeSheetPagingResult>,
-    QueryTimesheetArgs
-  >(TIME_SHEET, {
-    fetchPolicy: "network-only",
-    nextFetchPolicy: "cache-first",
-    notifyOnNetworkStatusChange: true,
-    variables: {
-      input: {
-        query: {
-          company_id: authData?.company?.id as string,
-          id: params?.id
-        },
-        paging: {
-          order: ['weekStartDate:DESC']
-        }
-      }
-    },
-    onCompleted: (response) => {
-      const timesheet = response.Timesheet?.data?.[0];
-      const byStatus = timesheet?.entriesGroup?.byStatus ?? [];
-      const byInvoice = timesheet?.entriesGroup?.byInvoice ?? [];
 
-      let approvedTimeEntries: TimeEntry[] = find(byStatus, { approvalStatus: 'Approved' })?.entries ?? [];
-      let pendingTimeEntries: TimeEntry[] = find(byStatus, { approvalStatus: 'Pending' })?.entries ?? [];
-      let rejectedTimeEntries: TimeEntry[] = find(byStatus, { approvalStatus: 'Rejected' })?.entries ?? [];
-
-      let invoiced: InvoicedTimeEntries[] = [];
-
-      byInvoice.forEach((byInv) => {
-        const _invoiced: InvoicedTimeEntries = {
-          invoice_id: byInv.invoice_id,
-          group: groupEntriesByProject(byInv.entries),
-        };
-
-        invoiced.push(_invoiced);
-      })
-
-      entriesByStatusRef.current = {
-        approved: approvedTimeEntries,
-        pending: pendingTimeEntries,
-        rejected: rejectedTimeEntries,
-      }
-
-      setInvoicedTimeEntries(invoiced);
-      setEntriesByStatus({
-        approved: groupEntriesByProject(approvedTimeEntries),
-        pending: groupEntriesByProject(pendingTimeEntries),
-        rejected: groupEntriesByProject(rejectedTimeEntries),
-      })
-
-      getProject({
-        variables: {
-          input: {
-            query: {
-              company_id: authData?.company?.id,
-              client_id: response?.Timesheet?.data[0]?.client?.id,
-			  user_id:authData?.user?.id,
-            },
-            paging: {
-              order: ['updatedAt:DESC']
-            }
-          }
-        }
-      }).then(r => { })
-    }
-  })
-
-  const timesheetDetail = timeSheetDetailData?.Timesheet?.data[0];
+  const timesheetDetail = timesheet;
 
   const onChangeProjectSelect = (value: string) => {
     if (form.getFieldValue(['task'])) {
@@ -463,79 +345,136 @@ const DetailTimesheet = () => {
 
   const isSubmitted:any = timesheetDetail?.isSubmitted;
 
+  const hasTimeEntries = (
+    entriesByStatus?.approved?.length || !timesheetDetail?.rejected?.length || 
+    entriesByStatus.pending.length || !timesheetDetail?.entriesGroup?.byInvoice.length
+  );
+
   return (
     <>
-      {(timesheetLoading && networkStatus !== NetworkStatus.refetch) ? <TimeSheetLoader /> :
-        <Spin spinning={timesheetLoading}>
-          <div className={styles['site-card-wrapper']}>
-            {
-              !!timesheetDetail && <TimesheetInformation timesheet={timesheetDetail} />
-            }
+      <div className={styles['site-card-wrapper']}>
+        <Card bordered={false} className={styles['time-entries']}>
+          {
+            !timesheetDetail?.isSubmitted ? (
+              <Row className={styles['timesheet-detail']}>
 
-            <br />
-
-            <Card bordered={false} className={styles['time-entries']}>
-              {
-                !timesheetDetail?.isSubmitted ?
-                <Row className={styles['timesheet-detail']}>
-
-                  <PageHeader
-                    title="Time Entry Details"
-                    extra={[
-                    <span key="new-entry">
-                      {
-                        roles.includes(constants.roles.Employee) &&
-                        <span
-                          key="new-entry"
-                          className={styles['add-entry']}
-                          onClick={() => {
-                            setShowAddNewEntry(true)
-                            form.resetFields();
-                          }}
-                        >
-                          Add New Time Entry
-                        </span>
-                      }
-                    </span>
-                    ]}
-                  />
-                </Row>
-                :
-                <Row className={styles['timesheet-detail']}>
+                <PageHeader
+                  title="Time Entry Details"
+                  extra={[
+                  <span key="new-entry">
+                    {
+                      roles.includes(constants.roles.Employee) &&
+                      <span
+                        key="new-entry"
+                        className={styles['add-entry']}
+                        onClick={() => {
+                          setShowAddNewEntry(true)
+                          form.resetFields();
+                        }}
+                      >
+                        Add New Time Entry
+                      </span>
+                    }
+                  </span>
+                  ]}
+                />
+              </Row>
+            ) : (
+              <Row className={styles['timesheet-detail']}>
 
                 <PageHeader
                   title="Time Entry Details"
                 />
               </Row>
-              }
- 			 {(!entriesByStatus.pending.length && !timesheetDetail?.entriesGroup?.byInvoice.length) ?
-                <NoContent title={'No Time Entry added'} subtitle={'There are no entries added at the moment'} /> 
-				:
+            )
+          }
+
+          {
+            !hasTimeEntries ? (
+              <NoContent title={'No Time Entry added'} subtitle={'There are no entries added at the moment'} /> 
+            ) : (
               <>
-              <div className={styles['resp-table']}>
-                {
-                  !!entriesByStatus.pending?.length &&
-                  <div className={styles['timesheet-section']}>
-                    <div
-                      className={
-                        _cs([styles['timesheet-status'], styles['unapproved-status']])
-                      }
-                    >
-                      <div>
-                        Unapproved Timesheet
+                <div className={styles['resp-table']}>
+                  {
+                    !!entriesByStatus.pending?.length && (
+                      <div className={styles['timesheet-section']}>
+                        <div
+                          className={
+                            _cs([styles['timesheet-status'], styles['unapproved-status']])
+                          }
+                        >
+                          <div>
+                            Unapproved Timesheet
+                          </div>
+
+                          {
+                            timesheetDetail?.isSubmitted && managerLvlRole && (
+                              <div className={styles['action']}>
+                                <span 
+                                  onClick={() => setCommentDetails({
+                                    showModal: true,
+                                    commentType: 'UndoSubmit',
+                                  })}
+                                >
+                                  Unlock
+                                </span>
+                              </div>
+                            )
+                          }
+                        </div>
+
+                        <TimeEntryDetail
+                          startDate={timesheetDetail?.weekStartDate as string}
+                          groupedTimeEntries={entriesByStatus.pending}
+                          durationMap={timesheetDetail?.durationMap?.['Pending']}
+                          client_id={timesheetDetail?.client?.id as string}
+                          refetch={props.refetchTimeSheet}
+                          status='Pending'
+                          deleteAction={deletePendingGroups}
+                          needAction
+                          timesheet_id={timesheet_id}
+                          isTimesheetSubmitted={isSubmitted}
+                        />
+
+                        {
+                          managerLvlRole && isSubmitted && (
+                            <Row justify="end" style={{ margin: '36px 0' }}>
+                              <Space>
+                                <Button onClick={() => { approveRejectAll('Approved') }} >
+                                  Approve All
+                                </Button>
+
+                                <Button onClick={() => { approveRejectAll('Rejected') }} >
+                                  Reject All
+                                </Button>
+                              </Space>
+                            </Row>
+
+                          )
+                        }
                       </div>
+                    )
+                  }
+
+                  {
+                    adminLvlRole && invoicedTimeEntries.map((invoiced) => (
+                      <div key={invoiced.invoice_id} className={styles['timesheet-section']}>
+                        <div
+                          className={
+                            _cs([styles['timesheet-status'], styles['approved-status']])
+                          }
+                        >
+                          <div>
+                            Invoiced Timesheet
+                          </div>
 
                       {
-                        timesheetDetail?.isSubmitted && managerLvlRole && (
-                          <div className={styles['action']}>
-                            <span 
-                              onClick={() => setCommentDetails({
-                                showModal: true,
-                                commentType: 'UndoSubmit',
-                              })}
-                            >
-                              Unlock
-                            </span>
+                        roles.includes(constants.roles.CompanyAdmin) && (
+                          <div
+                            className={styles['action']}
+                            onClick={() => handleViewInvoiceClick(invoiced.invoice_id)}
+                          >
+                            View Invoice
                           </div>
                         )
                       }
@@ -543,55 +482,53 @@ const DetailTimesheet = () => {
 
                     <TimeEntryDetail
                       startDate={timesheetDetail?.weekStartDate as string}
-                      groupedTimeEntries={entriesByStatus.pending}
-                      durationMap={timesheetDetail?.durationMap?.['Pending']}
+                      groupedTimeEntries={invoiced.group}
+                      durationMap={timesheetDetail?.durationMap?.[invoiced.invoice_id]}
                       client_id={timesheetDetail?.client?.id as string}
-                      refetch={refetchTimeSheet}
-                      status='Pending'
-                      deleteAction={deletePendingGroups}
-                      needAction
+                      refetch={props.refetchTimeSheet}
+                      status='Invoiced'
                       timesheet_id={timesheet_id}
-                      isTimesheetSubmitted={isSubmitted}
                     />
-
-                    {
-                      managerLvlRole && isSubmitted && (
-                        <Row justify="end" style={{ margin: '36px 0' }}>
-                          <Space>
-                            <Button onClick={() => { approveRejectAll('Approved') }} >
-                              Approve All
-                            </Button>
-
-                            <Button onClick={() => { approveRejectAll('Rejected') }} >
-                              Reject All
-                            </Button>
-                          </Space>
-                        </Row>
-
-                      )
-                    }
                   </div>
-                }
+                    ))
+                  }
 
-                {
-                  adminLvlRole && invoicedTimeEntries.map((invoiced) => (
-                    <div key={invoiced.invoice_id} className={styles['timesheet-section']}>
+                  {
+                    !!entriesByStatus.approved.length &&
+                    <div className={styles['timesheet-section']}>
                       <div
                         className={
                           _cs([styles['timesheet-status'], styles['approved-status']])
                         }
                       >
                         <div>
-                          Invoiced Timesheet
+                          Approved Timesheet
                         </div>
 
                         {
-                          roles.includes(constants.roles.CompanyAdmin) && (
-                            <div
-                              className={styles['action']}
-                              onClick={() => handleViewInvoiceClick(invoiced.invoice_id)}
-                            >
-                              View Invoice
+                          managerLvlRole && (
+                            <div className={styles['action']}>
+                              <span 
+                                onClick={() => setCommentDetails({
+                                  showModal: true,
+                                  commentType: 'UnlockApproved',
+                                })}
+                              >
+                                Unlock
+                              </span>
+
+                              {
+                                adminLvlRole && (
+                                  <Link
+                                    className={styles['invoice-link']}
+                                    to={routes.timesheetInvoice.path(authData?.company?.code as string, timesheet_id)}
+                                    state={{ from: 'timesheet' }}
+                                  >
+                                    Generate Invoice
+                                  </Link>
+                                )
+
+                              }
                             </div>
                           )
                         }
@@ -599,124 +536,69 @@ const DetailTimesheet = () => {
 
                       <TimeEntryDetail
                         startDate={timesheetDetail?.weekStartDate as string}
-                        groupedTimeEntries={invoiced.group}
-                        durationMap={timesheetDetail?.durationMap?.[invoiced.invoice_id]}
+                        groupedTimeEntries={entriesByStatus.approved}
+                        durationMap={timesheetDetail?.durationMap?.['Approved']}
                         client_id={timesheetDetail?.client?.id as string}
-                        refetch={refetchTimeSheet}
-                        status='Invoiced'
+                        refetch={props.refetchTimeSheet}
+                        status='Approved'
+                        needAction
+                        timesheet_id={timesheet_id}
+                      />
+
+                    </div>
+                  }
+
+                  {
+                    !!entriesByStatus.rejected.length &&
+                    <div className={styles['timesheet-section']}>
+                      <div
+                        className={
+                          _cs([styles['timesheet-status'], styles['rejected-status']])
+                        }
+                      >
+                        <div>
+                          Rejected Timesheet
+                        </div>
+
+                        {
+                          managerLvlRole && (
+                            <div className={styles['action']}>
+                              <span 
+                                onClick={() => setCommentDetails({
+                                  showModal: true,
+                                  commentType: 'UnlockRejected',
+                                })}
+                              >
+                                Unlock
+                              </span>
+                            </div>
+                          )
+                        }
+                      </div>
+
+                      <TimeEntryDetail
+                        startDate={timesheetDetail?.weekStartDate as string}
+                        groupedTimeEntries={entriesByStatus.rejected}
+                        durationMap={timesheetDetail?.durationMap?.['Rejected']}
+                        client_id={timesheetDetail?.client?.id as string}
+                        status='Rejected'
+                        refetch={props.refetchTimeSheet}
+                        needAction
                         timesheet_id={timesheet_id}
                       />
                     </div>
-                  ))
-                }
+                  }
+                </div>
+              </>
+            )
+          }
+          <br />
+          <br />
+        </Card>
+      </div>
 
-                {
-                  !!entriesByStatus.approved.length &&
-                  <div className={styles['timesheet-section']}>
-                    <div
-                      className={
-                        _cs([styles['timesheet-status'], styles['approved-status']])
-                      }
-                    >
-                      <div>
-                        Approved Timesheet
-                      </div>
-
-                      {
-                        managerLvlRole && (
-                          <div className={styles['action']}>
-                            <span 
-                              onClick={() => setCommentDetails({
-                                showModal: true,
-                                commentType: 'UnlockApproved',
-                              })}
-                            >
-                              Unlock
-                            </span>
-
-                            {
-                              adminLvlRole && (
-                                <Link
-                                  className={styles['invoice-link']}
-                                  to={routes.timesheetInvoice.path(authData?.company?.code as string, params?.id as string)}
-                                  state={{ from: 'timesheet' }}
-                                >
-                                  Generate Invoice
-                                </Link>
-                              )
-
-                            }
-                          </div>
-                        )
-                      }
-                    </div>
-
-                    <TimeEntryDetail
-                      startDate={timesheetDetail?.weekStartDate as string}
-                      groupedTimeEntries={entriesByStatus.approved}
-                      durationMap={timesheetDetail?.durationMap?.['Approved']}
-                      client_id={timesheetDetail?.client?.id as string}
-                      refetch={refetchTimeSheet}
-                      status='Approved'
-                      needAction
-                      timesheet_id={timesheet_id}
-                    />
-
-                  </div>
-                }
-
-                {
-                  !!entriesByStatus.rejected.length &&
-                  <div className={styles['timesheet-section']}>
-                    <div
-                      className={
-                        _cs([styles['timesheet-status'], styles['rejected-status']])
-                      }
-                    >
-                      <div>
-                        Rejected Timesheet
-                      </div>
-
-                      {
-                        managerLvlRole && (
-                          <div className={styles['action']}>
-                            <span 
-                              onClick={() => setCommentDetails({
-                                showModal: true,
-                                commentType: 'UnlockRejected',
-                              })}
-                            >
-                              Unlock
-                            </span>
-                          </div>
-                        )
-                      }
-                    </div>
-
-                    <TimeEntryDetail
-                      startDate={timesheetDetail?.weekStartDate as string}
-                      groupedTimeEntries={entriesByStatus.rejected}
-                      durationMap={timesheetDetail?.durationMap?.['Rejected']}
-                      client_id={timesheetDetail?.client?.id as string}
-                      status='Rejected'
-                      refetch={refetchTimeSheet}
-                      needAction
-                      timesheet_id={timesheet_id}
-                    />
-                  </div>
-                }
-              </div>
-			  </>
-			   }
-              <br />
-              <br />
-            </Card>
-          </div>
-        </Spin>
-      } 
-
-    {timesheetDetail?.user.timesheet_attachment &&  
-        (
+      {
+        timesheetDetail?.user.timesheet_attachment && (
           <div className={styles['site-card-wrapper']}>
             <Card className={styles['attach-approved-timesheet']}>
               <Collapse accordion defaultActiveKey={['2']}>
@@ -729,49 +611,50 @@ const DetailTimesheet = () => {
               </Collapse>
             </Card>
           </div>
-      )}
+        )
+      }
 
-		{(!timesheetDetail?.entriesGroup?.byStatus?.length &&
-               !timesheetDetail?.entriesGroup?.byInvoice?.length ) ?
-               "" :
-               <Row justify={"end"} className={styles['button-row']}>
-                 <Col className={styles['form-col']}>
-                   <Space>
-                     <Button
-                       type="primary"
-                       htmlType="button"
-                       onClick={exit}
-                     >
-                       Exit
-                     </Button>
- 
-                     {
-                       isEmployee && (
-                         <Button
-                           type="default"
-                           htmlType="button"
-                           loading={submittingTimesheet}
-                           disabled={isSubmitted}
-                           onClick={onSubmitTimesheet}
-                         >
-                           Submit
-                         </Button>
- 
-                       )
-                     }
-                   </Space>
-                 </Col>
-               </Row>}
+      {
+        (!!timesheetDetail?.entriesGroup?.byStatus?.length || !!timesheetDetail?.entriesGroup?.byInvoice?.length ) &&  (
+          <Row justify={"end"} className={styles['button-row']}>
+            <Col className={styles['form-col']}>
+              <Space>
+                <Button
+                  type="primary"
+                  htmlType="button"
+                  onClick={exit}
+                >
+                  Exit
+                </Button>
 
+                {
+                  isEmployee && (
+                    <Button
+                      type="default"
+                      htmlType="button"
+                      loading={submittingTimesheet}
+                      disabled={isSubmitted}
+                      onClick={onSubmitTimesheet}
+                    >
+                      Submit
+                    </Button>
 
-        <div className={styles['site-card-wrapper']}>
-          <Card bordered={false} className={styles['time-entries']}>
-            <Comment 
-              timesheet_id={timesheet_id}
-              company_id={authData?.company?.id as string}
-            />
-          </Card>
-        </div>
+                  )
+                }
+              </Space>
+            </Col>
+          </Row>
+        )
+      }
+
+      <div className={styles['site-card-wrapper']}>
+        <Card bordered={false} className={styles['time-entries']}>
+          <Comment 
+            timesheet_id={timesheet_id}
+            company_id={authData?.company?.id as string}
+          />
+        </Card>
+      </div>
 
       <Modal
           centered
@@ -858,7 +741,7 @@ const DetailTimesheet = () => {
           commentType={commentDetails.commentType}
           company_id={authData?.company?.id as string}
           onHideModal={onCommentFormCancel}
-          refetchTimesheet={refetchTimeSheet}
+          refetchTimesheet={props.refetchTimeSheet}
         />
       </Modal>
 

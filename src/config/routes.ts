@@ -371,7 +371,8 @@ const routes = {
   detailTimesheet: {
     childPath: ':id/detail',
     path: (id: string, tid: string) => `/${id}/timesheet/${tid}/detail`,
-    component: lazy(() => import('../pages/Timesheet/DetailTimesheet')),
+    //component: lazy(() => import('../pages/Timesheet/DetailTimesheet')),
+    component: lazy(() => import('../pages/Timesheet/GroupedTimesheet')),
     name: 'Detail Timesheet',
     key: 'timesheet',
     allowedRoles: [CompanyAdmin, SuperAdmin, Employee, TaskManager,BookKeeper],

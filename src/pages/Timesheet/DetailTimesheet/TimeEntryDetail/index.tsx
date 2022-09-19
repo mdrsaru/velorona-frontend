@@ -66,6 +66,7 @@ const TimeEntryDetails = (props: IProps) => {
     userRoles,
     expectedRoles: [constants.roles.CompanyAdmin, constants.roles.SuperAdmin, constants.roles.TaskManager]
   });
+
   const canDelete = checkRoles({
     userRoles,
     expectedRoles: [constants.roles.Employee]

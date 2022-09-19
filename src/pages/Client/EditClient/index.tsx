@@ -1,3 +1,5 @@
+import moment from 'moment';
+import { useMemo } from 'react';
 import { Card, Col, Form, message, Row } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import { useNavigate, useParams } from "react-router-dom";
@@ -6,7 +8,7 @@ import { GraphQLResponse } from "../../../interfaces/graphql.interface";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { notifyGraphqlError } from "../../../utils/error";
 import { authVar } from "../../../App/link";
-import { Client, ClientPagingResult, MutationClientUpdateArgs, QueryClientArgs } from "../../../interfaces/generated";
+import { Client, ClientPagingResult, MutationClientUpdateArgs, QueryClientArgs, ClientUpdateInput } from "../../../interfaces/generated";
 import { CLIENT } from "../index";
 
 import ClientForm from '../NewClient/ClientForm';
@@ -20,6 +22,7 @@ export const CLIENT_UPDATE = gql`
         name
         email
         invoicingEmail
+        biweeklyStartDate
         address {
           id
           streetAddress
@@ -59,24 +62,33 @@ const EditClient = () => {
 
   const onSubmitForm = (values: any) => {
     let key = 'message';
+
+    const input: ClientUpdateInput = {
+      id: params?.cid as string,
+      name: values.name,
+      company_id: authData?.company?.id as string,
+      phone: values?.phone,
+      invoiceSchedule: values.invoiceSchedule,
+      invoicingEmail:values.invoicingEmail,
+      invoice_payment_config_id: values.invoice_payment_config_id,
+      address: {
+        country: values?.country,
+        streetAddress: values.streetAddress,
+        state: values.state,
+        city: values.city,
+        zipcode: values.zipcode
+      }
+    };
+
+    if(values.invoiceSchedule === 'Biweekly') {
+      input['biweeklyStartDate'] = values.biweeklyStartDate ? moment(values.biweeklyStartDate).format('YYYY-MM-DD') : null;
+    } else {
+      input['biweeklyStartDate'] = null;
+    }
+
     clientUpdate({
       variables: {
-        input: {
-          id: params?.cid as string,
-          name: values.name,
-          company_id: authData?.company?.id as string,
-          phone: values?.phone,
-          invoiceSchedule: values.invoiceSchedule,
-		  invoicingEmail:values.invoicingEmail,
-          invoice_payment_config_id: values.invoice_payment_config_id,
-          address: {
-            country: values?.country,
-            streetAddress: values.streetAddress,
-            state: values.state,
-            city: values.city,
-            zipcode: values.zipcode
-          }
-        }
+        input,
       }
     }).then((response) => {
       if (response.errors) {
@@ -93,19 +105,30 @@ const EditClient = () => {
   }
 
   const client = clientData?.Client?.data?.[0]
-  const initialValues = {
-    email: client?.email ?? '',
-    name: client?.name ?? '',
-    country: client?.address?.country ?? '',
-    streetAddress: client?.address?.streetAddress ?? '',
-    state: client?.address?.state ?? '',
-    city: client?.address?.city ?? '',
-    zipcode: client?.address?.zipcode ?? '',
-    phone: client?.phone ?? '',
-    invoicingEmail: client?.invoicingEmail ?? '',
-    invoiceSchedule: client?.invoiceSchedule,
-    invoice_payment_config_id: client?.invoice_payment_config_id,
-  }
+
+  const initialValues = useMemo(() => {
+    const client = clientData?.Client?.data?.[0]
+
+    const values: any = {
+      email: client?.email ?? '',
+      name: client?.name ?? '',
+      country: client?.address?.country ?? '',
+      streetAddress: client?.address?.streetAddress ?? '',
+      state: client?.address?.state ?? '',
+      city: client?.address?.city ?? '',
+      zipcode: client?.address?.zipcode ?? '',
+      phone: client?.phone ?? '',
+      invoicingEmail: client?.invoicingEmail ?? '',
+      invoiceSchedule: client?.invoiceSchedule,
+      invoice_payment_config_id: client?.invoice_payment_config_id,
+    };
+
+    if(client?.invoiceSchedule === 'Biweekly' && client?.biweeklyStartDate) {
+      values.biweeklyStartDate = moment(client.biweeklyStartDate);
+    }
+
+    return values;
+  }, [clientData?.Client?.data])
 
   return (
     <div className={styles['main-div']}>

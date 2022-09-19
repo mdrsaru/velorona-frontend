@@ -1,27 +1,27 @@
 import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { gql, useLazyQuery, useQuery } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import { Card, Table, Button, Form, Row, Select, Col, Input, DatePicker } from 'antd';
-import { DownloadOutlined, SearchOutlined,EyeFilled } from '@ant-design/icons';
+import { SearchOutlined,EyeFilled } from '@ant-design/icons';
 
 import { authVar } from '../../App/link';
 import constants, { employee_timesheet_status } from '../../config/constants';
 import routes from '../../config/routes';
 import { notifyGraphqlError } from '../../utils/error';
 import { TimesheetPagingData } from '../../interfaces/graphql.interface';
-import { TimesheetQueryInput, Timesheet, RoleName } from '../../interfaces/generated';
+import { TimesheetQueryInput, Timesheet } from '../../interfaces/generated';
 import PageHeader from '../../components/PageHeader';
 import Status from '../../components/Status';
-
 
 import filterImg from "../../assets/images/filter.svg"
 
 import styles from './style.module.scss';
-import { downloadCSV } from '../../utils/common';
 import { debounce } from 'lodash';
 import TimeDuration from '../../components/TimeDuration';
+
 const { Option } = Select;
+
 export const EMPLOYEE_TIMESHEET = gql`
   query EmployeeTimesheet($input: TimesheetQueryInput!) {
     Timesheet(input: $input) {
@@ -50,17 +50,12 @@ export const EMPLOYEE_TIMESHEET = gql`
   }
 `;
 
-const csvHeader: Array<{ label: string, key: string, subKey?: string }> = [
-  { label: "Employee Name", key: "client", subKey: "name" },
-  { label: "Total Time", key: "durationFormat" },
-  { label: "Status", key: "status" },
-  { label: "Total Expense", key: "totalExpense" },
-  { label: "Last Approved", key: "lastApprovedAt" }
-]
 const { RangePicker } = DatePicker;
+
 const EmployeeTimesheet = () => {
   const authData = authVar();
   const company_id = authData.company?.id as string
+
   const [pagingInput, setPagingInput] = useState<{
     skip: number,
     currentPage: number,
@@ -69,13 +64,11 @@ const EmployeeTimesheet = () => {
     currentPage: 1,
   });
 
-
   const [filterForm] = Form.useForm();
 
   const [filterProperty, setFilterProperty] = useState<any>({
     filter: false,
   });
-
 
   const input: TimesheetQueryInput = {
     paging: {
@@ -84,7 +77,8 @@ const EmployeeTimesheet = () => {
       order: ['weekStartDate:DESC'],
     },
     query: {
-      company_id: company_id
+      company_id: company_id,
+      needGroupedTimesheet: true,
     },
   };
 
@@ -258,12 +252,14 @@ const EmployeeTimesheet = () => {
     <div className={styles['container']}>
       <Card bordered={false}>
         <PageHeader title="Employee Timesheet" />
+
         <Form
           form={filterForm}
           layout="vertical"
           onFinish={() => { }}
           autoComplete="off"
-          name="filter-form">
+          name="filter-form"
+        >
           <Row gutter={[32, 0]}>
             <Col xs={24} sm={24} md={16} lg={17} xl={20}>
               <Form.Item name="search" label="">
@@ -274,6 +270,7 @@ const EmployeeTimesheet = () => {
                 />
               </Form.Item>
             </Col>
+
             <Col xs={24} sm={24} md={8} lg={7} xl={4}>
               <div className={styles['filter-col']}>
                 <Button

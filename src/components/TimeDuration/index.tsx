@@ -11,8 +11,7 @@ const TimeDuration = (props: IProps) => {
 
         if(hours > 1){
             return (sec/3600).toFixed(2) + " hours"
-        }
-        else if (hours < 1){
+        } else {
             if(minutes> 1){
                 return minutes +" min"
             }
