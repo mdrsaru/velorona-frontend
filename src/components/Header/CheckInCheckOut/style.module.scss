@@ -1,17 +1,25 @@
 .cico {
-  border-right: 1px solid var(--gray-3);
-  padding: 0 1.5rem;
-  margin-right: 1rem;
   cursor: pointer;
+ }
 
-  .check-out {
-    display: flex;
-    align-items: center;
-    gap: 30px;
+.container {
+  background-color: var(--white);
+  padding: 1rem 2rem;
+  border: 1px solid var(--gray-secondary);
+}
 
-    .timer {
-      font-weight: 600;
-      font-size: 18px;
-    }
-  }
+.title {
+  font-weight: 600;
+  font-size: 18px;
+  color: var(--primary-blue);
+}
+
+.date {
+  font-weight: 600;
+  font-size: 24px;
+}
+
+.timer{
+  font-weight: 600;
+  font-size: 24px;
 }
