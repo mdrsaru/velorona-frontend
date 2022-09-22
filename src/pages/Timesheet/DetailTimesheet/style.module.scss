@@ -132,6 +132,14 @@
 
 .timesheet-detail {
   padding-right: 0.5rem;
+
+  .add-entry {
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 22px;
+    cursor: pointer;
+    color: var(--primary-blue);
+  }
 }
 
 .total-row {
