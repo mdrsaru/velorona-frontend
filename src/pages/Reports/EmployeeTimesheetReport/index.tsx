@@ -5,7 +5,7 @@ import { Card, Button, Form, Row, Select, Col, DatePicker, Typography, Input } f
 import { DownloadOutlined, SearchOutlined } from '@ant-design/icons';
 
 import { authVar } from '../../../App/link';
-import { TimesheetQueryInput, RoleName, Timesheet } from '../../../interfaces/generated';
+import { TimesheetQueryInput, RoleName } from '../../../interfaces/generated';
 import { TimesheetPagingData } from '../../../interfaces/graphql.interface';
 import { downloadCSV } from '../../../utils/common';
 import { notifyGraphqlError } from '../../../utils/error';
@@ -16,18 +16,11 @@ import PageHeader from '../../../components/PageHeader';
 import filterImg from '../../../assets/images/filter.svg';
 const { Option } = Select;
 
-const csvHeader: Array<{ label: string; key: string; subKey?: string }> = [
-  { label: 'Employee Name', key: 'client', subKey: 'name' },
-  { label: 'Total Time', key: 'durationFormat' },
-  { label: 'Status', key: 'status' },
-  { label: 'Total Expense', key: 'totalExpense' },
-  { label: 'Last Approved', key: 'lastApprovedAt' },
-];
 const { RangePicker } = DatePicker;
 const EmployeeTimesheetReport = () => {
   const authData = authVar();
   const company_id = authData.company?.id as string;
-  const [pagingInput, setPagingInput] = useState<{
+  const [pagingInput] = useState<{
     skip: number;
     currentPage: number;
   }>({
@@ -54,7 +47,6 @@ const EmployeeTimesheetReport = () => {
 
   const {
     data: timesheetData,
-    loading: timesheetLoading,
     refetch: refetchTimesheet,
   } = useQuery<TimesheetPagingData, { input: TimesheetQueryInput }>(EMPLOYEE_TIMESHEET, {
     fetchPolicy: 'network-only',
@@ -65,6 +57,35 @@ const EmployeeTimesheetReport = () => {
     onError: notifyGraphqlError,
   });
 
+  const csvHeader: Array<{ label: string; key: string; subKey?: string }> = [
+    { label: 'Date', key: 'date' },
+    { label: 'Employee Name', key: 'employee' },
+    { label: 'Client Name', key: 'client' },
+    { label: 'Total Time', key: 'durationFormat' },
+    { label: 'Last Approved', key: 'lastApprovedAt' },
+    { label: 'Total Expense', key: 'totalExpense' },
+    { label: 'Status', key: 'status' },
+
+  ];
+
+  const tableBody = () => {
+    const tableRows = [];
+    let timesheets: any = timesheetDownloadData?.Timesheet?.data;
+
+    for (const timesheet of timesheets) {
+      const date = (timesheet?.weekStartDate + '-' + timesheet?.weekEndDate) ?? '-';
+      const employee = timesheet?.user?.fullName ?? '-';
+      const client = timesheet?.client?.name ?? '-';
+      const durationFormat = timesheet?.durationFormat ?? '-';
+      const status = (timesheet?.status ?? '-');
+      const totalExpense = (timesheet?.totalExpense ?? '-');
+      const lastApprovedAt = (timesheet?.lastApprovedAt ?? '-');
+      tableRows.push({
+        date,employee, client, durationFormat, status, totalExpense, lastApprovedAt
+      });
+    }
+    return tableRows;
+  };
   const [fetchDownloadData, { data: timesheetDownloadData }] = useLazyQuery<
     TimesheetPagingData,
     { input: TimesheetQueryInput }
@@ -73,7 +94,8 @@ const EmployeeTimesheetReport = () => {
     nextFetchPolicy: 'cache-first',
     onError: notifyGraphqlError,
     onCompleted: () => {
-      downloadCSV(timesheetDownloadData?.Timesheet?.data, csvHeader, 'EmployeeTimesheet.csv');
+      const csvBody = tableBody()
+      downloadCSV(csvBody, csvHeader, 'EmployeeTimesheet.csv');
     },
   });
 
