@@ -2,7 +2,7 @@ import { debounce } from 'lodash';
 import React, { useState } from 'react';
 import { useLazyQuery, useQuery } from '@apollo/client';
 import { DownloadOutlined } from '@ant-design/icons';
-import { Card, Button, Col, Form, Input, Row, Select, Typography } from 'antd';
+import { Card, Button, Col, Form, Row, Select, Typography } from 'antd';
 
 import { USER } from '../../Employee';
 import { authVar } from '../../../App/link';
@@ -16,13 +16,6 @@ import filterImg from '../../../assets/images/filter.svg';
 
 const { Option } = Select;
 
-const csvHeader: Array<{ label: string; key: string; subKey?: string }> = [
-  { label: 'FullName', key: 'fullName' },
-  { label: 'Email', key: 'email' },
-  { label: 'Address', key: 'address', subKey: 'streetAddress' },
-  { label: 'Phone', key: 'phone' },
-  { label: 'Status', key: 'status' },
-];
 
 const EmployeeReport = () => {
   const loggedInUser = authVar();
@@ -31,7 +24,6 @@ const EmployeeReport = () => {
     filter: false,
   });
   const {
-    loading: employeeLoading,
     data: employeeData,
     refetch: refetchEmployee,
   } = useQuery<GraphQLResponse<'User', UserPagingResult>, QueryUserArgs>(USER, {
@@ -103,6 +95,52 @@ const EmployeeReport = () => {
     };
   });
 
+  const csvHeader: Array<{ label: string; key: string; subKey?: string }> = [
+    { label: 'FullName', key: 'fullName' },
+    { label: 'Email', key: 'email' },
+    { label: 'Phone', key: 'phone' },
+    { label: 'Designation', key: 'designation' },
+    { label: 'Country', key: 'country' },
+    { label: 'State', key: 'state' },
+    { label: 'City', key: 'city' },
+    { label: 'Street Address', key: 'streetAddress' },
+    { label: 'Apartment', key: 'aptOrSuite' },
+    { label: 'Zip Code', key: 'zipcode' },
+    { label: 'Status', key: 'status' },
+    { label: 'Role', key: 'role' },
+    { label: 'Manager Id', key: 'manager' },
+    { label: 'Start Date', key: 'startDate' },
+    { label: 'End Date', key: 'endDate' },
+  ];
+
+
+  const tableBody = () => {
+    const tableRows = [];
+    let users: any = employeeDownloadData?.User?.data;
+
+      for (const user of users) {
+        const fullName = user?.fullName ?? '-';
+        const email = user?.email;
+        const phone = (user?.phone ?? '-');
+        const designation = (user?.designation ?? '-');
+        const country = (user?.address?.country ?? '-');
+        const state = (user?.address?.streetAddress ?? '-');
+        const city = (user?.address?.city ?? '-');
+        const aptOrSuite = (user?.address?.aptOrSuite ?? '-');
+        const streetAddress = (user?.address?.streetAddress ?? '-');
+        const zipcode = (user?.address?.zipcode ?? '-');
+        const status = user?.status;
+        const role = (user?.roles?.[0]?.name ?? '-');
+        const manager = (user?.manager?.fullName ?? '-');
+        const startDate = (user?.startDate ?? '-');
+        const endDate = (user?.endDate ?? '-');
+        tableRows.push({
+          fullName, email, phone, designation, country, state, city, aptOrSuite, streetAddress, zipcode, status, role, manager, startDate, endDate
+        });
+      }
+      return tableRows;
+    };
+
   const [fetchDownloadData, { data: employeeDownloadData }] = useLazyQuery<
     GraphQLResponse<'User', UserPagingResult>,
     QueryUserArgs
@@ -117,7 +155,8 @@ const EmployeeReport = () => {
       },
     },
     onCompleted: () => {
-      downloadCSV(employeeDownloadData?.User?.data, csvHeader, 'Users.csv');
+      const csvBody = tableBody();
+      downloadCSV(csvBody, csvHeader, 'Users.csv');
     },
   });
   const openFilterRow = () => {

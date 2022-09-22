@@ -47,6 +47,10 @@ export const CLIENT = gql`
         archived
         phone
         invoiceSchedule
+        invoicePayment{
+        name
+        days
+        }
         invoice_payment_config_id
         biweeklyStartDate
         address {
