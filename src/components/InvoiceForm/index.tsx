@@ -2,11 +2,10 @@ import moment from 'moment';
 import isNil from 'lodash/isNil';
 import { ChangeEvent, useState, useEffect } from 'react';
 import { gql, useQuery, useMutation } from '@apollo/client';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { Button, Col, Form, Input, Row, Select, Image, DatePicker, InputNumber, Space, message, Popover, Checkbox } from 'antd';
 import { CloseCircleOutlined } from '@ant-design/icons';
 import { CheckboxChangeEvent } from 'antd/es/checkbox';
-
 
 import { round } from '../../utils/common';
 import { notifyGraphqlError } from '../../utils/error';
@@ -25,16 +24,6 @@ import {
 
 import addIcon from '../../assets/images/add_icon.svg';
 import styles from './style.module.scss';
-
-interface IProps {
-  timesheet_id?: string;
-  client_id: string;
-
-  /**
-   * If passed, will be used for editing or auto populating for the timesheet
-   */
-  invoice?: IInvoiceInput 
-}
 
 const PROJECT_LIST = gql`
   query ProjectList($input: ProjectQueryInput!) {
@@ -63,6 +52,18 @@ export const INVOICE_UPDATE = gql`
   }
 `;
 
+interface IProps {
+  timesheet_id?: string;
+  client_id: string;
+  startDate?: string;
+  endDate?: string;
+  user_id?: string;
+  /**
+   * If passed, will be used for editing or auto populating for the timesheet
+   */
+  invoice?: IInvoiceInput 
+}
+
 const InvoiceForm = (props: IProps) => {
   const navigate = useNavigate();
   const location = useLocation() as any;
@@ -70,10 +71,11 @@ const InvoiceForm = (props: IProps) => {
   const [form] = Form.useForm();
   const [isSendInvoiceClicked, setIsSendInvoiceClicked] = useState(false);
   const [needProject, setNeedProject] = useState(true);
+  const [searchParams, ] = useSearchParams();
+  const period = searchParams.get('period');
 
   const company_id = loggedInUser?.company?.id as string
   const companyCode = loggedInUser?.company?.code as string
-  const isTimesheet = !!props.timesheet_id; 
 
   useEffect(() => {
     if(!isNil(props.invoice?.needProject)) {
@@ -350,6 +352,16 @@ const InvoiceForm = (props: IProps) => {
         })),
       }; 
 
+      if(props.user_id) {
+        input.user_id = props.user_id;
+      }
+      if(props.startDate) {
+        input.startDate = props.startDate;
+      }
+      if(props.endDate) {
+        input.endDate = props.endDate;
+      }
+
       if(values.status) {
         input.status = values.status
       }
@@ -382,7 +394,7 @@ const InvoiceForm = (props: IProps) => {
       layout="vertical"
       initialValues={initialValues}
       onFinish={onSubmit}
-	  className={styles['invoice-form']}
+      className={styles['invoice-form']}
     >
       <Row gutter={24}>
         <Col xs={24} sm={24} md={12} lg={12}>
@@ -440,18 +452,22 @@ const InvoiceForm = (props: IProps) => {
         </Col>
       </Row>
 
-      <Row gutter={24}>
-        <Col xs={24} sm={24} md={12} lg={12}>
-          <Form.Item
-            name="needProject"
-            valuePropName="checked"
-          >
-            <Checkbox onChange={onNeedProjectChange}>
-              <h3>Need project for the invoice</h3>
-            </Checkbox>
-          </Form.Item>
-        </Col>
-      </Row>
+      {
+        !period && (
+          <Row gutter={24}>
+            <Col xs={24} sm={24} md={12} lg={12}>
+              <Form.Item
+                name="needProject"
+                valuePropName="checked"
+              >
+                <Checkbox onChange={onNeedProjectChange}>
+                  <h3>Need project for the invoice</h3>
+                </Checkbox>
+              </Form.Item>
+            </Col>
+          </Row>
+        )
+      }
 
       <div>
         <table className={styles['items-table']}>
@@ -486,7 +502,7 @@ const InvoiceForm = (props: IProps) => {
                                   }]}
                                   {...restField}
                                 >
-                                  <Select placeholder="Select Project" loading={projectLoading} disabled={isTimesheet}>
+                                  <Select placeholder="Select Project" loading={projectLoading} disabled={!!period}>
                                     {
                                       projectData?.Project?.data?.map((project) => (
                                         <Select.Option key={project.id} value={project.id}>{project.name}</Select.Option>
@@ -547,7 +563,7 @@ const InvoiceForm = (props: IProps) => {
                           </td>
 
                           {
-                            !isTimesheet && (
+                            !period && (
                               <td>
                                 <CloseCircleOutlined 
                                   className={styles['remove-icon']} 
@@ -562,7 +578,7 @@ const InvoiceForm = (props: IProps) => {
                     }
 
                     {
-                      !isTimesheet && (
+                      !period && (
                         <tr>
                           <td>
                             <Form.Item>

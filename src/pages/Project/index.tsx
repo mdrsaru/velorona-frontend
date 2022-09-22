@@ -41,11 +41,11 @@ export const PROJECT = gql`
         }
         status
         archived
-		users{
-			id
-			fullName
-			email
-		}
+        users{
+          id
+          fullName
+          email
+        }
       }
     }
   }

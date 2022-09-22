@@ -1,5 +1,6 @@
 import moment from 'moment';
-import { useRef, useState, useMemo, useEffect } from 'react'; import { gql, useQuery, useMutation } from '@apollo/client';
+import { useRef, useState, useMemo, useEffect } from 'react';
+import { gql, useQuery, useMutation } from '@apollo/client';
 import {
   Link,
   useNavigate
@@ -16,7 +17,7 @@ import { _cs, checkRoles } from '../../../utils/common';
 import routes from '../../../config/routes';
 import { notifyGraphqlError } from "../../../utils/error";
 import constants from "../../../config/constants";
-import { TimeEntry, MutationTimeEntriesApproveRejectArgs } from '../../../interfaces/generated';
+import { TimeEntry, MutationTimeEntriesApproveRejectArgs, InvoiceSchedule } from '../../../interfaces/generated';
 import { GraphQLResponse } from '../../../interfaces/graphql.interface';
 import { PROJECT } from '../../Project';
 import { IGroupedTimeEntries } from '../../../interfaces/common.interface';
@@ -350,9 +351,12 @@ const DetailTimesheet = (props: any) => {
     entriesByStatus.pending.length || !timesheetDetail?.entriesGroup?.byInvoice.length
   );
 
+  let generateInvoiceLink = routes.timesheetInvoice.path(authData?.company?.code as string, timesheet_id) + 
+    `?period=Weekly&timesheet_id=${timesheet_id}&client_id=${timesheet?.client?.id}&start=${timesheet?.weekStartDate}&end=${timesheet?.weekEndDate}&user_id=${timesheet?.user?.id}`
+
   return (
     <>
-      <div className={styles['site-card-wrapper']}>
+      <div>
         <Card bordered={false} className={styles['time-entries']}>
           {
             !timesheetDetail?.isSubmitted ? (
@@ -518,10 +522,10 @@ const DetailTimesheet = (props: any) => {
                               </span>
 
                               {
-                                adminLvlRole && (
+                                props.period === InvoiceSchedule.Weekly && adminLvlRole && (
                                   <Link
                                     className={styles['invoice-link']}
-                                    to={routes.timesheetInvoice.path(authData?.company?.code as string, timesheet_id)}
+                                    to={generateInvoiceLink}
                                     state={{ from: 'timesheet' }}
                                   >
                                     Generate Invoice

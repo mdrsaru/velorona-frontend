@@ -1,36 +1,39 @@
 import moment from 'moment';
+import uniq from 'lodash/uniq';
 import { useMemo } from 'react';
 import { gql, useQuery, NetworkStatus } from '@apollo/client';
 import {
   useParams,
-  Link,
-  useNavigate
+  useNavigate,
+  useSearchParams,
 } from 'react-router-dom';
-import groupBy from 'lodash/groupBy';
-import find from 'lodash/find';
-import { Card, Col, Row, Button, Space, message, Modal, Form, Select, Spin, Collapse } from 'antd';
-import {
-  CloseOutlined,
-} from '@ant-design/icons';
+import { Collapse, Button, Row } from 'antd';
 
+import { round } from '../../../utils/common';
 import { authVar } from '../../../App/link';
-import { _cs, checkRoles } from '../../../utils/common';
 import routes from '../../../config/routes';
-import { notifyGraphqlError } from "../../../utils/error";
-import constants from "../../../config/constants";
-import { TimeEntry, QueryTimesheetArgs, TimeSheetPagingResult, MutationTimeEntriesApproveRejectArgs, Timesheet } from '../../../interfaces/generated';
+import {
+  QueryTimesheetArgs,
+  TimeSheetPagingResult,
+  Timesheet,
+  InvoiceSchedule,
+  QueryCanGenerateInvoiceArgs,
+  TimesheetStatus
+} from '../../../interfaces/generated';
 import { GraphQLResponse } from '../../../interfaces/graphql.interface';
-import { PROJECT } from '../../Project';
-import { IGroupedTimeEntries } from '../../../interfaces/common.interface';
 
 import TimeSheetLoader from '../../../components/Skeleton/TimeSheetLoader';
-import InvoiceViewer from '../../../components/InvoiceViewer';
-import ModalConfirm from '../../../components/Modal';
 
 import TimesheetInformation from '../DetailTimesheet/TimesheetInformation';
 import DetailTimesheet from '../DetailTimesheet';
 
 import styles from './style.module.scss';
+
+export const CAN_GENERATE_INVOICE = gql`
+  query CanGenerateInvoice($input: TimeEntryPeriodicInput) {
+    CanGenerateInvoice(input: $input)
+  }
+`
 
 export const TIME_SHEET = gql`
   query Timesheet($input: TimesheetQueryInput!) {
@@ -60,6 +63,7 @@ export const TIME_SHEET = gql`
         client {
           id
           name
+          invoiceSchedule
         }
         company {
           id
@@ -118,14 +122,14 @@ const { Panel } = Collapse;
 
 const GroupedTimesheet = () => {
   let params = useParams()
-  let navigate = useNavigate();
-  const timesheet_id = params?.id as string;
-  const { Option } = Select;
-
-
   const authData = authVar()
-  const roles = authData?.user?.roles;
-  const [form] = Form.useForm()
+  const navigate = useNavigate();
+  const [searchParams,] = useSearchParams();
+  const company_id = authData?.company?.id as string;
+
+  const period = searchParams.get('period') ?? InvoiceSchedule.Weekly;
+  const start = searchParams.get('start');
+  const end = searchParams.get('end');
 
   const { data: timeSheetDetailData, loading: timesheetLoading, refetch: refetchTimeSheet, networkStatus } = useQuery<
     GraphQLResponse<'Timesheet', TimeSheetPagingResult>,
@@ -137,7 +141,7 @@ const GroupedTimesheet = () => {
     variables: {
       input: {
         query: {
-          company_id: authData?.company?.id as string,
+          company_id,
           ids: params?.id?.split(',') ?? [],
         },
         paging: {
@@ -145,16 +149,37 @@ const GroupedTimesheet = () => {
         }
       }
     },
-    onCompleted: (response) => {
-    }
   });
 
   const timesheet = timeSheetDetailData?.Timesheet?.data;
+  const client = timesheet?.[0]?.client;
+
+  const skipInvoiceQuery = !timesheet?.length || !period || period === InvoiceSchedule.Weekly
+
+  const { data: canGenerateInvoiceData } = useQuery<
+    GraphQLResponse<'CanGenerateInvoice', boolean>,
+    QueryCanGenerateInvoiceArgs
+  >(CAN_GENERATE_INVOICE, {
+    skip: skipInvoiceQuery,
+    fetchPolicy: 'network-only',
+    nextFetchPolicy: 'cache-first',
+    variables: {
+      input: {
+        startDate: start as string,
+        endDate: end as string,
+        client_id: client?.id as string,
+        user_id: timesheet?.[0]?.user?.id as string,
+        company_id,
+      }
+    }
+  })
 
   const totalExpense = useMemo(() => {
-    return timesheet?.reduce((acc, current) => {
+    const expense = timesheet?.reduce((acc, current) => {
       return acc + (current?.totalExpense ?? 0);
-    }, 0)
+    }, 0) ?? 0;
+
+    return round(expense, 2);
   }, [timesheet])
 
   const details = useMemo(() => {
@@ -163,6 +188,9 @@ const GroupedTimesheet = () => {
     if(!totalTimesheet) {
       return null;
     }
+
+    const statuses = timesheet?.map((ts) => ts.status) ?? [];
+    const status = getStatus(statuses);
 
     const approvedDates = timesheet
       ?.filter((_timesheet) => _timesheet.lastApprovedAt)
@@ -175,13 +203,24 @@ const GroupedTimesheet = () => {
     return {
       ...(timesheet?.[0] ?? {}),
       totalExpense,
-      weekStartDate: timesheet?.[totalTimesheet - 1]?.weekStartDate,
-      weekEndDate: timesheet?.[0]?.weekEndDate,
+      weekStartDate: start ? start : timesheet?.[totalTimesheet - 1]?.weekStartDate,
+      weekEndDate: end ? end : timesheet?.[0]?.weekEndDate,
       lastApprovedAt: approvedDates?.length ? moment.max(approvedDates) : null,
       lastSubmittedAt: submittedDates?.length ? moment.max(submittedDates) : null,
       isSubmitted: true,
+      status,
     } 
-  }, [timesheet, totalExpense]) as Timesheet;
+  }, [timesheet, totalExpense, start, end]) as Timesheet;
+
+  const generateInvoice = () => {
+    const code = authData?.company?.code as string;
+    const user_id = timesheet?.[0]?.user?.id;
+    let link = routes.timesheetInvoice.path(code, '');
+
+    link += `?client_id=${client?.id}&period=${period}&start=${start}&end=${end}&user_id=${user_id}`;
+
+    navigate(link);
+  }
 
   return (
     <>
@@ -196,17 +235,31 @@ const GroupedTimesheet = () => {
               )
             }
 
+            <>
+              {
+                canGenerateInvoiceData?.CanGenerateInvoice && (
+                  <Row justify="end" style={{ marginBottom: 10 }}>
+                    <Button onClick={generateInvoice}>
+                      Generate Invoice
+                    </Button>
+                  </Row>
+                )
+              }
+            </>
+
             {
               timesheet?.length === 1 ? (
                 <DetailTimesheet 
+                  period={period}
                   timesheet={timesheet[0]}
                   refetchTimeSheet={refetchTimeSheet}
                 />
               ) : timesheet?.map((_timesheet, index) => (
-                <div key={_timesheet.id} style={{ marginBottom: 10 }}>
+                <div key={_timesheet.id} style={{ marginBottom: 16 }}>
                   <Collapse collapsible="header" defaultActiveKey={index}>
                     <Panel header={`${_timesheet.weekStartDate} - ${_timesheet.weekEndDate}`} key={index}>
                     <DetailTimesheet 
+                      period={period}
                       timesheet={_timesheet}
                       refetchTimeSheet={refetchTimeSheet}
                     />
@@ -220,6 +273,29 @@ const GroupedTimesheet = () => {
       }
     </>
   )
+}
+
+function getStatus(statuses: string[]) {
+  const status = uniq(statuses);
+
+  if (status.length === 1) {
+    return status[0];
+  }
+
+  if (status.includes(TimesheetStatus.PartiallyApproved)) {
+    return TimesheetStatus.PartiallyApproved;
+  }
+
+  if (status.includes(TimesheetStatus.Rejected)) {
+    return TimesheetStatus.Rejected;
+  }
+
+  if(status.length > 1) {
+    return TimesheetStatus.PartiallyApproved;
+  }
+
+  return TimesheetStatus.Pending;
+
 }
 
 export default GroupedTimesheet;

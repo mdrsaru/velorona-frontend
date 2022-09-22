@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Link, useParams, useLocation } from 'react-router-dom';
+import { Link, useSearchParams } from 'react-router-dom';
 import { gql, useQuery } from '@apollo/client';
 import { Card } from 'antd';
 import { ArrowLeftOutlined } from '@ant-design/icons';
@@ -7,8 +7,13 @@ import { ArrowLeftOutlined } from '@ant-design/icons';
 import { authVar } from '../../App/link';
 import routes from '../../config/routes';
 import { round } from '../../utils/common';
-import { TimesheetPagingData, IInvoiceInput } from '../../interfaces/graphql.interface';
-import { TimesheetQueryInput } from '../../interfaces/generated';
+import { IInvoiceInput } from '../../interfaces/graphql.interface';
+import {
+  ClientPagingResult,
+  ProjectItem,
+  ProjectItemInput,
+  ClientQueryInput,
+} from '../../interfaces/generated';
 
 import PageHeader from '../../components/PageHeader';
 import InvoiceClientDetail from '../../components/InvoiceClientDetail';
@@ -17,107 +22,124 @@ import Loader from '../../components/Loader';
 
 import styles from './style.module.scss';
 
-const TIMESHEET = gql`
-  query Timesheet($input: TimesheetQueryInput!) {
-    Timesheet(input: $input) {
+type QueryInput = {
+  clientInput: ClientQueryInput,
+  projectItemInput: ProjectItemInput,
+};
+
+type Response = {
+  Client: ClientPagingResult,
+  ProjectItems: ProjectItem[],
+};
+
+const CLIENT_AND_PROJECT_ITEMS = gql`
+  query ClientAndProjectItems(
+    $clientInput: ClientQueryInput!,
+    $projectItemInput: ProjectItemInput!
+  ) {
+    Client(input: $clientInput) {
       data {
         id
-        weekStartDate
-        weekEndDate
-        durationFormat
-        totalExpense
-        lastApprovedAt
-        status
-        user {
-          fullName
-        }
-        client {
-          id
-          name
-          email
-          address {
-            streetAddress
-          }
-        }
-        projectItems {
-          project_id
-          totalExpense
-          totalDuration
-          totalHours
-          hourlyRate
+        name
+        email
+        address {
+          streetAddress
         }
       }
     }
+
+    ProjectItems(input: $projectItemInput) {
+      project_id
+      totalExpense
+      totalDuration
+      totalHours
+      hourlyRate
+    }
   }
-`;
+`
 
 const TimesheetInvoice = (props: any) => {
   const authData = authVar();
-  const { timesheetId } = useParams();
+  //const { timesheetId } = useParams();
   const [invoiceInput, setInvoiceInput] = useState<IInvoiceInput | undefined>();
   const company_id = authData.company?.id as string;
-  const location = useLocation();
+  const searchParams = useSearchParams()[0];
+
+  const timesheetId = searchParams.get('timesheet_id') as string;
+  const client_id = searchParams.get('client_id') as string;
+  const user_id = searchParams.get('user_id') as string;
+  const startDate = searchParams.get('start') as string;
+  const endDate = searchParams.get('end') as string;
 
   const {
-    data: timesheetData,
-    loading: timesheetLoading,
-  } = useQuery<TimesheetPagingData, { input: TimesheetQueryInput }>(
-    TIMESHEET, {
-      fetchPolicy: 'cache-first',
-      variables: {
-        input: {
-          query: {
-            company_id,
-            id: timesheetId,
-          },
-        },
-      },
-      onCompleted(response) {
-        const timesheet = response?.Timesheet?.data?.[0];
-        if(timesheet) {
-          let totalAmount = 0;
-          let totalQuantity = 0;
-          const description = `${timesheet.weekStartDate} - ${timesheet.weekEndDate}`;
-
-          const items = (timesheet?.projectItems ?? []).map((item) => {
-            const quantity = item.totalHours;
-            totalAmount += item.totalExpense;
-            totalQuantity += quantity;
-
-            return {
-              project_id: item.project_id,
-              description,
-              quantity: round(quantity, 6),
-              rate: item.hourlyRate,
-              amount: item.totalExpense,
-            }
-          })
-
-          totalAmount = round(totalAmount, 2);
-
-          const invoice: IInvoiceInput = {
-            issueDate: new Date(), 
-            dueDate: new Date(),
-            poNumber: '',
-            totalAmount,
-            subtotal: totalAmount,
-            taxPercent: 0,
-            taxAmount: 0,
-            discount: 0,
-            discountAmount: 0,
-            notes: '',
-            totalQuantity: round(totalQuantity, 2),
-            shipping: 0,
-            items,
-          }
-
-          setInvoiceInput(invoice);
+    data: clientProjectData,
+    loading,
+  } = useQuery<
+    Response,
+    QueryInput
+  >(CLIENT_AND_PROJECT_ITEMS, {
+    variables: {
+      clientInput: {
+        query: {
+          company_id,
+          id: client_id,
         }
+      },
+      projectItemInput: {
+        startTime: startDate + ' 00:00:00',
+        endTime: endDate + ' 23:59:59',
+        company_id,
+        user_id,
+        client_id,
       }
     },
-  );
+    onCompleted(response) {
+      if(response.ProjectItems) {
+        let totalAmount = 0;
+        let totalQuantity = 0;
 
-  const timesheet = timesheetData?.Timesheet?.data?.[0];
+        const description = `${startDate} - ${endDate}`;
+
+        const items = (response?.ProjectItems ?? []).map((item) => {
+          const quantity = item.totalHours;
+          totalAmount += item.totalExpense;
+          totalQuantity += quantity;
+
+          return {
+            project_id: item.project_id,
+            description,
+            quantity: round(quantity, 6),
+            rate: item.hourlyRate,
+            amount: item.totalExpense,
+          }
+        })
+
+        totalAmount = round(totalAmount, 2);
+
+        const invoice: IInvoiceInput = {
+          issueDate: new Date(), 
+          dueDate: new Date(),
+          needProject: true,
+          poNumber: '',
+          totalAmount,
+          subtotal: totalAmount,
+          taxPercent: 0,
+          taxAmount: 0,
+          discount: 0,
+          discountAmount: 0,
+          notes: '',
+          totalQuantity: round(totalQuantity, 2),
+          shipping: 0,
+          items,
+        }
+
+        setInvoiceInput(invoice);
+      }
+
+    }
+  })
+
+  const client = clientProjectData?.Client?.data?.[0];
 
   return (
     <div className={styles['container']}>
@@ -134,14 +156,25 @@ const TimesheetInvoice = (props: any) => {
         />
 
         {
-          timesheetLoading && <Loader />
+          loading && <Loader />
         }
 
         {
-          !!timesheet?.client && (
+          !!client && (
             <>
-              <InvoiceClientDetail client={timesheet.client} />
-              { invoiceInput && <InvoiceForm timesheet_id={timesheet.id} client_id={timesheet.client.id} invoice={invoiceInput} /> }
+              <InvoiceClientDetail client={client} />
+              { 
+                invoiceInput && (
+                  <InvoiceForm 
+                    timesheet_id={timesheetId} 
+                    client_id={client.id}
+                    invoice={invoiceInput} 
+                    startDate={startDate}
+                    endDate={endDate}
+                    user_id={user_id}
+                  /> 
+                )
+              }
             </>
           )
         }

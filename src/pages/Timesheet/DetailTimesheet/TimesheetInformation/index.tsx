@@ -33,7 +33,6 @@ const TimesheetInformation = (props: IProps) => {
   return (
     <Card
       bordered={false}
-      className={styles['timesheet-information']}
     >
       <PageHeader
         title={

@@ -10,7 +10,7 @@ import constants, { employee_timesheet_status } from '../../config/constants';
 import routes from '../../config/routes';
 import { notifyGraphqlError } from '../../utils/error';
 import { TimesheetPagingData } from '../../interfaces/graphql.interface';
-import { TimesheetQueryInput, Timesheet } from '../../interfaces/generated';
+import { TimesheetQueryInput, Timesheet, InvoiceSchedule} from '../../interfaces/generated';
 import PageHeader from '../../components/PageHeader';
 import Status from '../../components/Status';
 
@@ -30,6 +30,7 @@ export const EMPLOYEE_TIMESHEET = gql`
       }
       data {
         id
+        period
         durationFormat
         duration
         invoicedDuration
@@ -236,11 +237,16 @@ const EmployeeTimesheet = () => {
     {
       title: 'Action',
       render: (timesheet: Timesheet) => {
+        let link = routes.detailTimesheet.path(authData?.company?.code as string, timesheet?.id)
+        if(timesheet.period === InvoiceSchedule.Biweekly || timesheet.period === InvoiceSchedule.Monthly) {
+          link += `?start=${timesheet.weekStartDate}&end=${timesheet.weekEndDate}&period=${timesheet.period}`;
+        }
+
         return (
           <Link
             className={styles['invoice-link']}
             title='View Detail'
-            to={routes.detailTimesheet.path(authData?.company?.code as string, timesheet.id)}>
+            to={link}>
             <EyeFilled  className={`${styles["table-icon"]} ${styles["table-view-icon"]}`}/>
           </Link>
         )
