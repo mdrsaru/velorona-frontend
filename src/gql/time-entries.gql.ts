@@ -9,6 +9,8 @@ export const TIME_ENTRY_FIELDS = gql`
     duration
     clientLocation
     description
+    startBreakTime
+    breakTime
     company {
       id
       name

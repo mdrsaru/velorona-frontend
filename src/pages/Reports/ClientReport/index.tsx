@@ -1,4 +1,3 @@
-import { debounce } from 'lodash';
 import { useState } from 'react';
 import { Button, Card, Row, Col, Form, Select, Typography } from 'antd';
 import { useLazyQuery, useQuery } from '@apollo/client';
@@ -30,12 +29,6 @@ export interface UserData {
 
 const { Option } = Select;
 
-const csvHeader: Array<{ label: string; key: string; subKey?: string }> = [
-  { label: 'Client Name', key: 'name' },
-  { label: 'Email Address', key: 'email' },
-  { label: 'Invoicing Email', key: 'invoicingEmail' },
-  { label: 'Status', key: 'status' },
-];
 
 const ClientReport = () => {
   const loggedInUser = authVar();
@@ -63,6 +56,47 @@ const ClientReport = () => {
     },
   });
 
+  const csvHeader: Array<{ label: string; key: string; subKey?: string }> = [
+    { label: 'Client Name', key: 'name' },
+    { label: 'Email Address', key: 'email' },
+    { label: 'Invoicing Email', key: 'invoicingEmail' },
+    { label: 'Country', key: 'country' },
+    { label: 'State', key: 'state' },
+    { label: 'City', key: 'city' },
+    { label: 'Street Address', key: 'streetAddress' },
+    { label: 'Zip Code', key: 'zipcode' },
+    { label: 'Contact Number', key: 'phone'},
+    { label: 'Invoice Schedule', key: 'invoiceSchedule'},
+    { label: 'Invoice Payment', key: 'invoicePayment'},
+    { label: 'Status', key: 'status' },
+  ];
+
+  
+  const tableBody = () => {
+    const tableRows = [];
+    let clients: any =clientDownloadData?.Client?.data;
+
+      for (const client of clients) {
+        const name = client?.name ?? '-';
+        const email = client?.email;
+        const phone = (client?.phone ?? '-');
+        const invoicingEmail = (client?.invoicingEmail ?? '-');
+        const country = (client?.address?.country ?? '-');
+        const state = (client?.address?.streetAddress ?? '-');
+        const city = (client?.address?.city ?? '-');
+        const streetAddress = (client?.address?.streetAddress ?? '-');
+        const zipcode = (client?.address?.zipcode ?? '-');
+        const status = client?.status;
+        const invoicePayment = (client?.invoicePayment?.name ?? '-');
+        const invoiceSchedule = (client?.invoiceSchedule ?? '-');
+        tableRows.push({
+          name, email, phone, invoicingEmail, country, 
+          state, city, streetAddress, zipcode, status, invoicePayment, invoiceSchedule
+        });
+      }
+      return tableRows;
+    };
+
   const [fetchDownloadData, { data: clientDownloadData }] = useLazyQuery<
     GraphQLResponse<'Client', ClientPagingResult>,
     QueryClientArgs
@@ -80,7 +114,8 @@ const ClientReport = () => {
       },
     },
     onCompleted: () => {
-      downloadCSV(clientDownloadData?.Client?.data, csvHeader, 'Client.csv');
+      const csvBody = tableBody()
+      downloadCSV(csvBody, csvHeader, 'Client.csv');
     },
   });
 
