@@ -2,7 +2,7 @@ import moment from 'moment';
 import { useState } from 'react';
 import { useStopwatch } from 'react-timer-hook';
 import { gql, useMutation, useQuery } from '@apollo/client';
-import { Button, Modal } from 'antd';
+import { Button, Col, message, Modal, Row } from 'antd';
 
 import { TIME_ENTRY_FIELDS } from '../../../gql/time-entries.gql';
 import { GraphQLResponse } from '../../../interfaces/graphql.interface';
@@ -38,20 +38,28 @@ export const UPDATE_TIME_ENTRY = gql`
   }
 `;
 
-interface IProps{
-  refetch?:any;
-  refetchTimesheet?:any;
+interface IProps {
+  refetch?: any;
+  refetchTimesheet?: any;
 }
-const CheckInCheckOut = (props:IProps) => {
+const CheckInCheckOut = (props: IProps) => {
   const [activeEntry_id, setActiveEntry_id] = useState<string | null>(null)
   const [isCheckInVisible, setIsCheckInVisible] = useState(false)
-
+  const [breakStartTime, setBreakStartTime] = useState<string>()
   const {
     seconds,
     minutes,
     hours,
     isRunning,
     reset,
+  } = useStopwatch({ autoStart: false });
+
+  const {
+    seconds: breakSeconds,
+    minutes: breakMinutes,
+    hours: breakHours,
+    isRunning: isBreakRunning,
+    reset: breakReset,
   } = useStopwatch({ autoStart: false });
 
   const { data: authData } = useQuery(AUTH)
@@ -67,6 +75,14 @@ const CheckInCheckOut = (props:IProps) => {
     const time = offset.setSeconds(offset.getSeconds() + diff)
     reset(new Date(time))
     setActiveEntry_id(id);
+  }
+
+  const startBreakTimer = (date: string) => {
+    const offset = new Date();
+    const now = moment();
+    const diff = now.diff(moment(date), 'seconds');
+    const time = offset.setSeconds(offset.getSeconds() + diff)
+    breakReset(new Date(time))
   }
 
   const { loading: timeEntryLoading } = useQuery<
@@ -87,9 +103,15 @@ const CheckInCheckOut = (props:IProps) => {
     onCompleted(response) {
       if (response.TimeEntry.activeEntry) {
         let startTime = response.TimeEntry.activeEntry?.startTime;
+        let startBreakTime = response.TimeEntry.activeEntry?.startBreakTime;
         if (startTime) {
           startTime = moment(startTime).utc().format('YYYY-MM-DDTHH:mm:ss');
           startTimer(response.TimeEntry.activeEntry.id, startTime);
+        }
+        if (startBreakTime) {
+          startBreakTime = moment(startBreakTime).utc().format('YYYY-MM-DDTHH:mm:ss');
+          startBreakTimer(startBreakTime);
+          setBreakStartTime(startBreakTime)
         }
       }
     }
@@ -157,15 +179,15 @@ const CheckInCheckOut = (props:IProps) => {
         }
       })
       props?.refetchTimesheet({
-				input: {
-					query: {
-						company_id,
-					},
-					paging: {
-						order: ['weekStartDate:DESC']
-					}
-				}
-			})
+        input: {
+          query: {
+            company_id,
+          },
+          paging: {
+            order: ['weekStartDate:DESC']
+          }
+        }
+      })
     },
     onError: notifyGraphqlError,
   });
@@ -184,6 +206,25 @@ const CheckInCheckOut = (props:IProps) => {
     }
   }
 
+  const [addBreakTime] = useMutation<
+    GraphQLResponse<'TimeEntryUpdate', TimeEntry>,
+    MutationTimeEntryUpdateArgs
+  >(UPDATE_TIME_ENTRY, {
+    onCompleted(response) {
+      if (response?.TimeEntryUpdate) {
+        message.success({ content: `Break time added successfully`, className: 'custom-message' })
+        breakReset(undefined, false);
+      }
+    },
+    onError: notifyGraphqlError,
+  });
+
+  const [addStartBreakTime] = useMutation<
+    GraphQLResponse<'TimeEntryUpdate', TimeEntry>,
+    MutationTimeEntryUpdateArgs
+  >(UPDATE_TIME_ENTRY, {
+    onError: notifyGraphqlError,
+  });
   const showCheckInModal = () => {
     setIsCheckInVisible(true);
   }
@@ -192,27 +233,106 @@ const CheckInCheckOut = (props:IProps) => {
     setIsCheckInVisible(false);
   }
 
+  const handleAddBreakTime = () => {
+    const date = moment().format('YYYY-MM-DD HH:mm:ss')
+    addStartBreakTime({
+      variables: {
+        input: {
+          id: activeEntry_id as string,
+          company_id,
+          startBreakTime: date
+        },
+      },
+    })
+  }
+
+  const handleEndBreakTime = () => {
+    let endDate = moment().format('YYYY-MM-DDTHH:mm:ss')
+
+    const diff = moment(endDate).diff(breakStartTime, 'seconds');
+
+    if (activeEntry_id) {
+      addBreakTime({
+        variables: {
+          input: {
+            id: activeEntry_id as string,
+            company_id,
+            breakTime: diff,
+            startBreakTime: null
+          },
+        },
+      })
+    }
+  }
+
+  const today = moment().format('MM/DD/YYYY')
   return (
     <>
       <div className={styles['cico']}>
-        {
-          isRunning ? (
-            <div className={styles['check-out']}>
-              <div className={styles['timer']}>
-                <Digit value={hours} />:<Digit value={minutes} />:<Digit value={seconds} />
-              </div>
-              <Button onClick={checkOut} loading={updateLoading}>
-                Check-out
-              </Button>
-            </div>
-          ) : (
-            <Button type="primary" onClick={showCheckInModal} disabled={timeEntryLoading}>
-              Check-in
-            </Button>
-          )
-        }
+        <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
+        {isRunning &&
+          <Col xs={24} sm={24} md={12} lg={11}>
+            <div className={styles['container']}>
+              <Row >
+                <Col xs={24} sm={24} md={12} lg={18}>
+                  <p className={styles['title']}>Take Break</p>
+                </Col>
+                <Col>
+                  <p className={styles['date']}>{today}</p>
+                </Col>
+              </Row>
+              <Row>
+                <Col className={`${styles['timer']}`}  xs={24} sm={24} md={12} lg={18}>
+                  <Digit value={breakHours} />:<Digit value={breakMinutes} />:<Digit value={breakSeconds} />
+                </Col>
+                <Col>
+                  {isBreakRunning ?
+                      <Button onClick={handleEndBreakTime} loading={updateLoading}>
+                        End Break
+                      </Button>
+                    :
 
+                      <Button  type='primary' onClick={handleAddBreakTime} loading={updateLoading}>
+                        Break
+                      </Button>
+                  }
+                </Col>
+              </Row>
+            </div>
+          </Col>
+}
+          :
+          <Col xs={24} sm={24} md={12} lg={12}>
+            <div className={styles['container']}>
+              <Row>
+                <Col  xs={24} sm={24} md={12} lg={18}>
+                  <p className={styles['title']}>Check-in</p>
+                </Col>
+                <Col>
+                  <p className={styles['date']}>{today}</p>
+                </Col>
+              </Row>
+              <Row>
+                <Col className={`gutter-row ${styles['timer']}`} xs={24} sm={24} md={12} lg={18}>
+                  <Digit value={hours} />:<Digit value={minutes} />:<Digit value={seconds} />
+                </Col>
+                <Col className={styles['timer']}>
+                  {isRunning ?
+                    <Button onClick={checkOut} loading={updateLoading}>
+                      Check-out
+                    </Button>
+                    :
+                    <Button onClick={showCheckInModal} loading={updateLoading}>
+                      Check-in
+                    </Button>
+                  }
+                </Col>
+              </Row>
+            </div>
+          </Col>
+        </Row>
       </div>
+
 
       <Modal
         centered
