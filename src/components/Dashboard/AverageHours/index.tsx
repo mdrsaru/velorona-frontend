@@ -9,10 +9,11 @@ import {
   Legend, ChartOptions,
 } from 'chart.js';
 import { Bar } from 'react-chartjs-2';
-import { Empty, Typography } from "antd";
+import { Col, Empty, Select, Typography } from "antd";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 import styles from "./style.module.scss";
 import { IBarChart } from "../../../interfaces/IDashboard";
+import moment from "moment";
 
 ChartJS.register(
   CategoryScale,
@@ -27,7 +28,11 @@ interface IProps {
   averageHoursData: IBarChart[];
   caption: string;
   title: string;
+  setDate?: any;
 }
+
+
+const { Option } = Select;
 
 const Index = (props: IProps) => {
   const { averageHoursData,  title } = props;
@@ -40,7 +45,7 @@ const Index = (props: IProps) => {
           display: false,
         },
         suggestedMin: 0,
-        suggestedMax: 120,
+        suggestedMax: 1000,
       },
       y: {
         grid: {
@@ -94,7 +99,14 @@ const Index = (props: IProps) => {
       }
     ],
   }
-  
+
+  const months = moment.monthsShort();
+
+  const handleChange = (month: number) => {
+    props.setDate(`2022/${month}/01`)
+  }
+
+  let month = new Date().getMonth();
   return (
     <>
       <div className={styles['average-hours']}>
@@ -102,7 +114,20 @@ const Index = (props: IProps) => {
           <Typography.Title level={3}>{title}</Typography.Title>
           {/* <Typography.Title level={4} keyboard className={styles['no-margin']}>
             {caption}
-          </Typography.Title> */}
+          </Typography.Title> */
+
+          }
+          <Col
+            xs={24}
+            sm={24}
+            md={24}
+            lg={7}>
+            <Select onSelect={handleChange} placeholder='Select Month' defaultValue={month + 1}>
+              {months.map((month, index) => (
+                <Option value={index + 1} >{month}</Option>
+              ))}
+            </Select>
+          </Col>
         </div>
         {data?.labels?.length ?
           <div className={

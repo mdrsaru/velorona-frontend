@@ -27,7 +27,7 @@ query Count($totalDurationInput: TotalDurationCountInput!, $projectInvolvedInput
 const EmployeeDashboard = () => {
 
     const authData = authVar();
-
+    const [date,setDate] = useState(new Date())
     const { data: overallCount } = useQuery(
         COUNT,
         {
@@ -58,6 +58,8 @@ const EmployeeDashboard = () => {
                     query: {
                         company_id: authData?.company?.id,
                         user_id: authData?.user?.id,
+                        weekStartDate: moment(date).startOf('month').format('YYYY/MM/DD'),
+                        weekEndDate: moment(date).endOf('month').format("YYYY/MM/DD"),            
                     },
                     paging: {
                         order: ['weekStartDate:DESC']
@@ -190,6 +192,7 @@ const EmployeeDashboard = () => {
                         averageHoursData={averageHoursData}
                         title={'Hours Tracked Per Week'}
                         caption={'Jan 2022'}
+                        setDate = {setDate}
                     />
                 </Col>
                 <Col xs={24} lg={12}>

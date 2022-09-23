@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {Col, Row} from "antd";
 import employeesImg from "../../../assets/images/employees.svg";
 import clientsImg from "../../../assets/images/clients.svg";
@@ -26,6 +26,7 @@ query Count($userInput: UserCountInput!, $clientInput: ClientCountInput!,$projec
 const CompanyAdminDashboard = () => {
 
   const authData = authVar()
+const [date,setDate] = useState(new Date())
 
   const { data: overallCount } = useQuery(
     COUNT,
@@ -53,7 +54,9 @@ const CompanyAdminDashboard = () => {
       variables: {
         input: {
           query: {
-            company_id: authData?.company?.id
+            company_id: authData?.company?.id,
+            weekStartDate: moment(date).startOf('month').format('YYYY/MM/DD'),
+            weekEndDate: moment(date).endOf('month').format("YYYY/MM/DD"),
           },
           paging: {
             order: ['weekStartDate:DESC']
@@ -125,6 +128,7 @@ const CompanyAdminDashboard = () => {
             averageHoursData={averageHoursData}
             title = {'Average Hours Tracked'}
             caption={'Jan 2022'}
+            setDate = {setDate}
           />
           <TotalExpenses totalExpensesData={totalExpensesData} caption={'Jan 2022'}/>
         </Col>
