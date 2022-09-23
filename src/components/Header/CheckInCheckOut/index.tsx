@@ -235,6 +235,7 @@ const CheckInCheckOut = (props: IProps) => {
 
   const handleAddBreakTime = () => {
     const date = moment().format('YYYY-MM-DD HH:mm:ss')
+    startBreakTimer(date)
     addStartBreakTime({
       variables: {
         input: {
