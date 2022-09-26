@@ -98,11 +98,6 @@ const EditProject = () => {
 
   const onSubmitForm = (values: any) => {
     let key = 'project'
-    message.loading({
-      content: "Editing project in progress..",
-      key,
-      className: 'custom-message'
-    })
     projectUpdate({
       variables: {
         input: {

@@ -41,8 +41,6 @@ const NewClient = () => {
 
   const onSubmitForm = (values: any) => {
     let key = 'message';
-    message.loading({ content: "New client adding in progress..", key, className: 'custom-message' })
-
     const input: ClientCreateInput = {
       name: values.name,
       email: values.email,

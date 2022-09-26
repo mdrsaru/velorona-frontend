@@ -116,7 +116,6 @@ const AttachClient = () => {
 
   const onSubmitForm = (values: any) => {
     let key = 'client';
-    message.loading({ content: "Adding client in progress..", key, className: 'custom-message' })
     clientCreate({
       variables: {
         input: {
