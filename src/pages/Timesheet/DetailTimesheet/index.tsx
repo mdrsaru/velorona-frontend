@@ -239,9 +239,14 @@ const DetailTimesheet = (props: any) => {
   }
 
   const checkDate = (today: any, weekEndDate: any) => {
-    return today.getFullYear() === weekEndDate.getFullYear() &&
-      today.getDate() <= weekEndDate.getDate() &&
-      today.getMonth() === weekEndDate.getMonth();
+
+    let todayDate = new Date(today).getTime();
+    let endDate = new Date(weekEndDate).getTime();
+
+    return todayDate < endDate
+    // return today.getFullYear() === weekEndDate.getFullYear() &&
+    //   today.getDate() <= weekEndDate.getDate() &&
+    //   today.getMonth() === weekEndDate.getMonth();
   }
 
   const onSubmitTimesheet = () => {
@@ -347,11 +352,11 @@ const DetailTimesheet = (props: any) => {
   const isSubmitted:any = timesheetDetail?.isSubmitted;
 
   const hasTimeEntries = (
-    entriesByStatus?.approved?.length || !timesheetDetail?.rejected?.length || 
+    entriesByStatus?.approved?.length || !timesheetDetail?.rejected?.length ||
     entriesByStatus.pending.length || !timesheetDetail?.entriesGroup?.byInvoice.length
   );
 
-  let generateInvoiceLink = routes.timesheetInvoice.path(authData?.company?.code as string, timesheet_id) + 
+  let generateInvoiceLink = routes.timesheetInvoice.path(authData?.company?.code as string, timesheet_id) +
     `?period=Weekly&timesheet_id=${timesheet_id}&client_id=${timesheet?.client?.id}&start=${timesheet?.weekStartDate}&end=${timesheet?.weekEndDate}&user_id=${timesheet?.user?.id}`
 
   return (
@@ -365,21 +370,21 @@ const DetailTimesheet = (props: any) => {
                 <PageHeader
                   title="Time Entry Details"
                   extra={[
-                  <span key="new-entry">
-                    {
-                      roles.includes(constants.roles.Employee) &&
-                      <span
-                        key="new-entry"
-                        className={styles['add-entry']}
-                        onClick={() => {
-                          setShowAddNewEntry(true)
-                          form.resetFields();
-                        }}
-                      >
-                        Add New Time Entry
-                      </span>
-                    }
-                  </span>
+                    <span key="new-entry">
+                      {
+                        roles.includes(constants.roles.Employee) &&
+                        <span
+                          key="new-entry"
+                          className={styles['add-entry']}
+                          onClick={() => {
+                            setShowAddNewEntry(true)
+                            form.resetFields();
+                          }}
+                        >
+                          Add New Time Entry
+                        </span>
+                      }
+                    </span>
                   ]}
                 />
               </Row>
@@ -395,7 +400,7 @@ const DetailTimesheet = (props: any) => {
 
           {
             !hasTimeEntries ? (
-              <NoContent title={'No Time Entry added'} subtitle={'There are no entries added at the moment'} /> 
+              <NoContent title={'No Time Entry added'} subtitle={'There are no entries added at the moment'} />
             ) : (
               <>
                 <div className={styles['resp-table']}>
@@ -414,7 +419,7 @@ const DetailTimesheet = (props: any) => {
                           {
                             timesheetDetail?.isSubmitted && managerLvlRole && (
                               <div className={styles['action']}>
-                                <span 
+                                <span
                                   onClick={() => setCommentDetails({
                                     showModal: true,
                                     commentType: 'UndoSubmit',
@@ -472,28 +477,28 @@ const DetailTimesheet = (props: any) => {
                             Invoiced Timesheet
                           </div>
 
-                      {
-                        roles.includes(constants.roles.CompanyAdmin) && (
-                          <div
-                            className={styles['action']}
-                            onClick={() => handleViewInvoiceClick(invoiced.invoice_id)}
-                          >
-                            View Invoice
-                          </div>
-                        )
-                      }
-                    </div>
+                          {
+                            roles.includes(constants.roles.CompanyAdmin) && (
+                              <div
+                                className={styles['action']}
+                                onClick={() => handleViewInvoiceClick(invoiced.invoice_id)}
+                              >
+                                View Invoice
+                              </div>
+                            )
+                          }
+                        </div>
 
-                    <TimeEntryDetail
-                      startDate={timesheetDetail?.weekStartDate as string}
-                      groupedTimeEntries={invoiced.group}
-                      durationMap={timesheetDetail?.durationMap?.[invoiced.invoice_id]}
-                      client_id={timesheetDetail?.client?.id as string}
-                      refetch={props.refetchTimeSheet}
-                      status='Invoiced'
-                      timesheet_id={timesheet_id}
-                    />
-                  </div>
+                        <TimeEntryDetail
+                          startDate={timesheetDetail?.weekStartDate as string}
+                          groupedTimeEntries={invoiced.group}
+                          durationMap={timesheetDetail?.durationMap?.[invoiced.invoice_id]}
+                          client_id={timesheetDetail?.client?.id as string}
+                          refetch={props.refetchTimeSheet}
+                          status='Invoiced'
+                          timesheet_id={timesheet_id}
+                        />
+                      </div>
                     ))
                   }
 
@@ -512,7 +517,7 @@ const DetailTimesheet = (props: any) => {
                         {
                           managerLvlRole && (
                             <div className={styles['action']}>
-                              <span 
+                              <span
                                 onClick={() => setCommentDetails({
                                   showModal: true,
                                   commentType: 'UnlockApproved',
@@ -567,7 +572,7 @@ const DetailTimesheet = (props: any) => {
                         {
                           managerLvlRole && (
                             <div className={styles['action']}>
-                              <span 
+                              <span
                                 onClick={() => setCommentDetails({
                                   showModal: true,
                                   commentType: 'UnlockRejected',
@@ -653,7 +658,7 @@ const DetailTimesheet = (props: any) => {
 
       <div className={styles['site-card-wrapper']}>
         <Card bordered={false} className={styles['time-entries']}>
-          <Comment 
+          <Comment
             timesheet_id={timesheet_id}
             company_id={authData?.company?.id as string}
           />
@@ -661,18 +666,18 @@ const DetailTimesheet = (props: any) => {
       </div>
 
       <Modal
-          centered
-          visible={showAddNewEntry}
-          footer={null}
-          closeIcon={[
-            <div onClick={() => setShowAddNewEntry(false)} key={1}>
-              <span className={styles['close-icon-div']}>
-                <CloseOutlined />
-              </span>
-            </div>
-          ]}
-          width={1000}
-        >
+        centered
+        visible={showAddNewEntry}
+        footer={null}
+        closeIcon={[
+          <div onClick={() => setShowAddNewEntry(false)} key={1}>
+            <span className={styles['close-icon-div']}>
+              <CloseOutlined />
+            </span>
+          </div>
+        ]}
+        width={1000}
+      >
         <div className={styles['modal-title']}>Select Project</div>
 
         <Form
@@ -739,7 +744,7 @@ const DetailTimesheet = (props: any) => {
         visible={commentDetails.showModal}
         onCancel={onCommentFormCancel}
       >
-        <CommentForm 
+        <CommentForm
           timesheet_id={timesheet_id}
           user_id={timesheetDetail?.user?.id as string}
           commentType={commentDetails.commentType}

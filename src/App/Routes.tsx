@@ -231,14 +231,6 @@ const _Routes = () => {
                 </CheckRoles>
               }
             />
-            <Route
-              path={routes.timeTracker.childPath}
-              element={
-                <Suspense fallback={<TimeSheetLoader />}>
-                  <routes.timeTracker.component />
-                </Suspense>
-              }
-            />
 
             <Route path={routes.timesheet.childPath}>
               <Route
