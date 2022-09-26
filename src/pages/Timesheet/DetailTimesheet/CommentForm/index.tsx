@@ -74,6 +74,7 @@ interface IProps {
   commentType: 'Reject' | 'UnlockApproved' | 'UnlockRejected' | 'UndoSubmit' | undefined;
   onHideModal: () => void;
   refetchTimesheet: any;
+  refetchCanGenerateInvoiceData?: any;
 }
 
 const CommentForm = (props: IProps) => {
@@ -130,6 +131,7 @@ const CommentForm = (props: IProps) => {
     onCompleted(response) {
       if(response.TimeEntriesUnlock && response.TimesheetSubmitUndo) {
         props.refetchTimesheet();
+        props?.refetchCanGenerateInvoiceData?.()
       }
     }
   })

@@ -156,7 +156,7 @@ const GroupedTimesheet = () => {
 
   const skipInvoiceQuery = !timesheet?.length || !period || period === InvoiceSchedule.Weekly
 
-  const { data: canGenerateInvoiceData } = useQuery<
+  const { data: canGenerateInvoiceData, refetch: refetchCanGenerateInvoiceData } = useQuery<
     GraphQLResponse<'CanGenerateInvoice', boolean>,
     QueryCanGenerateInvoiceArgs
   >(CAN_GENERATE_INVOICE, {
@@ -262,6 +262,7 @@ const GroupedTimesheet = () => {
                       period={period}
                       timesheet={_timesheet}
                       refetchTimeSheet={refetchTimeSheet}
+                      refetchCanGenerateInvoiceData={refetchCanGenerateInvoiceData}
                     />
                     </Panel>
                   </Collapse>

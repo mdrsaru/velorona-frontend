@@ -47,6 +47,7 @@ interface IProps {
   refetch: any;
   timesheet_id: string;
   isTimesheetSubmitted?: boolean;
+  refetchCanGenerateInvoiceData?: any;
 }
 
 const TimeEntryDetails = (props: IProps) => {
@@ -78,6 +79,7 @@ const TimeEntryDetails = (props: IProps) => {
   >(APPROVE_REJECT_TIME_ENTRIES, {
     onCompleted() {
       props.refetch();
+      props?.refetchCanGenerateInvoiceData?.();
     }
   })
 
@@ -105,6 +107,7 @@ const TimeEntryDetails = (props: IProps) => {
       message.success('Entries deleted successfully!')
       setShowDeleteModal(false);
       props.refetch();
+      props?.refetchCanGenerateInvoiceData?.();
     }
   });
 

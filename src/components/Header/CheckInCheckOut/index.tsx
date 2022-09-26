@@ -89,6 +89,8 @@ const CheckInCheckOut = (props: IProps) => {
     GraphQLResponse<'TimeEntry', TimeEntryPagingResult>,
     QueryTimeEntryArgs
   >(TIME_ENTRY, {
+    fetchPolicy: 'network-only',
+    nextFetchPolicy: 'cache-first',
     variables: {
       input: {
         paging: {

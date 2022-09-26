@@ -149,6 +149,7 @@ const DetailTimesheet = (props: any) => {
   >(APPROVE_REJECT_TIME_ENTRIES, {
     onCompleted() {
       props.refetchTimeSheet();
+      props?.refetchCanGenerateInvoiceData?.();
     },
     onError: notifyGraphqlError,
   });
@@ -438,6 +439,7 @@ const DetailTimesheet = (props: any) => {
                           durationMap={timesheetDetail?.durationMap?.['Pending']}
                           client_id={timesheetDetail?.client?.id as string}
                           refetch={props.refetchTimeSheet}
+                          refetchCanGenerateInvoiceData={props?.refetchCanGenerateInvoiceData}
                           status='Pending'
                           deleteAction={deletePendingGroups}
                           needAction
@@ -497,6 +499,7 @@ const DetailTimesheet = (props: any) => {
                           refetch={props.refetchTimeSheet}
                           status='Invoiced'
                           timesheet_id={timesheet_id}
+                          refetchCanGenerateInvoiceData={props?.refetchCanGenerateInvoiceData}
                         />
                       </div>
                     ))
@@ -552,6 +555,7 @@ const DetailTimesheet = (props: any) => {
                         status='Approved'
                         needAction
                         timesheet_id={timesheet_id}
+                        refetchCanGenerateInvoiceData={props?.refetchCanGenerateInvoiceData}
                       />
 
                     </div>
@@ -594,6 +598,7 @@ const DetailTimesheet = (props: any) => {
                         refetch={props.refetchTimeSheet}
                         needAction
                         timesheet_id={timesheet_id}
+                        refetchCanGenerateInvoiceData={props?.refetchCanGenerateInvoiceData}
                       />
                     </div>
                   }
@@ -751,6 +756,7 @@ const DetailTimesheet = (props: any) => {
           company_id={authData?.company?.id as string}
           onHideModal={onCommentFormCancel}
           refetchTimesheet={props.refetchTimeSheet}
+          refetchCanGenerateInvoiceData={props?.refetchCanGenerateInvoiceData}
         />
       </Modal>
 
