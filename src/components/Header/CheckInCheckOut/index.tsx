@@ -271,42 +271,12 @@ const CheckInCheckOut = (props: IProps) => {
     <>
       <div className={styles['cico']}>
         <Row gutter={{ xs: 8, sm: 16, md: 24, lg: 32 }}>
-        {isRunning &&
-          <Col xs={24} sm={24} md={12} lg={11}>
-            <div className={styles['container']}>
-              <Row >
-                <Col xs={24} sm={24} md={12} lg={18}>
-                  <p className={styles['title']}>Take Break</p>
-                </Col>
-                <Col>
-                  <p className={styles['date']}>{today}</p>
-                </Col>
-              </Row>
-              <Row>
-                <Col className={`${styles['timer']}`}  xs={24} sm={24} md={12} lg={18}>
-                  <Digit value={breakHours} />:<Digit value={breakMinutes} />:<Digit value={breakSeconds} />
-                </Col>
-                <Col>
-                  {isBreakRunning ?
-                      <Button onClick={handleEndBreakTime} loading={updateLoading}>
-                        End Break
-                      </Button>
-                    :
 
-                      <Button  type='primary' onClick={handleAddBreakTime} loading={updateLoading}>
-                        Break
-                      </Button>
-                  }
-                </Col>
-              </Row>
-            </div>
-          </Col>
-}
-          :
+
           <Col xs={24} sm={24} md={12} lg={12}>
             <div className={styles['container']}>
               <Row>
-                <Col  xs={24} sm={24} md={12} lg={18}>
+                <Col xs={24} sm={24} md={12} lg={18}>
                   <p className={styles['title']}>Check-in</p>
                 </Col>
                 <Col>
@@ -331,6 +301,37 @@ const CheckInCheckOut = (props: IProps) => {
               </Row>
             </div>
           </Col>
+          {isRunning &&
+            <Col xs={24} sm={24} md={12} lg={11}>
+              <div className={styles['container']}>
+                <Row >
+                  <Col xs={24} sm={24} md={12} lg={18}>
+                    <p className={styles['title']}>Take Break</p>
+                  </Col>
+                  <Col>
+                    <p className={styles['date']}>{today}</p>
+                  </Col>
+                </Row>
+                <Row>
+                  <Col className={`${styles['timer']}`} xs={24} sm={24} md={12} lg={18}>
+                    <Digit value={breakHours} />:<Digit value={breakMinutes} />:<Digit value={breakSeconds} />
+                  </Col>
+                  <Col>
+                    {isBreakRunning ?
+                      <Button onClick={handleEndBreakTime} loading={updateLoading}>
+                        End Break
+                      </Button>
+                      :
+
+                      <Button type='primary' onClick={handleAddBreakTime} loading={updateLoading}>
+                        Break
+                      </Button>
+                    }
+                  </Col>
+                </Row>
+              </div>
+            </Col>
+          }
         </Row>
       </div>
 
