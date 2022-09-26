@@ -1,50 +1,7 @@
-:global {
-  :local(.confirm-client) {
-    .ant-btn {
-      width: 85%;
-      height: 54px;
-      margin: 0 auto;
-      display: block;
-    }
-  }
-
-  :local(.close-icon) {
-    .ant-icon {
-      font: 1.5px solid var(--gray-secondary);
-    }
-  }
+.custom-filter {
+  margin-bottom: 3rem;
 }
 
-.client-selection-wrapper {
-  display: flex;
-  align-items: flex-end;
-  gap: 15px;
-
-  .select-client {
-    width: 75%;
-  }
-
-  .confirm-client {
-    width: 25%;
-  }
-}
-
-.client-detail {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border: 1px solid var(--gray-secondary);
-  padding: 1rem 1rem 0 1rem;
-  margin-bottom: 2rem;
-  box-sizing: border-box;
-}
-
-.close-icon {
-  cursor: pointer;
-  font-size: 20px;
-  padding: 0.4rem;
-  color: var(--gray-secondary);
-  &:hover {
-    color: var(--primary-purple);
-  }
+.date-employee-filter {
+  margin: 1rem 0;
 }

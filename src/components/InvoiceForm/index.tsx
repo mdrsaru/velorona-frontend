@@ -61,7 +61,7 @@ interface IProps {
   /**
    * If passed, will be used for editing or auto populating for the timesheet
    */
-  invoice?: IInvoiceInput 
+  invoice?: IInvoiceInput;
 }
 
 const InvoiceForm = (props: IProps) => {
@@ -82,6 +82,39 @@ const InvoiceForm = (props: IProps) => {
       setNeedProject(props.invoice?.needProject as boolean);
     }
   }, [props.invoice?.needProject])
+
+  useEffect(() => {
+    const invoice = props.invoice;
+    const formValues = {
+      issueDate: moment(invoice?.issueDate),
+      dueDate: moment(invoice?.dueDate),
+      poNumber: invoice?.poNumber ?? '',
+      totalAmount: invoice?.totalAmount ?? 0,
+      subtotal: invoice?.subtotal ?? 0,
+      taxPercent: invoice?.taxPercent ?? 0,
+      taxAmount: invoice?.taxAmount ?? 0,
+      discount: invoice?.discount ?? 0,
+      discountAmount: invoice?.discountAmount ?? 0,
+      notes: invoice?.notes ?? '',
+      totalQuantity: invoice?.totalQuantity ?? 0,
+      shipping: invoice?.shipping ?? 0,
+      items: invoice?.items?.map((item) => ({
+        id: item.id,
+        project_id: item.project_id,
+        description: item.description || '',
+        quantity: item.quantity,
+        rate: item.rate,
+        amount: item.amount,
+      })) ?? [{
+        description: '',
+        quantity: 0,
+        rate: 0,
+        amount: 0,
+      }],
+    }
+
+    form.setFieldsValue(formValues);
+  }, [props.invoice, form])
 
   const [createInvoice, { loading: creatingInvoice }] = useMutation<
     GraphQLResponse<'InvoiceCreate', Invoice>,
@@ -137,37 +170,6 @@ const InvoiceForm = (props: IProps) => {
   const onNeedProjectChange = (e: CheckboxChangeEvent) => {
     setNeedProject(e.target.checked);
   }
-
-  const invoice = props.invoice;
-  const initialValues = {
-    issueDate: moment(invoice?.issueDate),
-    dueDate: moment(invoice?.dueDate),
-    poNumber: invoice?.poNumber ?? '',
-    totalAmount: invoice?.totalAmount ?? 0,
-    subtotal: invoice?.subtotal ?? 0,
-    taxPercent: invoice?.taxPercent ?? 0,
-    taxAmount: invoice?.taxAmount ?? 0,
-    discount: invoice?.discount ?? 0,
-    discountAmount: invoice?.discountAmount ?? 0,
-    notes: invoice?.notes ?? '',
-    totalQuantity: invoice?.totalQuantity ?? 0,
-    needProject: invoice?.needProject ?? needProject,
-    shipping: invoice?.shipping ?? 0,
-    items: invoice?.items?.map((item) => ({
-      id: item.id,
-      project_id: item.project_id,
-      description: item.description || '',
-      quantity: item.quantity,
-      rate: item.rate,
-      amount: item.amount,
-    })) ?? [{
-      description: '',
-      quantity: 0,
-      rate: 0,
-      amount: 0,
-    }],
-  }
-
 
   const onHourRateChange = (index: number) => {
     let { items, totalAmount, taxPercent = 0, taxAmount = 0, discount = 0, discountAmount = 0, shipping = 0 } = form.getFieldsValue();
@@ -388,11 +390,15 @@ const InvoiceForm = (props: IProps) => {
     onSubmit(values);
   }
 
+  const initialValues = {
+    needProject: props?.invoice?.needProject ?? needProject,
+  }
+
   return (
     <Form
       form={form}
-      layout="vertical"
       initialValues={initialValues}
+      layout="vertical"
       onFinish={onSubmit}
       className={styles['invoice-form']}
     >
@@ -405,7 +411,7 @@ const InvoiceForm = (props: IProps) => {
               <div>
                 <Input 
                   placeholder="Invoice Number" 
-                  value={invoice?.invoiceNumber} 
+                  value={props.invoice?.invoiceNumber} 
                   disabled
                 />
               </div>

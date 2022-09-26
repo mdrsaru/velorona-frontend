@@ -1,0 +1,31 @@
+:global {
+  :local(.confirm-client) {
+    .ant-btn {
+      width: 85%;
+      height: 54px;
+      margin: 0 auto;
+      display: block;
+    }
+  }
+
+  :local(.close-icon) {
+    .ant-icon {
+      font: 1.5px solid var(--gray-secondary);
+    }
+  }
+}
+
+.client-selection-wrapper {
+  display: flex;
+  align-items: flex-end;
+  gap: 15px;
+
+  .select-client {
+    width: 75%;
+  }
+
+  .confirm-client {
+    width: 25%;
+  }
+}
+
