@@ -87,11 +87,6 @@ const NewProject = () => {
 
   const onSubmitForm = (values: any) => {
     let key = 'project'
-    message.loading({
-      content: "Creating project in progress..",
-      key,
-      className: 'custom-message'
-    })
     projectCreate({
       variables: {
         input: {

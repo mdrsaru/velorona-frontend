@@ -158,11 +158,6 @@ const NewEmployee = () => {
     onCompleted: (response) => {
       const user = response?.UserCreate;
       if (fileData?.id) {
-        message.loading({
-          content: "Uploading user's profile image..",
-          key,
-          className: 'custom-message'
-        })
         changeProfilePictureInput({
           variables: {
             input: {

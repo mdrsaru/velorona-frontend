@@ -95,11 +95,6 @@ const SuperAdmin =() =>{
 
   const changeStatus = (value: string, id: string) => {
     let key = "status";
-    message.loading({
-      content: "Updating status of employee..",
-      key,
-      className: "custom-message",
-    });
     employeeUpdate({
       variables: {
         input: {
@@ -122,11 +117,6 @@ const SuperAdmin =() =>{
 
   const archiveUser = () => {
     let key = "archive";
-    message.loading({
-      content: "Archiving user in progress..",
-      key,
-      className: "custom-message",
-    });
     employeeArchive({
       variables: {
         input: {

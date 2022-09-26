@@ -108,9 +108,6 @@ const ClientForm = (props: any) => {
               rules={[{
                 type: 'email',
                 message: 'The input is not valid Invoice E-mail!',
-              }, {
-                required: true,
-                message: 'Please input your invoice E-mail!'
               }]}
             >
               <Input
