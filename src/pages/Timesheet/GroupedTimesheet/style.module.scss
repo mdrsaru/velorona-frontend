@@ -1,3 +1,11 @@
+:global {
+  :local(.collapse) {
+    .ant-collapse-content > .ant-collapse-content-box {
+      padding: 0 16px;
+    }
+  }
+}
+
 .container {
   padding: 2rem 0 2rem 0;
 

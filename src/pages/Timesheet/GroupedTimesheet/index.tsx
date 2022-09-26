@@ -255,8 +255,8 @@ const GroupedTimesheet = () => {
                   refetchTimeSheet={refetchTimeSheet}
                 />
               ) : timesheet?.map((_timesheet, index) => (
-                <div key={_timesheet.id} style={{ marginBottom: 16 }}>
-                  <Collapse collapsible="header" defaultActiveKey={index}>
+                <div className={styles['collapse']} key={_timesheet.id} style={{ marginBottom: 16 }}>
+                  <Collapse collapsible="header">
                     <Panel header={`${_timesheet.weekStartDate} - ${_timesheet.weekEndDate}`} key={index}>
                     <DetailTimesheet 
                       period={period}

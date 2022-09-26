@@ -347,8 +347,8 @@ const DetailTimesheet = (props: any) => {
   const isSubmitted:any = timesheetDetail?.isSubmitted;
 
   const hasTimeEntries = (
-    entriesByStatus?.approved?.length || !timesheetDetail?.rejected?.length || 
-    entriesByStatus.pending.length || !timesheetDetail?.entriesGroup?.byInvoice.length
+    entriesByStatus?.approved?.length || timesheetDetail?.rejected?.length || 
+    entriesByStatus.pending.length || timesheetDetail?.entriesGroup?.byInvoice.length
   );
 
   let generateInvoiceLink = routes.timesheetInvoice.path(authData?.company?.code as string, timesheet_id) + 
