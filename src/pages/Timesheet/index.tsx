@@ -140,6 +140,16 @@ export const getTotalTimeForADay = (entries: any) => {
   return sum
 }
 
+export const getTotalBreakTimeForADay = (entries: any) => {
+  let sum = 0;
+  if (entries) {
+    const durations = entries.map((data: any) => data?.breakDuration)
+    sum = durations.reduce((entry1: any, entry2: any) => {
+      return entry1 + entry2;
+    }, 0);
+  };
+  return sum
+}
 
 const Timesheet = () => {
   const { Option } = Select
@@ -346,7 +356,7 @@ const Timesheet = () => {
     }
   });
 
-
+  
   return (
     <>
       <div className={styles['site-card-wrapper']}>
@@ -394,9 +404,9 @@ const Timesheet = () => {
                 <Col
                   xs={0}
                   sm={0}
-                  md={entryType !== EntryType.Cico ? 7 : 13}
-                  lg={entryType !== EntryType.Cico ? 7 : 13}
-                  xl={entryType !== EntryType.Cico ? 7 : 13}
+                  md={entryType !== EntryType.Cico ? 7 : 12}
+                  lg={entryType !== EntryType.Cico ? 7 : 12}
+                  xl={entryType !== EntryType.Cico ? 7 : 12}
                   className={styles['client-header']}>
                   Client: Project
                 </Col>
@@ -424,15 +434,24 @@ const Timesheet = () => {
                   md={3}
                   lg={3}
                   xl={3}
-                  className={styles['total-header']}>
-                  Total
+                  className={styles['end-header']}>
+                  Break Duration
                 </Col>
                 <Col
                   xs={0}
                   sm={0}
+                  md={3}
+                  lg={3}
+                  xl={3}
+                  className={styles['total-header']}>
+                  Total
+                </Col>
+                {/* <Col
+                  xs={0}
+                  sm={0}
                   md={2}
                   lg={2}
-                  xl={2}></Col>
+                  xl={2}></Col> */}
               </Row>
 
               {timeEntryData?.TimeEntry?.data?.length === 0
@@ -467,6 +486,7 @@ const Timesheet = () => {
                                 minStartTime={getStartTime(groupedEntry.entries)}
                                 maxEndTime={getEndTime(groupedEntry.entries)}
                                 totalDuration={getTotalTimeForADay(groupedEntry.entries)}
+                                totalBreakDuration={getTotalBreakTimeForADay(groupedEntry.entries)}
                               />
                             }
                           >
@@ -503,7 +523,7 @@ const Timesheet = () => {
               </Form>
             </Card>
           </>
-	   }
+        }
         <br />
 
         {/* Weekly's Timesheet Listing */}
