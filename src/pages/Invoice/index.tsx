@@ -2,7 +2,7 @@ import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { gql, useQuery, useMutation, useLazyQuery } from '@apollo/client';
-import { SearchOutlined, CheckCircleFilled, FormOutlined, EyeFilled, PlusCircleFilled,SendOutlined } from '@ant-design/icons';
+import { SearchOutlined, CheckCircleFilled, FormOutlined, EyeFilled, PlusCircleFilled,SendOutlined, FileTextOutlined } from '@ant-design/icons';
 import { Card, Col, Dropdown, Menu, Row, Table, message, Modal, Form, Select, Button, Input, Popconfirm, DatePicker } from 'antd';
 import { debounce } from 'lodash';
 import { useNavigate } from 'react-router-dom';
@@ -443,79 +443,81 @@ const navigate = useNavigate();
       render: (invoice: IInvoice) => {
         return (
           <Row>
-            {loggedInUser?.user?.roles.includes(constants.roles.BookKeeper) ?
-           <Col>
-            <div
-                    onClick={() => handleViewInvoiceClick(invoice.id)}
-                    title='View Invoice'
-                    className={`${styles["table-icon"]} ${styles["table-view-icon"]}`}
-                  >
-                    <EyeFilled />
-                  </div>
-          </Col>
-          :
-           <> 
-           <Col>
-              {
-                invoice.status === 'Pending' ? (
-                  <Link
-                    to={routes.editInvoice.path(loggedInUser?.company?.code as string, invoice.id)}
-                    title='Edit Invoice'
-                    className={`${styles["table-icon"]} ${styles["table-view-icon"]}`}
-                  >
-                    <FormOutlined />
-                  </Link>
-                ) : (
+            {
+              loggedInUser?.user?.roles.includes(constants.roles.BookKeeper) ? (
+                <Col>
                   <div
                     onClick={() => handleViewInvoiceClick(invoice.id)}
                     title='View Invoice'
                     className={`${styles["table-icon"]} ${styles["table-view-icon"]}`}
                   >
-                    <EyeFilled />
+                    <FileTextOutlined />
                   </div>
-                )
-              }
-            </Col>
-            <Col>
-              <div
-                className={`${styles["table-icon"]} ${styles["table-status-icon"]}`}
-                onClick={(event) => event.stopPropagation()}
-              >
-                <Dropdown
-                  overlay={menu(invoice)}
-                  trigger={["click"]}
-                  placement="bottomRight"
-                >
+                </Col>
+              ) : (
+                <> 
                   <div
-                    className="ant-dropdown-link"
-                    onClick={(e) => e.preventDefault()}
-                    title='Change Status'
+                    onClick={() => handleViewInvoiceClick(invoice.id)}
+                    title='View Invoice'
+                    className={`${styles["table-icon"]} ${styles["table-view-icon"]}`}
                   >
-                    <CheckCircleFilled />
+                    <FileTextOutlined />
                   </div>
-                </Dropdown>
-              </div>
-            </Col>
-			{
-                invoice.status === 'Sent' && (
-			<Col>
-			  <Popconfirm
-				placement="left"
-				title="Are you sure you want to resend invoice?"
-				onConfirm={() => handleResendInvoiceClick(invoice.id)}
-				okText="Yes" cancelText="No">        
-					<div     
-						title='Resend Invoice'
-						className={`${styles["table-icon"]} ${styles["table-view-icon"]}`}
-					>
-					 <SendOutlined />
-					</div>
-			  </Popconfirm>
-			</Col>
-			 )
-			}
-      </>
-      }
+
+                  <Col>
+                    {
+                      invoice.status === 'Pending' && (
+                        <Link
+                          to={routes.editInvoice.path(loggedInUser?.company?.code as string, invoice.id)}
+                          title='Edit Invoice'
+                          className={`${styles["table-icon"]} ${styles["table-view-icon"]}`}
+                        >
+                          <FormOutlined />
+                        </Link>
+                      ) 
+                    }
+                  </Col>
+                  <Col>
+                    <div
+                      className={`${styles["table-icon"]} ${styles["table-status-icon"]}`}
+                      onClick={(event) => event.stopPropagation()}
+                    >
+                      <Dropdown
+                        overlay={menu(invoice)}
+                        trigger={["click"]}
+                        placement="bottomRight"
+                      >
+                        <div
+                          className="ant-dropdown-link"
+                          onClick={(e) => e.preventDefault()}
+                          title='Change Status'
+                        >
+                          <CheckCircleFilled />
+                        </div>
+                      </Dropdown>
+                    </div>
+                  </Col>
+                  {
+                    invoice.status === 'Sent' && (
+                      <Col>
+                        <Popconfirm
+                          placement="left"
+                          title="Are you sure you want to resend invoice?"
+                          onConfirm={() => handleResendInvoiceClick(invoice.id)}
+                          okText="Yes" cancelText="No">        
+                          <div     
+                            title='Resend Invoice'
+                            className={`${styles["table-icon"]} ${styles["table-view-icon"]}`}
+                          >
+                            <SendOutlined />
+                          </div>
+                        </Popconfirm>
+                      </Col>
+                    )
+                  }
+                </>
+              )
+            }
           </Row>
         )
       }
