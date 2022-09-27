@@ -42,6 +42,7 @@ const CLIENT_AND_PROJECT_ITEMS = gql`
         id
         name
         email
+        invoicingEmail
         address {
           streetAddress
         }
@@ -172,6 +173,7 @@ const TimesheetInvoice = (props: any) => {
                     startDate={startDate}
                     endDate={endDate}
                     user_id={user_id}
+                    invoicingEmail={client.invoicingEmail}
                   /> 
                 )
               }

@@ -1,12 +1,19 @@
 import moment from 'moment';
+import debounce from 'lodash/debounce';
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { gql, useQuery, useMutation, useLazyQuery } from '@apollo/client';
-import { SearchOutlined, CheckCircleFilled, FormOutlined, EyeFilled, PlusCircleFilled,SendOutlined, FileTextOutlined } from '@ant-design/icons';
 import { Card, Col, Dropdown, Menu, Row, Table, message, Modal, Form, Select, Button, Input, Popconfirm, DatePicker } from 'antd';
-import { debounce } from 'lodash';
-import { useNavigate } from 'react-router-dom';
-
+import { 
+  SearchOutlined,
+  CheckCircleFilled,
+  FormOutlined,
+  EyeFilled,
+  PlusCircleFilled,
+  SendOutlined,
+  FileTextOutlined,
+  DownloadOutlined,
+} from '@ant-design/icons';
 
 import { authVar } from '../../App/link';
 import constants, { invoice_status } from '../../config/constants';
@@ -20,7 +27,8 @@ import {
   MutationInvoiceUpdateArgs,
   QueryInvoiceArgs,
   InvoiceUpdateInput,
-  InvoiceQuery
+  InvoiceQuery,
+  QueryInvoicePdfArgs,
 } from '../../interfaces/generated';
 import { GraphQLResponse } from '../../interfaces/graphql.interface';
 import { ATTACHED_TIMESHEET_FIELDS } from '../../gql/timesheet.gql'
@@ -32,7 +40,6 @@ import AttachNewTimesheetModal from '../../components/AddAttachedTimesheet';
 
 import filterImg from "../../assets/images/filter.svg"
 import styles from './style.module.scss';
-
 
 export const ATTACHED_TIMESHEET = gql`
   ${ATTACHED_TIMESHEET_FIELDS}
@@ -83,13 +90,20 @@ export const INVOICE_STATUS_UPDATE = gql`
   }
 `;
 
+const INVOICE_PDF = gql`
+  query($input: InvoicePDFInput!) {
+    InvoicePDF(input: $input) 
+  }
+`;
+
 const { Option } = Select;
 const { RangePicker } = DatePicker;
 
 const Invoice = () => {
   const loggedInUser = authVar();
-const navigate = useNavigate();
-  const companyCode = loggedInUser?.company?.code as string
+  const navigate = useNavigate();
+  const companyCode = loggedInUser?.company?.code as string;
+  const company_id = loggedInUser?.company?.id as string;
 
   const [filterForm] = Form.useForm();
 
@@ -115,8 +129,22 @@ const navigate = useNavigate();
 
   const [invoiceId, setInvoiceId] = useState('');
   const [showAttachment, setShowAttachment] = useState(false)
-
   const [showAttachTimeEntry, setAttachTimeEntry] = useState(false);
+  const debouncedResults = debounce(() => { onChangeFilter() }, 600);
+
+  useEffect(() => {
+    return () => {
+      debouncedResults.cancel();
+    };
+  });
+
+  const [getPDF] = useLazyQuery<
+    GraphQLResponse<'InvoicePDF', string>, 
+    QueryInvoicePdfArgs
+  >(INVOICE_PDF, {
+    fetchPolicy: 'cache-only',
+  });
+
   const [updateStatus, { loading: updateLoading }] = useMutation<
     GraphQLResponse<'InvoiceUpdate', IInvoice>,
     MutationInvoiceUpdateArgs
@@ -136,7 +164,7 @@ const navigate = useNavigate();
       order: ['issueDate:ASC'],
     },
     query: {
-      company_id: loggedInUser?.company?.id as string,
+      company_id,
     },
   };
 
@@ -157,7 +185,7 @@ const navigate = useNavigate();
     variables: {
       input: {
         query: {
-          company_id: loggedInUser?.company?.id,
+          company_id,
           invoice_id: invoiceId
         },
         paging: {
@@ -168,20 +196,20 @@ const navigate = useNavigate();
   });
 
   const [updateInvoice] = useMutation<
-  GraphQLResponse<'InvoiceUpdate', IInvoice>,
-  MutationInvoiceUpdateArgs
->(
-  INVOICE_STATUS_UPDATE, {
-	onCompleted(data) {
-	  if(data.InvoiceUpdate) {
-		message.success('Invoice resend successfully');
+    GraphQLResponse<'InvoiceUpdate', IInvoice>,
+    MutationInvoiceUpdateArgs
+  >(
+    INVOICE_STATUS_UPDATE, {
+      onCompleted(data) {
+        if(data.InvoiceUpdate) {
+          message.success('Invoice resend successfully');
 
-		navigate(routes.invoice.path(companyCode));
-	  }
-	},
-	onError: notifyGraphqlError,
-  }
-);
+          navigate(routes.invoice.path(companyCode));
+        }
+      },
+      onError: notifyGraphqlError,
+    }
+  );
 
 
   const changeStatus = (id: string, status: InvoiceStatus) => {
@@ -189,7 +217,7 @@ const navigate = useNavigate();
       variables: {
         input: {
           id,
-          company_id: loggedInUser?.company?.id as string,
+          company_id,
           status,
         }
       }
@@ -213,18 +241,18 @@ const navigate = useNavigate();
   }
 
   const handleResendInvoiceClick = (invoice_id: string) => {
-	const input: InvoiceUpdateInput = {
-		id: invoice_id,
-		status: InvoiceStatus.Sent,
-		company_id: loggedInUser?.company?.id as string,
-	};
+    const input: InvoiceUpdateInput = {
+      id: invoice_id,
+      status: InvoiceStatus.Sent,
+      company_id,
+    };
 
-	updateInvoice({
-		variables: {
-			input,
-		}
-	})
-}
+    updateInvoice({
+      variables: {
+        input,
+      }
+    })
+  }
 
   const handleViewInvoiceCancel = () => {
     setInvoiceViewer({
@@ -240,17 +268,18 @@ const navigate = useNavigate();
     attachments({
       variables: {
         input: {
-            query: {
-                company_id: loggedInUser?.company?.id as string,
-                invoice_id: invoice_id as string,
-            },
-            paging: {
-                order: ['updatedAt:DESC']
-            }
+          query: {
+            company_id,
+            invoice_id: invoice_id as string,
+          },
+          paging: {
+            order: ['updatedAt:DESC']
+          }
         }
-    }
+      }
     })
   }
+
   const handleAddAttachment = (invoice_id: string) => {
     setAttachTimeEntry(!showAttachTimeEntry)
     setInvoiceId(invoice_id)
@@ -258,7 +287,6 @@ const navigate = useNavigate();
 
 
   const refetchInvoices = () => {
-
     let values = filterForm.getFieldsValue(['search', 'role', 'status', 'date'])
 
     let input: {
@@ -270,13 +298,13 @@ const navigate = useNavigate();
       },
 
       query: {
-        company_id: loggedInUser?.company?.id
+        company_id,
       }
 
     }
 
     let query: InvoiceQuery = {
-      company_id: loggedInUser?.company?.id as string
+      company_id,
     }
 
     if (values.date) {
@@ -311,7 +339,7 @@ const navigate = useNavigate();
             order: ["updatedAt:DESC"],
           },
           query: {
-            company_id: loggedInUser?.company?.id as string,
+            company_id,
           }
         }
       })
@@ -322,14 +350,26 @@ const navigate = useNavigate();
     })
   }
 
-
-  const debouncedResults = debounce(() => { onChangeFilter() }, 600);
-
-  useEffect(() => {
-    return () => {
-      debouncedResults.cancel();
-    };
-  });
+  const downloadPDF = (id: string, invoiceNo: number) => {
+    getPDF({
+      variables: {
+        input: {
+          id,
+          company_id,
+        }
+      }
+    }).then((response) => {
+      if(response.data?.InvoicePDF) {
+        const pdf = response.data.InvoicePDF;
+        const linkSource = `data:application/pdf;base64,${pdf}`;
+        const downloadLink = document.createElement("a");
+        const fileName = `Invoice-${invoiceNo}.pdf`;
+        downloadLink.href = linkSource;
+        downloadLink.download = fileName;
+        downloadLink.click();
+      }
+    })
+  }
 
   const menu = (invoice: IInvoice) => (
     <Menu>
@@ -456,14 +496,6 @@ const navigate = useNavigate();
                 </Col>
               ) : (
                 <> 
-                  <div
-                    onClick={() => handleViewInvoiceClick(invoice.id)}
-                    title='View Invoice'
-                    className={`${styles["table-icon"]} ${styles["table-view-icon"]}`}
-                  >
-                    <FileTextOutlined />
-                  </div>
-
                   <Col>
                     {
                       invoice.status === 'Pending' && (
@@ -477,6 +509,23 @@ const navigate = useNavigate();
                       ) 
                     }
                   </Col>
+
+                  <div
+                    onClick={() => handleViewInvoiceClick(invoice.id)}
+                    title='View Invoice'
+                    className={`${styles["table-icon"]} ${styles["table-view-icon"]}`}
+                  >
+                    <FileTextOutlined />
+                  </div>
+
+                  <div
+                    onClick={() => downloadPDF(invoice.id, invoice.invoiceNumber)}
+                    title='Download Invoice'
+                    className={`${styles["table-icon"]} ${styles["table-view-icon"]}`}
+                  >
+                    <DownloadOutlined />
+                  </div>
+
                   <Col>
                     <div
                       className={`${styles["table-icon"]} ${styles["table-status-icon"]}`}
@@ -639,7 +688,8 @@ const navigate = useNavigate();
         visibility={showAttachTimeEntry}
         setVisibility={setAttachTimeEntry}
         invoice_id={invoiceId} 
-        refetch = {attachments}/>
+        refetch = {attachments}
+      />
     </div>
   )
 }

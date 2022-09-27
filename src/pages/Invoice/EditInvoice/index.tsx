@@ -34,6 +34,9 @@ const INVOICE = gql`
         discountAmount
         needProject
         shipping
+        client {
+          invoicingEmail
+        }
         items {
           id
           quantity
@@ -84,6 +87,7 @@ const EditInvoice = () => {
               timesheet_id={invoice?.timesheet_id as string}
               client_id={invoice?.client_id as string} 
               invoice={invoice as IInvoiceInput}
+              invoicingEmail={invoice?.client?.invoicingEmail}
             />
           )
         }

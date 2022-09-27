@@ -3,7 +3,7 @@ import isNil from 'lodash/isNil';
 import { ChangeEvent, useState, useEffect } from 'react';
 import { gql, useQuery, useMutation } from '@apollo/client';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
-import { Button, Col, Form, Input, Row, Select, Image, DatePicker, InputNumber, Space, message, Popover, Checkbox } from 'antd';
+import { Button, Col, Form, Input, Row, Select, Image, DatePicker, InputNumber, Space, message, Popover, Checkbox, Alert } from 'antd';
 import { CloseCircleOutlined } from '@ant-design/icons';
 import { CheckboxChangeEvent } from 'antd/es/checkbox';
 
@@ -19,7 +19,7 @@ import {
   ProjectPagingResult,
   MutationInvoiceUpdateArgs,
   MutationInvoiceCreateArgs,
-  QueryProjectArgs
+  QueryProjectArgs,
 } from '../../interfaces/generated';
 
 import addIcon from '../../assets/images/add_icon.svg';
@@ -58,6 +58,7 @@ interface IProps {
   startDate?: string;
   endDate?: string;
   user_id?: string;
+  invoicingEmail: string | undefined | null;
   /**
    * If passed, will be used for editing or auto populating for the timesheet
    */
@@ -746,6 +747,17 @@ const InvoiceForm = (props: IProps) => {
         </table>
       </div>
 
+      {
+        !props.invoicingEmail && (
+          <Row justify="end" style={{ marginBottom: 16 }}>
+            <Alert
+              message="Please add client invoicing email to send the invoice."
+              type="warning"
+            />
+          </Row>
+        )
+      }
+
       <Row justify="end">
         <Space>
           <Button 
@@ -757,6 +769,7 @@ const InvoiceForm = (props: IProps) => {
           </Button>
 
           <Button 
+            disabled={!props.invoicingEmail}
             type="primary" 
             loading={isSendInvoiceClicked && (creatingInvoice || updatingInvoice)}
             onClick={saveAndSend}

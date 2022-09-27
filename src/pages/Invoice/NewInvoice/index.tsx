@@ -37,6 +37,7 @@ const CLIENT_LIST = gql`
         id
         name
         email
+        invoicingEmail
         address {
           streetAddress
         }
@@ -51,6 +52,7 @@ const CLIENT = gql`
       id
       name
       email
+      invoicingEmail
       address {
         streetAddress
       }
@@ -345,6 +347,7 @@ const NewInvoice = (props: any) => {
                   user_id={user_id}
                   client_id={selectedClient?.id as string} 
                   invoice={invoiceInput}
+                  invoicingEmail={selectedClient?.invoicingEmail}
                 />
               </Spin>
             )
