@@ -7,7 +7,7 @@ import { DownloadOutlined, SearchOutlined } from '@ant-design/icons';
 import { authVar } from '../../../App/link';
 import { TimesheetQueryInput, RoleName } from '../../../interfaces/generated';
 import { TimesheetPagingData } from '../../../interfaces/graphql.interface';
-import { downloadCSV } from '../../../utils/common';
+import { downloadCSV, secondsToHms } from '../../../utils/common';
 import { notifyGraphqlError } from '../../../utils/error';
 import { EMPLOYEE_TIMESHEET } from '../../EmployeeTimesheet';
 import constants, { employee_timesheet_status } from '../../../config/constants';
@@ -63,40 +63,38 @@ const EmployeeTimesheetReport = () => {
     { label: 'Client Name', key: 'client' },
     { label: 'Total Time', key: 'durationFormat' },
     { label: 'Last Approved', key: 'lastApprovedAt' },
-    { label: 'Total Expense', key: 'totalExpense' },
+    { label: 'Invoiced amount', key: 'totalExpense' },
+    { label: 'User Payrate amount', key: 'userPayRate' },
     { label: 'Status', key: 'status' },
 
   ];
 
-  const tableBody = () => {
+  const tableBody = (timesheet:any) => {
     const tableRows = [];
-    let timesheets: any = timesheetDownloadData?.Timesheet?.data;
+    let timesheets: any = timesheet?.Timesheet?.data;
 
     for (const timesheet of timesheets) {
       const date = (timesheet?.weekStartDate + '-' + timesheet?.weekEndDate) ?? '-';
       const employee = timesheet?.user?.fullName ?? '-';
       const client = timesheet?.client?.name ?? '-';
-      const durationFormat = timesheet?.durationFormat ?? '-';
+      const durationFormat = secondsToHms(timesheet?.duration) ?? '-';
       const status = (timesheet?.status ?? '-');
       const totalExpense = (timesheet?.totalExpense ?? '-');
+      const userPayRate = (timesheet?.userPayment ?? '-');
       const lastApprovedAt = (timesheet?.lastApprovedAt ?? '-');
       tableRows.push({
-        date,employee, client, durationFormat, status, totalExpense, lastApprovedAt
+        date,employee, client, durationFormat, status, totalExpense, lastApprovedAt,userPayRate
       });
     }
     return tableRows;
   };
-  const [fetchDownloadData, { data: timesheetDownloadData }] = useLazyQuery<
+  const [fetchDownloadData] = useLazyQuery<
     TimesheetPagingData,
     { input: TimesheetQueryInput }
   >(EMPLOYEE_TIMESHEET, {
     fetchPolicy: 'network-only',
     nextFetchPolicy: 'cache-first',
     onError: notifyGraphqlError,
-    onCompleted: () => {
-      const csvBody = tableBody()
-      downloadCSV(csvBody, csvHeader, 'EmployeeTimesheet.csv');
-    },
   });
 
   const downloadReport = () => {
@@ -144,7 +142,13 @@ const EmployeeTimesheetReport = () => {
       variables: {
         input: input
       },
-    });
+    })
+    .then((response) => {
+      if(response.data){
+      const csvBody = tableBody(response.data)
+      downloadCSV(csvBody, csvHeader, 'EmployeeTimesheet.csv');
+      }
+    })
   };
 
   const refetchTimesheets = () => {

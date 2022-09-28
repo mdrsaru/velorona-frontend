@@ -39,6 +39,7 @@ export const EMPLOYEE_TIMESHEET = gql`
         lastApprovedAt
         weekStartDate
         weekEndDate
+        userPayment
         status
         user {
           fullName

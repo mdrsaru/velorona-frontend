@@ -13,6 +13,7 @@ import constants, { invoice_status } from '../../../config/constants';
 import { INVOICE } from '../../Invoice';
 
 import filterImg from '../../../assets/images/filter.svg';
+import { notifyGraphqlError } from '../../../utils/error';
 
 const csvHeader: Array<{ label: string; key: string; subKey?: string }> = [
   {
@@ -48,7 +49,7 @@ const InvoiceReport = () => {
 
   const [filterForm] = Form.useForm();
 
-  const [pagingInput, setPagingInput] = useState<{
+  const [pagingInput] = useState<{
     skip: number;
     currentPage: number;
   }>({
@@ -73,7 +74,6 @@ const InvoiceReport = () => {
 
   const {
     data: invoiceData,
-    loading,
     refetch: refetchInvoice,
   } = useQuery<GraphQLResponse<'Invoice', InvoicePagingResult>, QueryInvoiceArgs>(INVOICE, {
     fetchPolicy: 'network-only',
@@ -83,7 +83,7 @@ const InvoiceReport = () => {
     },
   });
 
-  const [fetchDownloadData, { data: invoiceDownloadData }] = useLazyQuery<
+  const [fetchDownloadData] = useLazyQuery<
     GraphQLResponse<'Invoice', InvoicePagingResult>,
     QueryInvoiceArgs
   >(INVOICE, {
@@ -92,9 +92,7 @@ const InvoiceReport = () => {
     variables: {
       input,
     },
-    onCompleted: () => {
-      downloadCSV(invoiceDownloadData?.Invoice?.data, csvHeader, 'Invoice.csv');
-    },
+   onError:notifyGraphqlError
   });
 
   const refetchInvoices = () => {
@@ -198,7 +196,10 @@ const InvoiceReport = () => {
       variables: {
         input: input
       },
-    });
+    })
+    .then((response) => {
+      downloadCSV(response?.data?.Invoice?.data, csvHeader, 'Invoice.csv');
+    })
   };
 
   const debouncedResults = debounce(() => {

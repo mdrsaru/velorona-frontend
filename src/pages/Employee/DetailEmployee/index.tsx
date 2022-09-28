@@ -48,6 +48,10 @@ export const USERCLIENT = gql`
         email
         status
 			}
+      user{
+      id 
+      fullName
+      }
       }
     }
   }

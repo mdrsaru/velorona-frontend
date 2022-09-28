@@ -10,9 +10,10 @@ import PageHeader from '../../../components/PageHeader';
 import { PROJECT } from '../../Project';
 import { archived, status } from '../../../config/constants';
 import { GraphQLResponse } from '../../../interfaces/graphql.interface';
-import { ProjectPagingResult, QueryProjectArgs, Project } from '../../../interfaces/generated';
+import { ProjectPagingResult, QueryProjectArgs } from '../../../interfaces/generated';
 
 import filterImg from '../../../assets/images/filter.svg';
+import { notifyGraphqlError } from '../../../utils/error';
 
 const csvHeader: Array<{ label: string; key: string; subKey?: string }> = [
   { label: 'Project Name', key: 'name' },
@@ -49,7 +50,7 @@ const ProjectReport = () => {
     },
   });
 
-  const [fetchDownloadData, { data: projectDownloadData }] = useLazyQuery<
+  const [fetchDownloadData] = useLazyQuery<
     GraphQLResponse<'Project', ProjectPagingResult>,
     QueryProjectArgs
   >(PROJECT, {
@@ -65,9 +66,7 @@ const ProjectReport = () => {
         },
       },
     },
-    onCompleted: () => {
-      downloadCSV(projectDownloadData?.Project?.data, csvHeader, 'Projects.csv');
-    },
+   onError:notifyGraphqlError
   });
 
   const downloadReport = () => {
@@ -105,7 +104,10 @@ const ProjectReport = () => {
       variables: {
         input:input
       },
-    });
+    })
+    .then((response) => {
+      downloadCSV(response?.data?.Project?.data, csvHeader, 'Projects.csv');
+    })
   };
 
   const refetchProjects = () => {

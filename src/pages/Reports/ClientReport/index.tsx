@@ -17,6 +17,7 @@ import { GraphQLResponse } from '../../../interfaces/graphql.interface';
 import { downloadCSV } from '../../../utils/common';
 import { CLIENT } from '../../Client';
 import PageHeader from '../../../components/PageHeader';
+import { notifyGraphqlError } from '../../../utils/error';
 
 export interface UserData {
   User: {
@@ -72,9 +73,9 @@ const ClientReport = () => {
   ];
 
   
-  const tableBody = () => {
+  const tableBody = (clientData:any) => {
     const tableRows = [];
-    let clients: any =clientDownloadData?.Client?.data;
+    let clients: any =clientData?.Client?.data;
 
       for (const client of clients) {
         const name = client?.name ?? '-';
@@ -97,7 +98,7 @@ const ClientReport = () => {
       return tableRows;
     };
 
-  const [fetchDownloadData, { data: clientDownloadData }] = useLazyQuery<
+  const [fetchDownloadData] = useLazyQuery<
     GraphQLResponse<'Client', ClientPagingResult>,
     QueryClientArgs
   >(CLIENT, {
@@ -113,10 +114,7 @@ const ClientReport = () => {
         },
       },
     },
-    onCompleted: () => {
-      const csvBody = tableBody()
-      downloadCSV(csvBody, csvHeader, 'Client.csv');
-    },
+   onError:notifyGraphqlError
   });
 
   const downloadReport = () => {
@@ -155,7 +153,11 @@ const ClientReport = () => {
       variables: {
         input: input
       },
-    });
+    })
+    .then((response) => {
+      const csvBody = tableBody(response?.data)
+      downloadCSV(csvBody, csvHeader, 'Client.csv');
+    })
   };
 
   const refetchClients = () => {
