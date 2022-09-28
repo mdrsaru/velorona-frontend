@@ -1,7 +1,23 @@
+.date-employee-filter {
+  margin: 2rem 0;
+}
+
 .custom-filter {
+  margin-bottom: 3rem;
+  h1 {
+    font-weight: 600;
+  }
+}
+
+.custom-filter, 
+.attachment,
+.invoice-form {
+  border-radius: 3px;
+  padding: 1.5rem 1rem;
+  border: 1px solid var(--gray-secondary);
+}
+
+.attachment {
   margin-bottom: 3rem;
 }
 
-.date-employee-filter {
-  margin: 1rem 0;
-}

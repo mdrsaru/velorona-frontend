@@ -13,11 +13,12 @@ import {
   Client,
   ClientPagingResult,
   QueryClientArgs,
-  QueryUserArgs,
-  UserPagingResult,
+  UserClientPagingResult,
+  QueryUserClientArgs,
   RoleName,
   ProjectItem,
   QueryProjectItemsArgs,
+  AttachmentCreateInput,
 } from '../../../interfaces/generated';
 import { MayBe } from '../../../interfaces/common.interface';
 
@@ -27,6 +28,7 @@ import InvoiceForm from '../../../components/InvoiceForm';
 import CustomFilter from './CustomFilter';
 import ClientSelection from './ClientSelection';
 import InvoiceClientDetail from '../../../components/InvoiceClientDetail';
+import Attachment from './Attachment';
 
 import styles from './style.module.scss';
 
@@ -61,12 +63,14 @@ const CLIENT = gql`
 `;
 
 const EMPLOYEES = gql`
-  query Employees($input: UserQueryInput!) {
-    User(input: $input) {
+  query UserClient($input: UserClientQueryInput!) {
+    UserClient(input: $input) {
       data {
-        id
-        email
-        fullName
+        user {
+          id
+          email
+          fullName
+        }
       }
     }
   }
@@ -95,6 +99,7 @@ const NewInvoice = (props: any) => {
   const [startDate, setStartDate] = useState<MayBe<string>>();
   const [endDate, setEndDate] = useState<MayBe<string>>();
   const [invoiceInput, setInvoiceInput] = useState<MayBe<IInvoiceInput>>();
+  const [attachments, setAttachments] = useState<AttachmentCreateInput[]>([]);
 
   const loggedInUser = authVar();
   const company_id = loggedInUser?.company?.id as string;
@@ -128,15 +133,15 @@ const NewInvoice = (props: any) => {
   });
 
   const { data: employeeData, loading: employeeLoading } = useQuery<
-    GraphQLResponse<'User', UserPagingResult>,
-    QueryUserArgs
+    GraphQLResponse<'UserClient', UserClientPagingResult>,
+    QueryUserClientArgs
   >(EMPLOYEES, {
-    skip: !needCustomFiltering,
+    skip: !needCustomFiltering || !selectedClient,
     fetchPolicy: 'cache-first',
     variables: {
       input: {
         query: {
-          role: RoleName.Employee,
+          client_id: selectedClient?.id!,
         }
       }
     }
@@ -322,11 +327,13 @@ const NewInvoice = (props: any) => {
           {
             needCustomFiltering && (
               <div className={styles['custom-filter']}>
+                <h1>Custom Filter</h1>
+
                 <CustomFilter
                   loading={itemsLoading}
                   employeeLoading={employeeLoading}
                   isFilterApplied={isFilterApplied}
-                  employees={employeeData?.User?.data ?? []}
+                  employees={employeeData?.UserClient?.data?.map((uc) => uc.user) ?? []}
                   onUserChange={onUserChange}
                   onDateRangeChange={onDateRangeChange}
                   applyFilter={applyFilter}
@@ -340,16 +347,28 @@ const NewInvoice = (props: any) => {
         <>
           {
             showForm && (
-              <Spin spinning={itemsLoading}>
-                <InvoiceForm 
-                  startDate={startDate}
-                  endDate={endDate}
-                  user_id={user_id}
-                  client_id={selectedClient?.id as string} 
-                  invoice={invoiceInput}
-                  invoicingEmail={selectedClient?.invoicingEmail}
-                />
-              </Spin>
+              <>
+                <div className={styles['attachment']}>
+                  <Attachment 
+                    attachments={attachments}
+                    setAttachments={setAttachments}
+                  />
+                </div>
+
+                <div className={styles['invoice-form']}>
+                  <Spin spinning={itemsLoading}>
+                    <InvoiceForm 
+                      startDate={startDate}
+                      endDate={endDate}
+                      user_id={user_id}
+                      client_id={selectedClient?.id as string} 
+                      invoice={invoiceInput}
+                      attachments={attachments}
+                      invoicingEmail={selectedClient?.invoicingEmail}
+                    />
+                  </Spin>
+                </div>
+              </>
             )
           }
         </>

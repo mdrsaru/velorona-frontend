@@ -20,6 +20,7 @@ import {
   MutationInvoiceUpdateArgs,
   MutationInvoiceCreateArgs,
   QueryProjectArgs,
+  AttachmentCreateInput,
 } from '../../interfaces/generated';
 
 import addIcon from '../../assets/images/add_icon.svg';
@@ -59,6 +60,7 @@ interface IProps {
   endDate?: string;
   user_id?: string;
   invoicingEmail: string | undefined | null;
+  attachments?: AttachmentCreateInput[];
   /**
    * If passed, will be used for editing or auto populating for the timesheet
    */
@@ -363,6 +365,9 @@ const InvoiceForm = (props: IProps) => {
       }
       if(props.endDate) {
         input.endDate = props.endDate;
+      }
+      if(props.attachments?.length) {
+        input.attachments = props.attachments;
       }
 
       if(values.status) {

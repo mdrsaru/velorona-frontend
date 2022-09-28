@@ -1,0 +1,45 @@
+:global {
+  :local(.container) {
+    .ant-upload-list {
+      display: none;
+    }
+  }
+}
+
+.upload-file {
+  padding: 1rem;
+  display: flex;
+  background: var(--gray-2);
+
+  div {
+    width: 50%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .browse-file {
+    text-align: end;
+    cursor: pointer;
+
+    span {
+      color: var(--primary-blue);
+      font-weight: 400;
+      font-size: 14px;
+      line-height: 17px;
+    }
+  }
+
+  span {
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 22px;
+    color: var(--gray-secondary);
+  }
+}
+
+.asterisk-icon{
+  margin-right: 1px;
+  line-height:1;
+  font-family:'SimSun,sans-serif'
+}
