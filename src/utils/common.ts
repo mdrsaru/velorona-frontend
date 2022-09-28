@@ -99,3 +99,10 @@ export const getDurationFromTimeFormat = (timeFormat: string) : number => {
 
   return duration;
 }
+
+export function secondsToHms(d: any) {
+  d = Number(d);
+  let h = d / 3600;
+
+  return h.toFixed(2)
+}

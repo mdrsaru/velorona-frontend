@@ -7,16 +7,15 @@ import { GraphQLResponse } from '../../../interfaces/graphql.interface';
 import {
   SubscriptionPaymentPagingResult,
   QuerySubscriptionPaymentArgs,
-  InvoiceQuery,
   SubscriptionPaymentQuery,
 } from '../../../interfaces/generated';
 import PageHeader from '../../../components/PageHeader';
 import { SUBSCRIPTION_PAYMENT } from '../../Payment';
 import { downloadCSV } from '../../../utils/common';
 import constants, { payment_status } from '../../../config/constants';
-import { authVar } from '../../../App/link';
 
 import filterImg from '../../../assets/images/filter.svg';
+import { notifyGraphqlError } from '../../../utils/error';
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -42,11 +41,10 @@ const csvHeader: Array<{ label: string; key: string; subKey?: string }> = [
 
 const PaymentReport = () => {
   const [filterForm] = Form.useForm();
-  const loggedInUser = authVar();
   const [filterPayment, setFilterPayment] = useState<any>({
     filter: false,
   });
-  const [pagingInput, setPagingInput] = useState<{
+  const [pagingInput] = useState<{
     skip: number;
     currentPage: number;
   }>({
@@ -56,7 +54,6 @@ const PaymentReport = () => {
 
   const {
     data,
-    loading,
     refetch: refetchPayment,
   } = useQuery<GraphQLResponse<'SubscriptionPayment', SubscriptionPaymentPagingResult>, QuerySubscriptionPaymentArgs>(
     SUBSCRIPTION_PAYMENT,
@@ -75,7 +72,7 @@ const PaymentReport = () => {
       },
     }
   );
-  const [fetchDownloadData, { data: DownloadPaymentData }] = useLazyQuery<
+  const [fetchDownloadData] = useLazyQuery<
     GraphQLResponse<'SubscriptionPayment', SubscriptionPaymentPagingResult>,
     QuerySubscriptionPaymentArgs
   >(SUBSCRIPTION_PAYMENT, {
@@ -89,9 +86,7 @@ const PaymentReport = () => {
         },
       },
     },
-    onCompleted: () => {
-      downloadCSV(DownloadPaymentData?.SubscriptionPayment?.data, csvHeader, 'Payment.csv');
-    },
+    onError:notifyGraphqlError
   });
 
   const refetchPayments = () => {
@@ -149,7 +144,10 @@ const PaymentReport = () => {
       variables: {
         input: input
       }
-    });
+    })
+    .then((response) => {
+      downloadCSV(response?.data?.SubscriptionPayment?.data, csvHeader, 'Payment.csv');
+    })
   };
   const openFilterRow = () => {
     if (filterPayment?.filter) {
@@ -212,7 +210,7 @@ const PaymentReport = () => {
             </Row>
           )}
         </Form>
-        {data && data?.SubscriptionPayment?.data?.length >= 1 ? (
+        {data && data?.SubscriptionPayment?.data?.length ? (
           <Button type='link' onClick={downloadReport} icon={<DownloadOutlined />}>
             Download
           </Button>

@@ -13,6 +13,7 @@ import { GraphQLResponse } from '../../../interfaces/graphql.interface';
 import { UserPagingResult, QueryUserArgs } from '../../../interfaces/generated';
 
 import filterImg from '../../../assets/images/filter.svg';
+import { notifyGraphqlError } from '../../../utils/error';
 
 const { Option } = Select;
 
@@ -56,7 +57,10 @@ const EmployeeReport = () => {
       archived?: boolean;
       role?: string;
       search?: string;
-    } = {};
+      company_id:string;
+    } = {
+      company_id:loggedInUser?.company?.id as string
+    };
 
     if (values.status) {
       if (values.status === 'Active' || values.status === 'Inactive') {
@@ -114,9 +118,9 @@ const EmployeeReport = () => {
   ];
 
 
-  const tableBody = () => {
+  const tableBody = (employeeData:any) => {
     const tableRows = [];
-    let users: any = employeeDownloadData?.User?.data;
+    let users: any = employeeData?.User?.data;
 
       for (const user of users) {
         const fullName = user?.fullName ?? '-';
@@ -141,7 +145,7 @@ const EmployeeReport = () => {
       return tableRows;
     };
 
-  const [fetchDownloadData, { data: employeeDownloadData }] = useLazyQuery<
+  const [fetchDownloadData] = useLazyQuery<
     GraphQLResponse<'User', UserPagingResult>,
     QueryUserArgs
   >(USER, {
@@ -154,10 +158,7 @@ const EmployeeReport = () => {
         },
       },
     },
-    onCompleted: () => {
-      const csvBody = tableBody();
-      downloadCSV(csvBody, csvHeader, 'Users.csv');
-    },
+  onError:notifyGraphqlError
   });
   const openFilterRow = () => {
     if (filterProperty?.filter) {
@@ -190,7 +191,10 @@ const EmployeeReport = () => {
       archived?: boolean;
       role?: string;
       search?: string;
-    } = {};
+      company_id:string;
+    } = {
+				company_id: loggedInUser?.company?.id as string,
+    };
 
     if (values.status) {
       if (values.status === 'Active' || values.status === 'Inactive') {
@@ -216,7 +220,10 @@ const EmployeeReport = () => {
       variables: {
         input: input
       },
-    });
+    }).then((response) => {
+      const csvBody = tableBody(response.data);
+      downloadCSV(csvBody, csvHeader, 'Users.csv');
+    })
   };
   return (
     <div>

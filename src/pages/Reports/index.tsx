@@ -7,6 +7,8 @@ import EmployeeTimesheetReport from './EmployeeTimesheetReport';
 import ClientReport from './ClientReport';
 import InvoiceReport from './InvoiceReport';
 import ScheduleReport from './ScheduleReport';
+import EmployeeClientReport from './EmployeeClientReport/index';
+import UserPayRateReport from './UserPayRateReport';
 
 const Reports = () => {
   return (
@@ -26,9 +28,12 @@ const Reports = () => {
       <Col span={24}>
         <InvoiceReport />
       </Col>
-      {/* <Col span={24}>
-        <ScheduleReport />
-      </Col> */}
+      <Col span={24}>
+        <EmployeeClientReport />
+      </Col>
+      <Col span={24}>
+        <UserPayRateReport />
+      </Col>
     </Row>
   );
 };

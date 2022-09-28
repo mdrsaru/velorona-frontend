@@ -12,6 +12,7 @@ import { COMPANY } from '../../Company';
 import PageHeader from '../../../components/PageHeader';
 
 import filterImg from '../../../assets/images/filter.svg';
+import { notifyGraphqlError } from '../../../utils/error';
 
 const csvHeader: Array<{ label: string; key: string; subKey?: string }> = [
   { label: 'Company Name', key: 'name' },
@@ -25,14 +26,13 @@ const CompanyReport = () => {
 
   const {
     data: companyData,
-    loading: dataLoading,
     refetch: refetchCompany,
   } = useQuery<GraphQLResponse<'Company', CompanyPagingResult>, QueryCompanyArgs>(COMPANY, {
     fetchPolicy: 'network-only',
     nextFetchPolicy: 'cache-only',
   });
 
-  const [fetchDownloadData, { data: companyDownloadData }] = useLazyQuery<
+  const [fetchDownloadData] = useLazyQuery<
     GraphQLResponse<'Company', CompanyPagingResult>,
     QueryCompanyArgs
   >(COMPANY, {
@@ -46,9 +46,7 @@ const CompanyReport = () => {
         },
       },
     },
-    onCompleted: () => {
-      downloadCSV(companyDownloadData?.Company?.data, csvHeader, 'Company.csv');
-    },
+   onError:notifyGraphqlError
   });
 
   const downloadReport = () => {
@@ -84,7 +82,10 @@ const CompanyReport = () => {
       variables: {
         input: input
       },
-    });
+    })
+    .then((response) => {
+      downloadCSV(response?.data?.Company?.data, csvHeader, 'Company.csv');
+    })
   };
 
   const [filterProperty, setFilterProperty] = useState<any>({
@@ -185,7 +186,7 @@ const CompanyReport = () => {
             </Row>
           )}
         </Form>
-        {companyData && companyData?.Company?.data?.length > 1 ? (
+        {companyData && companyData?.Company?.data?.length ? (
           <Button type='link' onClick={downloadReport} icon={<DownloadOutlined />}>
             Download
           </Button>
