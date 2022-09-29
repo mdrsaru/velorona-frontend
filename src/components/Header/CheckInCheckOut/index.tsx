@@ -25,6 +25,10 @@ export const TIME_ENTRY = gql`
         activeEntry {
           ...timeEntryFields
         }
+        activeBreakEntry{
+        id
+        startTime
+        }
       }
     }
 `;
@@ -105,15 +109,18 @@ const CheckInCheckOut = (props: IProps) => {
     onCompleted(response) {
       if (response.TimeEntry.activeEntry) {
         let startTime = response.TimeEntry.activeEntry?.startTime;
-        let startBreakTime = response.TimeEntry.activeEntry?.startBreakTime;
         if (startTime) {
           startTime = moment(startTime).utc().format('YYYY-MM-DDTHH:mm:ss');
           startTimer(response.TimeEntry.activeEntry.id, startTime);
         }
-        if (startBreakTime) {
-          startBreakTime = moment(startBreakTime).utc().format('YYYY-MM-DDTHH:mm:ss');
-          startBreakTimer(startBreakTime);
-          setBreakStartTime(startBreakTime)
+        if(response.TimeEntry.activeBreakEntry){
+          let startBreakTime = response.TimeEntry.activeBreakEntry?.startTime;
+  
+          if (startBreakTime) {
+            startBreakTime = moment(startBreakTime).utc().format('YYYY-MM-DDTHH:mm:ss');
+            startBreakTimer(startBreakTime);
+            setBreakStartTime(startBreakTime)
+          }
         }
       }
     }
@@ -251,17 +258,13 @@ const CheckInCheckOut = (props: IProps) => {
 
   const handleEndBreakTime = () => {
     let endDate = moment().format('YYYY-MM-DDTHH:mm:ss')
-
-    const diff = moment(endDate).diff(breakStartTime, 'seconds');
-
     if (activeEntry_id) {
       addBreakTime({
         variables: {
           input: {
             id: activeEntry_id as string,
             company_id,
-            breakTime: diff,
-            startBreakTime: null
+            endBreakTime: endDate,
           },
         },
       })
