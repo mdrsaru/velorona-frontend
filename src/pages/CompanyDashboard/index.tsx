@@ -12,24 +12,16 @@ const CompanyDashboard = () => {
   const roles = authData?.user?.roles;
 
   if(roles.includes(constants.roles.CompanyAdmin) ||roles.includes(constants.roles.SuperAdmin)  ){
-	return <CompanyAdminDashboard/>
-  }
-  else if (roles.includes(constants.roles.TaskManager) ){
-	return <TaskManagerDashboard/>
-  }
-
-  else if (roles.includes(constants.roles.Employee) ){
-	return <EmployeeDashboard/>
-  }
-  
-  else if (roles.includes(constants.roles.BookKeeper) ){
+    return <CompanyAdminDashboard/>
+  } else if (roles.includes(constants.roles.TaskManager) ){
+    return <TaskManagerDashboard/>
+  } else if (roles.includes(constants.roles.Employee) ){
+    return <EmployeeDashboard/>
+  } else if (roles.includes(constants.roles.BookKeeper) ){
     return <Invoice/>
   }
 
-  else {
-	return <Home/>
-  }
-
+  return <Home/>
 }
 
 export default CompanyDashboard

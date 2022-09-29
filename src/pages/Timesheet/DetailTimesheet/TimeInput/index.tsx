@@ -28,7 +28,7 @@ interface IProps {
 
 const TimeInput = (props: IProps) => {
   const _timeFormat = !isNil(props.duration) ? getTimeFormat(props.duration) : '-';
-  const [timeFormat, setTimeFormat] = useState('');
+  const [timeFormat, setTimeFormat] = useState(_timeFormat);
   const [showEntryModal, setShowEntryModal] = useState(false);
   const ref = useRef<InputRef>(null)
 
@@ -39,7 +39,9 @@ const TimeInput = (props: IProps) => {
     onCompleted(response) {
       if(response.TimeEntriesBulkUpdate) {
         message.success('Time entry updated')
-        props.refetch();
+        props.refetch().then(() => {
+          setTimeFormat(getTimeFormat(props.duration))
+        });
       }
     }
   })

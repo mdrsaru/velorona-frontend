@@ -57,6 +57,7 @@ const SuperAdminDashboard = () => {
     return companyGrowthList.push({ label: month, value: companyGrowth?.count })
 
   })
+
   const dashboardCount: IDashboardCount[] = [
     {
       title: 'Companies',

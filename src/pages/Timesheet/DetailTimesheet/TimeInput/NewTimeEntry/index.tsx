@@ -4,6 +4,7 @@ import { Form, Button, Input, message } from 'antd';
 
 import { AUTH } from '../../../../../gql/auth.gql';
 import { getDurationFromTimeFormat } from '../../../../../utils/common';
+import { notifyGraphqlError } from '../../../../../utils/error';
 import { TimeEntry, MutationTimeEntryCreateArgs } from '../../../../../interfaces/generated';
 import { GraphQLResponse } from '../../../../../interfaces/graphql.interface';
 
@@ -37,7 +38,8 @@ const NewTimeEntry = (props: IProps) => {
         props.refetch();
         message.success('Time entry created')
       }
-    }
+    },
+    onError: notifyGraphqlError,
   })
 
   const onFinish = (values: any) => {
@@ -75,7 +77,7 @@ const NewTimeEntry = (props: IProps) => {
           label="Description"
           rules={[{ required: true, message: 'Descripton is required' }]}
         >
-          <Input placeholder="Description" />
+          <Input placeholder="Description" autoFocus />
         </Form.Item>
 
         <Form.Item 
