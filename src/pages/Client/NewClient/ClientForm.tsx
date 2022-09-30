@@ -30,9 +30,20 @@ export const INVOICE_PAYMENT_CONFIG = gql`
   }
  `;
 
+interface IProps {
+  form: any;
+  btnText: string;
+  loading: boolean;
+  onSubmitForm: any;
+  cancelAddClient: any;
+  id?: string;
+  initialValues?: any;
+  createdAt?: string;
+}
+
 const ClientForm = (props: any) => {
-  const { id, loading, form, onSubmitForm, btnText, cancelAddClient, initialValues } = props;
-  const [schedule, setSchedule] = useState<string | undefined>(initialValues?.invoiceSchedule);
+  const { id, loading, form, onSubmitForm, btnText, cancelAddClient, initialValues, createdAt = null } = props;
+  const [schedule, setSchedule] = useState<InvoiceSchedule | undefined>(initialValues?.invoiceSchedule);
 
   const { data: paymentConfigData, loading: paymnentConfigLoading } = useQuery<
     GraphQLResponse<'InvoicePaymentConfig', InvoicePaymentConfigPagingResult>
@@ -48,11 +59,18 @@ const ClientForm = (props: any) => {
   });
 
   const onScheduleChange = (value: string) => {
-    setSchedule(value);
+    setSchedule(value as InvoiceSchedule);
   }
 
   const disabledDate: RangePickerProps['disabledDate'] = current => {
-    return moment(current).day() !== 1
+    const currentDate = moment(current);
+    let createdDate = createdAt ? moment(createdAt) : moment();
+
+    if(schedule === InvoiceSchedule.Custom) {
+      return  currentDate >= createdDate
+    }
+
+    return currentDate.day() !== 1 || currentDate >= createdDate;
   };
 
 
@@ -247,6 +265,7 @@ const ClientForm = (props: any) => {
                 <Select.Option value={InvoiceSchedule.Weekly}>{InvoiceSchedule.Weekly}</Select.Option>
                 <Select.Option value={InvoiceSchedule.Biweekly}>{InvoiceSchedule.Biweekly}</Select.Option>
                 <Select.Option value={InvoiceSchedule.Monthly}>{InvoiceSchedule.Monthly}</Select.Option>
+                <Select.Option value={InvoiceSchedule.Custom}>{InvoiceSchedule.Custom}</Select.Option>
               </Select>
             </Form.Item>
           </Col>
@@ -267,11 +286,11 @@ const ClientForm = (props: any) => {
           </Col>
 
           {
-            schedule === 'Biweekly' && (
+            [InvoiceSchedule.Biweekly, InvoiceSchedule.Custom].includes(schedule as InvoiceSchedule) && (
               <Col xs={24} sm={24} md={12} lg={12} className={styles.formCol}>
                 <Form.Item
-                  label="Biweekly start date"
-                  name='biweeklyStartDate'
+                  label="Schedule start date"
+                  name='scheduleStartDate'
                 >
                   <DatePicker 
                     disabledDate={disabledDate}
@@ -297,7 +316,8 @@ const ClientForm = (props: any) => {
                 <Button
                   loading={loading}
                   type="primary"
-                  htmlType="submit">
+                  htmlType="submit"
+                >
                   {btnText}
                 </Button>
               </Space>

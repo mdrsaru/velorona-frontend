@@ -8,7 +8,7 @@ import { notifyGraphqlError } from "../../../utils/error";
 import { authVar } from "../../../App/link";
 
 import ClientForm from "./ClientForm";
-import { Client, MutationClientCreateArgs, ClientCreateInput } from "../../../interfaces/generated";
+import { Client, MutationClientCreateArgs, ClientCreateInput, InvoiceSchedule } from "../../../interfaces/generated";
 
 import styles from "../style.module.scss";
 import { GraphQLResponse } from "../../../interfaces/graphql.interface";
@@ -21,7 +21,7 @@ export const CLIENT_CREATE = gql`
             name
             email
             invoicingEmail
-            biweeklyStartDate
+            scheduleStartDate
         }
     }
 `
@@ -58,10 +58,10 @@ const NewClient = () => {
       }
     }
 
-    if(values.invoiceSchedule === 'Biweekly') {
-      input['biweeklyStartDate'] = values.biweeklyStartDate ? moment(values.biweeklyStartDate).format('YYYY-MM-DD') : null;
+    if(values.invoiceSchedule === InvoiceSchedule.Biweekly || values.invoiceSchedule === InvoiceSchedule.Custom) {
+      input['scheduleStartDate'] = values.scheduleStartDate ? moment(values.scheduleStartDate).format('YYYY-MM-DD') : null;
     } else {
-      input['biweeklyStartDate'] = null;
+      input['scheduleStartDate'] = null;
     }
 
     clientCreate({

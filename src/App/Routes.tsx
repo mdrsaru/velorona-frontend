@@ -569,6 +569,40 @@ const _Routes = () => {
               </CheckRoles>
             }
           />
+          <Route path={routes.currency.path}>
+            <Route
+              index
+              element={
+                <CheckRoles allowedRoles={routes.currency.allowedRoles}>
+                  <Suspense fallback={<LoginLoader />}>
+                    <routes.currency.component />
+                  </Suspense>
+                </CheckRoles>
+              }
+            />
+            <Route
+
+              path={routes.addCurrency.childPath}
+              element={
+                <CheckRoles allowedRoles={routes.addCurrency.allowedRoles}>
+                  <Suspense fallback={<RouteLoader />}>
+                    <routes.addCurrency.component />
+                  </Suspense>
+                </CheckRoles>
+              }
+            />
+
+            <Route
+              path={routes.editCurrency.childPath}
+              element={
+                <CheckRoles allowedRoles={routes.editCurrency.allowedRoles}>
+                  <Suspense fallback={<RouteLoader />}>
+                    <routes.editCurrency.component />
+                  </Suspense>
+                </CheckRoles>
+              }
+            />
+          </Route>
           <Route path='*' element={<NotFound />} />
         </Route>
       </Routes>

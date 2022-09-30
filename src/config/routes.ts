@@ -104,6 +104,30 @@ const routes = {
     name: 'Edit Company',
     key: 'company'
   },
+  currency: {
+    childPath: 'currency',
+    path: '/currency',
+		component: lazy(() => import('../pages/Currency')),
+    name: 'Currency',
+    key: 'currency',
+    allowedRoles: [SuperAdmin],
+  },
+  addCurrency: {
+    childPath: ':add',
+    path: `/currency/add`,
+    component: lazy(() => import('../pages/Currency/AddCurrency')),
+    name: 'New Currency',
+    key: 'currency',
+    allowedRoles: [SuperAdmin],
+  },
+  editCurrency: {
+    childPath: ':id/edit',
+    path: (id: string) => `/currency/${id}/edit`,
+    component: lazy(() => import('../pages/Currency/EditCurrency')),
+    name: 'Edit Currency',
+    key: 'currency',
+    allowedRoles: [SuperAdmin],
+  },
   superAdmin: {
     childPath: 'super-admin',
     path: '/super-admin',

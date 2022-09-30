@@ -550,7 +550,6 @@ const EditEmployee = () => {
                         </Form.Item>
                       </Col>
 
-
                       <Col
                         xs={24}
                         sm={24}

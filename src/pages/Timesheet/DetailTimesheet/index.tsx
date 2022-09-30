@@ -17,7 +17,7 @@ import { _cs, checkRoles } from '../../../utils/common';
 import routes from '../../../config/routes';
 import { notifyGraphqlError } from "../../../utils/error";
 import constants, { plans } from "../../../config/constants";
-import { TimeEntry, MutationTimeEntriesApproveRejectArgs, InvoiceSchedule } from '../../../interfaces/generated';
+import { TimeEntry, MutationTimeEntriesApproveRejectArgs, InvoiceSchedule, EntryType } from '../../../interfaces/generated';
 import { GraphQLResponse } from '../../../interfaces/graphql.interface';
 import { PROJECT } from '../../Project';
 import { IGroupedTimeEntries } from '../../../interfaces/common.interface';
@@ -91,6 +91,7 @@ const DetailTimesheet = (props: any) => {
   const companyPlan = authData?.company?.plan;
   const trialEnded = authData?.company?.trialEnded;
 
+  const entryType = authData?.user?.entryType;
   const [form] = Form.useForm()
 
   const [commentDetails, setCommentDetails] = useState<{
@@ -376,7 +377,7 @@ const DetailTimesheet = (props: any) => {
                   extra={[
                     <span key="new-entry">
                       {
-                        roles.includes(constants.roles.Employee) &&
+                        roles.includes(constants.roles.Employee) && entryType !== EntryType.Cico &&
                         <span
                           key="new-entry"
                           className={styles['add-entry']}
