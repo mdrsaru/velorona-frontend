@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { Button, Card, Col, DatePicker, Form, Input, message, Row, Select, Space, Upload } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
-import constants, { roles_user } from "../../../config/constants";
+import constants, { plans, roles_user } from "../../../config/constants";
 
 import type { UploadProps } from 'antd';
 import { useNavigate } from "react-router-dom";
@@ -91,6 +91,10 @@ const NewEmployee = () => {
     id: '',
     name: ''
   })
+
+  const companyPlan = authData?.company?.plan
+  const trialEnded = authData?.company?.trialEnded as boolean
+
   const [changeProfilePictureInput] = useMutation<
     GraphQLResponse<'ChangeProfilePicture', User>,
     MutationChangeProfilePictureArgs
@@ -131,7 +135,7 @@ const NewEmployee = () => {
     }
   };
 
-  const {  data: managerData } = useQuery<
+  const { data: managerData } = useQuery<
     GraphQLResponse<'User', UserPagingResult>,
     QueryUserArgs
   >(
@@ -146,6 +150,7 @@ const NewEmployee = () => {
           },
           query: {
             role: RoleName.TaskManager,
+            company_id: authData?.company?.id
           }
         },
       },
@@ -208,7 +213,7 @@ const NewEmployee = () => {
           firstName: values.firstName,
           middleName: values.middleName,
           lastName: values.lastName,
-          designation:values.designation,
+          designation: values.designation,
           status: UserStatus.InvitationSent,
           manager_id: values.manager_id,
           company_id: authData?.company?.id as string,
@@ -353,8 +358,8 @@ const NewEmployee = () => {
                 label="Designation"
                 name='designation'
                 rules={[{
-                  required:true,
-                  message:"Please enter the designation"
+                  required: true,
+                  message: "Please enter the designation"
                 }]}
               >
                 <Input placeholder="Enter designation" autoComplete="off" />
@@ -472,11 +477,18 @@ const NewEmployee = () => {
                   message: 'Please enter role!'
                 }]}>
                 <Select placeholder="Select Role" onChange={handleChange}>
-                  {roles_user?.map((role: any, index: number) => (
-                    <Option value={role?.value} key={index}>
-                      {role?.name}
-                    </Option>
-                  ))}
+                  {roles_user?.map((role: any, index: number) => {
+                    if (role?.value === 'TaskManager' && (companyPlan !== plans.Professional || trialEnded)) {
+                      return
+                    }
+                    else {
+                      return (
+                        <Option value={role?.value} key={index}>
+                          {role?.name}
+                        </Option>
+                      )
+                    }
+                  })}
                 </Select>
               </Form.Item>
             </Col>
@@ -502,27 +514,50 @@ const NewEmployee = () => {
             </Col> */}
             {role === constants.roles.Employee &&
               <>
-                <Col
-                  xs={24}
-                  sm={24}
-                  md={12}
-                  lg={12}>
-                  <Form.Item
-                    name="manager_id"
-                    label="Task Manager"
-                  >
-                    <Select placeholder="Select manager" onChange={handleManagerChange}>
-                      {managerData?.User?.data?.map((manager, index) => (
-                        <Option key={index} value={manager?.id}> {`${manager?.fullName} / ${manager?.email}`}</Option>
-                      ))}
-                    </Select>
-                    {form.getFieldValue('manager_id')}
-                    {!manager &&
-                      <p>Please add task manager first to assign manager for this user.</p>
-                    }
-                  </Form.Item>
-                </Col>
+                {
+                  (companyPlan !== plans.Professional && trialEnded) &&
+                  <>
+                    <Col
+                      xs={24}
+                      sm={24}
+                      md={12}
+                      lg={12}>
+                      <Form.Item
+                        name="manager_id"
+                        label="Task Manager"
+                      >
+                        <Select placeholder="Select manager" onChange={handleManagerChange}>
+                          {managerData?.User?.data?.map((manager, index) => (
+                            <Option key={index} value={manager?.id}> {`${manager?.fullName} / ${manager?.email}`}</Option>
+                          ))}
+                        </Select>
+                        {form.getFieldValue('manager_id')}
+                        {!manager &&
+                          <p>Please add task manager first to assign manager for this user.</p>
+                        }
+                      </Form.Item>
+                    </Col>
 
+                    <Col
+                      xs={24}
+                      sm={24}
+                      md={12}
+                      lg={12}>
+                      <Form.Item
+                        name="timesheet_attachment"
+                        label="Timesheet Attachment type"
+                        rules={[{
+                          required: true,
+                          message: 'Please select timesheet attachment type'
+                        }]}>
+                        <Select placeholder="Select status">
+                          <Option value={true}>Mandatory</Option>
+                          <Option value={false}>Optional</Option>
+                        </Select>
+                      </Form.Item>
+                    </Col>
+                  </>
+                }
                 <Col xs={24} sm={24} md={12} lg={12}>
                   <Form.Item
                     label="Start Date"
@@ -544,24 +579,6 @@ const NewEmployee = () => {
                   </Form.Item>
                 </Col>
 
-                <Col
-                  xs={24}
-                  sm={24}
-                  md={12}
-                  lg={12}>
-                  <Form.Item
-                    name="timesheet_attachment"
-                    label="Timesheet Attachment type"
-                    rules={[{
-                      required: true,
-                      message: 'Please select timesheet attachment type'
-                    }]}>
-                    <Select placeholder="Select status">
-                      <Option value={true}>Mandatory</Option>
-                      <Option value={false}>Optional</Option>
-                    </Select>
-                  </Form.Item>
-                </Col>
 
                 <Col
                   xs={24}

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { gql, useQuery, useMutation, useLazyQuery } from '@apollo/client';
 import { Card, Col, Dropdown, Menu, Row, Table, message, Modal, Form, Select, Button, Input, Popconfirm, DatePicker } from 'antd';
-import { 
+import {
   SearchOutlined,
   CheckCircleFilled,
   FormOutlined,
@@ -16,7 +16,7 @@ import {
 } from '@ant-design/icons';
 
 import { authVar } from '../../App/link';
-import constants, { invoice_status } from '../../config/constants';
+import constants, { invoice_status, plans } from '../../config/constants';
 import routes from '../../config/routes';
 import { notifyGraphqlError } from '../../utils/error';
 import {
@@ -105,6 +105,9 @@ const Invoice = () => {
   const companyCode = loggedInUser?.company?.code as string;
   const company_id = loggedInUser?.company?.id as string;
 
+  const companyPlan = loggedInUser?.company?.plan as string
+  const trialEnded = loggedInUser?.company?.trialEnded as boolean
+
   const [filterForm] = Form.useForm();
 
   const [pagingInput, setPagingInput] = useState<{
@@ -139,7 +142,7 @@ const Invoice = () => {
   });
 
   const [getPDF] = useLazyQuery<
-    GraphQLResponse<'InvoicePDF', string>, 
+    GraphQLResponse<'InvoicePDF', string>,
     QueryInvoicePdfArgs
   >(INVOICE_PDF, {
     fetchPolicy: 'cache-only',
@@ -200,15 +203,15 @@ const Invoice = () => {
     MutationInvoiceUpdateArgs
   >(
     INVOICE_STATUS_UPDATE, {
-      onCompleted(data) {
-        if(data.InvoiceUpdate) {
-          message.success('Invoice resend successfully');
+    onCompleted(data) {
+      if(data.InvoiceUpdate) {
+        message.success('Invoice resend successfully');
 
-          navigate(routes.invoice.path(companyCode));
-        }
-      },
-      onError: notifyGraphqlError,
-    }
+        navigate(routes.invoice.path(companyCode));
+      }
+    },
+    onError: notifyGraphqlError,
+  }
   );
 
 
@@ -448,32 +451,39 @@ const Invoice = () => {
       render: (invoice: IInvoice) => {
         return (
           <Row>
-            <Col>
-              {
+            {
+              (companyPlan === plans.Professional && !trialEnded) ?
+                <>
+                  <Col>
+                    {
 
-                <div
-                  onClick={() => handleViewAttachmentClick(invoice.id)}
-                  title='View Attachment'
-                  className={`${styles["table-icon"]} ${styles["table-view-attachment-icon"]}`}
-                >
-                  <EyeFilled />
-                </div>
-              }
-            </Col>
-            {!loggedInUser?.user?.roles.includes(constants.roles.BookKeeper) &&
-            <Col>
-              {
-                invoice.status === 'Pending' && (
-                  <div
-                    onClick={() => handleAddAttachment(invoice.id)}
-                    title='Add Attachment'
-                    className={`${styles["table-icon"]} ${styles["table-add-icon"]}`}
-                  >
-                    <PlusCircleFilled />
-                  </div>
-                )
-              }</Col>
-            }
+                      <div
+                        onClick={() => handleViewAttachmentClick(invoice.id)}
+                        title='View Attachment'
+                        className={`${styles["table-icon"]} ${styles["table-view-attachment-icon"]}`}
+                      >
+                        <EyeFilled />
+                      </div>
+                    }
+                  </Col>
+                  {!loggedInUser?.user?.roles.includes(constants.roles.BookKeeper) &&
+                    <Col>
+                      {
+                        invoice.status === 'Pending' && (
+                          <div
+                            onClick={() => handleAddAttachment(invoice.id)}
+                            title='Add Attachment'
+                            className={`${styles["table-icon"]} ${styles["table-add-icon"]}`}
+                          >
+                            <PlusCircleFilled />
+                          </div>
+                        )
+                      }</Col>
+                  }
+                </>
+                :
+                <>-</>
+      }
           </Row>
         )
       }
@@ -495,7 +505,7 @@ const Invoice = () => {
                   </div>
                 </Col>
               ) : (
-                <> 
+                <>
                   <Col>
                     {
                       invoice.status === 'Pending' && (
@@ -506,7 +516,7 @@ const Invoice = () => {
                         >
                           <FormOutlined />
                         </Link>
-                      ) 
+                      )
                     }
                   </Col>
 
@@ -553,8 +563,8 @@ const Invoice = () => {
                           placement="left"
                           title="Are you sure you want to resend invoice?"
                           onConfirm={() => handleResendInvoiceClick(invoice.id)}
-                          okText="Yes" cancelText="No">        
-                          <div     
+                          okText="Yes" cancelText="No">
+                          <div
                             title='Resend Invoice'
                             className={`${styles["table-icon"]} ${styles["table-view-icon"]}`}
                           >
@@ -576,22 +586,22 @@ const Invoice = () => {
   return (
     <div className={styles['container']}>
       <Card bordered={false}>
-      {loggedInUser?.user?.roles.includes(constants.roles.BookKeeper) ?
-        <PageHeader
-        title="Invoice History"
-      />
-      :
-       <PageHeader
-          title="Invoice History"
-          extra={[
-            <div className={styles['new-invoice']} key="new-invoice">
-              <Link to={routes.addInvoice.path(loggedInUser?.company?.code ?? '')}>
-                Add Invoice
-              </Link>
-            </div>
-          ]}
-        />
-      }
+        {loggedInUser?.user?.roles.includes(constants.roles.BookKeeper) ?
+          <PageHeader
+            title="Invoice History"
+          />
+          :
+          <PageHeader
+            title="Invoice History"
+            extra={[
+              <div className={styles['new-invoice']} key="new-invoice">
+                <Link to={routes.addInvoice.path(loggedInUser?.company?.code ?? '')}>
+                  Add Invoice
+                </Link>
+              </div>
+            ]}
+          />
+        }
         <Form
           form={filterForm}
           layout="vertical"
@@ -680,14 +690,14 @@ const Invoice = () => {
       <AttachmentModal
         visibility={showAttachment}
         setVisibility={setShowAttachment}
-        attachment ={attachmentsData?.AttachedTimesheet?.data}
+        attachment={attachmentsData?.AttachedTimesheet?.data}
       />
 
 
       <AttachNewTimesheetModal
         visibility={showAttachTimeEntry}
         setVisibility={setAttachTimeEntry}
-        invoice_id={invoiceId} 
+        invoice_id={invoiceId}
         refetch = {attachments}
       />
     </div>

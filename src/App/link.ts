@@ -23,6 +23,8 @@ const auth: IAuth = {
     code: '',
     id: null,
     name:'',
+    plan:'',
+    trialEnded:false,
     logo:{
       id:null,
       name:null,

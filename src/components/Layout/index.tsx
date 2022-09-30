@@ -37,6 +37,8 @@ const _Layout = () => {
           id: null,
           code: '',
           name: '',
+          plan: '',
+          trialEnded:false,
           logo: {
             id: null,
             name: null,
