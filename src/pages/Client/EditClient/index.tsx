@@ -8,7 +8,14 @@ import { GraphQLResponse } from "../../../interfaces/graphql.interface";
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { notifyGraphqlError } from "../../../utils/error";
 import { authVar } from "../../../App/link";
-import { Client, ClientPagingResult, MutationClientUpdateArgs, QueryClientArgs, ClientUpdateInput } from "../../../interfaces/generated";
+import {
+  Client,
+  ClientPagingResult,
+  MutationClientUpdateArgs,
+  QueryClientArgs,
+  ClientUpdateInput,
+  InvoiceSchedule,
+} from "../../../interfaces/generated";
 import { CLIENT } from "../index";
 
 import ClientForm from '../NewClient/ClientForm';
@@ -22,7 +29,7 @@ export const CLIENT_UPDATE = gql`
         name
         email
         invoicingEmail
-        biweeklyStartDate
+        scheduleStartDate
         address {
           id
           streetAddress
@@ -80,10 +87,10 @@ const EditClient = () => {
       }
     };
 
-    if(values.invoiceSchedule === 'Biweekly') {
-      input['biweeklyStartDate'] = values.biweeklyStartDate ? moment(values.biweeklyStartDate).format('YYYY-MM-DD') : null;
+    if([InvoiceSchedule.Biweekly, InvoiceSchedule.Custom].includes(values.invoiceSchedule)) {
+      input['scheduleStartDate'] = values.scheduleStartDate ? moment(values.scheduleStartDate).format('YYYY-MM-DD') : null;
     } else {
-      input['biweeklyStartDate'] = null;
+      input['scheduleStartDate'] = null;
     }
 
     clientUpdate({
@@ -123,8 +130,11 @@ const EditClient = () => {
       invoice_payment_config_id: client?.invoice_payment_config_id,
     };
 
-    if(client?.invoiceSchedule === 'Biweekly' && client?.biweeklyStartDate) {
-      values.biweeklyStartDate = moment(client.biweeklyStartDate);
+    if(
+      [InvoiceSchedule.Biweekly, InvoiceSchedule.Custom].includes(client?.invoiceSchedule as InvoiceSchedule) &&
+      client?.scheduleStartDate
+    ) {
+      values.scheduleStartDate = moment(client.scheduleStartDate);
     }
 
     return values;
@@ -155,6 +165,7 @@ const EditClient = () => {
                 onSubmitForm={onSubmitForm}
                 cancelAddClient={cancelAddClient}
                 initialValues={initialValues}
+                createdAt={client?.createdAt}
               />
             )
           }
