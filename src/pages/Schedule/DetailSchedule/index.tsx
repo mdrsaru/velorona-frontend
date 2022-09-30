@@ -332,7 +332,7 @@ const ScheduleDetail = () => {
                 groups[property] &&
                 groups[property]?.map((data: any) => {
                   return (
-                    day === moment(data?.schedule_date).format('YYYY-MM-DD') &&
+                    day === moment(data?.schedule_date).utc().format('YYYY-MM-DD') &&
                     data?.workscheduleTimeDetail?.length > 0 &&
                     data?.workscheduleTimeDetail?.map(
                       (timeData: any) => `${moment(timeData?.startTime).utc().format('HH:mm') || ''}-${
@@ -395,7 +395,7 @@ const ScheduleDetail = () => {
                                   {groups[key] &&
                                     groups[key]?.map((data: any, index: number) => (
                                       <Fragment key={index}>
-                                        {day === moment(data?.schedule_date).format('YYYY-MM-DD') &&
+                                        {day === moment(data?.schedule_date).utc().format('YYYY-MM-DD') &&
                                           data?.workscheduleTimeDetail?.length > 0 &&
                                           data?.workscheduleTimeDetail?.map((timeData: any, index: number) => (
                                             <Fragment key={index}>
@@ -403,8 +403,7 @@ const ScheduleDetail = () => {
                                                 onClick={() => handleChange(data?.id)}
                                                 style={{ cursor: 'pointer' }}
                                               >
-                                                {moment(timeData?.startTime).utc().format('HH:mm')} -
-                                                {moment(timeData?.endTime).utc().format('HH:mm')}
+                                                {moment(timeData?.startTime).utc().format('HH:mm')} - {moment(timeData?.endTime).utc().format('HH:mm')}
                                               </span>
                                               <br />
                                             </Fragment>
@@ -412,7 +411,7 @@ const ScheduleDetail = () => {
                                       </Fragment>
                                     ))}
                                   {!groups[key]?.some(
-                                    (data: any, index: any) => moment(data?.schedule_date).format('YYYY-MM-DD') === day
+                                    (data: any, index: any) => moment(data?.schedule_date).utc().format('YYYY-MM-DD') === day
                                   ) && (
                                     <span
                                       onClick={() =>
