@@ -25,6 +25,16 @@ export const USER_PAY_RATE = gql`
         id
         amount
         invoiceRate
+        invoiceRateCurrency{
+        id 
+        name
+        symbol 
+        }
+        userRateCurrency{
+        id 
+        name
+        symbol 
+        }
         project {
           id
           name
@@ -106,15 +116,15 @@ const ViewUserPayRate = (props: IProps) => {
         },
       },
       {
-        title: "Pay rate(per hour)",
+        title: "Invoice rate(per hour)",
         render: (payRate: any) => {
-          return <p>${payRate?.amount}</p>;
+          return <p>{`${payRate?.invoiceRateCurrency?.symbol} ${payRate?.invoiceRate}`}</p>;
         },
       },
       {
-        title: "Invoice rate(per hour)",
+        title: "Pay rate(per hour)",
         render: (payRate: any) => {
-          return <p>${payRate?.invoiceRate}</p>;
+          return <p>{`${payRate?.userRateCurrency?.symbol} ${payRate?.amount}`}</p>;
         },
       },
       {

@@ -105,6 +105,14 @@ const Sidebar = (props: any) => {
       viewAsAdmin: false,
     },
     {
+      key: routes.currency.key,
+      name: routes.currency.name,
+      icon: <UserOutlined />,
+      route: routes.currency.path,
+      accessRoles: [constants.roles.SuperAdmin],
+      viewAsAdmin: false,
+    },
+    {
       key: routes.user.key,
       name: routes.user.name,
       icon: <UsergroupAddOutlined />,
