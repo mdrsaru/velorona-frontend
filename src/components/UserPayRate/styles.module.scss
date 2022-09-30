@@ -19,9 +19,16 @@
       padding-top: 1rem;
       padding-right: 1rem;
     }
+
+    .ant-select .ant-select-arrow {
+      padding-right: 0;
+    }
   }
 }
 
+.form-select-item {
+  height: 10px;
+}
 .title {
   font-style: normal;
   font-weight: 600;

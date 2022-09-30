@@ -4,12 +4,14 @@ import { CloseOutlined } from "@ant-design/icons"
 import { gql, useMutation, useQuery } from "@apollo/client"
 import { PROJECT } from "../../pages/Project"
 import { authVar } from "../../App/link"
-import { MutationUserPayRateCreateArgs, UserPayRate } from "../../interfaces/generated"
+import { CurrencyPagingResult, MutationUserPayRateCreateArgs, QueryCurrencyArgs, UserPayRate } from "../../interfaces/generated"
 import { notifyGraphqlError } from "../../utils/error"
 
 import { USER_PAY_RATE } from "../ViewUserPayRate"
 import { GraphQLResponse } from "../../interfaces/graphql.interface"
 import styles from "./styles.module.scss"
+import { CURRENCY } from "../../pages/Currency"
+import { useState } from 'react';
 
 interface IProps {
   visibility: boolean;
@@ -38,13 +40,21 @@ const UserPayRateModal = (props: IProps) => {
       input: {
         query: {
           company_id: loggedInUser?.company?.id,
-          user_id : user?.id,
+          user_id: user?.id,
         },
         paging: {
           order: ["updatedAt:DESC"],
         },
       },
     },
+  });
+
+  const { data: currencyData } = useQuery<
+    GraphQLResponse<'Currency', CurrencyPagingResult>,
+    QueryCurrencyArgs
+  >(CURRENCY, {
+    fetchPolicy: 'network-only',
+    nextFetchPolicy: 'cache-only'
   });
 
   const project_ids: any = [];
@@ -98,18 +108,68 @@ const UserPayRateModal = (props: IProps) => {
     }
   })
   const [form] = Form.useForm();
+  const [userRateCurrency, setUserRateCurrency] = useState('')
+  const [invoiceRateCurrency, setInvoiceRateCurrency] = useState('')
+
+  const handleUserRateCurrency = (id: any) => {
+    setUserRateCurrency(id)
+  }
+
+  const handleInvoiceRateCurrency = (id: string) => {
+    setInvoiceRateCurrency(id)
+  }
+
+  const selectUserRateCurrency = (
+    <Select style={{ width: '5rem' }} placeholder='Symbol' onChange={handleUserRateCurrency}>
+      {currencyData?.Currency?.data?.map((currency, index) => (
+        <Select.Option
+          value={currency.id}
+          key={index}
+        >
+          {currency.symbol}
+        </Select.Option>
+      ))}
+    </Select>
+  );
+
+
+  const selectInvoiceRateCurrency = (
+    <Select style={{ width: '5rem' }} placeholder='Symbol' onChange={handleInvoiceRateCurrency}>
+      {currencyData?.Currency?.data?.map((currency, index) => (
+        <Select.Option
+          value={currency.id}
+          key={index}
+
+        >
+          {currency.symbol}
+        </Select.Option>
+      ))}
+
+    </Select>
+  );
 
   const onSubmitForm = (values: any) => {
     form.resetFields()
+
+    const input: any = {
+      user_id: user.id,
+      project_id: values.project_id,
+      amount: values.payRate,
+      invoiceRate: values.invoiceRate,
+      company_id: loggedInUser.company?.id as string
+    }
+
+    if (userRateCurrency) {
+      input.user_rate_currency_id = userRateCurrency
+    }
+
+    if (invoiceRateCurrency) {
+      input.invoice_rate_currency_id = invoiceRateCurrency
+    }
+
     userPayRateCreate({
       variables: {
-        input: {
-          user_id: user.id,
-          project_id: values.project_id,
-          amount: values.payRate,
-          invoiceRate: values.invoiceRate,
-          company_id: loggedInUser.company?.id as string
-        }
+        input: input
       }
     })
   };
@@ -175,11 +235,11 @@ const UserPayRateModal = (props: IProps) => {
                 label="Invoice rate"
                 name="invoiceRate">
                 <InputNumber
-                  addonBefore="$ "
+                  addonBefore={selectInvoiceRateCurrency}
                   addonAfter="Hr"
                   placeholder="Enter invoice rate"
                   autoComplete="off"
-                  style={{ width: '100%' }} />
+                  style={{ width: '100%' }}/>
               </Form.Item>
             </Col>
             <Col
@@ -191,7 +251,7 @@ const UserPayRateModal = (props: IProps) => {
                 label="Payrate"
                 name="payRate">
                 <InputNumber
-                  addonBefore="$ "
+                  addonBefore={selectUserRateCurrency}
                   addonAfter="Hr"
                   placeholder="Enter payrate"
                   autoComplete="off"
