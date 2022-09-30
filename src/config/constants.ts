@@ -106,8 +106,8 @@ export const employee_timesheet_status = [{
   name: 'Rejected'
 },
 {
-	value: 'PartiallyApproved',
-	name: 'PartiallyApproved'
+  value: 'PartiallyApproved',
+  name: 'PartiallyApproved'
 },
 ]
 
@@ -122,18 +122,23 @@ export const company_status = [{
 ]
 
 export const attachment_type = [{
-	value: 'Timesheet',
-	name: 'Timesheet'
-  },
-  {
-	value: 'Attachment',
-	name: 'Attachment'
-  },
-  {
-	value: 'Others',
-	name: 'Others'
-  }
-  ]
+  value: 'Timesheet',
+  name: 'Timesheet'
+},
+{
+  value: 'Attachment',
+  name: 'Attachment'
+},
+{
+  value: 'Others',
+  name: 'Others'
+}
+]
+
+export const plans = {
+  Starter: 'Starter',
+  Professional: 'Professional',
+};
 
 export const subscription = {
   price: {

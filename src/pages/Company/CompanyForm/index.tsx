@@ -19,7 +19,7 @@ import { useNavigate } from 'react-router-dom';
 import { notifyGraphqlError } from '../../../utils/error';
 
 import styles from './style.module.scss';
-import constants from '../../../config/constants';
+import constants, { plans } from '../../../config/constants';
 import { authVar } from '../../../App/link';
 import { GraphQLResponse } from '../../../interfaces/graphql.interface';
 import { Company, CompanyCreateInput, CompanyUpdateInput, MutationCompanyCreateArgs, MutationCompanyUpdateArgs, CompanyStatus } from '../../../interfaces/generated';
@@ -166,6 +166,7 @@ const CompanyForm = (props: IProps) => {
       const input: CompanyCreateInput = {
         name: values.name,
         status: values.status,
+        plan : values.plan,
         user: {
           firstName: values.firstName,
           middleName: values.middleName,
@@ -406,6 +407,24 @@ const CompanyForm = (props: IProps) => {
           </Form.Item>
         </Col>
 
+        <Col xs={24} sm={24} md={12}>
+          <Form.Item
+            name="plan"
+            label="Select company plan"
+            rules={[
+              {
+                required: true,
+                message: "Select a company plan.",
+              },
+            ]}
+          >
+            <Select placeholder="Company Plans">
+              <Option value={plans.Starter}>Starter</Option>
+              <Option value={plans.Professional}>Professional</Option>
+            </Select>
+          </Form.Item>
+        </Col>
+        
         <Col xs={24} sm={24} md={24} lg={24}>
           <Form.Item
             name="upload"

@@ -16,7 +16,7 @@ import { authVar } from '../../../App/link';
 import { _cs, checkRoles } from '../../../utils/common';
 import routes from '../../../config/routes';
 import { notifyGraphqlError } from "../../../utils/error";
-import constants from "../../../config/constants";
+import constants, { plans } from "../../../config/constants";
 import { TimeEntry, MutationTimeEntriesApproveRejectArgs, InvoiceSchedule, EntryType } from '../../../interfaces/generated';
 import { GraphQLResponse } from '../../../interfaces/graphql.interface';
 import { PROJECT } from '../../Project';
@@ -88,6 +88,9 @@ const DetailTimesheet = (props: any) => {
 
   const authData = authVar()
   const roles = authData?.user?.roles;
+  const companyPlan = authData?.company?.plan;
+  const trialEnded = authData?.company?.trialEnded;
+
   const entryType = authData?.user?.entryType;
   const [form] = Form.useForm()
 
@@ -449,7 +452,7 @@ const DetailTimesheet = (props: any) => {
                         />
 
                         {
-                          managerLvlRole && isSubmitted && (
+                          managerLvlRole && isSubmitted && (companyPlan === plans.Professional) &&!trialEnded &&(
                             <Row justify="end" style={{ margin: '36px 0' }}>
                               <Space>
                                 <Button onClick={() => { approveRejectAll('Approved') }} >
@@ -613,7 +616,7 @@ const DetailTimesheet = (props: any) => {
       </div>
 
       {
-        timesheetDetail?.user.timesheet_attachment && (
+        timesheetDetail?.user.timesheet_attachment && (companyPlan === plans.Professional) &&!trialEnded && (
           <div className={styles['site-card-wrapper']}>
             <Card className={styles['attach-approved-timesheet']}>
               <Collapse accordion defaultActiveKey={['2']}>

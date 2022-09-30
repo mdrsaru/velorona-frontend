@@ -27,6 +27,8 @@ const LOGIN = gql`
           id
           companyCode
           name
+          plan
+          trialEnded
           logo{
           id 
           name 
@@ -77,6 +79,8 @@ const Login = () => {
           id: loginData?.company?.id ?? '',
           code: loginData?.company?.companyCode ?? '',
           name:loginData?.company?.name ?? '',
+          plan:loginData?.company?.plan ?? '',
+          trialEnded:loginData?.company?.trialEnded ?? false,
           logo:{
           id: loginData?.company?.logo?.id ?? '',
           name: loginData?.company?.logo?.name ?? '',

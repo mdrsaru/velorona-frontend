@@ -130,6 +130,8 @@ const EditCompanySetting = () => {
           id: response.CompanyUpdate?.id as string,
           code: response.CompanyUpdate?.companyCode as string,
           name: response.CompanyUpdate?.name as string ?? userAuth?.company?.name,
+          plan: response.CompanyUpdate?.plan as string ,
+          trialEnded: response.CompanyUpdate?.trialEnded as boolean ,
           logo: {
             id: response.CompanyUpdate?.logo?.id ?? userAuth?.company?.logo?.id as string,
             url: response.CompanyUpdate?.logo?.url as string ?? userAuth?.company?.logo?.url,

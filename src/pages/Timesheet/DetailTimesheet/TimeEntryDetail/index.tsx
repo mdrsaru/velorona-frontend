@@ -7,7 +7,7 @@ import {
   CheckCircleOutlined,
 } from '@ant-design/icons';
 
-import constants from '../../../../config/constants';
+import constants, { plans } from '../../../../config/constants';
 import { notifyGraphqlError } from '../../../../utils/error';
 import { getWeekDays, getTimeFormat, checkRoles } from '../../../../utils/common';
 import { authVar } from '../../../../App/link';
@@ -57,6 +57,9 @@ const TimeEntryDetails = (props: IProps) => {
   const weekDays = getWeekDays(props.startDate);
   const groupedTimeEntries = props.groupedTimeEntries;
 
+  const companyPlan = authData?.company?.plan;
+  const trialEnded = authData?.company?.trialEnded
+  
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [entriesToDelete, setEntriesToDelete] = useState<{ entryIds: string[], task_id: string }>({
     entryIds: [],
@@ -229,7 +232,7 @@ const TimeEntryDetails = (props: IProps) => {
 
                         <Space>
                           {
-                            canApproveReject && ['Pending', 'Approved'].includes(props.status) && props.isTimesheetSubmitted &&(
+                            canApproveReject && ['Pending', 'Approved'].includes(props.status) && props.isTimesheetSubmitted && (companyPlan === plans.Professional) && !trialEnded &&(
                               <Popconfirm
                                 placement="left"
                                 title="Are you sure you want to reject timesheet?"
@@ -247,7 +250,7 @@ const TimeEntryDetails = (props: IProps) => {
                           }
 
                           {
-                            canApproveReject && ['Pending', 'Rejected'].includes(props.status) && props.isTimesheetSubmitted && (
+                            canApproveReject && ['Pending', 'Rejected'].includes(props.status) && props.isTimesheetSubmitted && (companyPlan === plans.Professional) && !trialEnded&& (
                               <Space>
                                 <Popconfirm
                                   placement="left"
