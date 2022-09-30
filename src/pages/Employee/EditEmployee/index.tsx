@@ -37,14 +37,18 @@ const profileFile = (e: any) => {
   return e && e.fileList;
 };
 
+const { Option } = Select;
+
 const EditEmployee = () => {
   let params = useParams();
   const authData = authVar();
   const navigate = useNavigate();
+  const [role, setRole] = useState('')
   const [fileData, setFile] = useState({
     id: "",
     name: "",
   });
+  const [form] = Form.useForm();
 
   const companyPlan = authData?.company?.plan
   const trialEnded = authData?.company?.trialEnded as boolean
@@ -88,6 +92,7 @@ const EditEmployee = () => {
       }
     },
   });
+
   const [changeProfilePictureInput] = useMutation<
     GraphQLResponse<'ChangeProfilePicture', User>,
     MutationChangeProfilePictureArgs
@@ -109,8 +114,23 @@ const EditEmployee = () => {
     },
   });
 
-  const [form] = Form.useForm();
-  const { Option } = Select;
+  const { data: managerData } = useQuery<
+    GraphQLResponse<'User', UserPagingResult>,
+    QueryUserArgs
+  >(USER, {
+    fetchPolicy: "network-only",
+    nextFetchPolicy: "cache-first",
+    variables: {
+      input: {
+        paging: {
+          order: ["updatedAt:DESC"],
+        },
+        query: {
+          role: RoleName.TaskManager,
+        }
+      },
+    },
+  })
 
   const cancelEditEmployee = () => {
     navigate(-1);
@@ -140,26 +160,6 @@ const EditEmployee = () => {
       }
     },
   };
-
-  const { data: managerData } = useQuery<
-    GraphQLResponse<'User', UserPagingResult>,
-    QueryUserArgs
-  >(
-    USER,
-    {
-      fetchPolicy: "network-only",
-      nextFetchPolicy: "cache-first",
-      variables: {
-        input: {
-          paging: {
-            order: ["updatedAt:DESC"],
-          },
-          query: {
-            role: RoleName.TaskManager,
-          }
-        },
-      },
-    })
 
   const onSubmitForm = () => {
     const values = form.getFieldsValue(true, (meta) => meta.touched);
@@ -198,7 +198,7 @@ const EditEmployee = () => {
       navigate(-1);
     }
   };
-  const [role, setRole] = useState('')
+
   const handleChange = (value: any) => {
     setRole(value)
   }
