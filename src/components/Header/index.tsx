@@ -59,6 +59,8 @@ const TopHeader = (props: any) => {
           id: null,
           code: '',
           name: '',
+          plan: '',
+          trialEnded:false,
           logo: {
             id: null,
             name: null,

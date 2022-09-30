@@ -39,6 +39,8 @@ export interface ICompanyUser {
   code: string;
   name:string;
   logo:ICompanyLogo;
+  plan: string;
+  trialEnded:boolean;
 }
 
 export interface IAvatarUser {

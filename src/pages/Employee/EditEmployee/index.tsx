@@ -15,7 +15,7 @@ import { ArrowLeftOutlined } from "@ant-design/icons";
 import moment from "moment";
 import type { UploadProps } from "antd";
 
-import constants, { roles_user } from '../../../config/constants'
+import constants, { plans, roles_user } from '../../../config/constants'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery } from '@apollo/client'
 import { notifyGraphqlError } from '../../../utils/error'
@@ -45,6 +45,9 @@ const EditEmployee = () => {
     id: "",
     name: "",
   });
+
+  const companyPlan = authData?.company?.plan
+  const trialEnded = authData?.company?.trialEnded as boolean
 
   const [userUpdate] = useMutation<
     GraphQLResponse<'UserUpdate', User>,
@@ -448,11 +451,18 @@ const EditEmployee = () => {
                       ]}
                     >
                       <Select placeholder="Employee" disabled={authData?.user?.id === params.eid ? true : false} onChange={handleChange}>
-                        {roles_user?.map((role: any, index: number) => (
-                          <Option value={role?.value} key={index}>
-                            {role?.name}
-                          </Option>
-                        ))}
+                        {roles_user?.map((role: any, index: number) => {
+                          if (role?.value === 'TaskManager' && (companyPlan !== plans.Professional || trialEnded)) {
+                            return
+                          }
+                          else {
+                            return (
+                              <Option value={role?.value} key={index}>
+                                {role?.name}
+                              </Option>
+                            )
+                          }
+                        })}
                       </Select>
                     </Form.Item>
                   </Col>
@@ -475,22 +485,46 @@ const EditEmployee = () => {
                   </Col>
                   {(userData?.User?.data[0]?.roles?.[0]?.name === constants.roles.Employee || role === constants.roles.Employee) &&
                     <>
-                      <Col
-                        xs={24}
-                        sm={24}
-                        md={12}
-                        lg={12}>
-                        <Form.Item
-                          name="manager_id"
-                          label="Task Manager"
-                        >
-                          <Select placeholder="Select manager" disabled={authData?.user?.id === params.eid ? true : false}>
-                            {managerData?.User?.data?.map((manager, index) => (
-                              <Option key={index} value={manager?.id}> {`${manager?.fullName} / ${manager?.email}`}</Option>
-                            ))}
-                          </Select>
-                        </Form.Item>
-                      </Col>
+                      {
+                        (companyPlan !== plans.Professional && trialEnded) &&
+                        <>
+                          <Col
+                            xs={24}
+                            sm={24}
+                            md={12}
+                            lg={12}>
+                            <Form.Item
+                              name="manager_id"
+                              label="Task Manager"
+                            >
+                              <Select placeholder="Select manager" disabled={authData?.user?.id === params.eid ? true : false}>
+                                {managerData?.User?.data?.map((manager, index) => (
+                                  <Option key={index} value={manager?.id}> {`${manager?.fullName} / ${manager?.email}`}</Option>
+                                ))}
+                              </Select>
+                            </Form.Item>
+                          </Col>
+
+                          <Col
+                            xs={24}
+                            sm={24}
+                            md={12}
+                            lg={12}>
+                            <Form.Item
+                              name="timesheet_attachment"
+                              label="Timesheet Attachment type"
+                              rules={[{
+                                required: true,
+                                message: 'Please select timesheet attachment type'
+                              }]}>
+                              <Select placeholder="Select status" disabled={authData?.user?.id === params.eid ? true : false}>
+                                <Option value={true}>Mandatory</Option>
+                                <Option value={false}>Optional</Option>
+                              </Select>
+                            </Form.Item>
+                          </Col>
+                        </>
+                      }
                       <Col xs={24} sm={24} md={12} lg={12}>
                         <Form.Item
                           label="Start Date"
@@ -516,24 +550,6 @@ const EditEmployee = () => {
                         </Form.Item>
                       </Col>
 
-                      <Col
-                        xs={24}
-                        sm={24}
-                        md={12}
-                        lg={12}>
-                        <Form.Item
-                          name="timesheet_attachment"
-                          label="Timesheet Attachment type"
-                          rules={[{
-                            required: true,
-                            message: 'Please select timesheet attachment type'
-                          }]}>
-                          <Select placeholder="Select status" disabled={authData?.user?.id === params.eid ? true : false}>
-                            <Option value={true}>Mandatory</Option>
-                            <Option value={false}>Optional</Option>
-                          </Select>
-                        </Form.Item>
-                      </Col>
                       <Col
                         xs={24}
                         sm={24}

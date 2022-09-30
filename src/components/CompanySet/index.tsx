@@ -68,6 +68,8 @@ const CompanySet = () => {
             code: company.companyCode,
             id: company.id,
             name: company.name,
+            plan: company?.plan as string,
+            trialEnded: company?.trialEnded as boolean,
             logo:{
               id: company.logo?.id ?? null,
               name: company.logo?.name ?? null,

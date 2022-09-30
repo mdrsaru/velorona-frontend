@@ -69,6 +69,8 @@ function App() {
               id: response?.data?.company?.id ?? null,
               code: response?.data?.company?.companyCode ?? null,
               name: response?.data?.company?.name ?? null,
+              plan: response?.data?.company?.plan ?? null,
+              trialEnded: response?.data?.company?.trialEnded ?? false,
               logo:{
               id: response?.data?.company?.logo?.id ?? null,
               name: response?.data?.company?.logo?.name ?? null,
