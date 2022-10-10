@@ -51,6 +51,7 @@ export const USERCLIENT = gql`
       user{
       id 
       fullName
+      email
       }
       }
     }

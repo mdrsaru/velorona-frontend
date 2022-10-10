@@ -1,5 +1,5 @@
-import { Card, Row, Col, Table, Dropdown, Menu, message, Input, Button, Select, Form, Avatar, Tabs, Popconfirm } from "antd"
-import { SearchOutlined, DownloadOutlined, DollarCircleFilled, FormOutlined, CheckCircleFilled, DeleteOutlined, UserOutlined, FileSyncOutlined, CloseCircleFilled, MailOutlined } from "@ant-design/icons"
+import { Card, Row, Col, Table, Dropdown, Menu, message, Input, Button, Select, Form, Avatar, Tabs, Popconfirm,Image } from "antd"
+import { SearchOutlined, FormOutlined, CheckCircleFilled, DeleteOutlined, UserOutlined, FileSyncOutlined, CloseCircleFilled, MailOutlined } from "@ant-design/icons"
 
 import { Link, useNavigate } from "react-router-dom"
 import routes from "../../config/routes"
@@ -15,6 +15,7 @@ import { notifyGraphqlError } from "../../utils/error"
 import deleteImg from "../../assets/images/delete_btn.svg"
 import archiveImg from "../../assets/images/archive_btn.svg"
 import filterImg from "../../assets/images/filter.svg"
+import PayRateImg from "../../assets/images/pay-rate.svg"
 import constants, { roles_user, status } from "../../config/constants"
 
 import RouteLoader from "../../components/Skeleton/RouteLoader";
@@ -29,7 +30,6 @@ import {
 import styles from "./style.module.scss";
 import { debounce } from "lodash";
 import PageHeader from "../../components/PageHeader";
-import { downloadCSV } from "../../utils/common";
 
 // const { SubMenu } = Menu;
 const { Option } = Select;
@@ -132,13 +132,6 @@ export const RESEND_INVITATION = gql`
     ResendInvitation(input: $input)
   }
 `;
-const csvHeader: Array<{ label: string, key: string, subKey?: string }> = [
-  { label: "FullName", key: "fullName" },
-  { label: "Email", key: "email" },
-  { label: "Address", key: "address", subKey: "streetAddress" },
-  { label: "Phone", key: "phone" },
-  { label: "Status", key: "status" }
-]
 
 const Employee = () => {
   const [filterForm] = Form.useForm();
@@ -669,7 +662,7 @@ const Employee = () => {
                       className={`${styles["table-icon"]} ${styles["table-payrate-icon"]}`}
                       title='Add Payrate'
                     >
-                      <DollarCircleFilled />
+                      <Image src={PayRateImg} width='2rem' preview={false}/>
                     </p>
                   </Col>
                 }

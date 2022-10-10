@@ -1,8 +1,7 @@
 import { Fragment, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
-import ReactToPrint from 'react-to-print';
 import {  Button, Card, Col, message, Row, } from "antd";
-import { PlusCircleFilled, DeleteOutlined ,PrinterOutlined ,CalendarOutlined, DownloadOutlined } from "@ant-design/icons";
+import { PlusCircleFilled, DeleteOutlined  ,CalendarOutlined, DownloadOutlined } from "@ant-design/icons";
 import { gql, useLazyQuery, useMutation, useQuery } from "@apollo/client";
 import moment from "moment";
 import _ from "lodash";
@@ -145,6 +144,7 @@ const ScheduleDetail = () => {
         {
             fetchPolicy: "network-only",
             nextFetchPolicy: "cache-first",
+            skip:true,
             variables: {
                 input: {
                     paging: {
