@@ -52,10 +52,11 @@ export const COMPANY_UPDATE = gql`
       status
       companyCode
       createdAt 
+      subscriptionPeriodEnd
       logo{
-      id
-      name 
-      url 
+        id
+        name 
+        url 
       }
     }
   }

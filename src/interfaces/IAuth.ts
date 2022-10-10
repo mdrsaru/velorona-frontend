@@ -41,6 +41,7 @@ export interface ICompanyUser {
   logo:ICompanyLogo;
   plan: string;
   trialEnded:boolean;
+  subscriptionPeriodEnd: Date | null,
 }
 
 export interface IAvatarUser {

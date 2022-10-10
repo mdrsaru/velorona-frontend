@@ -1,4 +1,6 @@
 import moment from 'moment';
+import { Button, notification, Space } from 'antd';
+import type { NotificationPlacement } from 'antd/es/notification';
 
 export const round = (value: number, decimals: number): number => {
   const temp = parseFloat(value + `e+${decimals}`);
@@ -106,3 +108,22 @@ export function secondsToHms(d: any) {
 
   return h.toFixed(2)
 }
+
+export type NotificationType = 'success' | 'info' | 'warning' | 'error';
+
+export type NotificationArgs = {
+  type: NotificationType,
+  title: string,
+  description: string,
+  placement?: NotificationPlacement,
+  duration?: number | null;
+}
+
+export const openNotificationWithIcon = (args: NotificationArgs) => {
+  notification[args.type]({
+    message: args.title,
+    description: args.description,
+    placement: args.placement ?? 'top',
+    duration: args.duration ?? 4.5,
+  });
+};

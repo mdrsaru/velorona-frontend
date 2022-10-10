@@ -1,3 +1,4 @@
+import moment from 'moment';
 import { Layout, Row, Col, Form, Input, Button, message, Modal } from 'antd';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -8,10 +9,11 @@ import { gql, useMutation } from '@apollo/client';
 import { notifyGraphqlError } from '../../utils/error';
 import constants from '../../config/constants';
 import routes from '../../config/routes';
+import { openNotificationWithIcon } from '../../utils/common'
 
 import logo from '../../assets/images/logo-content.svg';
 import highFiveImg from '../../assets/images/High_five.svg';
-import { LoginResponse, MutationLoginArgs } from '../../interfaces/generated';
+import { LoginResponse, MutationLoginArgs, RoleName } from '../../interfaces/generated';
 
 import styles from './style.module.scss';
 import { GraphQLResponse } from '../../interfaces/graphql.interface';
@@ -29,10 +31,11 @@ const LOGIN = gql`
           name
           plan
           trialEnded
+          subscriptionPeriodEnd
           logo{
-          id 
-          name 
-          url 
+            id 
+            name 
+            url 
           }
         }
         roles {
@@ -68,6 +71,8 @@ const Login = () => {
       message.success({ content: `LoggedIn successfully!`, key, className: 'custom-message' })
       const loginData = response?.Login;
       const roles = loginData?.roles?.map((role: any) => role?.name);
+      const subscriptionPeriodEnd = loginData?.company?.subscriptionPeriodEnd;
+
       authVar({
         token: loginData?.token,
         user: {
@@ -81,10 +86,11 @@ const Login = () => {
           name:loginData?.company?.name ?? '',
           plan:loginData?.company?.plan ?? '',
           trialEnded:loginData?.company?.trialEnded ?? false,
+          subscriptionPeriodEnd,
           logo:{
-          id: loginData?.company?.logo?.id ?? '',
-          name: loginData?.company?.logo?.name ?? '',
-          url: loginData?.company?.logo?.url ?? '',      
+            id: loginData?.company?.logo?.id ?? '',
+            name: loginData?.company?.logo?.name ?? '',
+            url: loginData?.company?.logo?.url ?? '',      
           }
         },
         fullName: loginData?.fullName,
@@ -95,16 +101,43 @@ const Login = () => {
         isLoggedIn: true,
       });
 
+      if(roles.includes(RoleName.CompanyAdmin) && subscriptionPeriodEnd) {
+        const periodEnd = moment(subscriptionPeriodEnd);
+        const now = moment();
+        const diff = periodEnd.diff(now, 'days');
+        let title: string = '';
+        let description: string = '';
+
+        if(diff >= 0 && diff <= 7) {
+          title = 'Subscription about to expire';
+          description = `Your subscription will expire in ${diff} days.`;
+        } else if(diff < 0) {
+          title = 'Subscription expired';
+          description = `Your subscription has expired.`;
+        }
+
+        if(title && description) {
+          setTimeout(() => {
+            openNotificationWithIcon({
+              type: 'info',
+              title,
+              description,
+              duration: 0,
+            });
+          }, 2000)
+        }
+      }
+
       if (roles.includes(constants.roles.SuperAdmin)) {
         navigate(routes.dashboard.path)
       } else if (roles.includes(constants.roles.CompanyAdmin) || roles.includes(constants.roles.Employee) || roles.includes(constants.roles.TaskManager) || roles.includes(constants.roles.BookKeeper)) {
          navigate(routes.company.path(loginData?.company?.companyCode ?? ''))
-      }
-      else {
+      } else {
         navigate(routes.home.path);
       }
     }
   });
+
   const [forgotPassword] = useMutation(FORGOT_PASSWORD, {
     onCompleted: (response: any) => {
       setModalVisible(false)
