@@ -138,7 +138,7 @@ const CompanyForm = (props: IProps) => {
       }
 
 
-  const input: CompanyUpdateInput = {
+      const input: CompanyUpdateInput = {
         id: props.company.id,
         name: values.name,
         status: values.status,
@@ -381,7 +381,7 @@ const CompanyForm = (props: IProps) => {
             <Input
               placeholder="Enter the city "
               name='city'
-              autoComplete="off" 
+              autoComplete="off"
             />
           </Form.Item>
         </Col>
@@ -406,26 +406,26 @@ const CompanyForm = (props: IProps) => {
             <Input placeholder="Enter the zipcode" autoComplete="off" />
           </Form.Item>
         </Col>
-
-        <Col xs={24} sm={24} md={12}>
-          <Form.Item
-            name="plan"
-            label="Select company plan"
-            rules={[
-              {
-                required: true,
-                message: "Select a company plan.",
-              },
-            ]}
-          >
-            <Select placeholder="Company Plans">
-              <Option value={plans.Starter}>Starter</Option>
-              <Option value={plans.Professional}>Professional</Option>
-            </Select>
-          </Form.Item>
-        </Col>
-        
-        <Col xs={24} sm={24} md={24} lg={24}>
+        {!props.company &&
+          <Col xs={24} sm={24} md={12}>
+            <Form.Item
+              name="plan"
+              label="Select company plan"
+              rules={[
+                {
+                  required: true,
+                  message: "Select a company plan.",
+                },
+              ]}
+            >
+              <Select placeholder="Company Plans">
+                <Option value={plans.Starter}>Starter</Option>
+                <Option value={plans.Professional}>Professional</Option>
+              </Select>
+            </Form.Item>
+          </Col>
+        }
+        <Col xs={24} sm={24} md={12} lg={12}>
           <Form.Item
             name="upload"
             label="Upload Company Logo"

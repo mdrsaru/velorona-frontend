@@ -1,10 +1,10 @@
 import { useEffect, useState } from 'react'
-import { gql, useLazyQuery, useMutation, useQuery } from '@apollo/client'
+import { gql, useMutation, useQuery } from '@apollo/client'
 
 import { Avatar, Button, Card, Col, Dropdown, Form, Input, Menu, message, Row, Select, Table } from 'antd'
 import { Link } from 'react-router-dom'
 import routes from '../../config/routes'
-import { SearchOutlined, DownloadOutlined, FormOutlined, CheckCircleFilled,CloseCircleFilled, DeleteOutlined , UserOutlined} from "@ant-design/icons"
+import { SearchOutlined, FormOutlined, CheckCircleFilled, CloseCircleFilled, DeleteOutlined, UserOutlined } from "@ant-design/icons"
 
 import { authVar } from '../../App/link';
 import ModalConfirm from '../../components/Modal';
@@ -21,8 +21,8 @@ import { MutationProjectUpdateArgs, Project, ProjectPagingResult, ProjectStatus,
 import { GraphQLResponse } from '../../interfaces/graphql.interface';
 import styles from './style.module.scss';
 import PageHeader from '../../components/PageHeader'
-import { downloadCSV } from '../../utils/common'
 import { debounce } from 'lodash'
+import AssignedUser from './AssignedUser'
 
 export const PROJECT = gql`
   query Project($input: ProjectQueryInput!) {
@@ -97,6 +97,7 @@ const ProjectPage = () => {
   const [visibility, setVisibility] = useState<boolean>(false);
   const [showArchive, setArchiveModal] = useState<boolean>(false);
   const [project, setProject] = useState<Project>();
+  const [showAssignedUser, setShowAssignedUser] = useState<boolean>(false)
 
   const [filterForm] = Form.useForm();
   const [pagingInput, setPagingInput] = useState<{
@@ -183,7 +184,7 @@ const ProjectPage = () => {
     let query: {
       status?: string,
       archived?: boolean,
-      search?:boolean,
+      search?: boolean,
       company_id: string;
     } = {
       company_id: loggedInUser?.company?.id as string
@@ -326,18 +327,11 @@ const ProjectPage = () => {
     </Menu>
   );
 
-  const assignedMenu = (record: any) => (
-	    <Menu>
-	      <p className={styles.employeeTitle}>
-	        Employee List ({record.users.length}){" "}
-	      </p>
-	      {record.users?.map((user: any, index: number) => (
-	        <div key={index}>
-	          <Menu.Item className={styles.list}>{user?.fullName}</Menu.Item>
-			 </div>
-		  ))}
-		  </Menu>
-		)
+  const handleViewAssignedUser = (record: any) => {
+    setShowAssignedUser(!showAssignedUser)
+    setProject(record)
+  }
+
   const columns = [
     {
       title: "Project Name",
@@ -381,25 +375,19 @@ const ProjectPage = () => {
           </Dropdown>
         </div> */}
           <Row style={{ marginTop: '11px' }}>
-		  <Col>
-			<div
+            <Col>
+              <div
                 className={styles["table-icon"]}
                 onClick={(event) => event.stopPropagation()}
               >
-			<Dropdown
-            overlay={assignedMenu(record)}
-            trigger={["click"]}
-            placement="bottomRight"
-          >
-            <div
-              onClick={(e) => e.preventDefault()}
-              title="Assigned User"
-            >
-             <Avatar size={28} icon={<UserOutlined />}  />
-			</div>
-          </Dropdown>
-		  </div>
-		  </Col>
+                <div
+                  onClick={() => handleViewAssignedUser(record)}
+                  title="Assigned User"
+                >
+                  <Avatar size={28} icon={<UserOutlined />} />
+                </div>
+              </div>
+            </Col>
             <Col>
               <div
                 className={styles["table-icon"]}
@@ -416,15 +404,15 @@ const ProjectPage = () => {
                     title='Change Status'
                   >
                     {record?.status === 'Active' ?
-                            <div className={styles["table-inactive-status-icon"]} >
-                            <CloseCircleFilled />
-                            </div>
-                            :
-                            <div className={styles["table-active-status-icon"]}>
-                              
-                              <CheckCircleFilled />
-                            </div>
-                          }
+                      <div className={styles["table-inactive-status-icon"]} >
+                        <CloseCircleFilled />
+                      </div>
+                      :
+                      <div className={styles["table-active-status-icon"]}>
+
+                        <CheckCircleFilled />
+                      </div>
+                    }
                   </div>
                 </Dropdown>
               </div>
@@ -576,6 +564,13 @@ const ProjectPage = () => {
           />
         }
         onOkClick={archiveProject}
+      />
+
+      <AssignedUser
+        visibility={showAssignedUser}
+        setVisibility={setShowAssignedUser}
+        project={project}
+        refetch={refetchProject}
       />
     </div>
   );

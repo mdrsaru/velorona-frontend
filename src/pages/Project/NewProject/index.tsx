@@ -1,6 +1,6 @@
 import { Button, Card, Col, Form, Input, message, Row, Select, Space } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { authVar } from "../../../App/link";
@@ -11,8 +11,8 @@ import { notifyGraphqlError } from "../../../utils/error";
 import routes from "../../../config/routes";
 import styles from "../style.module.scss";
 import { GraphQLResponse } from "../../../interfaces/graphql.interface";
-import { ClientPagingResult, MutationProjectCreateArgs, Project, QueryClientArgs, QueryUserArgs, RoleName, UserPagingResult } from "../../../interfaces/generated";
-import { USER } from "../../Employee";
+import { ClientPagingResult, MutationProjectCreateArgs, Project, QueryClientArgs, QueryUserClientArgs, UserClientPagingResult } from "../../../interfaces/generated";
+import { USERCLIENT } from "../../Employee/DetailEmployee";
 
 interface ItemProps {
   label: string;
@@ -50,20 +50,26 @@ const NewProject = () => {
 	    style: { width: "100%" }
 	  };
 	
-	  const { data: employeeData } = useQuery<GraphQLResponse<'User', UserPagingResult>, QueryUserArgs>(USER, {
-	    fetchPolicy: "network-only",
-	    nextFetchPolicy: "cache-first",
-	    variables: {
-	      input: {
-	        query: {
-	          role: RoleName.Employee,
-	        },
-	        paging: {
-	          order: ["updatedAt:DESC"],
-	        },
-	      },
-	    },
-	  });
+  const [client, setClient] = useState('')
+ 
+  const handleChange = (value: any) => {
+    setClient(value)
+  }
+
+    const { data: userClientData } = useQuery<GraphQLResponse<'UserClient', UserClientPagingResult>, QueryUserClientArgs>(USERCLIENT, {
+      fetchPolicy: "network-only",
+      nextFetchPolicy: "cache-first",
+      variables: {
+        input: {
+          query: {
+            client_id: client as string
+          },
+          paging: {
+            order: ["updatedAt:DESC"],
+          },
+        },
+      },
+    });
 
   const [projectCreate] = useMutation<
     GraphQLResponse<'ProjectCreate',
@@ -146,7 +152,7 @@ const NewProject = () => {
                   required: true,
                   message: 'Please enter client name!'
                 }]}>
-                <Select placeholder="Select Name of the Client">
+                <Select placeholder="Select Name of the Client" onChange={handleChange}>
                   {clientData && clientData.Client.data.map((user: any, index: number) => (
                     <Option value={user?.id} key={index}>{user?.name} / {user?.email}</Option>
                   ))}
@@ -162,12 +168,12 @@ const NewProject = () => {
                   {...selectProps}
                   allowClear
                   placeholder="Please select">
-                  {employeeData &&
-                    employeeData?.User?.data?.map((employee, index) => (
+                  {userClientData &&
+                    userClientData?.UserClient?.data?.map((userClient,index) => (
                       <Option
-                        value={employee?.id}
+                        value={userClient?.user?.id}
                         key={index}>
-                        {employee?.fullName} / {employee?.email}
+                        {userClient?.user?.fullName} / {userClient?.user?.email}
                       </Option>
                     ))}
                 </Select>

@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { Button, Card, Col, DatePicker, Form, Input, message, Row, Select, Space, Upload } from "antd";
+import { Button, Card, Checkbox, Col, DatePicker, Form, Input, message, Row, Select, Space, Upload } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import constants, { plans, roles_user } from "../../../config/constants";
 
@@ -91,7 +91,7 @@ const NewEmployee = () => {
     id: '',
     name: ''
   })
-
+  const [skipClient, setSkipClient] = useState(false)
   const companyPlan = authData?.company?.plan
   const trialEnded = authData?.company?.trialEnded as boolean
 
@@ -108,8 +108,12 @@ const NewEmployee = () => {
 
   const redirectTo = (role: string, user: string) => {
     role === constants?.roles?.Employee ?
-      navigate(routes.attachClient.path(authData?.company?.code ?? "", user ?? "")) :
-      navigate(routes.user.path(authData?.company?.code ?? ''));
+      (!skipClient ?
+        navigate(routes.attachClient.path(authData?.company?.code ?? "", user ?? ""))
+        :
+        navigate(routes.user.path(authData?.company?.code ?? '')))
+      :
+      navigate(routes.user.path(authData?.company?.code ?? ''))
     message.success({
       content: `New User is created successfully!`,
       className: 'custom-message'
@@ -247,7 +251,9 @@ const NewEmployee = () => {
   const handleManagerChange = (value: any) => {
     setManager(value)
   }
-
+  const handleSkipClient = (e: any) => {
+    setSkipClient(e.target.checked)
+  }
   return (
     <div className={styles['main-div']}>
       <Card bordered={false}>
@@ -479,7 +485,7 @@ const NewEmployee = () => {
                 <Select placeholder="Select Role" onChange={handleChange}>
                   {roles_user?.map((role: any, index: number) => {
                     if (role?.value === 'TaskManager' && (companyPlan !== plans.Professional || trialEnded)) {
-                      return
+                      return 0
                     }
                     else {
                       return (
@@ -625,6 +631,11 @@ const NewEmployee = () => {
                 </div>
               </Form.Item>
             </Col>
+
+            <Col xs={24} sm={24} md={24} lg={24}>
+              <Checkbox onChange={handleSkipClient}><p className={styles['skip-client']}>Skip Client</p></Checkbox>
+            </Col>
+
           </Row>
           <Row justify="end">
             <Col style={{ padding: '0 1rem 1rem 0' }}>
