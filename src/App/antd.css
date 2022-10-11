@@ -26041,7 +26041,8 @@ input {
 .ant-select:not(.ant-select-customize-input) .ant-select-selector {
   border: none;
   background-color: var(--gray-2) !important;
-  height: 54px;
+  height: auto;
+  padding-bottom: 1rem;
 }
 .ant-input-affix-wrapper,
 .ant-select-single.ant-select-show-arrow .ant-select-selection-placeholder,
