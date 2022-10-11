@@ -377,7 +377,7 @@ const DetailEmployee = () => {
                 View Payrate
               </p>
             </Col>
-                {userClientData?.UserClient?.data?.length  &&
+                {userClientData?.UserClient?.data.length ?
                   <>
                     <Col xs={24} sm={24} md={24} lg={24}>
                       <div className={styles['header-div']}>Client Assigned</div>
@@ -409,6 +409,8 @@ const DetailEmployee = () => {
 
                     </Col>
                   </>
+                  :
+                  <></>
                 }
               </>
             }

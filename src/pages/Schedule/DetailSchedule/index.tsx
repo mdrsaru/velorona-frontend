@@ -135,7 +135,7 @@ const ScheduleDetail = () => {
             },
         }
     );
-
+    
     const { data: employeeData} = useQuery<
         GraphQLResponse<'User', UserPagingResult>,
         QueryUserArgs
@@ -144,7 +144,7 @@ const ScheduleDetail = () => {
         {
             fetchPolicy: "network-only",
             nextFetchPolicy: "cache-first",
-            skip:true,
+            skip: !employee,
             variables: {
                 input: {
                     paging: {

@@ -15,7 +15,7 @@ const ActivityLogList =(props:IProps) =>{
   const authData = authVar()
   return(
     <>
-        <p className={styles['date']}>{moment(log?.createdAt).format('MMM D,HH:MM')}</p>
+        <p className={styles['date']}>{moment(log?.createdAt).format('MMM D,HH:mm')}</p>
                     <div  className={styles['activities']}>
 
                       <span>{log?.type === 'TimeEntry' ?
