@@ -118,13 +118,13 @@ const ViewUserPayRate = (props: IProps) => {
       {
         title: "Invoice rate(per hour)",
         render: (payRate: any) => {
-          return <p>{`${payRate?.invoiceRateCurrency?.symbol} ${payRate?.invoiceRate}`}</p>;
+          return <p><span>{payRate?.userRateCurrency?.symbol && payRate?.userRateCurrency?.symbol} </span>{`${payRate?.invoiceRate}`}</p>;
         },
       },
       {
         title: "Pay rate(per hour)",
         render: (payRate: any) => {
-          return <p>{`${payRate?.userRateCurrency?.symbol} ${payRate?.amount}`}</p>;
+          return <p><span>{payRate?.userRateCurrency?.symbol && payRate?.userRateCurrency?.symbol} </span>{`${payRate?.amount}`}</p>;
         },
       },
       {

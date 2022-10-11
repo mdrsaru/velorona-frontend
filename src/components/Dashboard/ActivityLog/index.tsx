@@ -114,14 +114,14 @@ const ActivityLog = (props: IProps) => {
                   <Typography.Text
                     style={{ color: 'var(--primary-blue)', marginRight:'10px' ,cursor: 'pointer'}}
                     onClick={() => changePage(pagingInput.currentPage - 1)}>
-                    {'<< Load Less '}
+                    {'<< Prev '}
                   </Typography.Text>)
                 }
                 {activityLogData?.ActivityLog?.paging?.hasNextPage && (
                   <Typography.Text
                     style={{ color: 'var(--primary-blue)', cursor: 'pointer' }}
                     onClick={() => changePage(pagingInput.currentPage + 1)}>
-                    {'Load More >>'}
+                    {'Next >>'}
                   </Typography.Text>)
                 }
               </div>

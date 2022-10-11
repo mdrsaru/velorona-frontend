@@ -566,12 +566,15 @@ const ProjectPage = () => {
         onOkClick={archiveProject}
       />
 
-      <AssignedUser
-        visibility={showAssignedUser}
-        setVisibility={setShowAssignedUser}
-        project={project}
-        refetch={refetchProject}
-      />
+      {showAssignedUser ?
+        <AssignedUser
+          visibility={showAssignedUser}
+          setVisibility={setShowAssignedUser}
+          project={project}
+          refetch={refetchProject}
+        />
+        :
+        null}
     </div>
   );
 };

@@ -87,6 +87,7 @@ const AssignedUser = (props: IProps) => {
 				</div>,
 			]}
 			width={869}
+			destroyOnClose={true}
 			footer={null}>
 			<div className={styles["modal-body"]}>
 				<div className={styles['title-div']}>
@@ -110,11 +111,11 @@ const AssignedUser = (props: IProps) => {
 					form={form}
 					layout="vertical"
 					onFinish={onSubmitForm}
-					initialValues={{
-						assignee: props?.project?.users?.map((user: any) => {
-							return user?.id
-						}) ?? "",
-					}}
+					initialValues=
+					{{assignee: props?.project?.users?.map((user: any) => {
+						return user?.id
+					}) ?? "",
+				}}
 				>
 					<Row className={styles.formCol}>
 						<Col xs={24} sm={24} md={24} lg={24} className={styles.formCol}>

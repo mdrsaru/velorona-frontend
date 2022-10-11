@@ -521,7 +521,7 @@ const NewEmployee = () => {
             {role === constants.roles.Employee &&
               <>
                 {
-                  (companyPlan !== plans.Professional && trialEnded) &&
+                  (companyPlan === plans.Professional && !trialEnded) &&
                   <>
                     <Col
                       xs={24}

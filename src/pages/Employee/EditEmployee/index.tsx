@@ -486,7 +486,7 @@ const EditEmployee = () => {
                   {(userData?.User?.data[0]?.roles?.[0]?.name === constants.roles.Employee || role === constants.roles.Employee) &&
                     <>
                       {
-                        (companyPlan !== plans.Professional && trialEnded) &&
+                        (companyPlan === plans.Professional && !trialEnded) &&
                         <>
                           <Col
                             xs={24}
