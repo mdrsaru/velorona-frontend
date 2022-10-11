@@ -26,7 +26,6 @@ import { Company, CompanyPagingResult, CompanyUpdateInput, MutationCompanyUpdate
 import routes from "../../../config/routes";
 import { COMPANY_UPDATE } from "../../Company";
 
-
 const normFile = (e: any) => {
   if (Array.isArray(e)) {
     return e;
@@ -132,6 +131,7 @@ const EditCompanySetting = () => {
           name: response.CompanyUpdate?.name as string ?? userAuth?.company?.name,
           plan: response.CompanyUpdate?.plan as string ,
           trialEnded: response.CompanyUpdate?.trialEnded as boolean ,
+          subscriptionPeriodEnd: response.CompanyUpdate?.subscriptionPeriodEnd,
           logo: {
             id: response.CompanyUpdate?.logo?.id ?? userAuth?.company?.logo?.id as string,
             url: response.CompanyUpdate?.logo?.url as string ?? userAuth?.company?.logo?.url,

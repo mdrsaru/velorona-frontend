@@ -19,6 +19,7 @@ const COMPANY_BY_CODE = gql`
         id
         companyCode
         name
+        subscriptionPeriodEnd
         logo {
           id
           name
@@ -70,6 +71,7 @@ const CompanySet = () => {
             name: company.name,
             plan: company?.plan as string,
             trialEnded: company?.trialEnded as boolean,
+            subscriptionPeriodEnd: company?.subscriptionPeriodEnd,
             logo:{
               id: company.logo?.id ?? null,
               name: company.logo?.name ?? null,

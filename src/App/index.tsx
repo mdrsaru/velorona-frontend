@@ -1,3 +1,4 @@
+import moment from 'moment';
 import { useEffect, useState } from 'react';
 import { ApolloProvider, ApolloClient, ApolloLink, InMemoryCache } from '@apollo/client';
 
@@ -8,6 +9,8 @@ import {
   fieldPolicy,
   typeDefs,
 } from '../gql/schema.gql';
+import { openNotificationWithIcon } from '../utils/common';
+import { RoleName } from '../interfaces/generated';
 
 import Routes from './Routes';
 import AppLoader from "../components/Skeleton/AppLoader";
@@ -57,13 +60,16 @@ function App() {
       .then((response) => response.json())
       .then((response) => {
         if (response?.data) {
+          const roles = response?.data?.roles?.map((role: any) => role.name);
+          const subscriptionPeriodEnd = response?.data?.company?.subscriptionPeriodEnd ?? null;
+
           authVar({
             isLoggedIn: true,
             token: response?.data?.accessToken,
             user: {
               id: response?.data?._id ?? null,
-              roles: response?.data?.roles?.map((role: any) => role.name),
               entryType: response?.data?.entryType,
+              roles,
             },
             company: {
               id: response?.data?.company?.id ?? null,
@@ -71,10 +77,11 @@ function App() {
               name: response?.data?.company?.name ?? null,
               plan: response?.data?.company?.plan ?? null,
               trialEnded: response?.data?.company?.trialEnded ?? false,
+              subscriptionPeriodEnd,
               logo:{
-              id: response?.data?.company?.logo?.id ?? null,
-              name: response?.data?.company?.logo?.name ?? null,
-              url: response?.data?.company?.logo?.url ?? null,
+                id: response?.data?.company?.logo?.id ?? null,
+                name: response?.data?.company?.logo?.name ?? null,
+                url: response?.data?.company?.logo?.url ?? null,
                 
               }
             },
@@ -83,12 +90,41 @@ function App() {
               id: response?.data?.avatar?.id ?? null,
               url: response?.data?.avatar?.url ?? null,
             },
-          })}
+          })
+
+          if(roles.includes(RoleName.CompanyAdmin) && subscriptionPeriodEnd) {
+            const periodEnd = moment(subscriptionPeriodEnd);
+            const now = moment();
+            const diff = periodEnd.diff(now, 'days');
+            let title: string = '';
+            let description: string = '';
+
+            if(diff >= 0 && diff <= 7) {
+              title = 'Subscription about to expire';
+              description = `Your subscription will expire in ${diff} days.`;
+            } else if(diff < 0) {
+              title = 'Subscription expired';
+              description = `Your subscription has expired.`;
+            }
+
+            if(title && description) {
+              setTimeout(() => {
+                openNotificationWithIcon({
+                  type: 'info',
+                  title,
+                  description,
+                  duration: 0,
+                });
+              }, 2000)
+            }
+          }
+        }
       })
       .finally(() => {
         setAppLoading(false);
       });
   }, []);
+
   return (
     <>
       {appLoading ?
