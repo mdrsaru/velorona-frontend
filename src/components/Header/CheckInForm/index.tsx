@@ -3,7 +3,7 @@ import { gql, useQuery, useMutation } from '@apollo/client';
 import { Select, Form, Button, Row } from 'antd';
 
 import { GraphQLResponse } from '../../../interfaces/graphql.interface';
-import { ProjectPagingResult, QueryProjectArgs, MutationTimeEntryCreateArgs, TimeEntry } from '../../../interfaces/generated';
+import { ProjectPagingResult, QueryProjectArgs, MutationTimeEntryCreateArgs, TimeEntry, ProjectStatus } from '../../../interfaces/generated';
 import { authVar } from "../../../App/link"
 
 import styles from './style.module.scss';
@@ -49,6 +49,7 @@ const CheckInForm = (props: IProps) => {
         query: {
           company_id,
           user_id:loggedInUser.user.id,
+          status:ProjectStatus.Active
         },
         paging: {
           order: ['createdAt:DESC'],

@@ -128,12 +128,12 @@ const TimeEntry = (props: IProps) => {
       >
         {props.totalBreakDuration ? 
         <div>
-        {getTimeFormat(props.totalBreakDuration)}
+        {props.totalBreakDuration ? getTimeFormat(props.totalBreakDuration) : '-'}
         </div>
         :
         <Popover content = {breakTimeList} >
         <div>
-        {getTimeFormat(timeEntry?.breakDuration)}
+        {timeEntry?.breakDuration ?  getTimeFormat(timeEntry?.breakDuration) : '-'}
         </div>
         </Popover>
         }
