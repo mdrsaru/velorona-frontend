@@ -8,19 +8,7 @@ export const PLANS = gql`
       price
       features
       subscriptionStatus
-    }
-  }
-`;
-
-
-export const CURRENT_PLAN = gql`
-  query CurrentPlan {
-    CurrentPlan @client {
-      name
-      description
-      price
-      features
-      subscriptionStatus
+      isCurrent
     }
   }
 `;

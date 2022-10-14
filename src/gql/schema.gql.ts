@@ -1,5 +1,5 @@
 import { gql } from '@apollo/client';
-import { authVar, sidebarVar, plansVar, currentPlanVar } from '../App/link';
+import { authVar, sidebarVar, plansVar } from '../App/link';
 
 export const typeDefs = gql`
   type AuthUser {
@@ -61,11 +61,6 @@ export const fieldPolicy = {
   Plans: {
     read() {
       return plansVar();
-    },
-  },
-  CurrentPlan: {
-    read() {
-      return currentPlanVar();
     },
   },
 };

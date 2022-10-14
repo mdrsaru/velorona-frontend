@@ -9,7 +9,7 @@ import { gql, useMutation } from '@apollo/client';
 import { notifyGraphqlError } from '../../utils/error';
 import constants from '../../config/constants';
 import routes from '../../config/routes';
-import { openNotificationWithIcon } from '../../utils/common'
+import { notifySubscriptionExpiration } from '../../utils/common'
 
 import logo from '../../assets/images/logo-content.svg';
 import highFiveImg from '../../assets/images/High_five.svg';
@@ -32,6 +32,8 @@ const LOGIN = gql`
           plan
           trialEnded
           subscriptionPeriodEnd
+          trialEndDate
+          subscriptionStatus
           logo{
             id 
             name 
@@ -72,6 +74,8 @@ const Login = () => {
       const loginData = response?.Login;
       const roles = loginData?.roles?.map((role: any) => role?.name);
       const subscriptionPeriodEnd = loginData?.company?.subscriptionPeriodEnd;
+      const trialEndDate = loginData?.company?.trialEndDate;
+      const subscriptionStatus = loginData?.company?.subscriptionStatus;
 
       authVar({
         token: loginData?.token,
@@ -102,30 +106,11 @@ const Login = () => {
       });
 
       if(roles.includes(RoleName.CompanyAdmin) && subscriptionPeriodEnd) {
-        const periodEnd = moment(subscriptionPeriodEnd);
-        const now = moment();
-        const diff = periodEnd.diff(now, 'days');
-        let title: string = '';
-        let description: string = '';
-
-        if(diff >= 0 && diff <= 7) {
-          title = 'Subscription about to expire';
-          description = `Your subscription will expire in ${diff} days.`;
-        } else if(diff < 0) {
-          title = 'Subscription expired';
-          description = `Your subscription has expired.`;
-        }
-
-        if(title && description) {
-          setTimeout(() => {
-            openNotificationWithIcon({
-              type: 'info',
-              title,
-              description,
-              duration: 0,
-            });
-          }, 2000)
-        }
+        notifySubscriptionExpiration({
+          trialEndDate,
+          periodEnd: subscriptionPeriodEnd,
+          status: subscriptionStatus,
+        })
       }
 
       if (roles.includes(constants.roles.SuperAdmin)) {

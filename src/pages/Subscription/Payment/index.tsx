@@ -6,7 +6,7 @@ import {
 } from '@stripe/react-stripe-js';
 import { Form, Input, Button, message } from 'antd';
 
-import { plansVar, currentPlanVar } from '../../../App/link'
+import { plansVar } from '../../../App/link'
 import { IPlan } from '../../../interfaces/subscription.interface';
 
 import './stripe.scss';
@@ -46,16 +46,13 @@ const Payment = (props: IProps) => {
         message.success('Payment successful')
 
         const plans = plansVar();
-        let currentPlan: IPlan | undefined;
+
         const newPlans = plans.map((plan) => {
           const _plan = { ...plan };
           if(plan.name === 'Professional') {
-            _plan.subscriptionStatus = 'active';
-
-            currentPlan = _plan;
+            _plan.isCurrent = true
           } else if(plan.name === 'Starter') {
-            _plan.subscriptionStatus = 'inactive';
-            currentPlan =  _plan;
+            _plan.isCurrent = false;
           }
 
           return _plan;
@@ -63,12 +60,6 @@ const Payment = (props: IProps) => {
 
         // Update the plansvar with active professional plan
         plansVar(newPlans)
-
-        // Update the currentVar with active professional plan
-        if(currentPlan) {
-          currentPlanVar(currentPlan)
-        }
-
         props.hidePaymentModal();
       } else if(error) {
         message.error(error.message);

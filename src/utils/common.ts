@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { Button, notification, Space } from 'antd';
+import { notification } from 'antd';
 import type { NotificationPlacement } from 'antd/es/notification';
 
 export const round = (value: number, decimals: number): number => {
@@ -127,3 +127,59 @@ export const openNotificationWithIcon = (args: NotificationArgs) => {
     duration: args.duration ?? 4.5,
   });
 };
+
+export type NotifySubscriptionExpiration = {
+  periodEnd: string;
+  status: string | null | undefined;
+  trialEndDate: string;
+};
+
+export const notifySubscriptionExpiration = (args: NotifySubscriptionExpiration) => {
+  const status = args.status;
+
+  const now = moment();
+  let title: string = '';
+  let description: string = '';
+
+  if(status === 'trialing') {
+    if(!args.trialEndDate) {
+      return;
+    }
+
+    const trialEnd = moment(args.trialEndDate);
+    const diff = trialEnd.diff(now, 'days');
+
+    if(diff >= 0 && diff <= 7) {
+      title = 'Trial about to end';
+      description = `Your subscription trial will end in ${diff} days. Please update the payment details from the subscription menu.`;
+    } else if(diff < 0) {
+      title = 'Trial ended';
+      description = `Your subscription trial has ended. Please update the payment details from the subscription menu.`;
+    }
+  } else {
+    const periodEnd = moment(args.periodEnd);
+
+    const diff = periodEnd.diff(now, 'days');
+
+    if(diff >= 0 && diff <= 7) {
+      title = 'Subscription about to expire';
+      description = `Your subscription will expire in ${diff} days.`;
+    } else if(diff < 0) {
+      title = 'Subscription expired';
+      description = `Your subscription has expired.`;
+    }
+  }
+
+
+  if(title && description) {
+    setTimeout(() => {
+      openNotificationWithIcon({
+        type: 'info',
+        title,
+        description,
+        duration: 0,
+      });
+    }, 2000)
+  }
+
+} 

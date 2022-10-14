@@ -1,6 +1,7 @@
+import { useMemo } from 'react';
 import { gql, useQuery } from '@apollo/client';
 
-import { CURRENT_PLAN } from '../../../gql/subscripton.gql'
+import { PLANS } from '../../../gql/subscripton.gql'
 import { AUTH } from '../../../gql/auth.gql';
 import { IPlan } from '../../../interfaces/subscription.interface';
 import { GraphQLResponse } from '../../../interfaces/graphql.interface';
@@ -8,17 +9,25 @@ import { GraphQLResponse } from '../../../interfaces/graphql.interface';
 import Plan from '../Plan';
 
 const CurrentPlan = () => {
-  const { data: currentPlanData } = useQuery<
-    GraphQLResponse<'CurrentPlan', IPlan>
-  >(CURRENT_PLAN);
+  const { data: planData } = useQuery<
+    GraphQLResponse<'Plans', IPlan[]>
+  >(PLANS);
 
-  if(!currentPlanData?.CurrentPlan) {
+  const currentPlan: IPlan | undefined = useMemo(() => {
+    const plans = planData?.Plans ?? [];
+    return plans.find((plan) => {
+      return plan.isCurrent;
+    });
+  }, [planData?.Plans])
+  console.log(planData, 'plan')
+
+  if(!currentPlan) {
     return null;
   }
 
   return (
     <Plan
-      plan={currentPlanData?.CurrentPlan}
+      plan={currentPlan}
     />
   )
 }

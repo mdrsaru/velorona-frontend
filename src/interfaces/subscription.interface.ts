@@ -3,5 +3,7 @@ export interface IPlan {
   description: string;
   price: string;
   features: string[];
-  subscriptionStatus: string;
+  subscriptionStatus: string | null;
+  trialEndDate?: Date;
+  isCurrent: boolean;
 };

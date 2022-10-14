@@ -48,7 +48,6 @@ const plans: IPlan[] = [];
 export const authVar = makeVar<IAuth>(auth);
 export const sidebarVar = makeVar<ISidebar>(sidebar);
 export const plansVar = makeVar<IPlan[]>(plans);
-export const currentPlanVar = makeVar<IPlan | null>(null);
 
 // Http Link
 export const httpLink = createHttpLink({
