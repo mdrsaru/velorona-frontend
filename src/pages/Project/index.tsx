@@ -4,12 +4,12 @@ import { gql, useMutation, useQuery } from '@apollo/client'
 import { Avatar, Button, Card, Col, Dropdown, Form, Input, Menu, message, Row, Select, Table } from 'antd'
 import { Link } from 'react-router-dom'
 import routes from '../../config/routes'
-import { SearchOutlined, FormOutlined, CheckCircleFilled, CloseCircleFilled, DeleteOutlined, UserOutlined } from "@ant-design/icons"
+import { SearchOutlined, FormOutlined, CheckCircleFilled, CloseCircleFilled, DeleteOutlined, UserOutlined,FileSyncOutlined } from "@ant-design/icons"
 
 import { authVar } from '../../App/link';
 import ModalConfirm from '../../components/Modal';
 
-import constants, { status } from '../../config/constants';
+import constants, { archived, status } from '../../config/constants';
 import deleteImg from '../../assets/images/delete_btn.svg';
 import filterImg from "../../assets/images/filter.svg"
 import archiveImg from '../../assets/images/archive_btn.svg';
@@ -165,7 +165,7 @@ const ProjectPage = () => {
 
   const refetchProjects = () => {
 
-    let values = filterForm.getFieldsValue(['search', 'role', 'status'])
+    let values = filterForm.getFieldsValue(['search', 'role', 'status','archived'])
 
     let input: {
       paging?: any,
@@ -191,10 +191,14 @@ const ProjectPage = () => {
     }
 
 
-    if (values.status === 'Active' || values.status === 'Inactive') {
-      query['status'] = values.status;
-    } else {
-      query['archived'] = values.status === 'Archived' ? true : false;
+    if (values.status) {
+      if (values.status === 'Active' || values.status === 'Inactive') {
+        query['status'] = values.status;
+      }
+    }
+
+    if (values.archived) {
+      query['archived'] = values?.archived
     }
 
     if (values.search) {
@@ -437,9 +441,9 @@ const ProjectPage = () => {
                   setArchiveVisibility(true);
                 }}
                 className={`${styles["table-icon"]} ${styles["table-archive-icon"]}`}
-                title='Archive Project'
+                title={!record.archived ? 'Archive Project' :'Unarchive Project'}
               >
-                <DeleteOutlined />
+                { !record.archived ?<DeleteOutlined /> : <FileSyncOutlined />}
               </div>
 
             </Col>
@@ -513,6 +517,19 @@ const ProjectPage = () => {
                     {status?.map((status: any) =>
                       <Option value={status?.value} key={status?.name}>
                         {status?.name}
+                      </Option>)}
+                  </Select>
+                </Form.Item>
+              </Col>
+              <Col xs={24} sm={12} md={10} lg={8} xl={5}>
+                <Form.Item name="archived" label="">
+                  <Select
+                    placeholder="Archived status"
+                    onChange={onChangeFilter}
+                  >
+                    {archived?.map((archived: any) =>
+                      <Option value={archived?.value} key={archived?.name}>
+                        {archived?.name}
                       </Option>)}
                   </Select>
                 </Form.Item>

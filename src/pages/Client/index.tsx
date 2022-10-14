@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button, Card, Col, Dropdown, Form, Input, Menu, message, Row, Select, Table } from "antd";
 import { Link, useNavigate } from "react-router-dom";
 import { gql, useMutation, useQuery } from "@apollo/client";
-import {  SearchOutlined,FormOutlined, CheckCircleFilled, DeleteOutlined,CloseCircleFilled } from "@ant-design/icons"
+import { SearchOutlined,FormOutlined, CheckCircleFilled, DeleteOutlined,CloseCircleFilled,FileSyncOutlined } from "@ant-design/icons"
 
 // import SubMenu from "antd/lib/menu/SubMenu";
 
@@ -11,7 +11,7 @@ import { authVar } from "../../App/link";
 
 import Status from "../../components/Status";
 import ModalConfirm from "../../components/Modal";
-import constants, { status } from '../../config/constants';
+import constants, { archived, status } from '../../config/constants';
 
 import archiveImg from "../../assets/images/archive_btn.svg";
 import filterImg from "../../assets/images/filter.svg"
@@ -164,7 +164,7 @@ const Client = () => {
     }
   );
   const refetchClients = () => {
-    let values = filterForm.getFieldsValue(['search', 'role', 'status'])
+    let values = filterForm.getFieldsValue(['search', 'role', 'status', 'archived'])
     let input: {
       paging?: any,
       query: any
@@ -191,12 +191,12 @@ const Client = () => {
     if (values.status) {
       if (values.status === 'Active' || values.status === 'Inactive') {
         query['status'] = values.status;
-      } else {
-        query['archived'] = values.status === 'Archived' ? true : false;
-
       }
     }
 
+    if (values.archived) {
+      query['archived'] = values?.archived
+    }
     input['query'] = query
 
     refetchClient({
@@ -383,23 +383,23 @@ const Client = () => {
                   onClick={(e) => e.preventDefault()}
                   title='Change Status'
                 >
-                   {record?.status === 'Active' ?
-                            <div className={styles["table-inactive-status-icon"]} >
-                            <CloseCircleFilled />
-                            </div>
-                            :
-                            <div className={styles["table-active-status-icon"]}>
-                              
-                              <CheckCircleFilled />
-                            </div>
-                          }
+                  {record?.status === 'Active' ?
+                    <div className={styles["table-inactive-status-icon"]} >
+                      <CloseCircleFilled />
+                    </div>
+                    :
+                    <div className={styles["table-active-status-icon"]}>
+
+                      <CheckCircleFilled />
+                    </div>
+                  }
                 </div>
               </Dropdown>
             </div>
           </Col>
           <Col>
             <Link
-               to={routes.editClient.path(
+              to={routes.editClient.path(
                 loggedInUser?.company?.code ?? "1",
                 record?.id ?? "1"
               )}
@@ -410,18 +410,16 @@ const Client = () => {
             </Link>
           </Col>
           <Col>
-           
-                <div
+          <div
                     onClick={() => {
                       setClient(record);
                       setArchiveVisibility(true);
                     }}
                     className={`${styles["table-icon"]} ${styles["table-archive-icon"]}`}
-                  title='Archive Client'
+                    title={!record.archived ? 'Archive Client' :'Unarchive Client'}
                 >
-                  <DeleteOutlined />
+                    { !record.archived ?<DeleteOutlined /> : <FileSyncOutlined />}
                 </div>
-             
           </Col>
         </Row>
       ),
@@ -491,6 +489,20 @@ const Client = () => {
                     {status?.map((status: any) =>
                       <Option value={status?.value} key={status?.name}>
                         {status?.name}
+                      </Option>)}
+                  </Select>
+                </Form.Item>
+              </Col>
+
+              <Col xs={24} sm={12} md={10} lg={8} xl={5}>
+                <Form.Item name="archived" label="">
+                  <Select
+                    placeholder="Archived status"
+                    onChange={onChangeFilter}
+                  >
+                    {archived?.map((archived: any) =>
+                      <Option value={archived?.value} key={archived?.name}>
+                        {archived?.name}
                       </Option>)}
                   </Select>
                 </Form.Item>
