@@ -151,15 +151,21 @@ export const subscription = {
   },
   features: {
     Starter: [
-      'Host upto 100 employees',
-      'Create upto 25 free projects',
-      'Timesheets tracking',
+      'Manual Invoicing',
+      'Unlimited clients',
+      'Unlimited work schedule',
+      'Use own company logo',
+      'Copy and paste schedule',
+      'Unlimited users',
+      'Notification for new schedule',
+      'Unlimited project'
     ],
     Professional: [
-      'Host upto 100 employees',
-      'Create upto 25 free projects',
-      'Timesheets tracking',
-      'Invoicing included',
+      'Everything from free features',
+      'Timesheet/ time tracker with approvals',
+      'Unlimited task manager',
+      'Attachment in timesheet',
+      'Auto attachment in the invoice'
     ],
   }
 };
