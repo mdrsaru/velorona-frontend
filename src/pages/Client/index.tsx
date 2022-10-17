@@ -243,14 +243,17 @@ const Client = () => {
   }
 
   const archiveClient = () => {
+    const archived = !client?.archived;
+
     clientUpdate({
       variables: {
         input: {
           id: client?.id,
 
-          archived: !client?.archived,
+          archived,
 
           company_id: loggedInUser?.company?.id as string,
+          status: archived ? ClientStatus.Inactive : ClientStatus.Active,
         },
       },
     });
@@ -411,15 +414,15 @@ const Client = () => {
           </Col>
           <Col>
           <div
-                    onClick={() => {
-                      setClient(record);
-                      setArchiveVisibility(true);
-                    }}
-                    className={`${styles["table-icon"]} ${styles["table-archive-icon"]}`}
-                    title={!record.archived ? 'Archive Client' :'Unarchive Client'}
-                >
-                    { !record.archived ?<DeleteOutlined /> : <FileSyncOutlined />}
-                </div>
+            onClick={() => {
+              setClient(record);
+              setArchiveVisibility(true);
+            }}
+            className={`${styles["table-icon"]} ${styles["table-archive-icon"]}`}
+            title={!record.archived ? 'Archive Client' :'Unarchive Client'}
+          >
+            { !record.archived ?<DeleteOutlined /> : <FileSyncOutlined />}
+          </div>
           </Col>
         </Row>
       ),
