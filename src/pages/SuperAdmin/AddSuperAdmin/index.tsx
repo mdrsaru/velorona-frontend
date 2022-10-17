@@ -193,16 +193,21 @@ const AddSuperAdmin = () => {
 			middleName: user?.middleName ?? "",
 			lastName: user?.lastName ?? "",
 			phone: user?.phone ?? "",
+			roles: user?.roles[0]?.name ?? "",
 			status: user?.status ?? "",
+			manager_id: user?.manager_id ?? "",
 			country:
 				user?.address?.country ?? "",
 			streetAddress:
 				user?.address?.streetAddress ?? "",
+			entryType: user?.entryType,
+			timesheet_attachment: user?.timesheet_attachment ? 'Mandatory' : 'Optional',
 			state: user?.address?.state ?? "",
 			city: user?.address?.city ?? "",
+			file: user?.avatar?.url,
 			zipcode: user?.address?.zipcode ?? "",
 			aptOrSuite: user?.address?.aptOrSuite ?? "",
-
+			payRate: user?.record?.payRate ?? ""
 		}
 	}
 	useEffect(() => {
@@ -225,28 +230,7 @@ const AddSuperAdmin = () => {
 					form={form}
 					layout="vertical"
 					scrollToFirstError
-					initialValues={{
-						email: user?.email ?? "",
-						firstName: user?.firstName ?? "",
-						middleName: user?.middleName ?? "",
-						lastName: user?.lastName ?? "",
-						phone: user?.phone ?? "",
-						roles: user?.roles[0]?.name ?? "",
-						status: user?.status ?? "",
-						manager_id: user?.manager_id ?? "",
-						country:
-							user?.address?.country ?? "",
-						streetAddress:
-							user?.address?.streetAddress ?? "",
-						entryType: user?.entryType,
-						timesheet_attachment: user?.timesheet_attachment ? 'Mandatory' : 'Optional',
-						state: user?.address?.state ?? "",
-						city: user?.address?.city ?? "",
-						file: user?.avatar?.url,
-						zipcode: user?.address?.zipcode ?? "",
-						aptOrSuite: user?.address?.aptOrSuite ?? "",
-						payRate: user?.record?.payRate ?? "",
-					}}
+					initialValues={{defaultValues}}
 					onFinish={onSubmitForm}>
 					<Row gutter={[32, 0]}>
 						<Col className={styles['form-header']}>
@@ -322,6 +306,10 @@ const AddSuperAdmin = () => {
 								label="Phone Number"
 								name='phone'
 								rules={[{
+									required:true,
+									message: 'Please enter phone number!'
+								},
+								{
 									max: 11,
 									message: "Phone number should be less than 11 digits"
 								  }]}
@@ -462,7 +450,7 @@ const AddSuperAdmin = () => {
 										loading={creatingAdmin}
 										type="primary"
 										htmlType="submit">
-										Continue
+										Add Super Admin
 									</Button>
 								</Space>
 							</Form.Item>

@@ -12,7 +12,7 @@ const DashboardCount = (props: IProps) => {
   return (
       <Row>
         {data && data.map((item: {title: string, count: number, icon: string}, index) =>(
-          <Col xs={24} sm={12} lg={8} key={index}>
+          <Col xs={24} sm={12} lg={6} key={index}>
             <div className={styles['dashboard-count']}>
               <div>
                 <Title level={5} type="secondary">{item.title}</Title>

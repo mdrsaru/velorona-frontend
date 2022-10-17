@@ -118,11 +118,11 @@ const ViewUserPayRate = (props: IProps) => {
       {
         title: "Invoice rate(per hour)",
         render: (payRate: any) => {
-          return <p><span>{payRate?.userRateCurrency?.symbol && payRate?.userRateCurrency?.symbol} </span>{`${payRate?.invoiceRate}`}</p>;
+          return <p><span>{payRate?.invoiceRateCurrency?.symbol && payRate?.invoiceRateCurrency?.symbol} </span>{`${payRate?.invoiceRate}`}</p>;
         },
       },
       {
-        title: "Pay rate(per hour)",
+        title: "Employee Pay rate(per hour)",
         render: (payRate: any) => {
           return <p><span>{payRate?.userRateCurrency?.symbol && payRate?.userRateCurrency?.symbol} </span>{`${payRate?.amount}`}</p>;
         },
@@ -152,7 +152,7 @@ const ViewUserPayRate = (props: IProps) => {
         onOk={() => setVisibility(false)}
       >
         <div className={styles["modal-body"]}>
-          <span className={styles["title"]}>Payrate</span>
+          <span className={styles["title"]}>Employee Payrate</span>
 
           <p className={styles.employeeName}>
             {userPayRate?.UserPayRate?.data?.[0]?.user?.fullName}

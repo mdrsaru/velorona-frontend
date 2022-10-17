@@ -108,44 +108,39 @@ const UserPayRateModal = (props: IProps) => {
     }
   })
   const [form] = Form.useForm();
-  const [userRateCurrency, setUserRateCurrency] = useState('')
-  const [invoiceRateCurrency, setInvoiceRateCurrency] = useState('')
 
-  const handleUserRateCurrency = (id: any) => {
-    setUserRateCurrency(id)
-  }
-
-  const handleInvoiceRateCurrency = (id: string) => {
-    setInvoiceRateCurrency(id)
-  }
 
   const selectUserRateCurrency = (
-    <Select style={{ width: '5rem' }} placeholder='Symbol' onChange={handleUserRateCurrency}>
-      {currencyData?.Currency?.data?.map((currency, index) => (
-        <Select.Option
-          value={currency.id}
-          key={index}
-        >
-          {currency.symbol}
-        </Select.Option>
-      ))}
-    </Select>
+    <Form.Item name='user_rate_currency_id' className={styles['form-select-item']}>
+      <Select style={{ width: '5rem' }} placeholder='Symbol'>
+        {currencyData?.Currency?.data?.map((currency, index) => (
+          <Select.Option
+            value={currency.id}
+            key={index}
+          >
+            {currency.symbol}
+          </Select.Option>
+        ))}
+      </Select>
+    </Form.Item>
   );
 
 
   const selectInvoiceRateCurrency = (
-    <Select style={{ width: '5rem' }} placeholder='Symbol' onChange={handleInvoiceRateCurrency}>
-      {currencyData?.Currency?.data?.map((currency, index) => (
-        <Select.Option
-          value={currency.id}
-          key={index}
+    <Form.Item name='invoice_rate_currency_id' className={styles['form-select-item']}>
+      <Select style={{ width: '5rem' }} placeholder='Symbol'>
+        {currencyData?.Currency?.data?.map((currency, index) => (
+          <Select.Option
+            value={currency.id}
+            key={index}
 
-        >
-          {currency.symbol}
-        </Select.Option>
-      ))}
+          >
+            {currency.symbol}
+          </Select.Option>
+        ))}
 
-    </Select>
+      </Select>
+    </Form.Item>
   );
 
   const onSubmitForm = (values: any) => {
@@ -156,15 +151,11 @@ const UserPayRateModal = (props: IProps) => {
       project_id: values.project_id,
       amount: values.payRate,
       invoiceRate: values.invoiceRate,
-      company_id: loggedInUser.company?.id as string
-    }
+      company_id: loggedInUser.company?.id as string,
+      user_rate_currency_id : values.user_rate_currency_id,
+      invoice_rate_currency_id : values.invoice_rate_currency_id,
 
-    if (userRateCurrency) {
-      input.user_rate_currency_id = userRateCurrency
-    }
 
-    if (invoiceRateCurrency) {
-      input.invoice_rate_currency_id = invoiceRateCurrency
     }
 
     userPayRateCreate({
@@ -175,7 +166,16 @@ const UserPayRateModal = (props: IProps) => {
   };
 
   const onCancel = () => {
-    props.setVisibility(!props.visibility)
+    form.resetFields()
+    props.setVisibility(false)
+  }
+
+  let defaultValues: any;
+  if (currencyData) {
+    defaultValues = {
+      user_rate_currency_id: currencyData?.Currency?.data?.[0]?.id,
+      invoice_rate_currency_id: currencyData?.Currency?.data?.[0]?.id,
+    }
   }
   return (
     <Modal
@@ -183,7 +183,8 @@ const UserPayRateModal = (props: IProps) => {
       visible={props?.visibility}
       className={styles['user-pay-rate']}
       closeIcon={[
-        <div onClick={() => props?.setVisibility(false)} key={1}>
+        <div onClick={onCancel}
+          key={1}>
           <span className={styles["close-icon-div"]}>
             <CloseOutlined />
           </span>
@@ -194,7 +195,7 @@ const UserPayRateModal = (props: IProps) => {
       <div className={styles["modal-body"]}>
         <div>
           <span className={styles["title"]}>
-            Add Payrate
+            Add Employee Payrate
           </span>
         </div>
 
@@ -207,6 +208,7 @@ const UserPayRateModal = (props: IProps) => {
           form={form}
           layout="vertical"
           name="payrate-form"
+          initialValues={defaultValues}
           onFinish={onSubmitForm}>
           <Row gutter={[24, 0]}>
             <Col

@@ -1,4 +1,4 @@
-import { Card, Row, Col, Table, Dropdown, Menu, message, Input, Button, Select, Form, Avatar, Tabs, Popconfirm,Image } from "antd"
+import { Card, Row, Col, Table, Dropdown, Menu, message, Input, Button, Select, Form, Avatar, Tabs, Popconfirm, Image } from "antd"
 import { SearchOutlined, FormOutlined, CheckCircleFilled, DeleteOutlined, UserOutlined, FileSyncOutlined, CloseCircleFilled, MailOutlined } from "@ant-design/icons"
 
 import { Link, useNavigate } from "react-router-dom"
@@ -627,11 +627,21 @@ const Employee = () => {
     {
       title: "Pay Rate",
       render: (user: any) => {
-        return <div
-          onClick={() => handleViewPayRate(user)}
-          className={styles["add-pay-rate"]}>
-          View PayRate
-        </div>;
+        return (
+        <>
+          {user.roles[0]?.name === constants.roles.Employee ?
+            (
+              <div
+                onClick={() => handleViewPayRate(user)}
+                className={styles["add-pay-rate"]}>
+                View Employee PayRate
+              </div>
+            )
+            :
+            (<>-</>)
+          }
+        </>
+        )
       },
     },
     {
@@ -664,7 +674,7 @@ const Employee = () => {
                     <p
                       onClick={() => handleUserPayRate(record)}
                       className={`${styles["table-icon"]} ${styles["table-payrate-icon"]}`}
-                      title='Add Payrate'
+                      title='Add Employee Payrate'
                     >
                       <Image src={PayRateImg} width='2rem' preview={false}/>
                     </p>
@@ -705,11 +715,11 @@ const Employee = () => {
                         >
                           {record?.status === 'Active' ?
                             <div className={styles["table-inactive-status-icon"]} >
-                            <CloseCircleFilled />
+                              <CloseCircleFilled />
                             </div>
                             :
                             <div className={styles["table-active-status-icon"]}>
-                              
+
                               <CheckCircleFilled />
                             </div>
                           }
@@ -927,7 +937,7 @@ const Employee = () => {
                   }}
                 />
               </Col>
-            </Row>            
+            </Row>
           </Card>
           <ModalConfirm
             visibility={visibility}

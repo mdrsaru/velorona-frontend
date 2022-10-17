@@ -165,8 +165,8 @@ const EditUserPayRateModal = (props: IProps) => {
       project_id: userPayRateData?.UserPayRate?.data?.[0]?.project?.id,
       amount: userPayRateData?.UserPayRate?.data?.[0]?.amount ?? 0,
       invoiceRate: userPayRateData?.UserPayRate?.data?.[0]?.invoiceRate,
-      user_rate_currency_id: userPayRateData?.UserPayRate?.data?.[0]?.userRateCurrency.id,
-      invoice_rate_currency_id: userPayRateData?.UserPayRate?.data?.[0]?.invoiceRateCurrency.id
+      user_rate_currency_id: userPayRateData?.UserPayRate?.data?.[0]?.userRateCurrency?.id,
+      invoice_rate_currency_id: userPayRateData?.UserPayRate?.data?.[0]?.invoiceRateCurrency?.id
     }
   }
 
@@ -190,7 +190,7 @@ const EditUserPayRateModal = (props: IProps) => {
       <div className={styles["modal-body"]}>
         <div>
           <span className={styles["title"]}>
-            Edit PayRate
+            Edit Employee PayRate
           </span>
         </div>
 

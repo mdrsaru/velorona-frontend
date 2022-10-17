@@ -13,13 +13,15 @@ import { authVar } from "../../../App/link";
 import { TIME_WEEKLY } from "../../Timesheet";
 import moment from "moment";
 import _ from "lodash";
+import { RoleName } from "../../../interfaces/generated";
 
 
 export const COUNT = gql`
-query Count($userInput: UserCountInput!, $clientInput: ClientCountInput!,$projectInput:ProjectCountInput!) {
+query Count($userInput: UserCountInput!, $clientInput: ClientCountInput!,$projectInput:ProjectCountInput!,$employeeInput:UserCountInput!) {
   UserCount(input: $userInput)
   ClientCount(input: $clientInput)
   ProjectCount(input:$projectInput)
+  EmployeeCount:UserCount(input:$employeeInput)
 }
 
 `
@@ -43,6 +45,11 @@ const [date,setDate] = useState(new Date())
         projectInput: {
           company_id: authData?.company?.id as string
         },
+        employeeInput:{
+          company_id: authData?.company?.id as string,
+          role:RoleName.Employee
+
+        }
       },
     }
   );
@@ -105,6 +112,11 @@ const [date,setDate] = useState(new Date())
     {
       title: 'Users',
       count: overallCount?.UserCount as number,
+      icon: employeesImg
+    }, 
+    {
+      title: 'Employees',
+      count: overallCount?.EmployeeCount as number,
       icon: employeesImg
     },
     {
