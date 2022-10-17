@@ -7,9 +7,9 @@ import {
   CheckCircleOutlined,
 } from '@ant-design/icons';
 
-import constants, { plans } from '../../../../config/constants';
+import constants, { plans, subscriptionStatus } from '../../../../config/constants';
 import { notifyGraphqlError } from '../../../../utils/error';
-import { getWeekDays, getTimeFormat, checkRoles } from '../../../../utils/common';
+import { getWeekDays, getTimeFormat, checkRoles, checkSubscriptions } from '../../../../utils/common';
 import { authVar } from '../../../../App/link';
 import { IGroupedTimeEntries } from '../../../../interfaces/common.interface';
 import { MutationTimeEntriesApproveRejectArgs } from '../../../../interfaces/generated';
@@ -57,8 +57,13 @@ const TimeEntryDetails = (props: IProps) => {
   const weekDays = getWeekDays(props.startDate);
   const groupedTimeEntries = props.groupedTimeEntries;
 
-  const companyPlan = authData?.company?.plan;
-  const trialEnded = authData?.company?.trialEnded
+  const _subscriptionStatus = authData?.company?.subscriptionStatus ?? ''
+  
+  const canAccess = checkSubscriptions({
+    userSubscription:_subscriptionStatus,
+    expectedSubscription: [subscriptionStatus.active,subscriptionStatus.trialing]
+  })
+
   
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [entriesToDelete, setEntriesToDelete] = useState<{ entryIds: string[], task_id: string }>({
@@ -232,7 +237,7 @@ const TimeEntryDetails = (props: IProps) => {
 
                         <Space>
                           {
-                            canApproveReject && ['Pending', 'Approved'].includes(props.status) && props.isTimesheetSubmitted && (companyPlan === plans.Professional) && !trialEnded &&(
+                            canApproveReject && ['Pending', 'Approved'].includes(props.status) && props.isTimesheetSubmitted && canAccess &&(
                               <Popconfirm
                                 placement="left"
                                 title="Are you sure you want to reject timesheet?"
@@ -250,7 +255,7 @@ const TimeEntryDetails = (props: IProps) => {
                           }
 
                           {
-                            canApproveReject && ['Pending', 'Rejected'].includes(props.status) && props.isTimesheetSubmitted && (companyPlan === plans.Professional) && !trialEnded&& (
+                            canApproveReject && ['Pending', 'Rejected'].includes(props.status) && props.isTimesheetSubmitted && canAccess && (
                               <Space>
                                 <Popconfirm
                                   placement="left"

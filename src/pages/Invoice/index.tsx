@@ -16,7 +16,7 @@ import {
 } from '@ant-design/icons';
 
 import { authVar } from '../../App/link';
-import constants, { invoice_status, plans } from '../../config/constants';
+import constants, { invoice_status, plans, subscriptionStatus } from '../../config/constants';
 import routes from '../../config/routes';
 import { notifyGraphqlError } from '../../utils/error';
 import {
@@ -40,6 +40,7 @@ import AttachNewTimesheetModal from '../../components/AddAttachedTimesheet';
 
 import filterImg from "../../assets/images/filter.svg"
 import styles from './style.module.scss';
+import { checkSubscriptions } from '../../utils/common';
 
 export const ATTACHED_TIMESHEET = gql`
   ${ATTACHED_TIMESHEET_FIELDS}
@@ -105,8 +106,13 @@ const Invoice = () => {
   const companyCode = loggedInUser?.company?.code as string;
   const company_id = loggedInUser?.company?.id as string;
 
-  const companyPlan = loggedInUser?.company?.plan as string
-  const trialEnded = loggedInUser?.company?.trialEnded as boolean
+  const _subscriptionStatus = loggedInUser?.company?.subscriptionStatus ?? ''
+  
+  const canAccess = checkSubscriptions({
+    userSubscription:_subscriptionStatus,
+    expectedSubscription: [subscriptionStatus.active,subscriptionStatus.trialing]
+  })
+
 
   const [filterForm] = Form.useForm();
 
@@ -452,7 +458,7 @@ const Invoice = () => {
         return (
           <Row>
             {
-              (companyPlan === plans.Professional && !trialEnded) ?
+              canAccess ?
                 <>
                   <Col>
                     {

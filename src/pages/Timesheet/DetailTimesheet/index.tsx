@@ -13,10 +13,10 @@ import {
 } from '@ant-design/icons';
 
 import { authVar } from '../../../App/link';
-import { _cs, checkRoles } from '../../../utils/common';
+import { _cs, checkRoles, checkSubscriptions } from '../../../utils/common';
 import routes from '../../../config/routes';
 import { notifyGraphqlError } from "../../../utils/error";
-import constants, { plans } from "../../../config/constants";
+import constants, { plans, subscriptionStatus } from "../../../config/constants";
 import { TimeEntry, MutationTimeEntriesApproveRejectArgs, InvoiceSchedule, EntryType } from '../../../interfaces/generated';
 import { GraphQLResponse } from '../../../interfaces/graphql.interface';
 import { PROJECT } from '../../Project';
@@ -88,8 +88,13 @@ const DetailTimesheet = (props: any) => {
 
   const authData = authVar()
   const roles = authData?.user?.roles;
-  const companyPlan = authData?.company?.plan;
-  const trialEnded = authData?.company?.trialEnded;
+  const _subscriptionStatus = authData?.company?.subscriptionStatus ?? ''
+  
+  const canAccess = checkSubscriptions({
+    userSubscription:_subscriptionStatus,
+    expectedSubscription: [subscriptionStatus.active,subscriptionStatus.trialing]
+  })
+
 
   const entryType = authData?.user?.entryType;
   const [form] = Form.useForm()
@@ -452,7 +457,7 @@ const DetailTimesheet = (props: any) => {
                         />
 
                         {
-                          managerLvlRole && isSubmitted && (companyPlan === plans.Professional) &&!trialEnded &&(
+                          managerLvlRole && isSubmitted && canAccess &&(
                             <Row justify="end" style={{ margin: '36px 0' }}>
                               <Space>
                                 <Button onClick={() => { approveRejectAll('Approved') }} >
@@ -616,7 +621,7 @@ const DetailTimesheet = (props: any) => {
       </div>
 
       {
-        timesheetDetail?.user.timesheet_attachment && (companyPlan === plans.Professional) &&!trialEnded && (
+        timesheetDetail?.user.timesheet_attachment && canAccess && (
           <div className={styles['site-card-wrapper']}>
             <Card className={styles['attach-approved-timesheet']}>
               <Collapse accordion defaultActiveKey={['2']}>

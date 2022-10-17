@@ -9,7 +9,7 @@ import {
   fieldPolicy,
   typeDefs,
 } from '../gql/schema.gql';
-import { openNotificationWithIcon } from '../utils/common';
+import { notifySubscriptionExpiration } from '../utils/common';
 import { RoleName } from '../interfaces/generated';
 
 import Routes from './Routes';
@@ -43,7 +43,7 @@ const client = new ApolloClient({
   }),
   defaultOptions: {
     watchQuery: {
-      errorPolicy: 'ignore',
+      errorPolicy: 'none',
     },
     //query: {
     //errorPolicy: 'ignore',
@@ -62,6 +62,8 @@ function App() {
         if (response?.data) {
           const roles = response?.data?.roles?.map((role: any) => role.name);
           const subscriptionPeriodEnd = response?.data?.company?.subscriptionPeriodEnd ?? null;
+          const trialEndDate = response?.data?.company?.trialEndDate ?? null;
+          const subscriptionStatus = response?.data?.company?.subscriptionStatus ?? null;
 
           authVar({
             isLoggedIn: true,
@@ -76,7 +78,7 @@ function App() {
               code: response?.data?.company?.companyCode ?? null,
               name: response?.data?.company?.name ?? null,
               plan: response?.data?.company?.plan ?? null,
-              trialEnded: response?.data?.company?.trialEnded ?? false,
+              subscriptionStatus: response?.data?.company?.subscriptionStatus ?? null,
               subscriptionPeriodEnd,
               logo:{
                 id: response?.data?.company?.logo?.id ?? null,
@@ -92,31 +94,12 @@ function App() {
             },
           })
 
-          if(roles.includes(RoleName.CompanyAdmin) && subscriptionPeriodEnd) {
-            const periodEnd = moment(subscriptionPeriodEnd);
-            const now = moment();
-            const diff = periodEnd.diff(now, 'days');
-            let title: string = '';
-            let description: string = '';
-
-            if(diff >= 0 && diff <= 7) {
-              title = 'Subscription about to expire';
-              description = `Your subscription will expire in ${diff} days.`;
-            } else if(diff < 0) {
-              title = 'Subscription expired';
-              description = `Your subscription has expired.`;
-            }
-
-            if(title && description) {
-              setTimeout(() => {
-                openNotificationWithIcon({
-                  type: 'info',
-                  title,
-                  description,
-                  duration: 0,
-                });
-              }, 2000)
-            }
+          if(roles.includes(RoleName.CompanyAdmin) && (subscriptionPeriodEnd || trialEndDate)) {
+            notifySubscriptionExpiration({
+              periodEnd: subscriptionPeriodEnd,
+              status: subscriptionStatus,
+              trialEndDate,
+            })
           }
         }
       })

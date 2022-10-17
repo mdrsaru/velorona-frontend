@@ -38,7 +38,7 @@ const _Layout = () => {
           code: '',
           name: '',
           plan: '',
-          trialEnded:false,
+          subscriptionStatus:'',
           subscriptionPeriodEnd: null,
           logo: {
             id: null,

@@ -3,7 +3,7 @@ import { Card, Tabs } from 'antd';
 import { Elements } from '@stripe/react-stripe-js';
 import { loadStripe } from '@stripe/stripe-js';
 
-import { plansVar, currentPlanVar } from '../../App/link';
+import { plansVar } from '../../App/link';
 import { subscription, stripeSetting } from '../../config/constants';
 import { AUTH } from '../../gql/auth.gql';
 import { GraphQLResponse } from '../../interfaces/graphql.interface';
@@ -25,6 +25,7 @@ const COMPANY = gql`
       id
       plan
       subscriptionStatus
+      trialEndDate
     }
   }
 `;
@@ -53,7 +54,7 @@ const Subscription = () => {
     onCompleted(response) {
       const company = response.CompanyById;
       const plan = company?.plan as 'Starter' | 'Professional';
-      const subscriptionStatus = company?.subscriptionStatus ?? (company?.plan === 'Starter' ? 'active' : 'inactive');
+      const subscriptionStatus: string | null = company?.subscriptionStatus ?? (company?.plan === 'Starter' ? 'active' : null);
 
       const currentPlan: IPlan = {
         name: company?.plan as string,
@@ -61,10 +62,12 @@ const Subscription = () => {
         price: subscription.price[plan] as string,
         features: subscription.features[plan] as string[] ?? [],
         subscriptionStatus,
+        trialEndDate: company?.trialEndDate,
+        isCurrent: true,
       }
+
       const plans = getPlans(currentPlan);
       plansVar(plans);
-      currentPlanVar(currentPlan);
     }
   });
 
@@ -115,15 +118,17 @@ function getPlans(currentPlan: IPlan) {
       name: 'Starter',
       description: subscription.description.Starter,
       price: subscription.price.Starter,
-      subscriptionStatus: currentPlan.name === 'Starter' ? 'active' : 'inactive',
+      subscriptionStatus: currentPlan.name === 'Starter' ? 'active' : null,
       features: subscription.features.Starter,
+      isCurrent: currentPlan.name === 'Starter' && currentPlan.isCurrent
     },
     {
       name: 'Professional',
       description: subscription.description.Professional,
       price: subscription.price.Professional,
-      subscriptionStatus: currentPlan.name === 'Professional' ? 'active' : 'inactive',
+      subscriptionStatus: currentPlan.name === 'Professional' ? currentPlan.subscriptionStatus : null,
       features: subscription.features.Professional,
+      isCurrent: currentPlan.name === 'Professional' && currentPlan.isCurrent
     },
   ];
 

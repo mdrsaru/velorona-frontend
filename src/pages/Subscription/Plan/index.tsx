@@ -1,16 +1,39 @@
 import { useState } from 'react';
-import { gql, useMutation, useQuery } from '@apollo/client';
-import { Button, Modal } from 'antd';
+import { Button, Modal, Popconfirm, message } from 'antd';
+import { loadStripe } from '@stripe/stripe-js';
+import { Elements } from '@stripe/react-stripe-js';
+import { gql, useMutation, useQuery, useLazyQuery } from '@apollo/client';
 
 import { AUTH } from '../../../gql/auth.gql';
+import { stripeSetting } from '../../../config/constants';
 import { notifyGraphqlError } from '../../../utils/error';
 import { IPlan } from '../../../interfaces/subscription.interface';
 import { GraphQLResponse } from '../../../interfaces/graphql.interface';
-import { SubscriptionCreateResult, MutationSubscriptionCreateArgs } from '../../../interfaces/generated';
+import {
+  SubscriptionCreateResult,
+  MutationSubscriptionCreateArgs,
+  QuerySetupIntentSecretArgs,
+  SetupIntentResult,
+  MutationSubscriptionDowngradeArgs,
+} from '../../../interfaces/generated';
 
 import Payment from '../Payment';
+import UpdatePaymentDetails from '../UpdatePaymentDetails';
 
 import styles from './style.module.scss';
+
+const stripePromise = loadStripe(stripeSetting.publishableKey);
+
+const statusMap: any = {
+  active: 'Active',
+  inactive: 'Inactive',
+  canceled: 'Canceled',
+  trialing: 'Trialing',
+  past_due: 'Past due',
+  unpaid: 'Unpaid',
+  incomplete: 'Incomplete',
+  incomplete_expired: 'Incomplete expired',
+}
 
 const SUBSCRIPTION_CREATE = gql`
   mutation SubscriptionCreate($input: SubscriptionCreateInput!) {
@@ -21,6 +44,20 @@ const SUBSCRIPTION_CREATE = gql`
   }
 `;
 
+const SETUP_INTENT_SECRET = gql`
+  query SetupInteSecret($input: SetupIntentSecretInput!) {
+    SetupIntentSecret(input: $input) {
+      clientSecret
+    }
+  }
+`;
+
+const SUBSCRIPTION_DOWNGRADE = gql`
+  mutation SubscriptionDowngrade($input: SubscriptionDowngradeInput!) {
+    SubscriptionDowngrade(input: $input)
+  }
+`;
+
 interface IProps {
   plan: IPlan;
 }
@@ -28,6 +65,7 @@ interface IProps {
 const Plan = (props: IProps) => {
   const plan = props.plan;
   const [subscriptionData, setSubscriptionData] = useState<null | SubscriptionCreateResult>(null);
+  const [showUpdatePaymentModal, setShowUpdatePaymentModal] = useState(false);
 
   const { data: authData } = useQuery(AUTH)
   const company_id = authData.AuthUser?.company?.id as string;
@@ -45,11 +83,49 @@ const Plan = (props: IProps) => {
       },
     },
     onCompleted(response) {
-      if(response.SubscriptionCreate) {
+      if(response?.SubscriptionCreate) {
         setSubscriptionData({
           clientSecret: response.SubscriptionCreate.clientSecret,
           subscriptionId: response.SubscriptionCreate.subscriptionId,
         });
+      }
+    },
+    onError: notifyGraphqlError,
+  });
+
+  const [
+    getSetupIntentSecret,
+    {
+      data: setupIntentSecretData, 
+      loading: setupIntentLoading,
+    }
+  ] = useLazyQuery<
+    GraphQLResponse<'SetupIntentSecret', SetupIntentResult>,
+    MutationSubscriptionCreateArgs
+  >(SETUP_INTENT_SECRET, {
+    onCompleted(response) {
+      if(response?.SetupIntentSecret) {
+        setShowUpdatePaymentModal(true);
+      }
+    },
+    onError: notifyGraphqlError,
+  });
+
+  const [
+    downgradeSubscription, 
+    { data: downgradeSubscriptionData, loading: downgrading },
+  ] = useMutation<
+    GraphQLResponse<'SubscriptionDowngrade', string>,
+    MutationSubscriptionDowngradeArgs
+  >(SUBSCRIPTION_DOWNGRADE, {
+    variables: {
+      input: {
+        company_id,
+      },
+    },
+    onCompleted(response) {
+      if(response?.SubscriptionDowngrade) {
+        message.success(response.SubscriptionDowngrade)
       }
     },
     onError: notifyGraphqlError,
@@ -61,17 +137,50 @@ const Plan = (props: IProps) => {
     }
   }
 
+  const handlePlanActionClick = () => {
+    if(plan.name === 'Starter') {
+      if(plan.isCurrent) {
+        return;
+      }
+
+      downgradeSubscription();
+      return;
+    }
+
+    if(plan.subscriptionStatus === 'trialing' || plan.subscriptionStatus === 'past_due') {
+      getSetupIntentSecret({
+        variables: {
+          input: {
+            company_id,
+          },
+        },
+      })
+    } else {
+      createSubscription();
+    }
+  } 
+
   const hidePaymentModal = () => {
     setSubscriptionData(null);
   }
 
+  const hidePaymentUpdateModal = () => {
+    setShowUpdatePaymentModal(false);
+  }
+
   const getBtnText = () => {
-    if(plan.subscriptionStatus === 'inactive' && plan.name === 'Starter') {
+    if(plan.name === 'Starter' && !plan.isCurrent) {
       return 'Downgrade';
     }
 
-    if(plan.subscriptionStatus === 'active') {
-      return 'Active';
+    if([
+      'active',
+      'trialing',
+      'past_due',
+      'incomplete',
+      'incomplete_expired',
+    ].includes(plan.subscriptionStatus as string)) {
+      return statusMap[plan.subscriptionStatus as string];
     }
 
     return 'Upgrade'
@@ -87,14 +196,21 @@ const Plan = (props: IProps) => {
       </div>
 
       {/* Need downgrade functionality */}
-      <Button
-        type="primary"
-        disabled={plan.subscriptionStatus === 'active'}
-        loading={creatingSubscription}
-        onClick={createIncompleteSubscription}
+      <Popconfirm
+        placement="top"
+        title="Are you sure?"
+        onConfirm={handlePlanActionClick}
+        okText="Yes"
+        cancelText="No"
       >
-        { getBtnText() }
-      </Button>
+        <Button
+          type="primary"
+          disabled={plan.subscriptionStatus === 'active'}
+          loading={creatingSubscription || downgrading}
+        >
+          { getBtnText() }
+        </Button>
+      </Popconfirm>
 
       <ul>
         {
@@ -117,6 +233,31 @@ const Plan = (props: IProps) => {
           hidePaymentModal={hidePaymentModal}
         />
       </Modal>
+
+      <Modal
+        footer={null}
+        destroyOnClose
+        title="Update Payment"
+        closable={false}
+        visible={showUpdatePaymentModal}
+      >
+        {
+          setupIntentSecretData?.SetupIntentSecret?.clientSecret && (
+            <Elements
+              stripe={stripePromise}
+              options={{
+                clientSecret: setupIntentSecretData?.SetupIntentSecret?.clientSecret 
+              }}
+            >
+              <UpdatePaymentDetails
+                hidePaymentUpdateModal={hidePaymentUpdateModal}
+                clientSecret={setupIntentSecretData?.SetupIntentSecret?.clientSecret}
+              />
+            </Elements>
+          )
+        }
+      </Modal>
+
 
     </div>
   )

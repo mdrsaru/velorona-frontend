@@ -40,7 +40,7 @@ export interface ICompanyUser {
   name:string;
   logo:ICompanyLogo;
   plan: string;
-  trialEnded:boolean;
+  subscriptionStatus:string;
   subscriptionPeriodEnd: Date | null,
 }
 

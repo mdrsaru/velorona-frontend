@@ -70,7 +70,7 @@ const CompanySet = () => {
             id: company.id,
             name: company.name,
             plan: company?.plan as string,
-            trialEnded: company?.trialEnded as boolean,
+            subscriptionStatus: company?.subscriptionStatus as string,
             subscriptionPeriodEnd: company?.subscriptionPeriodEnd,
             logo:{
               id: company.logo?.id ?? null,

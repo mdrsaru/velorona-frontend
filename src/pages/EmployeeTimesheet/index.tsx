@@ -239,7 +239,7 @@ const EmployeeTimesheet = () => {
       title: 'Action',
       render: (timesheet: Timesheet) => {
         let link = routes.detailTimesheet.path(authData?.company?.code as string, timesheet?.id)
-        if(timesheet.period === InvoiceSchedule.Biweekly || timesheet.period === InvoiceSchedule.Monthly) {
+        if(timesheet.period === InvoiceSchedule.Biweekly || timesheet.period === InvoiceSchedule.Monthly || timesheet.period === InvoiceSchedule.Custom) {
           link += `?start=${timesheet.weekStartDate}&end=${timesheet.weekEndDate}&period=${timesheet.period}`;
         }
 
