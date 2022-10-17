@@ -25,7 +25,8 @@ import { GraphQLResponse, UserPayRatePagingData } from "../../interfaces/graphql
 import {
   QueryUserArgs,
   // RoleName, 
-  UserPagingResult
+  UserPagingResult,
+  UserStatus,
 } from "../../interfaces/generated";
 import styles from "./style.module.scss";
 import { debounce } from "lodash";
@@ -270,13 +271,16 @@ const Employee = () => {
     }
   );
 
-  const archiveUser = () => {
+  const archiveUnarchiveUser = () => {
     let key = "archive";
+
+    const archived = !employee?.archived;
+
     employeeArchive({
       variables: {
         input: {
           id: employee?.id,
-          archived: !employee?.archived,
+          archived,
           company_id: loggedInUser?.company?.id,
         },
       },
@@ -939,7 +943,7 @@ const Employee = () => {
             imgSrc={archiveImg}
             okText={employee?.archived ? "Unarchive" : "Archive"}
             modalBody={<ArchiveBody />}
-            onOkClick={archiveUser}
+            onOkClick={archiveUnarchiveUser}
           />
 
           <ModalConfirm

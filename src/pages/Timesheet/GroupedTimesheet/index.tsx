@@ -58,6 +58,7 @@ export const TIME_SHEET = gql`
         user {
           id
           email
+          fullName
           timesheet_attachment
         }
         client {

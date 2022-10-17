@@ -143,7 +143,7 @@ export const plans = {
 export const subscription = {
   price: {
     Starter: 'FREE',
-    Professional: '$10 Flat + $1 per user',
+    Professional: '$10 Flat + $1 per user (per month)',
   },
   description: {
     Starter: 'For Small Business',

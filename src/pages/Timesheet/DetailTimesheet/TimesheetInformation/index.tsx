@@ -57,7 +57,7 @@ const TimesheetInformation = (props: IProps) => {
               Candidate Name
             </div>
 
-            <div>{timesheet?.user?.email}</div>
+            <div>{timesheet?.user?.fullName}</div>
           </div>
 
           <div className={styles['detail-row']}>
