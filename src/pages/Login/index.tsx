@@ -30,7 +30,7 @@ const LOGIN = gql`
           companyCode
           name
           plan
-          trialEnded
+          subscriptionStatus
           subscriptionPeriodEnd
           trialEndDate
           subscriptionStatus
@@ -89,7 +89,7 @@ const Login = () => {
           code: loginData?.company?.companyCode ?? '',
           name:loginData?.company?.name ?? '',
           plan:loginData?.company?.plan ?? '',
-          trialEnded:loginData?.company?.trialEnded ?? false,
+          subscriptionStatus:loginData?.company?.subscriptionStatus ?? '',
           subscriptionPeriodEnd,
           logo:{
             id: loginData?.company?.logo?.id ?? '',

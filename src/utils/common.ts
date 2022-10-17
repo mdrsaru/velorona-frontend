@@ -43,6 +43,11 @@ export type CheckRoleArgs = {
   userRoles: string[];
 }
 
+export type CheckSubscriptionArgs = {
+  expectedSubscription: string[];
+  userSubscription: string;
+}
+
 export const checkRoles = (args: CheckRoleArgs) => {
   const expectedRoles = args.expectedRoles;
   const userRoles: string[] = args.userRoles;
@@ -50,6 +55,12 @@ export const checkRoles = (args: CheckRoleArgs) => {
   return expectedRoles.some((role) => userRoles.includes(role));
 };
 
+export const checkSubscriptions = (args: CheckSubscriptionArgs) => {
+  const userSubscription = args.userSubscription;
+  const expectedSubscription: string[] = args.expectedSubscription;
+
+  return expectedSubscription.includes(userSubscription);
+};
 const arrayToCsv = (jsonData: any, csvHeader: any) => {
   let csvRows = [];
   let data = jsonData ?? []

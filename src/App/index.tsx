@@ -78,7 +78,7 @@ function App() {
               code: response?.data?.company?.companyCode ?? null,
               name: response?.data?.company?.name ?? null,
               plan: response?.data?.company?.plan ?? null,
-              trialEnded: response?.data?.company?.trialEnded ?? false,
+              subscriptionStatus: response?.data?.company?.subscriptionStatus ?? null,
               subscriptionPeriodEnd,
               logo:{
                 id: response?.data?.company?.logo?.id ?? null,

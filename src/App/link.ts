@@ -24,7 +24,7 @@ const auth: IAuth = {
     id: null,
     name:'',
     plan:'',
-    trialEnded:false,
+    subscriptionStatus:'',
     subscriptionPeriodEnd: null,
     logo:{
       id:null,

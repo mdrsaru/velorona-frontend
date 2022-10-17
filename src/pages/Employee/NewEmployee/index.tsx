@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { Button, Card, Checkbox, Col, DatePicker, Form, Input, message, Row, Select, Space, Upload } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
-import constants, { plans, roles_user } from "../../../config/constants";
+import constants, { plans, roles_user, subscriptionStatus } from "../../../config/constants";
 
 import type { UploadProps } from 'antd';
 import { useNavigate } from "react-router-dom";
@@ -16,6 +16,7 @@ import { USER } from "../index";
 
 import styles from "../style.module.scss";
 import { GraphQLResponse } from "../../../interfaces/graphql.interface";
+import { checkSubscriptions } from "../../../utils/common";
 
 const normFile = (e: any) => {
   if (Array.isArray(e)) {
@@ -92,8 +93,13 @@ const NewEmployee = () => {
     name: ''
   })
   const [skipClient, setSkipClient] = useState(false)
-  const companyPlan = authData?.company?.plan
-  const trialEnded = authData?.company?.trialEnded as boolean
+
+  const _subscriptionStatus = authData?.company?.subscriptionStatus ?? ''
+  
+  const canAccess = checkSubscriptions({
+    userSubscription:_subscriptionStatus,
+    expectedSubscription: [subscriptionStatus.active,subscriptionStatus.trialing]
+  })
 
   const [changeProfilePictureInput] = useMutation<
     GraphQLResponse<'ChangeProfilePicture', User>,
@@ -484,7 +490,7 @@ const NewEmployee = () => {
                 }]}>
                 <Select placeholder="Select Role" onChange={handleChange}>
                   {roles_user?.map((role: any, index: number) => {
-                    if (role?.value === 'TaskManager' && (companyPlan !== plans.Professional || trialEnded)) {
+                    if (role?.value === 'TaskManager' && !canAccess) {
                       return 0
                     }
                     else {
@@ -521,7 +527,7 @@ const NewEmployee = () => {
             {role === constants.roles.Employee &&
               <>
                 {
-                  (companyPlan === plans.Professional && !trialEnded) &&
+                  canAccess &&
                   <>
                     <Col
                       xs={24}

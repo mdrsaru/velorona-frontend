@@ -15,7 +15,7 @@ import { ArrowLeftOutlined } from "@ant-design/icons";
 import moment from "moment";
 import type { UploadProps } from "antd";
 
-import constants, { plans, roles_user } from '../../../config/constants'
+import constants, { plans, roles_user, subscriptionStatus } from '../../../config/constants'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery } from '@apollo/client'
 import { notifyGraphqlError } from '../../../utils/error'
@@ -26,8 +26,9 @@ import { useState } from 'react'
 import styles from '../style.module.scss'
 import { authVar } from '../../../App/link'
 import RouteLoader from '../../../components/Skeleton/RouteLoader'
-import { EntryType, MutationChangeProfilePictureArgs, MutationUserUpdateArgs, QueryUserArgs, RoleName, User, UserPagingResult, UserStatus } from "../../../interfaces/generated";
+import { EntryType, MutationChangeProfilePictureArgs, MutationUserUpdateArgs, QueryUserArgs, RoleName, SubscriptionPaymentStatus, User, UserPagingResult, UserStatus } from "../../../interfaces/generated";
 import { GraphQLResponse } from "../../../interfaces/graphql.interface";
+import { checkSubscriptions } from "../../../utils/common";
 
 const dateFormat = "YYYY-MM-DD HH:mm:ss";
 const profileFile = (e: any) => {
@@ -50,9 +51,13 @@ const EditEmployee = () => {
   });
   const [form] = Form.useForm();
 
-  const companyPlan = authData?.company?.plan
-  const trialEnded = authData?.company?.trialEnded as boolean
-
+  const _subscriptionStatus = authData?.company?.subscriptionStatus ?? ''
+  
+  const canAccess = checkSubscriptions({
+    userSubscription:_subscriptionStatus,
+    expectedSubscription: [subscriptionStatus.active,subscriptionStatus.trialing]
+  })
+  
   const [userUpdate] = useMutation<
     GraphQLResponse<'UserUpdate', User>,
     MutationUserUpdateArgs
@@ -452,7 +457,7 @@ const EditEmployee = () => {
                     >
                       <Select placeholder="Employee" disabled={authData?.user?.id === params.eid ? true : false} onChange={handleChange}>
                         {roles_user?.map((role: any, index: number) => {
-                          if (role?.value === 'TaskManager' && (companyPlan !== plans.Professional || trialEnded)) {
+                          if (role?.value === 'TaskManager' && !canAccess) {
                             return
                           }
                           else {
@@ -486,7 +491,7 @@ const EditEmployee = () => {
                   {(userData?.User?.data[0]?.roles?.[0]?.name === constants.roles.Employee || role === constants.roles.Employee) &&
                     <>
                       {
-                        (companyPlan === plans.Professional && !trialEnded) &&
+                        canAccess &&
                         <>
                           <Col
                             xs={24}
