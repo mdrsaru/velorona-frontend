@@ -382,15 +382,20 @@ const Invoice = () => {
 
   const menu = (invoice: IInvoice) => (
     <Menu>
+      {
+        invoice?.status !== InvoiceStatus.Received && (
+          <>
+            <Menu.Item
+              key="Pending"
+              onClick={() => changeStatus(invoice.id, InvoiceStatus.Pending)}
+            >
+              Pending
+            </Menu.Item>
 
-      <Menu.Item
-        key="Pending"
-        onClick={() => changeStatus(invoice.id, InvoiceStatus.Pending)}
-      >
-        Pending
-      </Menu.Item>
-
-      <Menu.Divider />
+            <Menu.Divider />
+          </>
+        )
+      }
 
       <Menu.Item
         key="Received"
@@ -399,16 +404,18 @@ const Invoice = () => {
         Received
       </Menu.Item>
 
-      <Menu.Divider />
-
       {
         invoice.status === InvoiceStatus.Pending && (
-          <Menu.Item
-            key="Sent"
-            onClick={() => changeStatus(invoice.id, InvoiceStatus.Sent)}
-          >
-            Sent
-          </Menu.Item>
+          <>
+            <Menu.Divider />
+
+            <Menu.Item
+              key="Sent"
+              onClick={() => changeStatus(invoice.id, InvoiceStatus.Sent)}
+            >
+              Sent
+            </Menu.Item>
+          </>
         )
       }
     </Menu>
