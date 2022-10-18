@@ -178,7 +178,7 @@ const AttachNewTimesheetModal = (props: IProps) => {
             <div className={styles["modal-body"]}>
                 <div className={styles['title-div']}>
                     <span className={styles["title"]}>
-                        Attach Expense
+                        Attachment
                     </span>
                 </div>
 
@@ -194,20 +194,20 @@ const AttachNewTimesheetModal = (props: IProps) => {
                             md={24}
                             lg={24}>
                             <Form.Item
-                                label="Expense Type"
+                                label="Attachment Type"
                                 name="type"
                                 rules={[{
                                     required: true,
-                                    message: 'Please enter expense type'
+                                    message: 'Please enter attachment type'
                                 }]}                                >
-                              <Select placeholder='Select expense type' onChange={handleTypeChange}>
+                              <Select placeholder='Select attachment type' onChange={handleTypeChange}>
 								{attachment_type.map((type,index)=>(
 									<Option value={type.value} key={index}>{type.name}</Option>
 								))}
 							  </Select>
                             </Form.Item>
                         </Col>
-					{type === AttachmentType.Attachment && (
+					{type === AttachmentType.Expense && (
 						<>
 							<Col
                             xs={24}

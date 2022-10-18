@@ -126,8 +126,8 @@ export const attachment_type = [{
   name: 'Timesheet'
 },
 {
-  value: 'Attachment',
-  name: 'Attachment'
+  value: 'Expense',
+  name: 'Expense'
 },
 {
   value: 'Others',

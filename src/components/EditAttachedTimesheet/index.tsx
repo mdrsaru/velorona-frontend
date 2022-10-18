@@ -15,9 +15,9 @@ interface IProps {
     visibility: boolean;
     setVisibility: any;
     data?: any;
-	fileData:any;
-	setFile:any;
-	refetch:any;
+    fileData:any;
+    setFile:any;
+    refetch:any;
 }
 
 
@@ -45,8 +45,8 @@ const {Option} = Select;
 const EditAttachedTimesheet = (props: IProps) => {
     const authData = authVar()
     const [form] = Form.useForm();
-	const attachedTimesheet = props?.data;
-	const [option,setOption] = useState('')
+    const attachedTimesheet = props?.data;
+    const [option,setOption] = useState('')
 
     const [attachedTimesheetUpdate] = useMutation<GraphQLResponse<'AttachedTimesheetUpdate', AttachedTimesheet>, MutationAttachedTimesheetUpdateArgs>(ATTACH_TIMESHEET_UPDATE, {
 
@@ -55,7 +55,7 @@ const EditAttachedTimesheet = (props: IProps) => {
                 content: `Attachment updated successfully!`,
                 className: "custom-message",
             });
-           props?.refetch({
+            props?.refetch({
                 variables: {
                     input: {
                         query: {
@@ -102,12 +102,12 @@ const EditAttachedTimesheet = (props: IProps) => {
             id: props?.data?.id,
             company_id: authData?.company?.id,
             description: values?.description,
-			type: values?.type,
+            type: values?.type,
             date: values?.date,
         }
-		if(values?.amount){
-			data.amount= values?.amount
-		}
+        if(values?.amount){
+            data.amount= values?.amount
+        }
         if (props.fileData?.id) {
             data.attachment_id = props.fileData?.id
         }
@@ -130,24 +130,24 @@ const EditAttachedTimesheet = (props: IProps) => {
         return e && e.fileList;
     };
 
-	const handleTypeChange = (value:any) =>{
-		setOption(value)
-	}
-	let defaultValues:any = useMemo(() => {}, []);
-	 defaultValues = {
-			description: attachedTimesheet?.description ?? '',
-			file: attachedTimesheet?.attachments?.url ?? '',
-			type:attachedTimesheet?.type ?? '',
-			amount:attachedTimesheet?.amount ?? '',
-			date: moment(
-				attachedTimesheet?.date ?? "2022-01-01T00:00:00.410Z",
-				dateFormat
-			  ), 
-		}
+    const handleTypeChange = (value:any) =>{
+        setOption(value)
+    }
+    let defaultValues:any = useMemo(() => {}, []);
+    defaultValues = {
+        description: attachedTimesheet?.description ?? '',
+        file: attachedTimesheet?.attachments?.url ?? '',
+        type:attachedTimesheet?.type ?? '',
+        amount:attachedTimesheet?.amount ?? '',
+        date: moment(
+            attachedTimesheet?.date ?? "2022-01-01T00:00:00.410Z",
+            dateFormat
+        ),
+    }
 
-	useEffect(() => {
-		form.setFieldsValue(defaultValues)
-	   }, [form, defaultValues])
+    useEffect(() => {
+        form.setFieldsValue(defaultValues)
+    }, [form, defaultValues])
 
     return (
         <Modal
@@ -178,7 +178,7 @@ const EditAttachedTimesheet = (props: IProps) => {
                     initialValues={defaultValues}
                 >
                     <Row gutter={[24, 0]}>
-					<Col
+                        <Col
                             xs={24}
                             sm={24}
                             md={24}
@@ -190,44 +190,44 @@ const EditAttachedTimesheet = (props: IProps) => {
                                     required: true,
                                     message: 'Please enter attachment type'
                                 }]}                                >
-                              <Select placeholder='Select attachment type' onChange={handleTypeChange}>
-								{attachment_type.map((type,index)=>(
-									<Option value={type.value} key={index}>{type.name}</Option>
-								))}
-							  </Select>
+                                <Select placeholder='Select attachment type' onChange={handleTypeChange}>
+                                    {attachment_type.map((type,index)=>(
+                                        <Option value={type.value} key={index}>{type.name}</Option>
+                                    ))}
+                                </Select>
                             </Form.Item>
                         </Col>
-					{(attachedTimesheet?.type === AttachmentType.Attachment || option === AttachmentType.Attachment) && (
-						<>
-							<Col
-                            xs={24}
-                            sm={24}
-                            md={12}
-                            lg={12}>
-                            <Form.Item
-                                label="Amount"
-                                name="amount"
-                            >
-                                <InputNumber
-									type='number'
-                                    placeholder="Enter amount"
-                                    autoComplete="off"
-                                    style={{ width: '100%' }} />
-                            </Form.Item>
-                        </Col>
-						<Col
-                            xs={24}
-                            sm={24}
-                            md={12}
-                            lg={12}>
-                            <Form.Item
-                                label="Date"
-                                name="date" >
-                                <DatePicker placeholder="Please select date"/>
-                            </Form.Item>
-                        </Col>
-					</>
-					)}
+                        {(attachedTimesheet?.type === AttachmentType.Expense || option === AttachmentType.Expense) && (
+                            <>
+                                <Col
+                                    xs={24}
+                                    sm={24}
+                                    md={12}
+                                    lg={12}>
+                                    <Form.Item
+                                        label="Amount"
+                                        name="amount"
+                                    >
+                                        <InputNumber
+                                            type='number'
+                                            placeholder="Enter amount"
+                                            autoComplete="off"
+                                            style={{ width: '100%' }} />
+                                    </Form.Item>
+                                </Col>
+                                <Col
+                                    xs={24}
+                                    sm={24}
+                                    md={12}
+                                    lg={12}>
+                                    <Form.Item
+                                        label="Date"
+                                        name="date" >
+                                        <DatePicker placeholder="Please select date"/>
+                                    </Form.Item>
+                                </Col>
+                            </>
+                        )}
                         <Col
                             xs={24}
                             sm={24}

@@ -17,6 +17,7 @@ import deleteImg from '../../assets/images/delete_btn.svg';
 import DeleteBody from "../../components/Delete";
 import { GraphQLResponse } from "../../interfaces/graphql.interface";
 import { notifyGraphqlError } from "../../utils/error";
+import { getTimeFormat } from "../Timesheet";
 
 export const WORKSCHEDULE = gql`
 query Workschedule($input: WorkscheduleQueryInput!) {
@@ -139,15 +140,15 @@ const Schedule = () => {
       title: "Payroll Allocated Hours",
       dataIndex: "payrollAllocatedHours",
       render: (payroll: any) => {
-        const hour = (payroll / 3600).toFixed(2)
+        const hour = getTimeFormat(payroll ?? 0)
         return hour
       }
     },
     {
       title: "Payroll Usage Hours",
       dataIndex: "payrollUsageHours",
-      render: (payrollUsage: number) => {
-        const hour = ((payrollUsage ?? 0) / 3600).toFixed(2)
+      render: (payrollUsage: any) => {
+        const hour =   getTimeFormat(payrollUsage ?? 0)
         return hour
       }
     },

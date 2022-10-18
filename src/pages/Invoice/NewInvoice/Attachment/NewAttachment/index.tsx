@@ -134,7 +134,7 @@ const NewAttachment = (props: IProps) => {
           </Col>
 
           {
-            type === AttachmentType.Attachment && (
+            type === AttachmentType.Expense && (
               <>
                 <Col xs={24} sm={24} md={12} lg={12}>
                   <Form.Item

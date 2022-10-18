@@ -76,7 +76,7 @@ const AttachmentModal = (props: IProps) => {
        <div >
        <div className={styles['title-div']}>
             <span className={styles["title"]}>
-              Attachments
+              Attachment
             </span>
           </div>
       <Table

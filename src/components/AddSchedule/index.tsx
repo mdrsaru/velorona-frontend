@@ -81,7 +81,7 @@ const AddSchedule = (props: IProps) => {
           startDate: values?.startDate,
           endDate: values?.endDate,
           company_id: loggedInUser?.company?.id as string,
-          status: values?.status,
+          status: 'Open',
         }
       }
     })
@@ -93,12 +93,14 @@ const AddSchedule = (props: IProps) => {
 
   function disabledStartDate(value: any) {
     return (
+      value.isBefore(moment().subtract(1, "day")) ||
       value.format("YYYY-MM-DD") !==
       moment(value).startOf("isoWeek").format("YYYY-MM-DD")
     );
   }
   function disabledEndDate(value: any) {
-    const enabledDays = value.format("YYYY-MM-DD") !==
+    const enabledDays = value?.isBefore(moment().subtract(1, "day")) ||
+      value.format("YYYY-MM-DD") !==
       moment(value).endOf("isoWeek").format("YYYY-MM-DD")
 
     return (enabledDays);
@@ -135,18 +137,6 @@ const AddSchedule = (props: IProps) => {
               lg={24}>
               <Form.Item label='Select end date' name='endDate'>
                 <DatePicker placeholder='Select end date' disabledDate={disabledEndDate} />
-              </Form.Item>
-            </Col>
-            <Col
-              xs={24}
-              sm={24}
-              md={24}
-              lg={24}>
-              <Form.Item label='Enter status' name='status'>
-                <Select placeholder='Select status'>
-                  <Select.Option value='Open'>Open</Select.Option>
-                  <Select.Option value='Closed'>Closed</Select.Option>
-                </Select>
               </Form.Item>
             </Col>
           </Row>
