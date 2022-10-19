@@ -225,15 +225,11 @@ const EditEmployee = () => {
         user?.address?.country ?? "",
       streetAddress:
         user?.address?.streetAddress ?? "",
-      startDate: moment(
-        user?.startDate ?? "2022-01-01T00:00:00.410Z",
+      startDate: user?.startDate  && moment(
+        user?.startDate,
         dateFormat
       ),
-      endDate: moment(
-        user?.endDate ??
-        "2022-12-30T00:00:00.410Z",
-        dateFormat
-      ),
+      endDate: user?.endDate && moment(user?.endDate ,dateFormat),
       entryType: user?.entryType,
       timesheet_attachment: user?.timesheet_attachment ? 'Mandatory' : 'Optional',
       state: user?.address?.state ?? "",
