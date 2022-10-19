@@ -50,6 +50,7 @@ export const ATTACHED_TIMESHEET_DELETE = gql`
 interface IProps {
   timesheet_id: string;
   isEmployee: boolean; 
+  isSubmitted: boolean;
 }
 
 const Attachments = (props: IProps) => {
@@ -240,14 +241,13 @@ const Attachments = (props: IProps) => {
         pagination={false}
       />
       {
-        props.isEmployee &&
-        <>
+        props.isEmployee && (
           <p className={styles['attach-new-timesheet']} onClick={attachNewTimesheet}>
             <PlusCircleFilled />
             <span style={{ marginLeft: '1rem' }}> Add New Expense
             </span>
           </p>
-        </>
+        )
       }
 
       <AttachNewTimesheetModal
