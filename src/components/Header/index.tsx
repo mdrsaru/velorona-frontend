@@ -19,6 +19,7 @@ import { RoleName } from '../../interfaces/generated';
 import CheckInCheckOut from './CheckInCheckOut';
 
 import styles from './style.module.scss';
+import { useParams } from 'react-router-dom';
 
 const { Header } = Layout;
 
@@ -34,6 +35,7 @@ const TopHeader = (props: any) => {
   const navigate = useNavigate();
   const { data: authData } = useQuery(AUTH)
   const loggedInUser = authData?.AuthUser;
+  const params = useParams()
 
   /* Uncomment it to make sidebar toggle
   const { data: sidebarData } = useQuery(SIDEBAR);
@@ -129,11 +131,11 @@ const TopHeader = (props: any) => {
             marginLeft: 10
           }} />
         <div>
-          {isSuperAdmin ?
-            <img
-              src={logoContent}
-              alt="logo"
-            />
+          {isSuperAdmin && !params.id ?
+                <img
+                  src={logoContent}
+                  alt="logo"
+                />
             :
             <>
               {authData?.AuthUser?.company?.logo?.url ?

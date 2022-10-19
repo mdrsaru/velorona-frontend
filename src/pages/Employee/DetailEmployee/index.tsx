@@ -129,9 +129,9 @@ const DetailEmployee = () => {
         query: {
           user_id: params?.eid,
         },
-		paging:{
-			order: ['updatedAt:DESC']
-		}
+        paging:{
+          order: ['updatedAt:DESC']
+        }
       },
     },
   });
@@ -310,31 +310,31 @@ const DetailEmployee = () => {
             </Col>
 
 
-			{
+            {
               userData?.User?.data[0]?.roles?.[0].name === RoleName.Employee &&
-		  <>
-		   <Col xs={24} sm={24} md={12} lg={8}>
+              <>
+                <Col xs={24} sm={24} md={12} lg={8}>
 
-              <div>
-                <div>Entry Type</div>
-                <span className={styles.detailValue}>
-                  {userData?.User?.data[0]?.entryType ?? 'N/A'}
-                </span>
-              </div>
+                  <div>
+                    <div>Entry Type</div>
+                    <span className={styles.detailValue}>
+                      {userData?.User?.data[0]?.entryType ?? 'N/A'}
+                    </span>
+                  </div>
 
-            </Col>
-            <Col xs={24} sm={24} md={12} lg={8}>
+                </Col>
+                <Col xs={24} sm={24} md={12} lg={8}>
 
-              <div>
-                <div>Timesheet Attachment Type</div>
-                <span className={styles.detailValue}>
-                  {userData?.User?.data[0]?.timesheet_attachment ? 'Mandatory' : 'Optional'}
-                </span>
-              </div>
+                  <div>
+                    <div>Timesheet Attachment Type</div>
+                    <span className={styles.detailValue}>
+                      {userData?.User?.data[0]?.timesheet_attachment ? 'Mandatory' : 'Optional'}
+                    </span>
+                  </div>
 
-            </Col>
-			</>
-			}
+                </Col>
+              </>
+            }
             <Col xs={24} sm={24} md={24} lg={24}>
               <div className={styles['header-div']}>Employment Status</div>
             </Col>
@@ -350,33 +350,33 @@ const DetailEmployee = () => {
               </div>
 
             </Col>
-			{
+            {
               userData?.User?.data[0]?.roles?.[0].name === RoleName.Employee &&
-		  <>
-		  <Col xs={24} sm={24} md={12} lg={12}>
-              <div>
-                <div>Employee Start Date</div>
-                <span className={styles.detailValue}>
-                  {userData?.User?.data[0]?.startDate ? moment(userData?.User?.data[0]?.startDate).format('L') : 'N/A'}
-                </span>
-              </div>
-            </Col>
-            <Col xs={24} sm={24} md={12} lg={12}>
-              <div>
-                <div>Employee End Date</div>
-                <span className={styles.detailValue}>
-                  {userData?.User?.data[0]?.startDate ? moment(userData?.User?.data[0]?.startDate).format('L') : 'N/A'}
-                </span>
-              </div>
-            </Col>
-            <Col xs={24} sm={24} md={24} lg={12}>
-              <p
-                className={styles["view-pay-rate"]}
-                onClick={handleViewPayRate}
-              >
-                View Payrate
-              </p>
-            </Col>
+              <>
+                <Col xs={24} sm={24} md={12} lg={12}>
+                  <div>
+                    <div>Employee Start Date</div>
+                    <span className={styles.detailValue}>
+                      {userData?.User?.data[0]?.startDate ? moment(userData?.User?.data[0]?.startDate).format('L') : 'N/A'}
+                    </span>
+                  </div>
+                </Col>
+                <Col xs={24} sm={24} md={12} lg={12}>
+                  <div>
+                    <div>Employee End Date</div>
+                    <span className={styles.detailValue}>
+                      {userData?.User?.data[0]?.endDate ? moment(userData?.User?.data[0]?.endDate).format('L') : 'N/A'}
+                    </span>
+                  </div>
+                </Col>
+                <Col xs={24} sm={24} md={24} lg={12}>
+                  <p
+                    className={styles["view-pay-rate"]}
+                    onClick={handleViewPayRate}
+                  >
+                    View Payrate
+                  </p>
+                </Col>
                 {userClientData?.UserClient?.data.length ?
                   <>
                     <Col xs={24} sm={24} md={24} lg={24}>
