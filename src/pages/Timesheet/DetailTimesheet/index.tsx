@@ -423,7 +423,7 @@ const DetailTimesheet = (props: any) => {
                           }
                         >
                           <div>
-                            Unapproved Timesheet
+                            Pending Timecard
                           </div>
 
                           {
