@@ -629,6 +629,7 @@ const DetailTimesheet = (props: any) => {
                   <Attachments
                     isEmployee={isEmployee}
                     timesheet_id={timesheet_id}
+                    isSubmitted={timesheet?.isSubmitted}
                   />
                 </Panel>
               </Collapse>
