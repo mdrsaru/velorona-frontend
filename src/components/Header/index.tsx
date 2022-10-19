@@ -99,7 +99,7 @@ const TopHeader = (props: any) => {
   const isCompanyAdmin = useMemo(() => {
     return checkRoles({
       userRoles: loggedInUser?.user?.roles ?? [],
-      expectedRoles: [RoleName.CompanyAdmin],
+      expectedRoles: [RoleName.CompanyAdmin,RoleName.SuperAdmin],
     })
   }, [loggedInUser?.user?.roles])
 
