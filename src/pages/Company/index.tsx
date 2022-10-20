@@ -3,7 +3,7 @@ import { debounce } from 'lodash';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useQuery, gql, useMutation } from '@apollo/client';
-import { MoreOutlined,SearchOutlined, SendOutlined, FormOutlined, UserOutlined } from '@ant-design/icons';
+import { MoreOutlined,SearchOutlined, SendOutlined, FormOutlined, UserOutlined, FileExcelOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import { Card, Row, Col, Table, Menu, Dropdown, Form, Select, Button, Input, Popconfirm, message } from 'antd';
 
 import routes from '../../config/routes';
@@ -171,10 +171,17 @@ const Company = () => {
   });
 
 
-  const [updateCompany] = useMutation<
+  const [updateCompany, { loading: updatingCompany }] = useMutation<
   GraphQLResponse<'CompanyUpdate', ICompany>,
     MutationCompanyUpdateArgs
-  >(COMPANY_UPDATE)
+  >(COMPANY_UPDATE, {
+    onCompleted: (response) => {
+      if(response?.CompanyUpdate) {
+        message.success('Status updated successfully.')
+      }
+    },
+    onError: notifyGraphqlError,
+  })
 
   const [visibility, setVisibility] = useState(false);
   const [showArchive, setArchiveModal] = useState(false);
@@ -188,7 +195,7 @@ const Company = () => {
   >(COMPANY_RESEND, {
     onCompleted(response) {
       if(response?.CompanyResendInvitation) {
-        message.info(response.CompanyResendInvitation)
+        message.success(response.CompanyResendInvitation)
       }
     },
     onError: notifyGraphqlError,
@@ -296,22 +303,26 @@ const Company = () => {
     return (
       <Menu>
         <Menu.Item key="active"
-          onClick={() => {
-            if (data?.status === 'Inactive') {
-              changeStatus('Active', data?.id)
-            }
-          }}>
+          onClick={() => changeStatus('Active', data?.id) }>
           Active
         </Menu.Item>
+
         <Menu.Divider />
+
         <Menu.Item
           key="inactive"
-          onClick={() => {
-            if (data?.status === 'Active') {
-              changeStatus('Inactive', data?.id)
-            }
-          }}>
+          onClick={() => changeStatus('Inactive', data?.id)}
+        >
           Inactive
+        </Menu.Item>
+
+        <Menu.Divider />
+
+        <Menu.Item
+          key="unapproved"
+          onClick={() => changeStatus('Unapproved', data?.id)}
+        >
+          Unapproved
         </Menu.Item>
       </Menu>
     )
@@ -356,6 +367,22 @@ const Company = () => {
             </Link>
           </span>
 
+          <span className={styles['status-icon']} title="Change status">
+            <Dropdown
+              trigger={['click']}
+              overlay={statusMenu(record)}
+              placement="bottomRight"
+            >
+              {
+                record.status === 'Active'   
+                  ? <CheckCircleOutlined style={{ color: 'var(--primary-green)' }} />
+                  : record.status === 'Inactive'
+                  ? <CloseCircleOutlined  style={{ color: 'var(--primary-red)' }} />
+                  : <FileExcelOutlined style={{ color: 'var(--primary-orange)' }} />
+              }
+            </Dropdown>
+          </span>
+
           <span className={styles['status-icon']} title="Resend invitation">
             <Popconfirm
               placement="topLeft"
@@ -366,16 +393,6 @@ const Company = () => {
             >
               <SendOutlined />
             </Popconfirm>
-          </span>
-
-          <span className={styles['status-icon']} title="Change status">
-            <Dropdown
-              trigger={['click']}
-              overlay={statusMenu(record)}
-              placement="bottomRight"
-            >
-              <SendOutlined />
-            </Dropdown>
           </span>
         </div>
     },
@@ -454,7 +471,7 @@ const Company = () => {
         <Row className='container-row'>
           <Col span={24}>
             <Table
-              loading={dataLoading || resendingEmail}
+              loading={dataLoading || resendingEmail || updatingCompany}
               dataSource={companyData?.Company?.data}
               columns={columns}
               rowKey={(record => record?.id)}
