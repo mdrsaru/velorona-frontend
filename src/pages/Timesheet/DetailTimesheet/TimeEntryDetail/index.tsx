@@ -195,7 +195,7 @@ const TimeEntryDetails = (props: IProps) => {
                           key={timeIndex}
                         >
                           {
-                            (['Approved', 'Rejected'].includes(props.status) || canApproveReject || props.isTimesheetSubmitted || authData?.user?.roles.includes(constants.roles.BookKeeper) ||  authData?.user?.entryType === 'CICO') ? (
+                            (['Approved', 'Rejected'].includes(props.status) || canApproveReject || props.isTimesheetSubmitted || authData?.user?.roles.includes(constants.roles.BookKeeper)) ? (
                               <div className={styles['entry-duration']}>
                                 { entries ? getTimeFormat(duration) : '-' }
                               </div>
