@@ -1,5 +1,4 @@
-import { Space, Row, Col, Card } from "antd";
-import PolicyList from "../../../components/PolicyList";
+import { Space, Card } from "antd";
 import PolicyCard from "../../../components/PolicyCard";
 
 import styles from './styles.module.scss'
@@ -10,23 +9,6 @@ const PrivacyPolicy = () => {
 		lastUpdated: "July 18, 2022",
 	};
 
-	const policyList = [
-		{
-			title: "Introduction",
-			description:
-				"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Bibendum proin lobortis mauris, dictum sit. Cursus eu, augue nibh vitae sed volutpat tempus, orci, elit. Montes, magna proin congue netus commodo mollis egestas libero. Velit rhoncus malesuada eget amet, ultrices non aliquam vitae. Neque diam scelerisque cras nunc. Porta dictum lectus donec in purus, eget nisi sollicitudin est. Auctor id dignissim ipsum sed. Purus, tellus ac non, vestibulum. Faucibus in adipiscing tempus adipiscing lorem. Phasellus tincidunt quis a, semper bibendum lectus amet sapien augue. Hac cursus quam vivamus nibh quis diam a. Elit duis ultrices nibh vestibulum faucibus ullamcorper. Blandit fermentum ultrices sagittis ipsum adipiscing id tempus. Tincidunt fermentum adipiscing sem scelerisque tincidunt. A tellus eget nam nisi varius. Sit at auctor cursus interdum nunc. Consectetur interdum netus turpis semper non. Dolor pretium sit platea dui tincidunt eu morbi. Molestie vitae mauris pulvinar odio ac. Sollicitudin amet ullamcorper mi ac bibendum. Mattis in sit eu non ullamcorper duis purus pharetra ac. Id elit, diam a laoreet. Tempor nec in nulla sed purus enim montes, amet. Nisl, dictum elementum rhoncus pellentesque amet neque. Metus, pulvinar bibendum augue aliquet vestibulum tellus nulla diam est. At arcu in cras cras egestas. Convallis quam nisl tempus nulla malesuada non eleifend aenean lacinia. Senectus congue cursus cras mattis enim. Nulla in sed blandit non platea tempor eget. Et, ut augue platea senectus iaculis elementum. Etiam amet sagittis, dui facilisis ipsum. Pellentesque lectus urna tincidunt molestie elit. Diam tortor et congue scelerisque. Maecenas risus in fermentum varius iaculis elit. Placerat at semper diam egestas a suspendisse habitasse. Dictum adipiscing neque felis risus tempor, leo, ipsum.    Dolor consectetur laoreet amet ultricies pulvinar viverra. Nibh commodo tellus massa feugiat interdum vestibulum a ante urna. Est quam massa massa elementum, justo vitae felis, est nunc. Cras egestas enim enim mauris turpis. Cras lacus, massa cras est, feugiat nulla arcu. Faucibus lectus congue aliquam sed. Vitae fermentum porttitor nunc lectus congue. Dapibus consectetur ac scelerisque ultricies. Sapien mi proin porttitor commodo praesent. Vestibulum, interdum bibendum mi velit adipiscing tincidunt amet nibh. Sed placerat nullam non ornare. Eget consectetur habitasse sem quis est. Nibh faucibus vitae et ipsum cursus molestie neque, eget lectus.    Orci lorem porta ultrices malesuada id viverra volutpat urna. Commodo fermentum, pretium urna, ultricies varius et odio id ante. Fermentum ut lacus velit eu amet nam morbi auctor auctor. Eleifend dolor, congue consectetur turpis scelerisque mauris vitae at. Sollicitudin vestibulum nibh urna facilisis elit. Ac eget convallis cras eget eu, morbi mauris praesent pulvinar.",
-		},
-		{
-			title: "Managing Your Information",
-			description:
-				"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Bibendum proin lobortis mauris, dictum sit. Cursus eu, augue nibh vitae sed volutpat tempus, orci, elit. Montes, magna proin congue netus commodo mollis egestas libero. Velit rhoncus malesuada eget amet, ultrices non aliquam vitae. Neque diam scelerisque cras nunc. Porta dictum lectus donec in purus, eget nisi sollicitudin est. Auctor id dignissim ipsum sed. Purus, tellus ac non, vestibulum. Faucibus in adipiscing tempus adipiscing lorem. Phasellus tincidunt quis a, semper bibendum lectus amet sapien augue. Hac cursus quam vivamus nibh quis diam a. Elit duis ultrices nibh vestibulum faucibus ullamcorper. Blandit fermentum ultrices sagittis ipsum adipiscing id tempus. Tincidunt fermentum adipiscing sem scelerisque tincidunt. A tellus eget nam nisi varius. Sit at auctor cursus interdum nunc. Consectetur interdum netus turpis semper non. Dolor pretium sit platea dui tincidunt eu morbi. Molestie vitae mauris pulvinar odio ac. Sollicitudin amet ullamcorper mi ac bibendum. Mattis in sit eu non ullamcorper duis purus pharetra ac. Id elit, diam a laoreet. Tempor nec in nulla sed purus enim montes, amet. Nisl, dictum elementum rhoncus pellentesque amet neque. Metus, pulvinar bibendum augue aliquet vestibulum tellus nulla diam est. At arcu in cras cras egestas. Convallis quam nisl tempus nulla malesuada non eleifend aenean lacinia. Senectus congue cursus cras mattis enim. Nulla in sed blandit non platea tempor eget. Et, ut augue platea senectus iaculis elementum. Etiam amet sagittis, dui facilisis ipsum. Pellentesque lectus urna tincidunt molestie elit. Diam tortor et congue scelerisque. Maecenas risus in fermentum varius iaculis elit. Placerat at semper diam egestas a suspendisse habitasse. Dictum adipiscing neque felis risus tempor, leo, ipsum.    Dolor consectetur laoreet amet ultricies pulvinar viverra. Nibh commodo tellus massa feugiat interdum vestibulum a ante urna. Est quam massa massa elementum, justo vitae felis, est nunc. Cras egestas enim enim mauris turpis. Cras lacus, massa cras est, feugiat nulla arcu. Faucibus lectus congue aliquam sed. Vitae fermentum porttitor nunc lectus congue. Dapibus consectetur ac scelerisque ultricies. Sapien mi proin porttitor commodo praesent. Vestibulum, interdum bibendum mi velit adipiscing tincidunt amet nibh. Sed placerat nullam non ornare. Eget consectetur habitasse sem quis est. Nibh faucibus vitae et ipsum cursus molestie neque, eget lectus.    Orci lorem porta ultrices malesuada id viverra volutpat urna. Commodo fermentum, pretium urna, ultricies varius et odio id ante. Fermentum ut lacus velit eu amet nam morbi auctor auctor. Eleifend dolor, congue consectetur turpis scelerisque mauris vitae at. Sollicitudin vestibulum nibh urna facilisis elit. Ac eget convallis cras eget eu, morbi mauris praesent pulvinar.",
-		},
-		{
-			title: "Security",
-			description:
-				"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Bibendum proin lobortis mauris, dictum sit. Cursus eu, augue nibh vitae sed volutpat tempus, orci, elit. Montes, magna proin congue netus commodo mollis egestas libero. Velit rhoncus malesuada eget amet, ultrices non aliquam vitae. Neque diam scelerisque cras nunc. Porta dictum lectus donec in purus, eget nisi sollicitudin est. Auctor id dignissim ipsum sed. Purus, tellus ac non, vestibulum. Faucibus in adipiscing tempus adipiscing lorem. Phasellus tincidunt quis a, semper bibendum lectus amet sapien augue. Hac cursus quam vivamus nibh quis diam a. Elit duis ultrices nibh vestibulum faucibus ullamcorper. Blandit fermentum ultrices sagittis ipsum adipiscing id tempus. Tincidunt fermentum adipiscing sem scelerisque tincidunt. A tellus eget nam nisi varius. Sit at auctor cursus interdum nunc. Consectetur interdum netus turpis semper non. Dolor pretium sit platea dui tincidunt eu morbi. Molestie vitae mauris pulvinar odio ac. Sollicitudin amet ullamcorper mi ac bibendum. Mattis in sit eu non ullamcorper duis purus pharetra ac. Id elit, diam a laoreet. Tempor nec in nulla sed purus enim montes, amet. Nisl, dictum elementum rhoncus pellentesque amet neque. Metus, pulvinar bibendum augue aliquet vestibulum tellus nulla diam est. At arcu in cras cras egestas. Convallis quam nisl tempus nulla malesuada non eleifend aenean lacinia. Senectus congue cursus cras mattis enim. Nulla in sed blandit non platea tempor eget. Et, ut augue platea senectus iaculis elementum. Etiam amet sagittis, dui facilisis ipsum. Pellentesque lectus urna tincidunt molestie elit. Diam tortor et congue scelerisque. Maecenas risus in fermentum varius iaculis elit. Placerat at semper diam egestas a suspendisse habitasse. Dictum adipiscing neque felis risus tempor, leo, ipsum.    Dolor consectetur laoreet amet ultricies pulvinar viverra. Nibh commodo tellus massa feugiat interdum vestibulum a ante urna. Est quam massa massa elementum, justo vitae felis, est nunc. Cras egestas enim enim mauris turpis. Cras lacus, massa cras est, feugiat nulla arcu. Faucibus lectus congue aliquam sed. Vitae fermentum porttitor nunc lectus congue. Dapibus consectetur ac scelerisque ultricies. Sapien mi proin porttitor commodo praesent. Vestibulum, interdum bibendum mi velit adipiscing tincidunt amet nibh. Sed placerat nullam non ornare. Eget consectetur habitasse sem quis est. Nibh faucibus vitae et ipsum cursus molestie neque, eget lectus.    Orci lorem porta ultrices malesuada id viverra volutpat urna. Commodo fermentum, pretium urna, ultricies varius et odio id ante. Fermentum ut lacus velit eu amet nam morbi auctor auctor. Eleifend dolor, congue consectetur turpis scelerisque mauris vitae at. Sollicitudin vestibulum nibh urna facilisis elit. Ac eget convallis cras eget eu, morbi mauris praesent pulvinar.",
-		},
-	];
 	return (
 		<Card className={styles['card-container']}>
 			<Space size={15} direction="vertical">
@@ -92,7 +74,7 @@ const PrivacyPolicy = () => {
 						<p><strong>Usage Data</strong> refers to data collected automatically, either generated by the use of the Service or from the Service infrastructure itself (for example, the duration of a page visit).</p>
 					</li>
 					<li>
-						<p><strong>Website</strong> refers to Velorona, accessible from <a href="www.velorona.com" rel="external nofollow noopener" target="_blank">www.velorona.com</a></p>
+						<p><strong>Website</strong> refers to Velorona, accessible from <a href="www.velorona.com" target="_blank" rel="noreferrer">www.velorona.com</a></p>
 					</li>
 					<li>
 						<p><strong>You</strong> means the individual accessing or using the Service, or the company, or other legal entity on behalf of which such individual is accessing or using the Service, as applicable.</p>
@@ -138,10 +120,10 @@ const PrivacyPolicy = () => {
 				<p>We use Cookies and similar tracking technologies to track the activity on Our Service and store certain information. Tracking technologies used are beacons, tags, and scripts to collect and track information and to improve and analyze Our Service. The technologies We use may include:</p>
 				<ul>
 					<li><strong>Cookies or Browser Cookies.</strong> A cookie is a small file placed on Your Device. You can instruct Your browser to refuse all Cookies or to indicate when a Cookie is being sent. However, if You do not accept Cookies, You may not be able to use some parts of our Service. Unless you have adjusted Your browser setting so that it will refuse Cookies, our Service may use Cookies.</li>
-					<li><strong>Flash Cookies.</strong> Certain features of our Service may use local stored objects (or Flash Cookies) to collect and store information about Your preferences or Your activity on our Service. Flash Cookies are not managed by the same browser settings as those used for Browser Cookies. For more information on how You can delete Flash Cookies, please read &quot;Where can I change the settings for disabling, or deleting local shared objects?&quot; available at <a href="https://helpx.adobe.com/flash-player/kb/disable-local-shared-objects-flash.html#main_Where_can_I_change_the_settings_for_disabling__or_deleting_local_shared_objects_" rel="external nofollow noopener" target="_blank">https://helpx.adobe.com/flash-player/kb/disable-local-shared-objects-flash.html#main_Where_can_I_change_the_settings_for_disabling__or_deleting_local_shared_objects_</a></li>
+					<li><strong>Flash Cookies.</strong> Certain features of our Service may use local stored objects (or Flash Cookies) to collect and store information about Your preferences or Your activity on our Service. Flash Cookies are not managed by the same browser settings as those used for Browser Cookies. For more information on how You can delete Flash Cookies, please read &quot;Where can I change the settings for disabling, or deleting local shared objects?&quot; available at <a href="https://helpx.adobe.com/flash-player/kb/disable-local-shared-objects-flash.html#main_Where_can_I_change_the_settings_for_disabling__or_deleting_local_shared_objects_" target="_blank" rel="noreferrer">https://helpx.adobe.com/flash-player/kb/disable-local-shared-objects-flash.html#main_Where_can_I_change_the_settings_for_disabling__or_deleting_local_shared_objects_</a></li>
 					<li><strong>Web Beacons.</strong> Certain sections of our Service and our emails may contain small electronic files known as web beacons (also referred to as clear gifs, pixel tags, and single-pixel gifs) that permit the Company, for example, to count users who have visited those pages or opened an email and for other related website statistics (for example, recording the popularity of a certain section and verifying system and server integrity).</li>
 				</ul>
-				<p>Cookies can be &quot;Persistent&quot; or &quot;Session&quot; Cookies. Persistent Cookies remain on Your personal computer or mobile device when You go offline, while Session Cookies are deleted as soon as You close Your web browser. Learn more about cookies on the <a href="https://www.privacypolicies.com/blog/privacy-policy-template/#Use_Of_Cookies_Log_Files_And_Tracking" target="_blank">Privacy Policies website</a> article.</p>
+				<p>Cookies can be &quot;Persistent&quot; or &quot;Session&quot; Cookies. Persistent Cookies remain on Your personal computer or mobile device when You go offline, while Session Cookies are deleted as soon as You close Your web browser. Learn more about cookies on the <a href="https://www.privacypolicies.com/blog/privacy-policy-template/#Use_Of_Cookies_Log_Files_And_Tracking" target="_blank" rel="noreferrer">Privacy Policies website</a> article.</p>
 				<p>We use both Session and Persistent Cookies for the purposes set out below:</p>
 				<ul>
 					<li>
@@ -245,8 +227,8 @@ const PrivacyPolicy = () => {
 						<p><strong>Google Analytics</strong></p>
 						<p>Google Analytics is a web analytics service offered by Google that tracks and reports website traffic. Google uses the data collected to track and monitor the use of our Service. This data is shared with other Google services. Google may use the collected data to contextualize and personalize the ads of its own advertising network.</p>
 						<p>You can opt-out of having made your activity on the Service available to Google Analytics by installing the Google Analytics opt-out browser add-on. The add-on prevents the Google Analytics JavaScript (ga.js, analytics.js and dc.js) from sharing information with Google Analytics about visits activity.</p>
-						<p>You may opt-out of certain Google Analytics features through your mobile device settings, such as your device advertising settings or by following the instructions provided by Google in their Privacy Policy: <a href="https://policies.google.com/privacy" rel="external nofollow noopener" target="_blank">https://policies.google.com/privacy</a></p>
-						<p>For more information on the privacy practices of Google, please visit the Google Privacy &amp; Terms web page: <a href="https://policies.google.com/privacy" rel="external nofollow noopener" target="_blank">https://policies.google.com/privacy</a></p>
+						<p>You may opt-out of certain Google Analytics features through your mobile device settings, such as your device advertising settings or by following the instructions provided by Google in their Privacy Policy: <a href="https://policies.google.com/privacy" target="_blank" rel="noreferrer">https://policies.google.com/privacy</a></p>
+						<p>For more information on the privacy practices of Google, please visit the Google Privacy &amp; Terms web page: <a href="https://policies.google.com/privacy" target="_blank" rel="noreferrer">https://policies.google.com/privacy</a></p>
 					</li>
 				</ul>
 				<h2>Advertising</h2>
@@ -255,31 +237,31 @@ const PrivacyPolicy = () => {
 					<li>
 						<p><strong>Google AdSense &amp; DoubleClick Cookie</strong></p>
 						<p>Google, as a third party vendor, uses cookies to serve ads on our Service. Google's use of the DoubleClick cookie enables it and its partners to serve ads to our users based on their visit to our Service or other websites on the Internet.</p>
-						<p>You may opt out of the use of the DoubleClick Cookie for interest-based advertising by visiting the Google Ads Settings web page: <a href="http://www.google.com/ads/preferences/" rel="external nofollow noopener" target="_blank">http://www.google.com/ads/preferences/</a></p>
+						<p>You may opt out of the use of the DoubleClick Cookie for interest-based advertising by visiting the Google Ads Settings web page: <a href="http://www.google.com/ads/preferences/" target="_blank" rel="noreferrer">http://www.google.com/ads/preferences/</a></p>
 					</li>
 					<li>
 						<p><strong>AdMob by Google</strong></p>
 						<p>AdMob by Google is provided by Google Inc.</p>
-						<p>You can opt-out from the AdMob by Google service by following the instructions described by Google: <a href="https://support.google.com/ads/answer/2662922?hl=en" rel="external nofollow noopener" target="_blank">https://support.google.com/ads/answer/2662922?hl=en</a></p>
-						<p>For more information on how Google uses the collected information, please visit the &quot;How Google uses data when you use our partners' sites or app&quot; page: <a href="https://policies.google.com/technologies/partner-sites" rel="external nofollow noopener" target="_blank">https://policies.google.com/technologies/partner-sites</a> or visit the Privacy Policy of Google: <a href="https://policies.google.com/privacy" rel="external nofollow noopener" target="_blank">https://policies.google.com/privacy</a></p>
+						<p>You can opt-out from the AdMob by Google service by following the instructions described by Google: <a href="https://support.google.com/ads/answer/2662922?hl=en" target="_blank" rel="noreferrer">https://support.google.com/ads/answer/2662922?hl=en</a></p>
+						<p>For more information on how Google uses the collected information, please visit the &quot;How Google uses data when you use our partners' sites or app&quot; page: <a href="https://policies.google.com/technologies/partner-sites" target="_blank" rel="noreferrer">https://policies.google.com/technologies/partner-sites</a> or visit the Privacy Policy of Google: <a href="https://policies.google.com/privacy" target="_blank" rel="noreferrer">https://policies.google.com/privacy</a></p>
 					</li>
 					<li>
 						<p><strong>Bing Ads</strong></p>
 						<p>Bing Ads is an advertising service provided by Microsoft Inc.</p>
-						<p>You can opt-out from Bing Ads by following the instructions on Bing Ads Opt-out page: <a href="https://advertise.bingads.microsoft.com/en-us/resources/policies/personalized-ads" rel="external nofollow noopener" target="_blank">https://advertise.bingads.microsoft.com/en-us/resources/policies/personalized-ads</a></p>
-						<p>For more information about Bing Ads, please visit their Privacy Policy: <a href="https://privacy.microsoft.com/en-us/PrivacyStatement" rel="external nofollow noopener" target="_blank">https://privacy.microsoft.com/en-us/PrivacyStatement</a></p>
+						<p>You can opt-out from Bing Ads by following the instructions on Bing Ads Opt-out page: <a href="https://advertise.bingads.microsoft.com/en-us/resources/policies/personalized-ads" target="_blank" rel="noreferrer">https://advertise.bingads.microsoft.com/en-us/resources/policies/personalized-ads</a></p>
+						<p>For more information about Bing Ads, please visit their Privacy Policy: <a href="https://privacy.microsoft.com/en-us/PrivacyStatement" target="_blank" rel="noreferrer">https://privacy.microsoft.com/en-us/PrivacyStatement</a></p>
 					</li>
 					<li>
 						<p><strong>Facebook</strong></p>
-						<p>Their Privacy Policy can be viewed at <a href="https://www.facebook.com/privacy/policy/?entry_point=data_policy_redirect&amp;entry=0" rel="external nofollow noopener" target="_blank">https://www.facebook.com/privacy/policy/?entry_point=data_policy_redirect&amp;entry=0</a></p>
+						<p>Their Privacy Policy can be viewed at <a href="https://www.facebook.com/privacy/policy/?entry_point=data_policy_redirect&amp;entry=0" target="_blank" rel="noreferrer">https://www.facebook.com/privacy/policy/?entry_point=data_policy_redirect&amp;entry=0</a></p>
 					</li>
 					<li>
 						<p><strong>LinkedIn</strong></p>
-						<p>Their Privacy Policy can be viewed at <a href="https://www.linkedin.com/legal/privacy-policy" rel="external nofollow noopener" target="_blank">https://www.linkedin.com/legal/privacy-policy</a></p>
+						<p>Their Privacy Policy can be viewed at <a href="https://www.linkedin.com/legal/privacy-policy" target="_blank" rel="noreferrer">https://www.linkedin.com/legal/privacy-policy</a></p>
 					</li>
 					<li>
 						<p><strong>Twitter</strong></p>
-						<p>Their Privacy Policy can be viewed at <a href="https://twitter.com/en/privacy" rel="external nofollow noopener" target="_blank">https://twitter.com/en/privacy</a></p>
+						<p>Their Privacy Policy can be viewed at <a href="https://twitter.com/en/privacy" target="_blank" rel="noreferrer">https://twitter.com/en/privacy</a></p>
 					</li>
 				</ul>
 				<h2>Email Marketing</h2>
@@ -289,7 +271,7 @@ const PrivacyPolicy = () => {
 					<li>
 						<p><strong>Mailchimp</strong></p>
 						<p>Mailchimp is an email marketing sending service provided by The Rocket Science Group LLC.</p>
-						<p>For more information on the privacy practices of Mailchimp, please visit their Privacy policy: <a href="https://mailchimp.com/legal/privacy/" rel="external nofollow noopener" target="_blank">https://mailchimp.com/legal/privacy/</a></p>
+						<p>For more information on the privacy practices of Mailchimp, please visit their Privacy policy: <a href="https://mailchimp.com/legal/privacy/" target="_blank" rel="noreferrer">https://mailchimp.com/legal/privacy/</a></p>
 					</li>
 				</ul>
 				<h2>Payments</h2>
@@ -298,7 +280,7 @@ const PrivacyPolicy = () => {
 				<ul>
 					<li>
 						<p><strong>Stripe</strong></p>
-						<p>Their Privacy Policy can be viewed at <a href="https://stripe.com/us/privacy" rel="external nofollow noopener" target="_blank">https://stripe.com/us/privacy</a></p>
+						<p>Their Privacy Policy can be viewed at <a href="https://stripe.com/us/privacy" target="_blank" rel="noreferrer">https://stripe.com/us/privacy</a></p>
 					</li>
 				</ul>
 				<h2>Usage, Performance and Miscellaneous</h2>
@@ -308,7 +290,7 @@ const PrivacyPolicy = () => {
 						<p><strong>Invisible reCAPTCHA</strong></p>
 						<p>We use an invisible captcha service named reCAPTCHA. reCAPTCHA is operated by Google.</p>
 						<p>The reCAPTCHA service may collect information from You and from Your Device for security purposes.</p>
-						<p>The information gathered by reCAPTCHA is held in accordance with the Privacy Policy of Google: <a href="https://www.google.com/intl/en/policies/privacy/" rel="external nofollow noopener" target="_blank">https://www.google.com/intl/en/policies/privacy/</a></p>
+						<p>The information gathered by reCAPTCHA is held in accordance with the Privacy Policy of Google: <a href="https://www.google.com/intl/en/policies/privacy/" target="_blank" rel="noreferrer">https://www.google.com/intl/en/policies/privacy/</a></p>
 					</li>
 				</ul>
 				<h1>GDPR Privacy</h1>
@@ -534,9 +516,9 @@ const PrivacyPolicy = () => {
 				<h3>Website</h3>
 				<p>You can opt out of receiving ads that are personalized as served by our Service Providers by following our instructions presented on the Service:</p>
 				<ul>
-					<li>The NAI's opt-out platform: <a href="http://www.networkadvertising.org/choices/" rel="external nofollow noopener" target="_blank">http://www.networkadvertising.org/choices/</a></li>
-					<li>The EDAA's opt-out platform <a href="http://www.youronlinechoices.com/" rel="external nofollow noopener" target="_blank">http://www.youronlinechoices.com/</a></li>
-					<li>The DAA's opt-out platform: <a href="http://optout.aboutads.info/?c=2&amp;lang=EN" rel="external nofollow noopener" target="_blank">http://optout.aboutads.info/?c=2&amp;lang=EN</a></li>
+					<li>The NAI's opt-out platform: <a href="http://www.networkadvertising.org/choices/" target="_blank" rel="noreferrer">http://www.networkadvertising.org/choices/</a></li>
+					<li>The EDAA's opt-out platform <a href="http://www.youronlinechoices.com/" target="_blank" rel="noreferrer">http://www.youronlinechoices.com/</a></li>
+					<li>The DAA's opt-out platform: <a href="http://optout.aboutads.info/?c=2&amp;lang=EN" target="_blank" rel="noreferrer">http://optout.aboutads.info/?c=2&amp;lang=EN</a></li>
 				</ul>
 				<p>The opt out will place a cookie on Your computer that is unique to the browser You use to opt out. If you change browsers or delete the cookies saved by your browser, You will need to opt out again.</p>
 				<h3>Mobile Devices</h3>
@@ -569,8 +551,8 @@ const PrivacyPolicy = () => {
 				<h1>Contact Us</h1>
 				<p>If you have any questions about this Privacy Policy, You can contact us:</p>
 				<ul>
-					<li>By email: <a href="/cdn-cgi/l/email-protection" className="__cf_email__" data-cfemail="365f5850597640535a59445958571855595b">[email&#160;protected]</a></li>
-				</ul><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+					<li>By email: <span className="__cf_email__" data-cfemail="365f5850597640535a59445958571855595b" >[email&#160;protected]</span></li>
+				</ul>
 			</Space>
 		</Card>
 	)
