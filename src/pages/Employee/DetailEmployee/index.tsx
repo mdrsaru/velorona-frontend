@@ -8,7 +8,7 @@ import {
   UploadProps,
   message,
   Upload,
-  Collapse,
+  Table,
 } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 
@@ -27,7 +27,7 @@ import constants from "../../../config/constants";
 import { CHANGE_PROFILE_IMAGE } from "../NewEmployee";
 import { notifyGraphqlError } from "../../../utils/error";
 import { GraphQLResponse, UserPayRatePagingData } from "../../../interfaces/graphql.interface";
-import { MutationChangeProfilePictureArgs, QueryUserArgs, QueryUserClientArgs, RoleName, User, UserClientPagingResult, UserPagingResult } from "../../../interfaces/generated";
+import { MutationChangeProfilePictureArgs, QueryUserArgs, QueryUserClientArgs, RoleName, User, UserClient,UserClientPagingResult, UserPagingResult } from "../../../interfaces/generated";
 import Loader from "../../../components/Loader";
 import moment from "moment";
 import Status from "../../../components/Status";
@@ -119,7 +119,7 @@ const DetailEmployee = () => {
     },
   });
 
-  const { data: userClientData } = useQuery<
+  const { data: userClientData, loading: userClientLoading } = useQuery<
     GraphQLResponse<'UserClient', UserClientPagingResult>,
     QueryUserClientArgs
   >(USERCLIENT, {
@@ -176,6 +176,27 @@ const DetailEmployee = () => {
     })
     setViewUserPayRateVisibility(!showViewUserPayRate);
   };
+
+  const columns = [
+    {
+      title: "Name",
+      key: "client.name",
+      width: '50%',
+      render: (userClient: UserClient) => {
+        return <>{userClient?.client?.name}</>
+      }
+
+    },
+    {
+      title: "Client Status",
+      key: "status",
+      dataIndex: 'status',
+      render: (status: string) => {
+        return <Status status={status} />
+      }
+    },
+  ]
+
   return (
     <div className={styles["main-div"]}>
       {userData?.User?.data[0] && (
@@ -384,29 +405,11 @@ const DetailEmployee = () => {
                     </Col>
 
                     <Col xs={24} sm={24} md={24} lg={24} style={{ marginBottom: '1rem' }}>
-                      {userClientData?.UserClient?.data?.map((userClient, index) => {
-                        return (
-                          <Collapse defaultActiveKey={index} key={index} style={{ border: 0 }}>
-                            <Collapse.Panel header={userClient?.client?.name} key={index}  >
-                              <Row>
-                                <Col xs={24} sm={24} md={12} lg={12}>
-                                  <div>Client Email Address</div>
-                                  <span className={styles.detailValue}>
-                                    {userClient?.client?.email}
-                                  </span>
-                                </Col>
-                                <Col xs={24} sm={24} md={12} lg={12}>
-                                  <div>Client Status</div>
-                                  <span className={`${styles.detailValue} ${styles.userClientStatus}`}>
-                                    <Status status={userClient?.status} />
-                                  </span>
-                                </Col>
-                              </Row>
-                            </Collapse.Panel>
-                          </Collapse>
-                        )
-                      })}
-
+                      <Table
+                        loading={userClientLoading}
+                        dataSource={userClientData?.UserClient?.data}
+                        columns={columns}
+                      />
                     </Col>
                   </>
                   :

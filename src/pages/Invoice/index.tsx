@@ -16,7 +16,7 @@ import {
 } from '@ant-design/icons';
 
 import { authVar } from '../../App/link';
-import constants, { invoice_status, plans, subscriptionStatus } from '../../config/constants';
+import constants, { invoice_status, subscriptionStatus } from '../../config/constants';
 import routes from '../../config/routes';
 import { notifyGraphqlError } from '../../utils/error';
 import {
@@ -170,7 +170,7 @@ const Invoice = () => {
     paging: {
       skip: pagingInput.skip,
       take: constants.paging.perPage,
-      order: ['issueDate:ASC'],
+      order: ['issueDate:DESC'],
     },
     query: {
       company_id,

@@ -14,11 +14,47 @@ import PageHeader from '../../../components/PageHeader';
 import filterImg from '../../../assets/images/filter.svg';
 import { notifyGraphqlError } from '../../../utils/error';
 
-const csvHeader: Array<{ label: string; key: string; subKey?: string }> = [
+const csvHeader: Array<{ label: string; key: string; subKey?: string; }> = [
   { label: 'Company Name', key: 'name' },
   { label: 'Status', key: 'status' },
+  { label: 'Admin Name', key: 'adminName' },
+  { label: 'Email', key: 'email' },
+  { label: 'Phone', key: 'phone' },
+  { label: 'Country', key: 'country' },
+  { label: 'State', key: 'state' },
+  { label: 'City', key: 'city' },
+  { label: 'Street Address', key: 'streetAddress' },
+  { label: 'Apartment', key: 'aptOrSuite' },
+  { label: 'Zip Code', key: 'zipcode' },
   { label: 'Created At', key: 'createdAt' },
 ];
+
+
+const tableBody = (companyData: any) => {
+  const tableRows = [];
+  let companies: any = companyData?.Company?.data;
+
+  for (const company of companies) {
+    const name = company?.name ?? '-';
+    const status = company?.status;
+    const adminName = (company?.admin?.fullName ?? '-');
+    const email = (company?.admin?.email ?? '-');
+    const phone = (company?.admin?.phone ?? '-');
+    const country = (company?.admin?.address?.country ?? '-');
+    const state = (company?.admin?.address?.streetAddress ?? '-');
+    const city = (company?.admin?.address?.city ?? '-');
+    const streetAddress = (company?.admin?.address?.streetAddress ?? '-');
+    const aptOrSuite = (company?.admin?.address?.aptOrSuite ?? '-');
+    const zipcode = (company?.admin?.address?.zipcode ?? '-');
+    const createdAt = company?.createdAt ?? '-';
+
+    tableRows.push({
+      name, status, phone, adminName, email, country,
+      state, city, streetAddress,aptOrSuite, zipcode,createdAt
+    });
+  }
+  return tableRows;
+};
 
 const { Option } = Select;
 const CompanyReport = () => {
@@ -31,7 +67,7 @@ const CompanyReport = () => {
     fetchPolicy: 'network-only',
     nextFetchPolicy: 'cache-only',
   });
-
+  
   const [fetchDownloadData] = useLazyQuery<
     GraphQLResponse<'Company', CompanyPagingResult>,
     QueryCompanyArgs
@@ -46,7 +82,7 @@ const CompanyReport = () => {
         },
       },
     },
-   onError:notifyGraphqlError
+    onError:notifyGraphqlError
   });
 
   const downloadReport = () => {
@@ -83,9 +119,10 @@ const CompanyReport = () => {
         input: input
       },
     })
-    .then((response) => {
-      downloadCSV(response?.data?.Company?.data, csvHeader, 'Company.csv');
-    })
+      .then((response) => {
+        const csvBody = tableBody(response?.data)
+        downloadCSV(csvBody, csvHeader, 'Company.csv');
+      })
   };
 
   const [filterProperty, setFilterProperty] = useState<any>({

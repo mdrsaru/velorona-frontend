@@ -193,6 +193,7 @@ const EmployeeDashboard = () => {
                         title={'Hours Tracked Per Week'}
                         caption={'Jan 2022'}
                         setDate = {setDate}
+                        employee={true}
                     />
                 </Col>
                 <Col xs={24} lg={12}>

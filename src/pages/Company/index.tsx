@@ -39,6 +39,25 @@ export const COMPANY = gql`
           name
           url
         }
+        admin{
+          id
+        email
+        phone
+        firstName
+        middleName
+        lastName
+        fullName
+        status
+        designation
+        address {
+          country
+          city
+          streetAddress
+          zipcode
+          state
+          aptOrSuite
+        }
+        }
       }
     }
   }

@@ -29,13 +29,15 @@ interface IProps {
   caption: string;
   title: string;
   setDate?: any;
+  employee?: boolean;
 }
 
 
 const { Option } = Select;
 
 const Index = (props: IProps) => {
-  const { averageHoursData,  title } = props;
+  const { averageHoursData, title, employee } = props;
+
   const options: ChartOptions<any> = {
     indexAxis: 'y' as const,
     scales: {
@@ -45,7 +47,7 @@ const Index = (props: IProps) => {
           display: false,
         },
         suggestedMin: 0,
-        suggestedMax: 1000,
+        suggestedMax : employee ? 120 : 1000,
       },
       y: {
         grid: {

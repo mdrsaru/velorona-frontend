@@ -11,7 +11,6 @@ import { USER_PAY_RATE } from "../ViewUserPayRate"
 import { GraphQLResponse } from "../../interfaces/graphql.interface"
 import styles from "./styles.module.scss"
 import { CURRENCY } from "../../pages/Currency"
-import { useState } from 'react';
 
 interface IProps {
   visibility: boolean;
@@ -218,7 +217,11 @@ const UserPayRateModal = (props: IProps) => {
               lg={24}>
               <Form.Item
                 label="Project Name"
-                name="project_id">
+                name="project_id"
+                rules={[{
+                  required: true,
+                  message: 'Please select project'
+              }]}>
                 <Select placeholder="Select Project">
                   {projectList?.map((project: any, index: number) => (
                     <Select.Option value={project?.id} key={index}>
