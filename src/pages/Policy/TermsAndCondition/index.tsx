@@ -1,6 +1,5 @@
-import { Space, Row, Col, Card } from "antd";
+import { Space, Card } from "antd";
 import PolicyCard from "../../../components/PolicyCard";
-import PolicyList from "../../../components/PolicyList";
 
 import styles from '../PrivacyPolicy/styles.module.scss'
 
@@ -190,8 +189,8 @@ const TermsAndCondition = () => {
 				<h1>Contact Us</h1>
 				<p>If you have any questions about these Terms and Conditions, You can contact us:</p>
 				<ul>
-					<li>By email: <a href="/cdn-cgi/l/email-protection" className="__cf_email__" data-cfemail="3950575f56794f5c55564b565758175a5654">[email&#160;protected]</a></li>
-				</ul><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script>
+					<li>By email: <span className="__cf_email__" data-cfemail="3950575f56794f5c55564b565758175a5654">[email&#160;protected]</span></li>
+				</ul>
 			</Space>
 		</Card>
 	)

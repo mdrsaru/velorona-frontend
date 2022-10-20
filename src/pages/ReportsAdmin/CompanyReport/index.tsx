@@ -41,7 +41,7 @@ const tableBody = (companyData: any) => {
     const email = (company?.admin?.email ?? '-');
     const phone = (company?.admin?.phone ?? '-');
     const country = (company?.admin?.address?.country ?? '-');
-    const state = (company?.admin?.address?.streetAddress ?? '-');
+    const state = (company?.admin?.address?.state ?? '-');
     const city = (company?.admin?.address?.city ?? '-');
     const streetAddress = (company?.admin?.address?.streetAddress ?? '-');
     const aptOrSuite = (company?.admin?.address?.aptOrSuite ?? '-');
@@ -67,7 +67,7 @@ const CompanyReport = () => {
     fetchPolicy: 'network-only',
     nextFetchPolicy: 'cache-only',
   });
-  
+
   const [fetchDownloadData] = useLazyQuery<
     GraphQLResponse<'Company', CompanyPagingResult>,
     QueryCompanyArgs
