@@ -16,8 +16,6 @@ import { AUTH } from '../../gql/auth.gql';
 import { checkRoles } from '../../utils/common';
 import { RoleName } from '../../interfaces/generated';
 
-import CheckInCheckOut from './CheckInCheckOut';
-
 import styles from './style.module.scss';
 import { useParams } from 'react-router-dom';
 
@@ -99,7 +97,7 @@ const TopHeader = (props: any) => {
   const isCompanyAdmin = useMemo(() => {
     return checkRoles({
       userRoles: loggedInUser?.user?.roles ?? [],
-      expectedRoles: [RoleName.CompanyAdmin,RoleName.SuperAdmin],
+      expectedRoles: [RoleName.CompanyAdmin],
     })
   }, [loggedInUser?.user?.roles])
 
@@ -109,7 +107,7 @@ const TopHeader = (props: any) => {
         <div onClick={() => profile()}>Profile</div>
       </Menu.Item>
 
-      {isCompanyAdmin &&
+      {(isCompanyAdmin || (isSuperAdmin && !!params.id)) &&
         <Menu.Item key={"2"}>
           <div onClick={() => setting()}>Setting</div>
         </Menu.Item>
