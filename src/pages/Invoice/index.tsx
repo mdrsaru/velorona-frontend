@@ -254,6 +254,7 @@ const Invoice = () => {
       id: invoice_id,
       status: InvoiceStatus.Sent,
       company_id,
+      sendEmail: true,
     };
 
     updateInvoice({

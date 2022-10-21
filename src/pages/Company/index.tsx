@@ -3,14 +3,21 @@ import { debounce } from 'lodash';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useQuery, gql, useMutation } from '@apollo/client';
-import { MoreOutlined,SearchOutlined} from '@ant-design/icons';
-import { Card, Row, Col, Table, Menu, Dropdown, Form, Select, Button, Input } from 'antd';
+import { MoreOutlined,SearchOutlined, SendOutlined, FormOutlined, UserOutlined, FileExcelOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import { Card, Row, Col, Table, Menu, Dropdown, Form, Select, Button, Input, Popconfirm, message } from 'antd';
 
 import routes from '../../config/routes';
 import constants, { company_status } from '../../config/constants';
 import { notifyGraphqlError } from '../../utils/error';
 import { GraphQLResponse } from '../../interfaces/graphql.interface';
-import { Company as ICompany,CompanyPagingResult, CompanyStatus, MutationCompanyUpdateArgs, QueryCompanyArgs } from '../../interfaces/generated';
+import {
+  Company as ICompany,
+  CompanyPagingResult,
+  CompanyStatus,
+  MutationCompanyUpdateArgs,
+  QueryCompanyArgs,
+  MutationCompanyResendInvitationArgs,
+} from '../../interfaces/generated';
 
 import Status from '../../components/Status';
 import ModalConfirm from '../../components/Modal';
@@ -79,7 +86,14 @@ export const COMPANY_UPDATE = gql`
       }
     }
   }
-`
+`;
+
+export const COMPANY_RESEND = gql`
+  mutation CompanyResendInvitation($input: CompanyResendInvitationInput!) {
+    CompanyResendInvitation(input: $input) 
+  }
+`;
+
 const DeleteBody = () => {
   return (
     <div className={styles['modal-message']}>
@@ -119,14 +133,14 @@ const Company = () => {
   const navigate = useNavigate();
   const [filterForm] = Form.useForm();
 
-  const { data: companyData, loading: dataLoading, refetch:refetchCompany } = useQuery<
-    GraphQLResponse<'Company', CompanyPagingResult>,
-    QueryCompanyArgs
-  >(COMPANY, {
-    fetchPolicy: 'network-only',
-    nextFetchPolicy: 'cache-only'
+  const debouncedResults = debounce(() => { onChangeFilter() }, 600);
+
+  useEffect(() => {
+    return () => {
+      debouncedResults.cancel();
+    };
   });
-  
+
   const [pagingInput, setPagingInput] = useState<{
     skip: number,
     currentPage: number,
@@ -134,28 +148,64 @@ const Company = () => {
     skip: 0,
     currentPage: 1,
   });
+
+  const { data: companyData, loading: dataLoading, refetch:refetchCompany } = useQuery<
+    GraphQLResponse<'Company', CompanyPagingResult>,
+    QueryCompanyArgs
+  >(COMPANY, {
+    fetchPolicy: 'network-only',
+    nextFetchPolicy: 'cache-only',
+    variables: {
+      input: {
+        paging: {
+          skip: pagingInput.skip,
+          take: constants.paging.perPage,
+          order: ['createdAt:DESC'],
+        }
+      }
+    }
+  });
   
   const [filterProperty, setFilterProperty] = useState<any>({
     filter: false,
   });
 
 
-  const [updateCompany] = useMutation<
+  const [updateCompany, { loading: updatingCompany }] = useMutation<
   GraphQLResponse<'CompanyUpdate', ICompany>,
     MutationCompanyUpdateArgs
-  >(COMPANY_UPDATE)
+  >(COMPANY_UPDATE, {
+    onCompleted: (response) => {
+      if(response?.CompanyUpdate) {
+        message.success('Status updated successfully.')
+      }
+    },
+    onError: notifyGraphqlError,
+  })
 
   const [visibility, setVisibility] = useState(false);
   const [showArchive, setArchiveModal] = useState(false);
   const setModalVisibility = (value: boolean) => {
     setVisibility(value)
   }
+
+  const [resendCompanyInvitation, { loading: resendingEmail }] = useMutation<
+  GraphQLResponse<'CompanyResendInvitation', string>,
+    MutationCompanyResendInvitationArgs
+  >(COMPANY_RESEND, {
+    onCompleted(response) {
+      if(response?.CompanyResendInvitation) {
+        message.success(response.CompanyResendInvitation)
+      }
+    },
+    onError: notifyGraphqlError,
+  });
+
   const setArchiveVisibility = (value: boolean) => {
     setArchiveModal(value)
   };
 
   const changeStatus = (value: string, id: string) => {
-
     updateCompany({
       variables: {
         input: {
@@ -180,7 +230,6 @@ const Company = () => {
   };
 
   const refetchCompanies = () => {
-
     let values = filterForm.getFieldsValue(['search', 'role', 'status'])
 
     let input: {
@@ -188,7 +237,7 @@ const Company = () => {
       query: any
     } = {
       paging: {
-        order: ["updatedAt:DESC"],
+        order: ['createdAt:DESC'],
       },
 
       query: {}
@@ -226,7 +275,7 @@ const Company = () => {
       refetchCompany({
         input: {
           paging: {
-            order: ["updatedAt:DESC"],
+            order: ["createdAt:DESC"],
           },
           query: { }
         }
@@ -238,63 +287,46 @@ const Company = () => {
     })
   }
 
-
-  const debouncedResults = debounce(() => { onChangeFilter() }, 600);
-
-  useEffect(() => {
+  const resendInvitation = (id: string) => {
     return () => {
-      debouncedResults.cancel();
-    };
-  });
+      resendCompanyInvitation({
+        variables: {
+          input: {
+            id,
+          }
+        }
+      })
+    }
+  }
 
-  const menu = (data: any) => (
-    <Menu>
-      <Menu.Item key="1">
-        <a href={`/${data.companyCode}`} target="_blank" rel="noreferrer">
-          Login To Company
-        </a>
-      </Menu.Item>
-
-      <Menu.Divider />
-
-      <Menu.Item key="2">
-        <div onClick={() => navigate(routes.editCompany.path(data?.id ?? '1'))}>
-          Edit Company
-        </div>
-      </Menu.Item>
-
-      <Menu.Divider />
-
-      <SubMenu title="Change status" key="3">
+  const statusMenu = (data: ICompany) => {
+    return (
+      <Menu>
         <Menu.Item key="active"
-          onClick={() => {
-            if (data?.status === 'Inactive') {
-              changeStatus('Active', data?.id)
-            }
-          }}>
+          onClick={() => changeStatus('Active', data?.id) }>
           Active
         </Menu.Item>
+
         <Menu.Divider />
+
         <Menu.Item
           key="inactive"
-          onClick={() => {
-            if (data?.status === 'Active') {
-              changeStatus('Inactive', data?.id)
-            }
-          }}>
+          onClick={() => changeStatus('Inactive', data?.id)}
+        >
           Inactive
         </Menu.Item>
-      </SubMenu>
-      {/* <Menu.Divider />
-      <Menu.Item key="3">
-        <div onClick={() => setArchiveVisibility(true)}>Archive Company</div>
-      </Menu.Item>
-      <Menu.Divider />
-      <Menu.Item key="4">
-        <div onClick={() => setModalVisibility(true)}>Delete Company</div>
-      </Menu.Item> */}
-    </Menu>
-  );
+
+        <Menu.Divider />
+
+        <Menu.Item
+          key="unapproved"
+          onClick={() => changeStatus('Unapproved', data?.id)}
+        >
+          Unapproved
+        </Menu.Item>
+      </Menu>
+    )
+  }
 
   const columns = [
     {
@@ -322,19 +354,47 @@ const Company = () => {
       title: 'Actions',
       key: 'actions',
       render: (record: any) =>
-        <div className={styles['dropdown-menu']}>
-          <Dropdown
-            overlay={menu(record)}
-            trigger={['click']}
-            placement="bottomRight">
-            <div
-              className="ant-dropdown-link"
-              onClick={e => e.preventDefault()}
-              style={{ paddingLeft: '1rem' }}>
-              <MoreOutlined />
-            </div>
-          </Dropdown>
-        </div>,
+        <div className={styles['actions']}>
+          <span className={styles['status-icon']} title="Login to company">
+            <a href={`/${record.companyCode}`} target="_blank" rel="noreferrer">
+              <UserOutlined />
+            </a>
+          </span>
+
+          <span className={styles['status-icon']} title="Edit Company">
+            <Link to={routes.editCompany.path(record.id)}>
+              <FormOutlined />
+            </Link>
+          </span>
+
+          <span className={styles['status-icon']} title="Change status">
+            <Dropdown
+              trigger={['click']}
+              overlay={statusMenu(record)}
+              placement="bottomRight"
+            >
+              {
+                record.status === 'Active'   
+                  ? <CheckCircleOutlined style={{ color: 'var(--primary-green)' }} />
+                  : record.status === 'Inactive'
+                  ? <CloseCircleOutlined  style={{ color: 'var(--primary-red)' }} />
+                  : <FileExcelOutlined style={{ color: 'var(--primary-orange)' }} />
+              }
+            </Dropdown>
+          </span>
+
+          <span className={styles['status-icon']} title="Resend invitation">
+            <Popconfirm
+              placement="topLeft"
+              title='Are you sure?'
+              onConfirm={resendInvitation(record.id)}
+              okText="Yes"
+              cancelText="No"
+            >
+              <SendOutlined />
+            </Popconfirm>
+          </span>
+        </div>
     },
   ];
 
@@ -411,7 +471,7 @@ const Company = () => {
         <Row className='container-row'>
           <Col span={24}>
             <Table
-              loading={dataLoading}
+              loading={dataLoading || resendingEmail || updatingCompany}
               dataSource={companyData?.Company?.data}
               columns={columns}
               rowKey={(record => record?.id)}
