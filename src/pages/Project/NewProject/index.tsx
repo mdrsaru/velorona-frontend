@@ -148,10 +148,7 @@ const NewProject = () => {
               <Form.Item
                 name="client"
                 label="Client Name"
-                rules={[{
-                  required: true,
-                  message: 'Please enter client name!'
-                }]}>
+              >
                 <Select placeholder="Select Name of the Client" onChange={handleChange}>
                   {clientData && clientData.Client.data.map((user: any, index: number) => (
                     <Option value={user?.id} key={index}>{user?.name} / {user?.email}</Option>
