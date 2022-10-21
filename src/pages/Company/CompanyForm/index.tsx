@@ -314,7 +314,7 @@ const CompanyForm = (props: IProps) => {
               },
             ]}
           >
-            <Input placeholder="Company Admin Email" autoComplete="off" disabled={!!props.company} />
+            <Input placeholder="Company Admin Email" autoComplete="off" />
           </Form.Item>
         </Col>
         <Col xs={24} sm={24} md={12}>
@@ -457,6 +457,7 @@ const CompanyForm = (props: IProps) => {
               <Button type="default" htmlType="button" onClick={() => navigate(routes.companyAdmin.path)}>
                 Cancel
               </Button>
+
               <Button type="primary" htmlType="submit" loading={creatingCompany || updatingCompany}>
                 { props.company ? 'Save': 'Add Company' }
               </Button>
