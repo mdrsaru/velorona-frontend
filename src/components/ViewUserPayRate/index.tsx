@@ -112,7 +112,7 @@ const ViewUserPayRate = (props: IProps) => {
       {
         title: "Client Name",
         render: (payRate: any) => {
-          return <p>{payRate?.project?.client?.name}</p>;
+          return <p>{payRate?.project?.client?.name ?? '-'}</p>;
         },
       },
       {

@@ -4,11 +4,12 @@ import { CloseOutlined } from '@ant-design/icons';
 
 import styles from './styles.module.scss'
 import { useMutation, useQuery } from '@apollo/client';
-import {  MutationProjectUpdateArgs, Project,UserClientPagingResult, QueryUserClientArgs } from '../../../interfaces/generated';
+import { MutationProjectUpdateArgs, Project, UserClientPagingResult, QueryUserClientArgs, QueryUserArgs, UserPagingResult, RoleName } from '../../../interfaces/generated';
 import { GraphQLResponse } from '../../../interfaces/graphql.interface';
 import { authVar } from '../../../App/link';
 import { USERCLIENT } from '../../Employee/DetailEmployee';
 import { PROJECT_UPDATE } from '..';
+import { USER } from '../../Employee';
 
 interface IProps {
 	visibility: boolean;
@@ -17,6 +18,7 @@ interface IProps {
 	refetch?: any;
 }
 const AssignedUser = (props: IProps) => {
+	const authData = authVar()
 	const [form] = Form.useForm();
 	const { Option } = Select;
 	const loggedInUser = authVar();
@@ -30,6 +32,7 @@ const AssignedUser = (props: IProps) => {
 	const { data: userClientData } = useQuery<GraphQLResponse<'UserClient', UserClientPagingResult>, QueryUserClientArgs>(USERCLIENT, {
 		fetchPolicy: "network-only",
 		nextFetchPolicy: "cache-first",
+		skip: !props?.project?.client?.id,
 		variables: {
 			input: {
 				query: {
@@ -42,10 +45,33 @@ const AssignedUser = (props: IProps) => {
 		},
 	});
 
-	let userClientList = userClientData?.UserClient?.data?.filter(function (userClient) {
-		return userClient?.user
+	const { data: userData } = useQuery<GraphQLResponse<'User', UserPagingResult>, QueryUserArgs>(USER, {
+		fetchPolicy: "network-only",
+		nextFetchPolicy: "cache-first",
+		variables: {
+			input: {
+				query: {
+					company_id: authData?.company?.id,
+					role: RoleName.Employee
+				},
+				paging: {
+					order: ["updatedAt:DESC"],
+				},
+			},
+		},
+	});
+
+	let userClientList, userList;
+	if (userClientData) {
+		userClientList = userClientData?.UserClient?.data?.filter(function (userClient) {
+			return userClient?.status === "Active"
+		}
+		);
+	} else {
+		userList = userData?.User?.data.filter((entry: any) => {
+			return entry?.activeClient === null
+		});
 	}
-	);
 
 
 	const [projectUpdate] = useMutation<GraphQLResponse<'ProjectUpdate', Project>, MutationProjectUpdateArgs>(PROJECT_UPDATE, {
@@ -113,9 +139,9 @@ const AssignedUser = (props: IProps) => {
 					onFinish={onSubmitForm}
 					initialValues=
 					{{assignee: props?.project?.users?.map((user: any) => {
-						return user?.id
-					}) ?? "",
-				}}
+							return user?.id
+						}) ?? "",
+					}}
 				>
 					<Row className={styles.formCol}>
 						<Col xs={24} sm={24} md={24} lg={24} className={styles.formCol}>
@@ -135,6 +161,15 @@ const AssignedUser = (props: IProps) => {
 												{userClient?.user?.fullName} / {userClient?.user?.email}
 											</Option>
 										))}
+									{userList &&
+										userList?.map((user, index: number) => (
+											<Option
+												value={user?.id}
+												key={index}>
+												{user?.fullName} / {user?.email}
+											</Option>
+										))
+									}
 								</Select>
 							</Form.Item>
 						</Col>

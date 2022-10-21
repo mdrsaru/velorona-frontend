@@ -71,7 +71,7 @@ const Plan = (props: IProps) => {
   const company_id = authData.AuthUser?.company?.id as string;
 
   const [
-    createSubscription, 
+    createSubscription,
     { data: createSubscriptionData, loading: creatingSubscription },
   ] = useMutation<
     GraphQLResponse<'SubscriptionCreate', SubscriptionCreateResult>,
@@ -96,7 +96,7 @@ const Plan = (props: IProps) => {
   const [
     getSetupIntentSecret,
     {
-      data: setupIntentSecretData, 
+      data: setupIntentSecretData,
       loading: setupIntentLoading,
     }
   ] = useLazyQuery<
@@ -112,7 +112,7 @@ const Plan = (props: IProps) => {
   });
 
   const [
-    downgradeSubscription, 
+    downgradeSubscription,
     { data: downgradeSubscriptionData, loading: downgrading },
   ] = useMutation<
     GraphQLResponse<'SubscriptionDowngrade', string>,
@@ -158,7 +158,7 @@ const Plan = (props: IProps) => {
     } else {
       createSubscription();
     }
-  } 
+  }
 
   const hidePaymentModal = () => {
     setSubscriptionData(null);
@@ -184,7 +184,7 @@ const Plan = (props: IProps) => {
     }
 
     return 'Upgrade'
-  } 
+  }
 
   return (
     <div className={styles['container']}>
@@ -193,6 +193,10 @@ const Plan = (props: IProps) => {
         <p>{plan.description}</p>
 
         <h1 className={styles['price']}>{plan.price}</h1>
+
+        {plan.name === 'Professional' &&
+          <h4>Free Trial for 3 months/No credit card needed</h4>
+        }
       </div>
 
       {/* Need downgrade functionality */}
@@ -227,7 +231,7 @@ const Plan = (props: IProps) => {
         closable={false}
         visible={!!subscriptionData}
       >
-        <Payment 
+        <Payment
           clientSecret={createSubscriptionData?.SubscriptionCreate?.clientSecret as string}
           subscriptionId={createSubscriptionData?.SubscriptionCreate?.subscriptionId as string}
           hidePaymentModal={hidePaymentModal}
@@ -246,7 +250,7 @@ const Plan = (props: IProps) => {
             <Elements
               stripe={stripePromise}
               options={{
-                clientSecret: setupIntentSecretData?.SetupIntentSecret?.clientSecret 
+                clientSecret: setupIntentSecretData?.SetupIntentSecret?.clientSecret
               }}
             >
               <UpdatePaymentDetails
