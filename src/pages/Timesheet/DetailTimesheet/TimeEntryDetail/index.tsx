@@ -1,7 +1,7 @@
 import moment from 'moment';
 import { useState } from 'react';
 import { gql, useMutation } from '@apollo/client';
-import { Space, message, Popconfirm } from 'antd';
+import { Space, message, Popconfirm, Modal, Input, Button, Row } from 'antd';
 import {
   CloseCircleOutlined,
   CheckCircleOutlined,
@@ -12,7 +12,7 @@ import { notifyGraphqlError } from '../../../../utils/error';
 import { getWeekDays, getTimeFormat, checkRoles, checkSubscriptions } from '../../../../utils/common';
 import { authVar } from '../../../../App/link';
 import { IGroupedTimeEntries } from '../../../../interfaces/common.interface';
-import { MutationTimeEntriesApproveRejectArgs } from '../../../../interfaces/generated';
+import { MutationTimeEntriesApproveRejectArgs, TimeEntryApproveRejectInput} from '../../../../interfaces/generated';
 import { GraphQLResponse } from '../../../../interfaces/graphql.interface';
 
 import ModalConfirm from '../../../../components/Modal';
@@ -64,11 +64,19 @@ const TimeEntryDetails = (props: IProps) => {
     expectedSubscription: [subscriptionStatus.active,subscriptionStatus.trialing]
   })
 
-  
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [entriesToDelete, setEntriesToDelete] = useState<{ entryIds: string[], task_id: string }>({
     entryIds: [],
     task_id: ''
+  });
+  const [rejectData, setRejectData] = useState<{
+    showModal: boolean,
+    reason: null | string,
+    group: IGroupedTimeEntries | null,
+  }>({
+    showModal: false,
+    reason: null,
+    group: null,
   });
 
   const canApproveReject = checkRoles({
@@ -81,7 +89,7 @@ const TimeEntryDetails = (props: IProps) => {
     expectedRoles: [constants.roles.Employee]
   })
 
-  const [approveRejectTimeEntries] = useMutation<
+  const [approveRejectTimeEntries, { loading: rejecting }] = useMutation<
     GraphQLResponse<'TimeEntriesApproveReject', boolean>,
     MutationTimeEntriesApproveRejectArgs
   >(APPROVE_REJECT_TIME_ENTRIES, {
@@ -93,17 +101,26 @@ const TimeEntryDetails = (props: IProps) => {
 
   const onApproveRejectTimeEntriesClick = (status: string, group: IGroupedTimeEntries) => {
     const ids = getEntryIdsFromGroup(group);
+    const input: TimeEntryApproveRejectInput = {
+      ids,
+      approvalStatus: status,
+      company_id,
+      timesheet_id: props?.timesheet_id,
+    };
+
+    if(status === 'Rejected' && rejectData.reason) {
+      input.reason = rejectData.reason;
+    }
 
     approveRejectTimeEntries({
       variables: {
-        input: {
-          ids,
-          approvalStatus: status,
-          company_id,
-          timesheet_id: props?.timesheet_id,
-        },
+        input,
       },
-    })
+    }).then((response) => {
+      if(response?.data?.TimeEntriesApproveReject && status === 'Rejected') {
+        onRejectCancel()
+      }
+    });
   }
 
   const [deleteBulkTimeEntry, { loading: deleting }] = useMutation(TIME_ENTRY_BULK_DELETE, {
@@ -147,6 +164,35 @@ const TimeEntryDetails = (props: IProps) => {
         task_id: ''
       });
       setShowDeleteModal(false);
+    }
+  }
+
+  const onRejectClick = (group: IGroupedTimeEntries) => {
+    setRejectData({
+      showModal: true,
+      group,
+      reason: null,
+    })
+  }
+
+  const onRejectCancel = () => {
+    setRejectData({
+      showModal: false,
+      group: null,
+      reason: null,
+    });
+  }
+
+  const onReasonChange = (e: any) => {
+    setRejectData({
+      ...rejectData,
+      reason: e.target.value,
+    });
+  }
+
+  const rejectTimeEntries = () => {
+    if(rejectData?.group) {
+      onApproveRejectTimeEntriesClick('Rejected', rejectData.group)
     }
   }
 
@@ -238,19 +284,11 @@ const TimeEntryDetails = (props: IProps) => {
                         <Space>
                           {
                             canApproveReject && ['Pending', 'Approved'].includes(props.status) && props.isTimesheetSubmitted && canAccess &&(
-                              <Popconfirm
-                                placement="left"
-                                title="Are you sure you want to reject timesheet?"
-                                onConfirm={() => {
-                                  onApproveRejectTimeEntriesClick('Rejected', group)
-                                }}
-                                okText="Yes" cancelText="No"
-                              >
-                                <CloseCircleOutlined
-                                  title='Reject timesheet'
-                                  className={styles['reject-entry']}
-                                />
-                              </Popconfirm>
+                              <CloseCircleOutlined
+                                title='Reject timesheet'
+                                className={styles['reject-entry']}
+                                onClick={() => onRejectClick(group)}
+                              />
                             )
                           }
 
@@ -311,6 +349,7 @@ const TimeEntryDetails = (props: IProps) => {
           </tbody>
         </table>
       </div>
+
       <ModalConfirm
         visibility={showDeleteModal}
         setModalVisibility={setShowDeleteModal}
@@ -325,6 +364,35 @@ const TimeEntryDetails = (props: IProps) => {
           />
         }
       />
+
+      <Modal
+        centered
+        width={800}
+        footer={null}
+        title="Reject"
+        destroyOnClose
+        visible={rejectData.showModal}
+        onCancel={onRejectCancel}
+      >
+        <Input.TextArea 
+          placeholder="Reason"
+          bordered={false}
+          rows={4}
+          autoSize={{ minRows: 4, maxRows: 8 }}
+          value={rejectData.reason ?? ''}
+          onChange={onReasonChange}
+        />
+
+      <Row justify="end" style={{ padding: '8px 0', borderTop: '1px solid var(--gray-secondary)' }}>
+        <Button 
+          loading={rejecting}
+          type="primary" 
+          onClick={rejectTimeEntries}
+        >
+          Reject
+        </Button>
+      </Row>
+      </Modal>
     </>
   )
 }
