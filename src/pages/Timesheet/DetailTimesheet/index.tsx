@@ -369,7 +369,6 @@ const DetailTimesheet = (props: any) => {
   let generateInvoiceLink = routes.timesheetInvoice.path(authData?.company?.code as string, timesheet_id) +
     `?period=Weekly&timesheet_id=${timesheet_id}&client_id=${timesheet?.client?.id}&start=${timesheet?.weekStartDate}&end=${timesheet?.weekEndDate}&user_id=${timesheet?.user?.id}`
 
-    console.log(!!entriesByStatus.rejected.length)
   return (
     <>
       <div>
