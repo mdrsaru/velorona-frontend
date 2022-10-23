@@ -362,13 +362,14 @@ const DetailTimesheet = (props: any) => {
   const isSubmitted:any = timesheetDetail?.isSubmitted;
 
   const hasTimeEntries = (
-    entriesByStatus?.approved?.length || timesheetDetail?.rejected?.length || 
+    entriesByStatus?.approved?.length || entriesByStatus?.rejected?.length || 
     entriesByStatus.pending.length || timesheetDetail?.entriesGroup?.byInvoice.length
   );
 
   let generateInvoiceLink = routes.timesheetInvoice.path(authData?.company?.code as string, timesheet_id) +
     `?period=Weekly&timesheet_id=${timesheet_id}&client_id=${timesheet?.client?.id}&start=${timesheet?.weekStartDate}&end=${timesheet?.weekEndDate}&user_id=${timesheet?.user?.id}`
 
+    console.log(!!entriesByStatus.rejected.length)
   return (
     <>
       <div>
