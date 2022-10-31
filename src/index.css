@@ -31,3 +31,12 @@ code {
 .container-row {
   overflow-x: auto;
 }
+
+.ant-notification-notice-btn{
+  float: none !important;
+  margin: 2rem !important;
+}
+
+.ant-notification-notice-description{
+  margin-bottom: 1rem;
+}

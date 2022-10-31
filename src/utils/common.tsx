@@ -1,6 +1,8 @@
 import moment from 'moment';
-import { notification } from 'antd';
+import { Button, notification } from 'antd';
 import type { NotificationPlacement } from 'antd/es/notification';
+import routes from '../config/routes';
+import { authVar } from '../App/link';
 
 export const round = (value: number, decimals: number): number => {
   const temp = parseFloat(value + `e+${decimals}`);
@@ -91,21 +93,21 @@ export const downloadCSV = (jsonData: any, csvHeader: any, fileName: string) => 
   document.body.removeChild(a);
 }
 
-export const getDurationFromTimeFormat = (timeFormat: string) : number => {
+export const getDurationFromTimeFormat = (timeFormat: string): number => {
   const formatList = timeFormat?.split(':');
   let duration = 0;
 
-  if(formatList.length) {
+  if (formatList.length) {
     const hour = parseInt(formatList[0] ?? 0);
     const min = parseInt(formatList[1] ?? 0);
     const seconds = parseInt(formatList[2] ?? 0);
     duration = seconds;
 
-    if(hour) {
+    if (hour) {
       duration += hour * 60 * 60;
     }
 
-    if(min) {
+    if (min) {
       duration += min * 60;
     }
   }
@@ -130,12 +132,22 @@ export type NotificationArgs = {
   duration?: number | null;
 }
 
+
 export const openNotificationWithIcon = (args: NotificationArgs) => {
+  const authData = authVar()
+
+  const btn = (
+    <Button><a href={routes.subscription.path(authData.company?.code as string)} target='_blank' rel="noreferrer">Renew subscription</a></Button>
+  )
+
+  
+
   notification[args.type]({
     message: args.title,
     description: args.description,
     placement: args.placement ?? 'top',
     duration: args.duration ?? 4.5,
+    btn
   });
 };
 
@@ -151,19 +163,22 @@ export const notifySubscriptionExpiration = (args: NotifySubscriptionExpiration)
   const now = moment();
   let title: string = '';
   let description: string = '';
+  let type: NotificationType;
 
-  if(status === 'trialing') {
-    if(!args.trialEndDate) {
+  if (status === 'trialing') {
+    if (!args.trialEndDate) {
       return;
     }
 
     const trialEnd = moment(args.trialEndDate);
     const diff = trialEnd.diff(now, 'days');
 
-    if(diff >= 0 && diff <= 7) {
+    if (diff >= 0 && diff <= 7) {
+      type = 'warning'
       title = 'Trial about to end';
       description = `Your subscription trial will end in ${diff} days. Please update the payment details from the subscription menu.`;
-    } else if(diff < 0) {
+    } else if (diff < 0) {
+      type = 'error'
       title = 'Trial ended';
       description = `Your subscription trial has ended. Please update the payment details from the subscription menu.`;
     }
@@ -172,20 +187,22 @@ export const notifySubscriptionExpiration = (args: NotifySubscriptionExpiration)
 
     const diff = periodEnd.diff(now, 'days');
 
-    if(diff >= 0 && diff <= 7) {
+    if (diff >= 0 && diff <= 7) {
       title = 'Subscription about to expire';
       description = `Your subscription will expire in ${diff} days.`;
-    } else if(diff < 0) {
+      type = 'warning'
+    } else if (diff < 0) {
       title = 'Subscription expired';
       description = `Your subscription has expired.`;
+      type = 'error'
     }
   }
 
 
-  if(title && description) {
+  if (title && description) {
     setTimeout(() => {
       openNotificationWithIcon({
-        type: 'info',
+        type: type,
         title,
         description,
         duration: 0,
