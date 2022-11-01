@@ -41,6 +41,7 @@ export const EMPLOYEE_TIMESHEET = gql`
         weekEndDate
         userPayment
         status
+        invoiceStatus
         user {
           fullName
         }
@@ -231,6 +232,13 @@ const EmployeeTimesheet = () => {
     {
       title: 'Status',
       dataIndex: 'status',
+      render: (status: string) => {
+        return <Status status={status} />
+      }
+    },
+    {
+      title: 'Invoice Status',
+      dataIndex: 'invoiceStatus',
       render: (status: string) => {
         return <Status status={status} />
       }

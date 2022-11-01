@@ -9,7 +9,7 @@ interface IProps {
 const Status = (props: IProps) => {
   const status = props.status;
 
-  return <span className={_cs([styles[status], styles['status']])}>{status}</span>;
+  return <span className={_cs([styles[status], styles['status']])}>{status ?? 'N/A'}</span>;
 };
 
 export default Status;
