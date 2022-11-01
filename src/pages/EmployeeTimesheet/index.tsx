@@ -240,7 +240,19 @@ const EmployeeTimesheet = () => {
       title: 'Invoice Status',
       dataIndex: 'invoiceStatus',
       render: (status: string) => {
-        return <Status status={status} />
+        if(!status) {
+          return 'N/A';
+        }
+
+        return (
+          <>
+            {
+              status?.split(',')?.map((st, index) => (
+                <>{ index ? ', ': '' }<Status status={st} /></>
+              ))
+            }
+          </>
+        )
       }
     },
     {
