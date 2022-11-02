@@ -44,6 +44,7 @@ export const EMPLOYEE_TIMESHEET = gql`
         invoiceStatus
         user {
           fullName
+          email
         }
         client {
           name
@@ -204,6 +205,10 @@ const EmployeeTimesheet = () => {
     {
       title: 'Employee Name',
       dataIndex: ['user', 'fullName'],
+    },
+    {
+      title: 'Employee Email',
+      dataIndex: ['user', 'email'],
     },
     {
       title: 'Client',

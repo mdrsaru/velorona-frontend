@@ -80,6 +80,7 @@ const EditProject = () => {
           id: params?.pid as string,
           name: values.name,
           company_id: loggedInUser?.company?.id as string,
+          client_id: values.client,
         }
       }
     }).then((response) => {
@@ -137,9 +138,9 @@ const EditProject = () => {
                     required: true,
                     message: 'Please enter client name!'
                   }]}>
-                  <Select placeholder="Select Name of the Client" disabled>
-                    {clientData && clientData?.User?.data.map((user: any, index: number) => (
-                      <Option value={user?.id} key={index}>{user?.fullName}</Option>
+                  <Select placeholder="Select Name of the Client">
+                    {clientData && clientData?.Client?.data.map((user: any, index: number) => (
+                      <Option value={user?.id} key={index}>{user?.name}</Option>
                     ))}
                   </Select>
                 </Form.Item>
