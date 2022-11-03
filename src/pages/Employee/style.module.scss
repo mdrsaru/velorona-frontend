@@ -119,12 +119,20 @@
 }
 
 .table-icon{
-  font-size:1.5rem;
-  margin-right: 1rem;
+  font-size: 1.5rem;
+  margin-right: 0.5rem;
+  cursor: pointer;
 }
 
 .table-payrate-icon{
   color: var(--primary-color);
+  font-size: 1.5rem;
+  margin-right: 1rem;
+
+  img {
+    width: 1em;
+    height: 1em;
+  }
 }
 
 .table-active-status-icon{

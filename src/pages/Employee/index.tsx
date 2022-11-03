@@ -673,7 +673,7 @@ const Employee = () => {
                   <Col>
                     <p
                       onClick={() => handleUserPayRate(record)}
-                      className={`${styles["table-icon"]} ${styles["table-payrate-icon"]}`}
+                      className={`${styles["table-payrate-icon"]}`}
                       title='Add Employee Payrate'
                     >
                       <Image src={PayRateImg} width='2rem' preview={false}/>
