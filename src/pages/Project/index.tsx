@@ -343,7 +343,12 @@ const ProjectPage = () => {
       render: (record: Project) => <div>{record?.name}</div>
     },
     {
-      title: "Client",
+      title: "Client Name",
+      key: "client",
+      render: (record: Project) => <div>{record?.client?.name ? record?.client?.name : '-'}</div>,
+    },
+    {
+      title: "Client Email",
       key: "client",
       render: (record: Project) => <div>{record?.client?.email ? record?.client?.email : '-'}</div>,
     },
