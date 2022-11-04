@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { Layout, Row, Col, Form, Input, Button, message, Modal } from 'antd';
+import { Layout, Row, Col, Form, Input, Button, message, Modal, notification } from 'antd';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -62,9 +62,23 @@ const FORGOT_PASSWORD = gql`
 const Login = () => {
   let key = 'login'
   let { role } = useParams();
+
+  const queryParams = new URLSearchParams(window.location.search);
+  const from = queryParams.get('from')
+  const redirectTo = queryParams.get('redirect_to')
   const [form] = Form.useForm();
   const [forgetForm] = Form.useForm();
   const navigate = useNavigate();
+
+  if (from === 'marketing') {
+    notification.destroy();
+    notification.info({
+      message: 'You need to login before subscribing any subscription.Please login with your credential',
+      placement: 'top',
+      duration: 10
+    })
+  }
+
   const [login] = useMutation<
     GraphQLResponse<'Login', LoginResponse>,
     MutationLoginArgs
@@ -87,14 +101,14 @@ const Login = () => {
         company: {
           id: loginData?.company?.id ?? '',
           code: loginData?.company?.companyCode ?? '',
-          name:loginData?.company?.name ?? '',
-          plan:loginData?.company?.plan ?? '',
-          subscriptionStatus:loginData?.company?.subscriptionStatus ?? '',
+          name: loginData?.company?.name ?? '',
+          plan: loginData?.company?.plan ?? '',
+          subscriptionStatus: loginData?.company?.subscriptionStatus ?? '',
           subscriptionPeriodEnd,
-          logo:{
+          logo: {
             id: loginData?.company?.logo?.id ?? '',
             name: loginData?.company?.logo?.name ?? '',
-            url: loginData?.company?.logo?.url ?? '',      
+            url: loginData?.company?.logo?.url ?? '',
           }
         },
         fullName: loginData?.fullName,
@@ -105,7 +119,7 @@ const Login = () => {
         isLoggedIn: true,
       });
 
-      if(roles.includes(RoleName.CompanyAdmin) && subscriptionPeriodEnd) {
+      if (roles.includes(RoleName.CompanyAdmin) && subscriptionPeriodEnd) {
         notifySubscriptionExpiration({
           trialEndDate,
           periodEnd: subscriptionPeriodEnd,
@@ -113,10 +127,14 @@ const Login = () => {
         })
       }
 
-      if (roles.includes(constants.roles.SuperAdmin)) {
+      if (from === 'marketing' && redirectTo === '/subscription') {
+        console.log('if')
+        navigate(routes.subscription.path(loginData?.company?.companyCode as string))
+      }
+      else if (roles.includes(constants.roles.SuperAdmin)) {
         navigate(routes.dashboard.path)
       } else if (roles.includes(constants.roles.CompanyAdmin) || roles.includes(constants.roles.Employee) || roles.includes(constants.roles.TaskManager) || roles.includes(constants.roles.BookKeeper)) {
-         navigate(routes.company.path(loginData?.company?.companyCode ?? ''))
+        navigate(routes.company.path(loginData?.company?.companyCode ?? ''))
       } else {
         navigate(routes.home.path);
       }
@@ -181,6 +199,7 @@ const Login = () => {
       }
     }).catch(notifyGraphqlError)
   }
+
 
   return (
     <Layout>
