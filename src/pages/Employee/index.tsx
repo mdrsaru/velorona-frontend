@@ -634,7 +634,7 @@ const Employee = () => {
               <div
                 onClick={() => handleViewPayRate(user)}
                 className={styles["add-pay-rate"]}>
-                View Employee PayRate
+                View Payment
               </div>
             )
             :
@@ -674,7 +674,7 @@ const Employee = () => {
                     <p
                       onClick={() => handleUserPayRate(record)}
                       className={`${styles["table-payrate-icon"]}`}
-                      title='Add Employee Payrate'
+                      title='Add Payment'
                     >
                       <Image src={PayRateImg} width='2rem' preview={false}/>
                     </p>
@@ -740,7 +740,7 @@ const Employee = () => {
                               setEmployee(record);
                               setShowChangeClient(true)
                             }}
-                            title='Edit Client'
+                            title='Change Client'
                             className={`${styles["table-icon"]} ${styles["table-client-icon"]}`}
                           >
 

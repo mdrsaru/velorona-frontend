@@ -5,12 +5,13 @@ import styles from './styles.module.scss'
 import { useNavigate } from 'react-router-dom';
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { GraphQLResponse } from "../../../interfaces/graphql.interface";
-import { AdminRole, MutationUserAdminCreateArgs, MutationUserUpdateArgs, User, UserPagingResult } from "../../../interfaces/generated";
+import { AdminRole, MutationUserAdminCreateArgs, MutationUserUpdateArgs, User, UserPagingResult, UserStatus } from "../../../interfaces/generated";
 import { USER, USER_UPDATE } from "../../Employee";
 import constants from "../../../config/constants";
 import { useParams } from 'react-router-dom';
 import routes from "../../../config/routes";
 import { useEffect } from "react";
+import { notifyGraphqlError } from "../../../utils/error";
 
 export const ADMIN_CREATE = gql`
   mutation UserAdminCreate($input: UserAdminCreateInput!) {
@@ -104,6 +105,9 @@ const AddSuperAdmin = () => {
 					}
 				})
 			}
+		},
+		onError:(err)=>{
+			notifyGraphqlError(err)
 		}
 	})
 
@@ -117,6 +121,9 @@ const AddSuperAdmin = () => {
 				className: 'custom-message'
 			})
 			navigate(routes.superAdmin.path)
+		},
+		onError: (err) => {
+			notifyGraphqlError(err)
 		}
 	});
 
@@ -162,7 +169,7 @@ const AddSuperAdmin = () => {
 							firstName: values.firstName,
 							middleName: values.middleName,
 							lastName: values.lastName,
-							status: values.status,
+							status: UserStatus.InvitationSent,
 							roles: [AdminRole.SuperAdmin],
 							address: {
 								country: values.country,
@@ -294,7 +301,7 @@ const AddSuperAdmin = () => {
 									required: true,
 									message: 'Please input your E-mail!'
 								}]}>
-								<Input placeholder="Enter your email" autoComplete="off" disabled={params?.id ? true : false} />
+								<Input placeholder="Enter your email" autoComplete="off"/>
 							</Form.Item>
 						</Col>
 						<Col
@@ -415,7 +422,7 @@ const AddSuperAdmin = () => {
 						</Col>
 
 
-						<Col
+						{/* <Col
 							xs={24}
 							sm={24}
 							md={12}
@@ -433,7 +440,7 @@ const AddSuperAdmin = () => {
 
 								</Select>
 							</Form.Item>
-						</Col>
+						</Col> */}
 					</Row>
 					<Row justify="end">
 						<Col style={{ padding: '0 1rem 1rem 0' }}>
@@ -450,7 +457,7 @@ const AddSuperAdmin = () => {
 										loading={creatingAdmin}
 										type="primary"
 										htmlType="submit">
-										Add Super Admin
+										{params?.id ? 'Edit' : 'Add'} Super Admin
 									</Button>
 								</Space>
 							</Form.Item>

@@ -111,7 +111,6 @@ const ClientForm = (props: any) => {
               }]}
             >
               <Input
-                disabled={!!id}
                 placeholder="Enter your email"
                 autoComplete="off" />
             </Form.Item>

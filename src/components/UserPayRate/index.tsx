@@ -194,7 +194,7 @@ const UserPayRateModal = (props: IProps) => {
       <div className={styles["modal-body"]}>
         <div>
           <span className={styles["title"]}>
-            Add Employee Payrate
+            Add payment
           </span>
         </div>
 

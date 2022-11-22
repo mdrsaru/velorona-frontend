@@ -96,6 +96,9 @@ const EditEmployee = () => {
         successMessage();
       }
     },
+    onError:(err)=>{
+      notifyGraphqlError(err)
+    }
   });
 
   const [changeProfilePictureInput] = useMutation<
@@ -313,7 +316,6 @@ const EditEmployee = () => {
                   <Input
                     placeholder="Enter your email"
                     autoComplete="off"
-                    disabled
                   />
                 </Form.Item>
               </Col>

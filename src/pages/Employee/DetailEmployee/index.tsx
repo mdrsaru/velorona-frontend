@@ -395,7 +395,7 @@ const DetailEmployee = () => {
                     className={styles["view-pay-rate"]}
                     onClick={handleViewPayRate}
                   >
-                    View Payrate
+                    View Payment Details
                   </p>
                 </Col>
                 {userClientData?.UserClient?.data.length ?

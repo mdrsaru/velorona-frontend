@@ -190,7 +190,7 @@ const EditUserPayRateModal = (props: IProps) => {
       <div className={styles["modal-body"]}>
         <div>
           <span className={styles["title"]}>
-            Edit Employee PayRate
+            Edit Payment
           </span>
         </div>
 

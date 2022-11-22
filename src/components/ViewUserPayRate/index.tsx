@@ -152,7 +152,7 @@ const ViewUserPayRate = (props: IProps) => {
         onOk={() => setVisibility(false)}
       >
         <div className={styles["modal-body"]}>
-          <span className={styles["title"]}>Employee Payrate</span>
+          <span className={styles["title"]}>Payment Details</span>
 
           <p className={styles.employeeName}>
             {userPayRate?.UserPayRate?.data?.[0]?.user?.fullName}
