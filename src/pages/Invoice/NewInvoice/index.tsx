@@ -215,7 +215,7 @@ const NewInvoice = (props: any) => {
     if (!selectedClient) {
       message.error('Please select client')
     }
-    if (selectedClient?.invoicingEmail === null) {
+    if (selectedClient?.invoicingEmail === null || selectedClient?.invoicingEmail === "") {
       message.error('Please add client invoicing email to send the invoice')
       return;
     }
