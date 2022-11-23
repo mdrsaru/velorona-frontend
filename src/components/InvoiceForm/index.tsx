@@ -154,6 +154,14 @@ const InvoiceForm = (props: IProps) => {
     }
   );
 
+  let query:any={};
+  query={
+    client_id: props.client_id,
+    company_id,
+  }
+  if(props?.user_id){
+    query.user_id = props?.user_id;
+  }
   const { data: projectData, loading: projectLoading } = useQuery<
     GraphQLResponse<'Project', ProjectPagingResult>,
     QueryProjectArgs
@@ -162,10 +170,7 @@ const InvoiceForm = (props: IProps) => {
     nextFetchPolicy: 'cache-only',
     variables: {
       input: {
-        query: {
-          client_id: props.client_id,
-          company_id,
-        }
+        query: query
       }
     }
   });

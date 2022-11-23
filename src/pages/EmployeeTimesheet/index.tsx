@@ -246,7 +246,7 @@ const EmployeeTimesheet = () => {
       dataIndex: 'invoiceStatus',
       render: (status: string) => {
         if(!status) {
-          return 'N/A';
+          return '-';
         }
 
         return (

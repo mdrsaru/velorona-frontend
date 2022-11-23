@@ -444,7 +444,14 @@ const _Routes = () => {
                   </Suspense>
                 }
               />
-
+              <Route
+                path={routes.attachProject.childPath}
+                element={
+                  <Suspense fallback={<RouteLoader />}>
+                    <routes.attachProject.component />
+                  </Suspense>
+                }
+              />
               <Route
                 path={routes.editEmployee.childPath}
                 element={

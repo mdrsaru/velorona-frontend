@@ -1,0 +1,44 @@
+.user-pay-rate {
+  :global {
+    .ant-input-number-group-addon {
+      background-color: var(--gray-2);
+      border: none;
+    }
+
+    .ant-input-number-group-addon:first-child {
+      color: var(--gray-secondary);
+      font-weight: 600;
+      font-size: 18px;
+    }
+
+    .ant-input-number-group-addon:last-child {
+      color: var(--primary-purple);
+    }
+
+    .ant-modal-close-x {
+      padding-top: 1rem;
+      padding-right: 1rem;
+    }
+
+    .ant-select .ant-select-arrow {
+      padding-right: 0;
+    }
+  }
+}
+
+.form-select-item {
+  height: 10px;
+}
+
+.employee-col{
+	margin-bottom: 2rem;
+}
+
+.main-div{
+  padding:2rem;
+  
+}
+
+.card{
+  padding:2rem;
+}

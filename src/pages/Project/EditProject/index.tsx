@@ -11,9 +11,11 @@ import { PROJECT } from "../index";
 
 import styles from "../style.module.scss";
 import { GraphQLResponse } from "../../../interfaces/graphql.interface";
-import { MutationProjectUpdateArgs, Project} from "../../../interfaces/generated";
+import { MutationProjectUpdateArgs, Project, QueryUserArgs, QueryUserClientArgs, RoleName, UserClientPagingResult, UserPagingResult } from "../../../interfaces/generated";
 import routes from "../../../config/routes";
 import { CLIENT } from "../../Client";
+import { USER } from "../../Employee";
+import { USERCLIENT } from "../../Employee/DetailEmployee";
 
 interface ItemProps {
   label: string;
@@ -45,8 +47,14 @@ const EditProject = () => {
   const navigate = useNavigate();
   const loggedInUser = authVar();
   const { Option } = Select;
+  const selectProps = {
+    placeholder: "Select Employees",
+    mode: "multiple" as const,
+    style: { width: "100%" }
+  };
 
-  const [projectUpdate] = useMutation<GraphQLResponse<'ProjectUpdate',Project>,MutationProjectUpdateArgs>(PROJECT_UPDATE);
+
+  const [projectUpdate] = useMutation<GraphQLResponse<'ProjectUpdate', Project>, MutationProjectUpdateArgs>(PROJECT_UPDATE);
 
   const { data: projectData } = useQuery(PROJECT, {
     variables: {
@@ -72,8 +80,72 @@ const EditProject = () => {
     }
   })
 
+  const { data: employeeData } = useQuery<GraphQLResponse<'User', UserPagingResult>, QueryUserArgs>(USER, {
+    fetchPolicy: "network-only",
+    nextFetchPolicy: "cache-first",
+    variables: {
+      input: {
+        query: {
+          role: RoleName.Employee,
+        },
+        paging: {
+          order: ["updatedAt:DESC"],
+        },
+      },
+    },
+  });
+  
+  const { data: userClientData } = useQuery<GraphQLResponse<'UserClient', UserClientPagingResult>, QueryUserClientArgs>(USERCLIENT, {
+		fetchPolicy: "network-only",
+		nextFetchPolicy: "cache-first",
+		skip: !projectData?.Project?.data[0]?.client?.id,
+		variables: {
+			input: {
+				query: {
+					client_id:projectData?.Project?.data[0]?.client?.id as string
+				},
+				paging: {
+					order: ["updatedAt:DESC"],
+				},
+			},
+		},
+	});
+
+  console.log(userClientData)
+
+	const { data: userData } = useQuery<GraphQLResponse<'User', UserPagingResult>, QueryUserArgs>(USER, {
+		fetchPolicy: "network-only",
+		nextFetchPolicy: "cache-first",
+		variables: {
+			input: {
+				query: {
+					company_id: loggedInUser?.company?.id,
+					role: RoleName.Employee
+				},
+				paging: {
+					order: ["updatedAt:DESC"],
+				},
+			},
+		},
+	});
+
+	let userClientList:any=[], userList;
+	if (userClientData?.UserClient?.data?.length) {
+		userClientList = userClientData?.UserClient?.data?.filter(function (userClient) {
+			return userClient?.status === "Active"
+		}
+		);
+	} else {
+		userList = userData?.User?.data.filter((entry: any) => {
+			return entry?.activeClient === null
+		});
+	}
+console.log(userClientList,'userClientList')
+console.log(userList)
+  
   const onSubmitForm = (values: any) => {
     let key = 'project'
+    console.log(values)
     projectUpdate({
       variables: {
         input: {
@@ -81,6 +153,7 @@ const EditProject = () => {
           name: values.name,
           company_id: loggedInUser?.company?.id as string,
           client_id: values.client,
+          user_ids: values?.assignee,
         }
       }
     }).then((response) => {
@@ -115,7 +188,10 @@ const EditProject = () => {
             onFinish={onSubmitForm}
             initialValues={{
               name: projectData?.Project?.data[0]?.name ?? '',
-              client: projectData?.Project?.data[0]?.client?.name ?? '',
+              client: projectData?.Project?.data[0]?.client?.id ?? '',
+              assignee: projectData?.Project?.data[0]?.users?.map((user: any) => {
+                return user?.id
+              }) ?? "",
             }}
           >
             <Row>
@@ -145,14 +221,44 @@ const EditProject = () => {
                   </Select>
                 </Form.Item>
               </Col>
+              <Col xs={24} sm={24} md={24} lg={24} className={styles.formCol}>
+							<Form.Item
+								name="assignee"
+								label="Tasks Assigned to"
+								style={{ position: "relative" }}>
+								<Select
+									{...selectProps}
+									allowClear
+									placeholder="Please select">
+									{userClientList?.length ?
+										userClientList?.map((userClient:any, index: number) => (
+											<Option
+												value={userClient?.user?.id}
+												key={index+1}>
+												{userClient?.user?.fullName} / {userClient?.user?.email}
+											</Option>
+										))
+                    :
+									
+                    userList?.map((user, index: number) => (
+											<Option
+												value={user?.id}
+												key={index}>
+												{user?.fullName} / {user?.email}
+											</Option>
+										))
+									}
+								</Select>
+							</Form.Item>
+						</Col>
             </Row>
             <br /><br />
             <Row justify="end">
               <Col>
                 <Form.Item>
                   <Space>
-                    <Button type="default" htmlType="button" onClick={()=>navigate(routes.projects.path(loggedInUser?.company?.id as string))}>Cancel</Button>
-                    <Button type="primary" htmlType="submit">Edit Project</Button>
+                    <Button type="default" htmlType="button" onClick={() => navigate(routes.projects.path(loggedInUser?.company?.id as string))}>Cancel</Button>
+                    <Button type="primary" htmlType="submit">Update Project</Button>
                   </Space>
                 </Form.Item>
               </Col>

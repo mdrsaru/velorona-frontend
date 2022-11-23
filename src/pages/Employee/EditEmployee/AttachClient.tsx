@@ -170,6 +170,7 @@ const AttachClient = () => {
   }
 
   const addClientToEmployee = () => {
+
     associateClient({
       variables: {
         input: {
@@ -183,7 +184,8 @@ const AttachClient = () => {
         return notifyGraphqlError((response.errors))
       } else if (response?.data?.UserClientAssociate) {
         message.success(`Client is associated with employee successfully!`).then(r => { });
-        navigate(routes.user.path(authData?.company?.code ?? ''));
+    navigate(routes.attachProject.path(authData?.company?.code as string,params?.eid as string,client))
+    // navigate(routes.user.path(authData?.company?.code ?? ''));
       }
     }).catch(notifyGraphqlError)
   }

@@ -105,8 +105,9 @@ const AssignedUser = (props: IProps) => {
 			centered
 			visible={props?.visibility}
 			className={styles['attach-timesheet']}
+			key={props?.project?.id}
 			closeIcon={[
-				<div onClick={() => props?.setVisibility(false)} key={1}>
+				<div onClick={() => props?.setVisibility(false)}>
 					<span className={styles["close-icon-div"]}>
 						<CloseOutlined />
 					</span>

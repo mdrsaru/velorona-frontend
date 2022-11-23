@@ -104,14 +104,14 @@ const NewInvoice = (props: any) => {
   const loggedInUser = authVar();
   const company_id = loggedInUser?.company?.id as string;
 
-  const { 
+  const {
     data: clientData,
     loading: clientLoading,
   } = useQuery<
-    GraphQLResponse<'Client', ClientPagingResult>, 
+    GraphQLResponse<'Client', ClientPagingResult>,
     QueryClientArgs
   >(
-    CLIENT_LIST, 
+    CLIENT_LIST,
     {
       fetchPolicy: 'network-only',
       nextFetchPolicy: 'cache-first',
@@ -155,7 +155,7 @@ const NewInvoice = (props: any) => {
     nextFetchPolicy: 'cache-only',
     onError: notifyGraphqlError,
     onCompleted(response) {
-      if(response.ProjectItems) {
+      if (response.ProjectItems) {
         let totalAmount = 0;
         let totalQuantity = 0;
 
@@ -176,7 +176,7 @@ const NewInvoice = (props: any) => {
         totalAmount = round(totalAmount, 2);
 
         const invoice: IInvoiceInput = {
-          issueDate: new Date(), 
+          issueDate: new Date(),
           dueDate: new Date(),
           needProject: true,
           poNumber: '',
@@ -199,19 +199,25 @@ const NewInvoice = (props: any) => {
     }
   });
 
-  const onClientChange= (value: string) => {
+  const onClientChange = (value: string) => {
     fetchClient({
       variables: {
         id: value,
       },
     }).then((response) => {
+      console.log(response, 'response')
       setSelectedClient(response?.data?.ClientById)
     });
   }
 
   const confirmCompany = () => {
-    if(!selectedClient) {
+    console.log(selectedClient)
+    if (!selectedClient) {
       message.error('Please select client')
+    }
+    if (selectedClient?.invoicingEmail === null) {
+      message.error('Please add client invoicing email to send the invoice')
+      return;
     }
     setConfirmed(true);
   }
@@ -233,7 +239,7 @@ const NewInvoice = (props: any) => {
 
   const onFilterChange = (e: RadioChangeEvent) => {
     const value = e.target.value;
-    if(value === false) {
+    if (value === false) {
       setShowForm(true)
       removeFilterValues();
     } else {
@@ -248,7 +254,7 @@ const NewInvoice = (props: any) => {
   }
 
   const onDateRangeChange = (values: any) => {
-    if(values?.length) {
+    if (values?.length) {
       const start = values[0]?.format('YYYY-MM-DD');
       const end = values[1]?.format('YYYY-MM-DD');
       setStartDate(start)
@@ -257,15 +263,15 @@ const NewInvoice = (props: any) => {
   }
 
   const applyFilter = () => {
-    if(!startDate || !endDate || !user_id || !selectedClient) {
+    if (!startDate || !endDate || !user_id || !selectedClient) {
       return message.error('Please select all filter data.');
     }
 
     fetchProjectItems({
       variables: {
         input: {
-          startTime: startDate ! + ' 00:00:00',
-          endTime: endDate ! + ' 23:59:59',
+          startTime: startDate! + ' 00:00:00',
+          endTime: endDate! + ' 23:59:59',
           company_id,
           user_id: user_id!,
           client_id: selectedClient!.id,
@@ -280,14 +286,14 @@ const NewInvoice = (props: any) => {
     setInvoiceInput(undefined);
   }
 
-  if(clientLoading) {
+  if (clientLoading) {
     return null;
   }
 
   return (
     <div className={styles['container']}>
       <Card bordered={false}>
-        <PageHeader 
+        <PageHeader
           title={<><ArrowLeftOutlined onClick={() => navigate(-1)} /> &nbsp; Add Invoice</>}
         />
 
@@ -349,7 +355,7 @@ const NewInvoice = (props: any) => {
             showForm && (
               <>
                 <div className={styles['attachment']}>
-                  <Attachment 
+                  <Attachment
                     attachments={attachments}
                     setAttachments={setAttachments}
                   />
@@ -357,11 +363,11 @@ const NewInvoice = (props: any) => {
 
                 <div className={styles['invoice-form']}>
                   <Spin spinning={itemsLoading}>
-                    <InvoiceForm 
+                    <InvoiceForm
                       startDate={startDate}
                       endDate={endDate}
                       user_id={user_id}
-                      client_id={selectedClient?.id as string} 
+                      client_id={selectedClient?.id as string}
                       invoice={invoiceInput}
                       attachments={attachments}
                       invoicingEmail={selectedClient?.invoicingEmail}
