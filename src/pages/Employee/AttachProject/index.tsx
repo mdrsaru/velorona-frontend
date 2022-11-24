@@ -8,7 +8,7 @@ import { gql, useMutation, useQuery } from "@apollo/client";
 import { PROJECT } from "../../Project";
 import { GraphQLResponse } from "../../../interfaces/graphql.interface";
 import { CurrencyPagingResult, MutationAttachProjectToUserArgs, MutationUserPayRateCreateArgs, QueryCurrencyArgs, User, UserPayRate } from "../../../interfaces/generated";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { CURRENCY } from "../../Currency";
 import routes from '../../../config/routes';
 import { USER_PAYRATE_CREATE } from "../../../components/UserPayRate";
@@ -127,6 +127,10 @@ const AttachProject = () => {
     }
   }
 
+	useEffect(() => {
+		form.setFieldsValue(defaultValues)
+}, [form, defaultValues])
+
 	const selectUserRateCurrency = (
 		<Form.Item name='user_rate_currency_id' className={styles['form-select-item']}>
 			<Select style={{ width: '5rem' }} placeholder='Symbol'>
@@ -241,7 +245,7 @@ const AttachProject = () => {
 					)
 					:
 					(
-						<>
+						<div className={styles["user-pay-rate"]}>
 							<Row>
 						<Col span={12} className={styles["employee-col"]}>
 							<h1>
@@ -337,7 +341,7 @@ const AttachProject = () => {
 								</Col>
 							</Row>
 						</Form>
-						</>
+						</div>
 					)
 				}
 			</Card>

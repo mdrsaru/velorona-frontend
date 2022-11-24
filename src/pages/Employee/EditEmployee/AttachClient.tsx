@@ -15,7 +15,8 @@ import { CLIENT } from "../../Client";
 
 import styles from "../style.module.scss";
 import { GraphQLResponse } from "../../../interfaces/graphql.interface";
-import { Client, ClientPagingResult, MutationClientCreateArgs, MutationUserClientAssociateArgs, QueryClientArgs, UserClient } from "../../../interfaces/generated";
+import { Client, ClientPagingResult, MutationClientCreateArgs, MutationUserClientAssociateArgs, QueryClientArgs, QueryUserClientArgs, UserClient, UserClientPagingResult } from "../../../interfaces/generated";
+import { USERCLIENT } from "../DetailEmployee";
 
 export const ASSOCIATE_USER_WITH_CLIENT = gql`
     mutation UserClientAssociate($input: UserClientAssociateInput!) {
@@ -87,6 +88,23 @@ const AttachClient = () => {
       }
     }
   })
+
+  const { data: userClientData } = useQuery<
+    GraphQLResponse<'UserClient', UserClientPagingResult>,
+    QueryUserClientArgs
+  >(USERCLIENT, {
+    fetchPolicy: "network-only",
+    variables: {
+      input: {
+        query: {
+          user_id: params?.eid,
+        },
+        paging:{
+          order: ['updatedAt:DESC']
+        }
+      },
+    },
+  });
 
   const inputChangeSearch = debounce((e: any) => {
     searchClients({
@@ -260,7 +278,7 @@ const AttachClient = () => {
 
             <div className={styles['list-client-card']}>
               <Radio.Group
-                defaultValue={clientData?.Client?.data[0]?.id}
+                defaultValue={userClientData?.UserClient?.data?.[0]?.client_id}
                 onChange={onChangeClient}>
                 <Row
                   gutter={16}

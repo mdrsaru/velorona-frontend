@@ -67,9 +67,9 @@ const EditClient = () => {
       }
     })
 
-  const onSubmitForm = (values: any) => {
+  const onSubmitForm = () => {
     let key = 'message';
-
+    const values = form.getFieldsValue(true, (meta) => meta.touched);
     const input: ClientUpdateInput = {
       id: params?.cid as string,
       name: values.name,
