@@ -92,7 +92,7 @@ const AttachProject = () => {
 			content: `User pay rate added successfully!`,
 			className: "custom-message",
 		});
-		routes.user.path(loggedInUser?.company?.code as string)
+		navigate(routes.user.path(loggedInUser?.company?.code ?? ''));
 	},
 	onError(err) {
 		return notifyGraphqlError(err);
@@ -165,7 +165,7 @@ const AttachProject = () => {
 	);
 
 	const onCancel = () => {
-		routes.user.path(loggedInUser?.company?.code ?? '')
+		navigate(routes.user.path(loggedInUser?.company?.code ?? ''));
 	}
 
 	const onSubmitUserPaymentForm = (values: any) => {

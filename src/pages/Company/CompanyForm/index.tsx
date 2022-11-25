@@ -125,7 +125,9 @@ const CompanyForm = (props: IProps) => {
     }
   };
 
-  const onSubmitForm = (values: any) => {
+  const onSubmitForm = () => {
+
+    const values = form.getFieldsValue(true, (meta) => meta.touched);
     if(props.company) {
       const address = {
 

@@ -1,4 +1,4 @@
-import { Button, Card, Col, Form, Input, message, Row, Select, Space } from "antd"
+import { Button, Card, Col, Form, Input, message, Row, Space } from "antd"
 import { ArrowLeftOutlined } from "@ant-design/icons"
 
 import styles from './styles.module.scss'
@@ -54,7 +54,6 @@ export const ADMIN_CREATE = gql`
   }
 `
 
-const { Option } = Select
 
 interface UserResponseArray {
 	User: UserPagingResult
@@ -145,8 +144,13 @@ const AddSuperAdmin = () => {
 					) {
 						address[data] = values[data];
 						formData["address"] = address;
-					} else if (data !== "upload") {
+					} else if (data !== "upload" && data !== 'email') {
 						formData[data] = values[data];
+					}
+					else if (data === 'email'){
+						if( user?.email !== values['email']){
+						formData["email"] = values['email']
+						}
 					}
 					else if (values?.roles) {
 						formData["roles"] = [values?.roles]
