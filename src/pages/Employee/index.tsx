@@ -26,7 +26,6 @@ import {
   QueryUserArgs,
   // RoleName, 
   UserPagingResult,
-  UserStatus,
 } from "../../interfaces/generated";
 import styles from "./style.module.scss";
 import { debounce } from "lodash";
@@ -467,7 +466,6 @@ const Employee = () => {
   });
 
   const handleResendInvitation = (record: any) => {
-    console.log(record.id)
     resendInvitation({
       variables: {
         input: {
@@ -634,7 +632,7 @@ const Employee = () => {
               <div
                 onClick={() => handleViewPayRate(user)}
                 className={styles["add-pay-rate"]}>
-                View Payment
+                View Payment Details
               </div>
             )
             :

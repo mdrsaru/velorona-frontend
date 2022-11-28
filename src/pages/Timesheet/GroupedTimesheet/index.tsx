@@ -296,7 +296,7 @@ function getStatus(statuses: string[]) {
     return TimesheetStatus.PartiallyApproved;
   }
 
-  return TimesheetStatus.Pending;
+  return TimesheetStatus.Open;
 
 }
 

@@ -3,7 +3,7 @@ import { debounce } from 'lodash';
 import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useQuery, gql, useMutation } from '@apollo/client';
-import { MoreOutlined,SearchOutlined, SendOutlined, FormOutlined, UserOutlined, FileExcelOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
+import { SearchOutlined, SendOutlined, FormOutlined, UserOutlined, FileExcelOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import { Card, Row, Col, Table, Menu, Dropdown, Form, Select, Button, Input, Popconfirm, message } from 'antd';
 
 import routes from '../../config/routes';
@@ -28,7 +28,6 @@ import filterImg from "../../assets/images/filter.svg"
 
 import styles from './style.module.scss';
 
-const { SubMenu } = Menu;
 export const COMPANY = gql`
   query Company($input:CompanyQueryInput) {
     Company(input:$input) {
@@ -41,6 +40,7 @@ export const COMPANY = gql`
         status
         createdAt 
         companyCode
+        unapprovedNotification
         logo {
           id
           name

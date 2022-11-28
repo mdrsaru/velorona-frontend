@@ -205,13 +205,11 @@ const NewInvoice = (props: any) => {
         id: value,
       },
     }).then((response) => {
-      console.log(response, 'response')
       setSelectedClient(response?.data?.ClientById)
     });
   }
 
   const confirmCompany = () => {
-    console.log(selectedClient)
     if (!selectedClient) {
       message.error('Please select client')
     }

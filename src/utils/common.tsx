@@ -3,6 +3,7 @@ import { Button, notification } from 'antd';
 import type { NotificationPlacement } from 'antd/es/notification';
 import routes from '../config/routes';
 import { authVar } from '../App/link';
+import { Company } from '../interfaces/generated';
 
 export const round = (value: number, decimals: number): number => {
   const temp = parseFloat(value + `e+${decimals}`);
@@ -210,4 +211,46 @@ export const notifySubscriptionExpiration = (args: NotifySubscriptionExpiration)
     }, 2000)
   }
 
-} 
+}
+
+export type NotifyCompanySignUp = {
+  companyList: any
+};
+
+export const openPendingCompanyNotification = (args: NotificationArgs) => {
+
+  const btn = (
+    <Button><a href={routes.companyAdmin.path} target='_blank' rel="noreferrer">Go to Company List</a></Button>
+  )
+
+
+  notification.destroy()
+  notification[args.type]({
+    message: args.title,
+    description: args.description,
+    placement: args.placement ?? 'top',
+    duration: args.duration ?? 4.5,
+    btn
+  });
+};
+
+export const notifyCompanySignUp = (args: NotifyCompanySignUp) => {
+let unapprovedCompany = false;
+  args?.companyList?.map((company: Company, index: number) => {
+    if (company?.unapprovedNotification) {
+      unapprovedCompany = true
+    }
+
+    return(
+      <div key={index}></div>
+    )
+  })
+ if(unapprovedCompany){
+  openPendingCompanyNotification({
+    type: 'info',
+    title: `New company approval pending`,
+    description: `Click the button to see the upapproved company list`,
+    duration: 0,
+  });
+}
+}

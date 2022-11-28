@@ -12,11 +12,9 @@ interface IProps {
 }
 
 const UpdatePaymentDetails = (props: IProps) => {
-  const clientSecret = props.clientSecret;
   const stripe = useStripe();
   const elements = useElements();
   const [loading, setLoading] = useState(false);
-  console.log(props, 'props');
 
   const onFinish = async () => {
     if (!stripe || !elements) {

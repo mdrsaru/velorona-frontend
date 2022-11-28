@@ -1,22 +1,23 @@
-import moment from 'moment';
 import { Layout, Row, Col, Form, Input, Button, message, Modal, notification } from 'antd';
 import { useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { authVar } from '../../App/link';
-import { gql, useMutation } from '@apollo/client';
+import { gql, useMutation} from '@apollo/client';
 
 import { notifyGraphqlError } from '../../utils/error';
 import constants from '../../config/constants';
 import routes from '../../config/routes';
-import { notifySubscriptionExpiration } from '../../utils/common'
+import { notifyCompanySignUp, notifySubscriptionExpiration } from '../../utils/common'
 
 import logo from '../../assets/images/logo-content.svg';
 import highFiveImg from '../../assets/images/High_five.svg';
-import { LoginResponse, MutationLoginArgs, RoleName } from '../../interfaces/generated';
+import {  LoginResponse, MutationLoginArgs, RoleName } from '../../interfaces/generated';
 
 import styles from './style.module.scss';
 import { GraphQLResponse } from '../../interfaces/graphql.interface';
+import { COMPANY } from '../Company';
+import { useLazyQuery } from '@apollo/client';
 
 const LOGIN = gql`
   mutation Login($input: LoginInput!) {
@@ -79,6 +80,14 @@ const Login = () => {
     })
   }
 
+  const [getCompany] = useLazyQuery(
+    COMPANY,
+    {
+      fetchPolicy: "network-only",
+      nextFetchPolicy: "cache-first",
+    },
+  );
+
   const [login] = useMutation<
     GraphQLResponse<'Login', LoginResponse>,
     MutationLoginArgs
@@ -90,7 +99,23 @@ const Login = () => {
       const subscriptionPeriodEnd = loginData?.company?.subscriptionPeriodEnd;
       const trialEndDate = loginData?.company?.trialEndDate;
       const subscriptionStatus = loginData?.company?.subscriptionStatus;
+      if (roles.includes(RoleName.SuperAdmin)) {
+        getCompany({
+          variables: {
+            input: {
+              paging: {
+                order: ["updatedAt:ASC"],
+              },
+            }
+          }
+        }).then((response) => {
 
+          notifyCompanySignUp({
+            companyList: response?.data?.Company?.data
+          })
+
+        });
+      }
       authVar({
         token: loginData?.token,
         user: {
@@ -128,7 +153,6 @@ const Login = () => {
       }
 
       if (from === 'marketing' && redirectTo === '/subscription') {
-        console.log('if')
         navigate(routes.subscription.path(loginData?.company?.companyCode as string))
       }
       else if (roles.includes(constants.roles.SuperAdmin)) {
@@ -138,9 +162,10 @@ const Login = () => {
       } else {
         navigate(routes.home.path);
       }
+
+
     }
   });
-
   const [forgotPassword] = useMutation(FORGOT_PASSWORD, {
     onCompleted: (response: any) => {
       setModalVisible(false)
@@ -199,6 +224,7 @@ const Login = () => {
       }
     }).catch(notifyGraphqlError)
   }
+
 
 
   return (

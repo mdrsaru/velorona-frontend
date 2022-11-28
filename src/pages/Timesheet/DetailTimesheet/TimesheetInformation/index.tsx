@@ -16,8 +16,9 @@ import routes from '../../../../config/routes';
 
 const statusMap = {
   'Approved': 'Approved',
-  'Pending': 'Pending',
+  'Open': 'Open',
   'Rejected': 'Rejected',
+  'Submitted': 'Submitted',
   'PartiallyApproved': 'Partially Approved',
 };
 

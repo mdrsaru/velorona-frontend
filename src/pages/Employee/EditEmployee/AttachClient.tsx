@@ -31,6 +31,7 @@ export const ASSOCIATE_USER_WITH_CLIENT = gql`
                 }
             }
             client {
+                id
                 name
             }
         }
@@ -43,8 +44,6 @@ const AttachClient = () => {
   const navigate = useNavigate();
   const authData = authVar();
   const [form] = Form.useForm();
-  const [client, setClient] = useState('');
-  
   const [associateClient] = useMutation<
     GraphQLResponse<'UserClientAssociate', UserClient>,
     MutationUserClientAssociateArgs
@@ -105,6 +104,8 @@ const AttachClient = () => {
       },
     },
   });
+
+  const [client, setClient] = useState<string>(userClientData?.UserClient?.data?.[0]?.client_id ?? '');
 
   const inputChangeSearch = debounce((e: any) => {
     searchClients({
@@ -202,7 +203,8 @@ const AttachClient = () => {
         return notifyGraphqlError((response.errors))
       } else if (response?.data?.UserClientAssociate) {
         message.success(`Client is associated with employee successfully!`).then(r => { });
-    navigate(routes.attachProject.path(authData?.company?.code as string,params?.eid as string,client))
+         const clientId = response?.data?.UserClientAssociate?.client?.id;
+        navigate(routes.attachProject.path(authData?.company?.code as string, params?.eid as string, clientId))
     // navigate(routes.user.path(authData?.company?.code ?? ''));
       }
     }).catch(notifyGraphqlError)

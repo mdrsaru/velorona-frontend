@@ -111,7 +111,6 @@ const EditProject = () => {
 		},
 	});
 
-  console.log(userClientData)
 
 	const { data: userData } = useQuery<GraphQLResponse<'User', UserPagingResult>, QueryUserArgs>(USER, {
 		fetchPolicy: "network-only",
@@ -140,12 +139,9 @@ const EditProject = () => {
 			return entry?.activeClient === null
 		});
 	}
-console.log(userClientList,'userClientList')
-console.log(userList)
   
   const onSubmitForm = (values: any) => {
     let key = 'project'
-    console.log(values)
     projectUpdate({
       variables: {
         input: {
