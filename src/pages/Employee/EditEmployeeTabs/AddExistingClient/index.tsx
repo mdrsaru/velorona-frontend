@@ -244,7 +244,7 @@ const AddExistingClient = () => {
 			title: 'Invoice Rate',
 			dataIndex: 'invoiceRate',
 			render: (rate: number, index: any) => {
-				return <Input defaultValue={rate} onChange={onInputChange("invoiceRate", index)} disabled={index?.projectId === null} title={index?.projectId === null ? 'You need to add project' : ''} />
+				return <Input defaultValue={rate} onKeyPress={onInputChange("invoiceRate", index)} disabled={index?.projectId === null} title={index?.projectId === null ? 'You need to add project' : ''} />
 			}
 		},
 		{
