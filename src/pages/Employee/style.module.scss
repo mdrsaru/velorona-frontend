@@ -62,6 +62,10 @@
       width: 100%;
     }
 
+    .ant-input{
+      font-size: 1rem;
+      font-weight: 400;
+    }
     .ant-radio-button-wrapper-checked:not(.ant-radio-button-wrapper-disabled) {
       border: 2px solid var(--primary-blue);
       box-sizing: border-box;
@@ -101,7 +105,7 @@
 }
 
 .main-div {
-  padding: 2rem 0 2rem 0;
+  // padding: 2rem 0 2rem 0;
 
   :global {
     .ant-upload-list {
@@ -442,4 +446,18 @@ h1 {
 .skip-client{
   font-size: 1.1rem;
   font-weight: 600;
+}
+
+
+.add-new-client{
+	display: flex;
+  justify-content: end;
+	font-size: 1rem;
+	font-weight: 600;
+  margin-top: -2rem;
+  cursor: pointer;
+}
+
+.header{
+	display: inline;
 }

@@ -171,7 +171,7 @@ const routes = {
   editEmployee: {
     childPath: ':eid',
     path: (id: string, eid: string) => `/${id}/users/${eid}`,
-    component: lazy(() => import('../pages/Employee/EditEmployee')),
+    component: lazy(() => import('../pages/Employee/EditEmployeeTabs')),
     name: 'Edit User',
     key: 'employee'
   },

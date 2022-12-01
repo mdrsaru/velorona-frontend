@@ -205,7 +205,7 @@ const Payment = () => {
             </Row>
           )}
         </Form>
-        <Row className='container-row'>
+        <div className='container-row'>
           <Table
             loading={loading}
             dataSource={data?.SubscriptionPayment?.data}
@@ -218,7 +218,7 @@ const Payment = () => {
                 pageSize: constants.paging.perPage,
             }}
           />
-        </Row>
+        </div>
       </Card>
     </div>
   );
