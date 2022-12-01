@@ -39,7 +39,7 @@ const AddExistingClient = () => {
 	const authData = authVar();
 	const navigate = useNavigate();
 	
-	const { data: userClientDetailData } = useQuery<
+	const { data: userClientDetailData , refetch:refetchUserClientDetail } = useQuery<
 		GraphQLResponse<'UserClientDetail', UserClientDetail>,
 		QueryUserClientDetailArgs
 	>(USER_CLIENT_DETAIL, {
@@ -79,7 +79,17 @@ const AddExistingClient = () => {
 	const [associateClient] = useMutation<
 		GraphQLResponse<'UserClientAssociate', UserClient>,
 		MutationUserClientAssociateArgs
-	>(ASSOCIATE_USER_WITH_CLIENT);
+	>(ASSOCIATE_USER_WITH_CLIENT,{
+		onCompleted(){
+			refetchUserClientDetail({
+				input: {
+					company_id: authData?.company?.id as string,
+					user_id: params?.eid,
+				}
+			
+		})
+		}
+	});
 
 	const { data: projectData } = useQuery(PROJECT, {
 		fetchPolicy: "network-only",
@@ -100,8 +110,14 @@ const AddExistingClient = () => {
 		GraphQLResponse<'ClientCreate', User>,
 		MutationAttachProjectToUserArgs
 	>(ATTACH_PROJECT, {
-		onCompleted(response) {
-			message.success('suceess')
+		onCompleted() {
+			refetchUserClientDetail({
+				input: {
+					company_id: authData?.company?.id as string,
+					user_id: params?.eid,
+				}
+			
+		})
 		}
 	});
 
@@ -114,6 +130,13 @@ const AddExistingClient = () => {
 				content: `User pay rate updated successfully!`,
 				className: "custom-message",
 			});
+			refetchUserClientDetail({
+				input: {
+					company_id: authData?.company?.id as string,
+					user_id: params?.eid,
+				}
+			
+		})
 		},
 		onError(err) {
 			return message.error('You can not add pay rate to already existing project')
@@ -130,6 +153,13 @@ const AddExistingClient = () => {
 				content: `User pay rate added successfully!`,
 				className: "custom-message",
 			});
+			refetchUserClientDetail({
+					input: {
+						company_id: authData?.company?.id as string,
+						user_id: params?.eid,
+					}
+				
+			})
 		},
 		onError(err) {
 			return notifyGraphqlError(err);
@@ -140,6 +170,7 @@ const AddExistingClient = () => {
 	const onInputChange = (key: any, index: any) => (
 		e: any
 	) => {
+		console.log(index)
 		if (e.key === 'Enter') {
 			if (index?.userPayRateId !== null) {
 				userPayRateUpdate({
