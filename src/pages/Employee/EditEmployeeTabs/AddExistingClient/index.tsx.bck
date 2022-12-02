@@ -1,4 +1,4 @@
-import { Input, message, Select, Button, Form } from "antd"
+import { Input, Table, message, Select, Button, Form } from "antd"
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { ClientPagingResult, QueryClientArgs, UserClientDetail, QueryUserClientDetailArgs, MutationUserPayRateUpdateArgs, UserPayRate, MutationAttachProjectToUserArgs, User, MutationUserPayRateCreateArgs, MutationUserClientAssociateArgs, UserClient } from "../../../../interfaces/generated";
 import { GraphQLResponse } from "../../../../interfaces/graphql.interface";
@@ -8,6 +8,7 @@ import { authVar } from "../../../../App/link";
 import { useState, useEffect } from "react";
 import { USER_PAYRATE_UPDATE } from "../../../../components/EditUserPayRate";
 import { PROJECT } from "../../../Project";
+import Status from "../../../../components/Status";
 import { ATTACH_PROJECT } from "../../AttachProject";
 import { USER_PAYRATE_CREATE } from "../../../../components/UserPayRate";
 import { notifyGraphqlError } from "../../../../utils/error";
@@ -39,11 +40,9 @@ const AddExistingClient = () => {
 	const navigate = useNavigate();
 	const [form] = Form.useForm()
 	const [client, setClient] = useState('')
-	const [projects, setProject] = useState([])
-	const [showRow, setShowRow] = useState(false)
+const [projects,setProject] = useState([])
 
-
-	const { data: userClientDetailData , refetch:refetchUserClientDetail } = useQuery<
+	const { data: userClientDetailData, refetch: refetchUserClientDetail } = useQuery<
 		GraphQLResponse<'UserClientDetail', UserClientDetail>,
 		QueryUserClientDetailArgs
 	>(USER_CLIENT_DETAIL, {
@@ -80,7 +79,7 @@ const AddExistingClient = () => {
 		},
 	});
 
-	const { refetch: refetchProject } = useQuery(PROJECT, {
+	const { data: projectData, refetch: refetchProject } = useQuery(PROJECT, {
 		fetchPolicy: "network-only",
 		nextFetchPolicy: "cache-first",
 		skip: !client,
@@ -97,48 +96,57 @@ const AddExistingClient = () => {
 		}
 	})
 
+	
+
 	const [associateClient] = useMutation<
 		GraphQLResponse<'UserClientAssociate', UserClient>,
 		MutationUserClientAssociateArgs
 	>(ASSOCIATE_USER_WITH_CLIENT, {
 		onCompleted(response) {
 			form.resetFields(['project'])
-			refetchUserClientDetail({
-				input: {
-					company_id: authData?.company?.id as string,
-					user_id: params?.eid,
-				}
+			// 	refetchUserClientDetail({
+			// 		input: {
+			// 			company_id: authData?.company?.id as string,
+			// 			user_id: params?.eid,
+			// 		}
 
-			})
+			// })
+console.log(response)
 			refetchProject({
 				input: {
 					query: {
 						company_id: authData?.company?.id as string,
-						client_id: response?.UserClientAssociate?.client?.id				},
-				paging: {
-					order: ["updatedAt:DESC"],
-				},
-		}
+						client_id: response?.UserClientAssociate?.client?.id
+					},
+					paging: {
+						order: ["updatedAt:DESC"],
+					},
+				}
+
 			})
-				.then((response) => {
-					setProject(response.data.Project.data)
-				})
+			.then((response)=>{
+				console.log(response.data.Project.data,'response')
+				setProject(response.data.Project.data)
+			})
 		}
 	});
+
+
+	console.log(projectData,'project')
+	console.log(projects)
 
 	const [attachProject] = useMutation<
 		GraphQLResponse<'ClientCreate', User>,
 		MutationAttachProjectToUserArgs
 	>(ATTACH_PROJECT, {
 		onCompleted() {
-			setShowRow(false)
 			refetchUserClientDetail({
 				input: {
 					company_id: authData?.company?.id as string,
 					user_id: params?.eid,
 				}
-			
-		})
+
+			})
 		}
 	});
 
@@ -156,8 +164,8 @@ const AddExistingClient = () => {
 					company_id: authData?.company?.id as string,
 					user_id: params?.eid,
 				}
-			
-		})
+
+			})
 		},
 		onError(err) {
 			return message.error('You can not add pay rate to already existing project')
@@ -243,19 +251,87 @@ const AddExistingClient = () => {
 	}
 
 	const handleAdd = () => {
-		form.resetFields()
-		setShowRow(!showRow)
-	};
+		const newData = {
+			clientName: <Form form={form}
+				layout="vertical"
+			>
+				<Select onChange={handleAddClient} placeholder='Select client'>
+					{
+						clientData?.Client?.data?.map((client: any, index: number) => (
+							<Select.Option value={client.id} key={index}>{client?.name}</Select.Option>
 
-	const tableData = dataSource?.map((data: any, index: number) => (
-		<tr>
-			<td>{data.clientName}</td>
-			<td>{data.projectName}</td>
-			<td><Input defaultValue={data.userRate} onKeyPress={onInputChange("amount", data)} /></td>
-			<td><Input defaultValue={data.invoiceRate} onKeyPress={onInputChange("invoiceRate", data)} /></td>
-			<td>{data.status}</td>
-		</tr>
-	))
+						))
+					}
+				</Select>
+			</Form>,
+			projectName: <Form form={form}
+				layout="vertical"
+			>
+				<Form.Item
+					name="project"
+					label="Client"
+					rules={[{
+						required: true,
+						message: 'Choose the client'
+					}]}>
+
+					<Select onChange={handleChangeProject} placeholder='Select project' >
+						{
+							projectData &&
+							projectData?.Project?.data?.map((project: any, index: number) => (
+								<Select.Option value={project.id} key={index}>{project?.name}</Select.Option>
+
+							))
+						}
+					</Select>
+				</Form.Item>
+			</Form>
+		};
+		setDataSource([...dataSource, newData]);
+	};
+	const columns: any = [
+		{
+			title: 'Client Name',
+			dataIndex: 'clientName',
+		},
+		{
+			title: 'Project Name',
+			dataIndex: 'projectName'
+			// render: (data: any) => {
+			// 	return (
+			// 		<Select defaultValue={data?.projectName} onChange={handleChangeProject} >
+			// 			{
+			// 				projectData?.Project?.data?.map((project: any, index: number) => (
+			// 					<Select.Option value={project.id} key={index}>{project?.name}</Select.Option>
+
+			// 				))
+			// 			}
+			// 		</Select>
+			// 	)
+			// }
+		},
+		{
+			title: 'User Rate',
+			dataIndex: 'userRate',
+			render: (rate: number, index: any) => {
+				return <Input defaultValue={rate} onKeyPress={onInputChange("amount", index)} disabled={index?.projectId === null} title={index?.projectId === null ? 'You need to add project' : ''} />
+			}
+		},
+		{
+			title: 'Invoice Rate',
+			dataIndex: 'invoiceRate',
+			render: (rate: number, index: any) => {
+				return <Input defaultValue={rate} onKeyPress={onInputChange("invoiceRate", index)} disabled={index?.projectId === null} title={index?.projectId === null ? 'You need to add project' : ''} />
+			}
+		},
+		{
+			title: 'Status',
+			dataIndex: 'status',
+			render: (status: string) => <Status status={status} />,
+		},
+
+	];
+
 	return (
 		<div className={styles['modal-body']}>
 			<div className={styles['header']}>
@@ -272,87 +348,62 @@ const AddExistingClient = () => {
 				</div>
 			</div>
 
-
-			<div className={styles['detail-table']}>
-
-				<Form form={form}>
-					<table className={styles['main-table']}>
-						<thead>
-							<tr className={styles['table-header']}>
-								<th>Client Name</th>
-								<th>Project Name</th>
-								<th>User Rate</th>
-								<th>Invoice Rate</th>
-								<th>Status</th>
-							</tr>
-						</thead>
-
-						<tbody>
-							{tableData}
-
-							{showRow &&
-								<tr>
-
-									<td>
-										<Form.Item
-											name="client"
-											rules={[{
-												required: true,
-												message: 'Choose the client'
-											}]}>
-											<Select onChange={handleAddClient} placeholder='Select client'>
-												{
-													clientData?.Client?.data?.map((client: any, index: number) => (
-														<Select.Option value={client.id} key={index}>{client?.name}</Select.Option>
-
-													))
-												}
-											</Select>
-										</Form.Item>
-									</td>
-									<td>
-										<Form.Item
-											name="project1"
-											rules={[{
-												required: true,
-												message: 'Choose the client'
-											}]}>
-
-											<Select onChange={handleChangeProject} placeholder='Select project' >
-												{
-													projects &&
-													projects?.map((project: any, index: number) => (
-														<Select.Option value={project.id} key={index}>{project?.name}</Select.Option>
-
-													))
-												}
-											</Select>
-										</Form.Item>
-
-									</td>
-									<td>
-										<Input onKeyPress={onInputChange("amount", 0)} disabled={true} title={'You need to add project'}/>
-									</td>
-									<td>
-										<Input onKeyPress={onInputChange("invoiceRate", 0)} disabled={true} title='You need to add project'/>
-									</td>
-									<td>N/A</td>
-
-								</tr>
-							}
-						</tbody>
-					</table>
-				</Form>
-			</div>
-			<Button
-				onClick={handleAdd}
-				type="primary"
-				style={{
-					marginBottom: 16,
-				}}
+			<Form form={form}
+				layout="vertical"
 			>
-				Add a row
-			</Button>
+				<Form.Item
+					name="client"
+					label="Client"
+					rules={[{
+						required: true,
+						message: 'Choose the client'
+					}]}>
+				<Select onChange={handleAddClient} placeholder='Select client'>
+					{
+						clientData?.Client?.data?.map((client: any, index: number) => (
+							<Select.Option value={client.id} key={index}>{client?.name}</Select.Option>
+
+						))
+					}
+				</Select>
+				</Form.Item>
+				<Form.Item
+					name="project1"
+					label="Project"
+					rules={[{
+						required: true,
+						message: 'Choose the client'
+					}]}>
+
+					<Select onChange={handleChangeProject} placeholder='Select project' >
+						{
+							projects &&
+							projects?.map((project: any, index: number) => (
+								<Select.Option value={project.id} key={index}>{project?.name}</Select.Option>
+
+							))
+						}
+					</Select>
+				</Form.Item>
+			</Form>
+			{/* <br /><br /> */}
+			<div className={styles['add-body']}>
+				<Table
+					dataSource={dataSource as any}
+					columns={columns}
+					pagination={false}
+				/>
+				<Button
+					onClick={handleAdd}
+					type="primary"
+					style={{
+						marginBottom: 16,
+					}}
+				>
+					Add a row
+				</Button>
+			</div>
+
 		</div>
 	)
 }
