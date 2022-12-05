@@ -663,7 +663,7 @@ const Invoice = () => {
                   </Select>
                 </Form.Item>
               </Col>
-              <Col xs={24} sm={12} md={10} lg={8} xl={5}>
+              <Col xs={24} sm={12} md={10} lg={8} xl={8}>
                 <Form.Item name='date' label=''>
                   <RangePicker size='large' onChange={onChangeFilter} />
                 </Form.Item>

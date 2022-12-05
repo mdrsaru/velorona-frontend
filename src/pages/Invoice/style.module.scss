@@ -32,3 +32,29 @@
   color: var(--primary-green);
 }
 
+.filter-col {
+  display: flex;
+  justify-content: flex-end;
+  margin-left: 3rem;
+
+  @media screen and (max-width: 767px) {
+    padding-bottom: 1rem;
+  }
+
+  :global {
+    .ant-btn-text {
+      color: var(--gray-secondary);
+    }
+
+    .ant-btn {
+      border-radius: 0;
+      height: 50px;
+      border-color: var(--gray-2);
+      background: var(--gray-2);
+      &:focus {
+        border-color: var(--primary-blue);
+        color: var(--black-1);
+      }
+    }
+  }
+}

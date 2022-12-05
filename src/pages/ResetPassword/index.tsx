@@ -98,10 +98,11 @@ const ResetPassword = () => {
               <Button
                 type="primary"
                 htmlType="submit"
-                disabled={
-                  !form.isFieldsTouched(true) ||
-                  !!form.getFieldsError().filter(({errors}) => errors.length).length
-                }>
+                // disabled={
+                //   !form.isFieldsTouched(true) ||
+                //   !!form.getFieldsError().filter(({errors}) => errors.length).length
+                // }
+                >
                 Reset Password
               </Button> <br/><br/>
               <Button type="default" onClick={() => navigate(routes?.login?.path)}>Go to Login</Button>

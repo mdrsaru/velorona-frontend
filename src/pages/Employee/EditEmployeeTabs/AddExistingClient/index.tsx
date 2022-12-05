@@ -191,8 +191,6 @@ const AddExistingClient = () => {
 	const onInputChange = (key: any, index: any) => (
 		e: any
 	) => {
-		console.log(index)
-		if (e.key === 'Enter') {
 			if (index?.userPayRateId !== null) {
 				userPayRateUpdate({
 					variables: {
@@ -215,7 +213,7 @@ const AddExistingClient = () => {
 					}
 				})
 			}
-		}
+		
 	};
 
 	const handleChangeProject = (id: string) => {

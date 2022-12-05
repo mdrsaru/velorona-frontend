@@ -98,8 +98,8 @@ export const employee_timesheet_status = [{
   name: 'Approved'
 },
 {
-  value: 'Pending',
-  name: 'Pending'
+  value: 'Open',
+  name: 'Open'
 },
 {
   value: 'Rejected',
