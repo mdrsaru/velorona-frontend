@@ -1,6 +1,6 @@
 import { Input, message, Select, Button, Form } from "antd"
 import { gql, useMutation, useQuery } from "@apollo/client";
-import { ClientPagingResult, QueryClientArgs, UserClientDetail, QueryUserClientDetailArgs, MutationUserPayRateUpdateArgs, UserPayRate, MutationAttachProjectToUserArgs, User, MutationUserPayRateCreateArgs, MutationUserClientAssociateArgs, UserClient } from "../../../../interfaces/generated";
+import { ClientPagingResult, QueryClientArgs, UserClientDetail, QueryUserClientDetailArgs, MutationUserPayRateUpdateArgs, UserPayRate, MutationAttachProjectToUserArgs, User, MutationUserPayRateCreateArgs, MutationUserClientAssociateArgs, UserClient, UserClientStatus, MutationUserClientChangeStatusArgs } from "../../../../interfaces/generated";
 import { GraphQLResponse } from "../../../../interfaces/graphql.interface";
 import { useParams } from 'react-router-dom';
 import { CLIENT } from "../../../Client";
@@ -24,6 +24,7 @@ export const USER_CLIENT_DETAIL = gql`
      user_id
 		 projectName
 		 clientName
+		 clientId
 		 invoiceRate
 		 userRate
 		 status
@@ -32,6 +33,17 @@ export const USER_CLIENT_DETAIL = gql`
     }
   }
 `;
+
+export const USER_CLIENT_UPDATE_STATUS = gql`
+    mutation UserClientChangeStatus($input: UserClientChangeStatusInput!) {
+      UserClientChangeStatus(input: $input) {
+       status
+			 user_id 
+			 client_id 
+      }
+    }
+  `;
+
 
 const AddExistingClient = () => {
 	const params = useParams()
@@ -43,7 +55,7 @@ const AddExistingClient = () => {
 	const [showRow, setShowRow] = useState(false)
 
 
-	const { data: userClientDetailData , refetch:refetchUserClientDetail } = useQuery<
+	const { data: userClientDetailData, refetch:refetchUserClientDetail } = useQuery<
 		GraphQLResponse<'UserClientDetail', UserClientDetail>,
 		QueryUserClientDetailArgs
 	>(USER_CLIENT_DETAIL, {
@@ -114,11 +126,12 @@ const AddExistingClient = () => {
 				input: {
 					query: {
 						company_id: authData?.company?.id as string,
-						client_id: response?.UserClientAssociate?.client?.id				},
-				paging: {
-					order: ["updatedAt:DESC"],
-				},
-		}
+						client_id: response?.UserClientAssociate?.client?.id
+					},
+					paging: {
+						order: ["updatedAt:DESC"],
+					},
+				}
 			})
 				.then((response) => {
 					setProject(response.data.Project.data)
@@ -137,7 +150,7 @@ const AddExistingClient = () => {
 					company_id: authData?.company?.id as string,
 					user_id: params?.eid,
 				}
-			
+   
 		})
 		}
 	});
@@ -156,7 +169,7 @@ const AddExistingClient = () => {
 					company_id: authData?.company?.id as string,
 					user_id: params?.eid,
 				}
-			
+
 		})
 		},
 		onError(err) {
@@ -188,31 +201,44 @@ const AddExistingClient = () => {
 		}
 	})
 
+	const [updateUserClientStatus] = useMutation<
+	GraphQLResponse<'UpdateUserClientStatus', UserClient>, MutationUserClientChangeStatusArgs>(USER_CLIENT_UPDATE_STATUS,{
+		onCompleted(){
+			refetchUserClientDetail({
+				input: {
+					company_id: authData?.company?.id as string,
+					user_id: params?.eid,
+				}
+
+			})
+		}
+	})
+
 	const onInputChange = (key: any, index: any) => (
 		e: any
 	) => {
-			if (index?.userPayRateId !== null) {
-				userPayRateUpdate({
-					variables: {
-						input: {
-							id: index?.userPayRateId,
-							[key]: Number(e.target.value)
-						}
+		if (index?.userPayRateId !== null) {
+			userPayRateUpdate({
+				variables: {
+					input: {
+						id: index?.userPayRateId,
+						[key]: Number(e.target.value)
 					}
-				})
-			}
-			else {
-				userPayRateCreate({
-					variables: {
-						input: {
-							user_id: params?.eid as string,
-							project_id: index?.projectId,
-							[key]: Number(e.target.value),
-							company_id: authData?.company?.id as string,
-						}
+				}
+			})
+		}
+		else {
+			userPayRateCreate({
+				variables: {
+					input: {
+						user_id: params?.eid as string,
+						project_id: index?.projectId,
+						[key]: Number(e.target.value),
+						company_id: authData?.company?.id as string,
 					}
-				})
-			}
+				}
+			})
+		}
 		
 	};
 
@@ -245,13 +271,34 @@ const AddExistingClient = () => {
 		setShowRow(!showRow)
 	};
 
+
+	const handleChangeStatus = (clientId:any,status:any) => {
+		console.log(status,clientId, 'e')
+		updateUserClientStatus({
+			variables:{
+				input:{
+					user_id: params?.eid as string,
+					client_id: clientId as string,
+					company_id: authData?.company?.id as string,
+					status:status
+				}
+			}
+		})
+	}
 	const tableData = dataSource?.map((data: any, index: number) => (
 		<tr>
 			<td>{data.clientName}</td>
 			<td>{data.projectName}</td>
 			<td><Input defaultValue={data.userRate} onKeyPress={onInputChange("amount", data)} /></td>
 			<td><Input defaultValue={data.invoiceRate} onKeyPress={onInputChange("invoiceRate", data)} /></td>
-			<td>{data.status}</td>
+			{/* <td>{data.status}</td> */}
+			<td>
+				<Select onSelect={(e:any)=>handleChangeStatus(data.clientId,e)} placeholder='Select status' defaultValue={data.status}>
+					<Select.Option value={UserClientStatus.Active}>{UserClientStatus.Active}</Select.Option>
+					<Select.Option value={UserClientStatus.Inactive}>{UserClientStatus.Inactive}</Select.Option>
+
+				</Select>
+			</td>
 		</tr>
 	))
 	return (

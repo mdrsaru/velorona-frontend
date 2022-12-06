@@ -13,7 +13,7 @@ const EditEmployeeTabs = () => {
 				<Tabs.TabPane tab="Client Info" key="item-2">
 					<AddExistingClient />
 				</Tabs.TabPane>
-			</Tabs>;
+			</Tabs>
 		</Card>
 	)
 }
