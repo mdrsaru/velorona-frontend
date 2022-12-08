@@ -471,6 +471,14 @@ const _Routes = () => {
                   </Suspense>
                 }
               />
+               <Route
+                path={routes.addUserPayRate.childPath}
+                element={
+                  <Suspense fallback={<RouteLoader />}>
+                    <routes.addUserPayRate.component />
+                  </Suspense>
+                }
+              />
               <Route
                 path={routes.editEmployee.childPath}
                 element={

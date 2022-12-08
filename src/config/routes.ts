@@ -241,6 +241,13 @@ const routes = {
     name: 'Attach Project',
     key: 'employee'
   },
+  addUserPayRate: {
+    childPath: ':eid/client/:cid/add-user-payrate',
+    path: (id: string, eid: string,cid:string) => `/${id}/users/${eid}/client/${cid}/add-user-payrate`,
+    component: lazy(() => import('../pages/Employee/AddUserPayRate')),
+    name: 'Add User Payrate',
+    key: 'employee'
+  },
   timesheet: {
     childPath: 'timesheet',
     path: (id: string) => `/${id}/timesheet`,
