@@ -1,9 +1,10 @@
-import { Input, message, Select, Button, Form } from "antd"
+import { Input, message, Select, Button, Form, Spin } from "antd"
 import { gql, useMutation, useQuery } from "@apollo/client";
-import { ClientPagingResult, QueryClientArgs, UserClientDetail, QueryUserClientDetailArgs, MutationUserPayRateUpdateArgs, UserPayRate, MutationAttachProjectToUserArgs, User, MutationUserPayRateCreateArgs, MutationUserClientAssociateArgs, UserClient, UserClientStatus, MutationUserClientChangeStatusArgs } from "../../../../interfaces/generated";
+import { ClientPagingResult, QueryClientArgs, UserClientDetail, QueryUserClientDetailArgs, MutationUserPayRateUpdateArgs, UserPayRate, MutationAttachProjectToUserArgs, User, MutationUserPayRateCreateArgs, MutationUserClientAssociateArgs, UserClient, UserClientStatus, MutationUserClientChangeStatusArgs, MutationRemoveUserProjectAssignArgs, Project, MutationUserPayRateDeleteArgs } from "../../../../interfaces/generated";
 import { GraphQLResponse } from "../../../../interfaces/graphql.interface";
 import { useParams } from 'react-router-dom';
 import { CLIENT } from "../../../Client";
+import { CloseCircleOutlined } from "@ant-design/icons"
 import { authVar } from "../../../../App/link";
 import { useState, useEffect } from "react";
 import { USER_PAYRATE_UPDATE } from "../../../../components/EditUserPayRate";
@@ -44,6 +45,22 @@ export const USER_CLIENT_UPDATE_STATUS = gql`
     }
   `;
 
+export const REMOVE_USER_PROJECT_ASSIGN = gql`
+    mutation RemoveUserProjectAssign($input: RemoveProjectUserAssignInput!) {
+      RemoveUserProjectAssign(input: $input) {
+       id 
+      }
+    }
+  `;
+
+export const REMOVE_USER_PAYRATE = gql`
+    mutation UserPayRateDelete($input: DeleteInput!) {
+      UserPayRateDelete(input: $input) {
+       id 
+      }
+    }
+  `;
+
 
 const AddExistingClient = () => {
 	const params = useParams()
@@ -55,7 +72,7 @@ const AddExistingClient = () => {
 	const [showRow, setShowRow] = useState(false)
 
 
-	const { data: userClientDetailData, refetch:refetchUserClientDetail } = useQuery<
+	const { data: userClientDetailData, refetch: refetchUserClientDetail, loading } = useQuery<
 		GraphQLResponse<'UserClientDetail', UserClientDetail>,
 		QueryUserClientDetailArgs
 	>(USER_CLIENT_DETAIL, {
@@ -150,8 +167,8 @@ const AddExistingClient = () => {
 					company_id: authData?.company?.id as string,
 					user_id: params?.eid,
 				}
-   
-		})
+
+			})
 		}
 	});
 
@@ -160,10 +177,10 @@ const AddExistingClient = () => {
 	>(USER_PAYRATE_UPDATE, {
 
 		onCompleted() {
-			message.success({
-				content: `User pay rate updated successfully!`,
-				className: "custom-message",
-			});
+			// message.success({
+			// 	content: `User pay rate updated successfully!`,
+			// 	className: "custom-message",
+			// });
 			refetchUserClientDetail({
 				input: {
 					company_id: authData?.company?.id as string,
@@ -183,10 +200,10 @@ const AddExistingClient = () => {
 	>(USER_PAYRATE_CREATE, {
 
 		onCompleted() {
-			message.success({
-				content: `User pay rate added successfully!`,
-				className: "custom-message",
-			});
+			// message.success({
+			// 	content: `User pay rate added successfully!`,
+			// 	className: "custom-message",
+			// });
 			refetchUserClientDetail({
 				input: {
 					company_id: authData?.company?.id as string,
@@ -202,8 +219,8 @@ const AddExistingClient = () => {
 	})
 
 	const [updateUserClientStatus] = useMutation<
-	GraphQLResponse<'UpdateUserClientStatus', UserClient>, MutationUserClientChangeStatusArgs>(USER_CLIENT_UPDATE_STATUS,{
-		onCompleted(){
+	GraphQLResponse<'UpdateUserClientStatus', UserClient>, MutationUserClientChangeStatusArgs>(USER_CLIENT_UPDATE_STATUS, {
+		onCompleted() {
 			refetchUserClientDetail({
 				input: {
 					company_id: authData?.company?.id as string,
@@ -214,6 +231,24 @@ const AddExistingClient = () => {
 		}
 	})
 
+
+	const [removeProjectUserAssign] = useMutation<
+		GraphQLResponse<'RemoveProjectUserAssign', Project>,
+		MutationRemoveUserProjectAssignArgs
+	>(REMOVE_USER_PROJECT_ASSIGN, {
+		onCompleted() {
+
+		}
+	});
+
+	const [removeUserPayRate] = useMutation<
+		GraphQLResponse<'RemoveUserPayRate', UserPayRate>,
+		MutationUserPayRateDeleteArgs
+	>(REMOVE_USER_PAYRATE, {
+		onCompleted() {
+
+		}
+	});
 	const onInputChange = (key: any, index: any) => (
 		e: any
 	) => {
@@ -239,7 +274,7 @@ const AddExistingClient = () => {
 				}
 			})
 		}
-		
+  
 	};
 
 	const handleChangeProject = (id: string) => {
@@ -272,16 +307,48 @@ const AddExistingClient = () => {
 	};
 
 
-	const handleChangeStatus = (clientId:any,status:any) => {
-		console.log(status,clientId, 'e')
+	const handleChangeStatus = (clientId: any, status: any) => {
+		console.log(status, clientId, 'e')
 		updateUserClientStatus({
-			variables:{
-				input:{
+			variables: {
+				input: {
 					user_id: params?.eid as string,
 					client_id: clientId as string,
 					company_id: authData?.company?.id as string,
-					status:status
+					status: status
 				}
+			}
+		})
+	}
+
+	const handleRemoveData = (projectId: string, userPayRateId: string) => {
+		if (userPayRateId) {
+			console.log('if')
+			removeUserPayRate({
+				variables: {
+					input: {
+						id: userPayRateId
+					}
+				}
+			})
+		}
+
+		removeProjectUserAssign({
+			variables: {
+				input: {
+					user_id: params?.eid as string,
+					project_id: projectId,
+					company_id: authData?.company?.id as string,
+				}
+			}
+		})
+
+		form.resetFields()
+
+		refetchUserClientDetail({
+			input: {
+				company_id: authData?.company?.id as string,
+				user_id: params?.eid,
 			}
 		})
 	}
@@ -293,11 +360,14 @@ const AddExistingClient = () => {
 			<td><Input defaultValue={data.invoiceRate} onKeyPress={onInputChange("invoiceRate", data)} /></td>
 			{/* <td>{data.status}</td> */}
 			<td>
-				<Select onSelect={(e:any)=>handleChangeStatus(data.clientId,e)} placeholder='Select status' defaultValue={data.status}>
+				<Select onSelect={(e: any) => handleChangeStatus(data.clientId, e)} placeholder='Select status' defaultValue={data.status}>
 					<Select.Option value={UserClientStatus.Active}>{UserClientStatus.Active}</Select.Option>
 					<Select.Option value={UserClientStatus.Inactive}>{UserClientStatus.Inactive}</Select.Option>
 
 				</Select>
+			</td>
+			<td>
+				<CloseCircleOutlined onClick={() => handleRemoveData(data.projectId, data.userPayRateId)} />
 			</td>
 		</tr>
 	))
@@ -305,19 +375,19 @@ const AddExistingClient = () => {
 		<div className={styles['modal-body']}>
 			<div className={styles['header']}>
 				<div>
-					<span className={styles['add-title']}>Add Existing Client</span>
+					<span className={styles['add-title']}>Client Information</span>
 				</div>
 				<div className={styles['add-new-client']}>
-					<span onClick={() => navigate(routes.addClient.path(
-						authData?.company?.code
-							? authData?.company?.code
-							: ""
-					))}>
+					<span style={{ cursor: 'pointer' }}
+						onClick={() => navigate(routes.addClient.path(
+							authData?.company?.code
+								? authData?.company?.code
+								: ""
+						))}>
 						Add New Client</span>
 				</div>
 			</div>
-
-
+			{loading && <Spin />}
 			<div className={styles['detail-table']}>
 
 				<Form form={form}>
@@ -329,6 +399,7 @@ const AddExistingClient = () => {
 								<th>User Rate</th>
 								<th>Invoice Rate</th>
 								<th>Status</th>
+								<th>Action</th>
 							</tr>
 						</thead>
 
@@ -376,12 +447,12 @@ const AddExistingClient = () => {
 
 									</td>
 									<td>
-										<Input onKeyPress={onInputChange("amount", 0)} disabled={true} title={'You need to add project'}/>
+										<Input onKeyPress={onInputChange("amount", 0)} disabled={true} title={'You need to add project'} />
 									</td>
 									<td>
-										<Input onKeyPress={onInputChange("invoiceRate", 0)} disabled={true} title='You need to add project'/>
+										<Input onKeyPress={onInputChange("invoiceRate", 0)} disabled={true} title='You need to add project' />
 									</td>
-									<td>N/A</td>
+									<td>-</td>
 
 								</tr>
 							}
