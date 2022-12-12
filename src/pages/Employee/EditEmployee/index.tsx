@@ -15,7 +15,7 @@ import { ArrowLeftOutlined } from "@ant-design/icons";
 import moment from "moment";
 import type { UploadProps } from "antd";
 
-import constants, { plans, roles_user, subscriptionStatus } from '../../../config/constants'
+import constants, { roles_user, subscriptionStatus } from '../../../config/constants'
 import { useNavigate, useParams } from 'react-router-dom'
 import { useMutation, useQuery } from '@apollo/client'
 import { notifyGraphqlError } from '../../../utils/error'
@@ -26,7 +26,7 @@ import { useState } from 'react'
 import styles from '../style.module.scss'
 import { authVar } from '../../../App/link'
 import RouteLoader from '../../../components/Skeleton/RouteLoader'
-import { EntryType, MutationChangeProfilePictureArgs, MutationUserUpdateArgs, QueryUserArgs, RoleName, SubscriptionPaymentStatus, User, UserPagingResult, UserStatus } from "../../../interfaces/generated";
+import { EntryType, MutationChangeProfilePictureArgs, MutationUserUpdateArgs, QueryUserArgs, RoleName, User, UserPagingResult, UserStatus } from "../../../interfaces/generated";
 import { GraphQLResponse } from "../../../interfaces/graphql.interface";
 import { checkSubscriptions } from "../../../utils/common";
 
@@ -498,7 +498,7 @@ const EditEmployee = () => {
                             lg={12}>
                             <Form.Item
                               name="manager_id"
-                              label="Task Manager"
+                              label="Approver"
                             >
                               <Select placeholder="Select manager" disabled={authData?.user?.id === params.eid ? true : false}>
                                 {managerData?.User?.data?.map((manager, index) => (
@@ -614,7 +614,7 @@ const EditEmployee = () => {
                     <Button
                       type="primary"
                       htmlType="submit">
-                      Update {authData?.user?.id === params.eid ? "Profile" : " Employee"}
+                      Save
                     </Button>
                   </Space>
                 </Form.Item >

@@ -221,7 +221,10 @@ const CompanyForm = (props: IProps) => {
 
   return (
     <Form initialValues={initialValues} form={form} layout="vertical" onFinish={onSubmitForm}>
-      <Row gutter={[24, 24]}>
+      <Row gutter={[24, 0]}>
+        <Col className={styles['form-header']}>
+          <p>Company Information</p>
+        </Col>
         <Col xs={24} sm={24} md={12}>
           <Form.Item
             label="Company Name"
@@ -340,7 +343,9 @@ const CompanyForm = (props: IProps) => {
             />
           </Form.Item>
         </Col>
-
+        <Col className={styles['form-header']}>
+          <p>Address</p>
+        </Col>
         <Col xs={24} sm={24} md={8} lg={8}>
           <Form.Item
             name="country"
@@ -407,6 +412,9 @@ const CompanyForm = (props: IProps) => {
           <Form.Item label="Zip Code" name="zipcode">
             <Input placeholder="Enter the zipcode" autoComplete="off" />
           </Form.Item>
+        </Col>
+        <Col className={styles['form-header']}>
+          <p>Company Detail</p>
         </Col>
         {!props.company &&
           <Col xs={24} sm={24} md={12}>

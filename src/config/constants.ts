@@ -34,7 +34,7 @@ export const roles_user = [{
 },
 {
   value: 'TaskManager',
-  name: 'Task Manager'
+  name: 'Approver'
 },
 {
   value: 'BookKeeper',
@@ -163,7 +163,7 @@ export const subscription = {
     Professional: [
       'Everything from free features',
       'Timesheet/ time tracker with approvals',
-      'Unlimited task manager',
+      'Unlimited approver',
       'Attachment in timesheet',
       'Auto attachment in the invoice'
     ],

@@ -220,7 +220,7 @@ const EditProject = () => {
               <Col xs={24} sm={24} md={24} lg={24} className={styles.formCol}>
 							<Form.Item
 								name="assignee"
-								label="Tasks Assigned to"
+								label="Projects Assigned to"
 								style={{ position: "relative" }}>
 								<Select
 									{...selectProps}

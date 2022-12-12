@@ -308,7 +308,6 @@ const AddExistingClient = () => {
 
 
 	const handleChangeStatus = (clientId: any, status: any) => {
-		console.log(status, clientId, 'e')
 		updateUserClientStatus({
 			variables: {
 				input: {
@@ -323,7 +322,6 @@ const AddExistingClient = () => {
 
 	const handleRemoveData = (projectId: string, userPayRateId: string) => {
 		if (userPayRateId) {
-			console.log('if')
 			removeUserPayRate({
 				variables: {
 					input: {
@@ -379,10 +377,11 @@ const AddExistingClient = () => {
 				</div>
 				<div className={styles['add-new-client']}>
 					<span style={{ cursor: 'pointer' }}
-						onClick={() => navigate(routes.addClient.path(
+						onClick={() => navigate(routes.addNewClient.path(
 							authData?.company?.code
 								? authData?.company?.code
-								: ""
+								: "",
+								params.eid as string
 						))}>
 						Add New Client</span>
 				</div>
@@ -465,6 +464,7 @@ const AddExistingClient = () => {
 				type="primary"
 				style={{
 					marginBottom: 16,
+					marginTop:4,
 				}}
 			>
 				Add a row

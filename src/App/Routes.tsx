@@ -487,7 +487,22 @@ const _Routes = () => {
                   </Suspense>
                 }
               />
-
+              <Route
+                path={routes.redirectToClientInfoTab.childPath}
+                element={
+                  <Suspense fallback={<RouteLoader />}>
+                    <routes.redirectToClientInfoTab.component />
+                  </Suspense>
+                }
+              />
+              <Route
+                path={routes.addNewClient.childPath}
+                element={
+                  <Suspense fallback={<RouteLoader />}>
+                    <routes.addNewClient.component />
+                  </Suspense>
+                }
+              />
               <Route
                 path={routes.detailEmployee.childPath}
                 element={

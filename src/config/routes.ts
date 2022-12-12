@@ -85,7 +85,7 @@ const routes = {
   company: {
     childPath: ':id',
     path: (id: string | undefined) => `/${id}`,
-		component: lazy(() => import('../pages/CompanyDashboard')),
+    component: lazy(() => import('../pages/CompanyDashboard')),
     name: 'Dashboard',
     key: 'dashboard',
     allowedRoles: [CompanyAdmin, SuperAdmin, TaskManager,Employee,BookKeeper],
@@ -107,7 +107,7 @@ const routes = {
   currency: {
     childPath: 'currency',
     path: '/currency',
-		component: lazy(() => import('../pages/Currency')),
+    component: lazy(() => import('../pages/Currency')),
     name: 'Currency',
     key: 'currency',
     allowedRoles: [SuperAdmin],
@@ -153,7 +153,7 @@ const routes = {
     allowedRoles: [SuperAdmin],
   },
   viewSuperAdmin: {
-	childPath: ':id/view',
+  childPath: ':id/view',
     path:(id: string) => `/super-admin/${id}/view`,
     component: lazy(() => import('../pages/SuperAdmin/ViewSuperAdmin')),
     name: 'Add super admin',
@@ -173,6 +173,20 @@ const routes = {
     path: (id: string, eid: string) => `/${id}/users/${eid}`,
     component: lazy(() => import('../pages/Employee/EditEmployeeTabs')),
     name: 'Edit User',
+    key: 'employee'
+  },
+  redirectToClientInfoTab: {
+    childPath: ':eid/:client',
+    path: (id: string, eid: string, client: string) => `/${id}/users/${eid}/${client}`,
+    component: lazy(() => import('../pages/Employee/EditEmployeeTabs')),
+    name: 'Edit User',
+    key: 'employee'
+  },
+  addNewClient: {
+    childPath: ':eid/client/add',
+    path: (id: string,eid:string) => `/${id}/users/${eid}/client/add`,
+    component: lazy(() => import('../pages/Employee/EditEmployeeTabs/AddNewClient')),
+    name: 'New Client',
     key: 'employee'
   },
   editProfile: {

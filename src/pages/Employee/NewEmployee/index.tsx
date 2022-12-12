@@ -2,7 +2,7 @@ import { useState } from "react";
 
 import { Button, Card, Checkbox, Col, DatePicker, Form, Input, message, Row, Select, Space, Upload } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
-import constants, { plans, roles_user, subscriptionStatus } from "../../../config/constants";
+import constants, {roles_user, subscriptionStatus } from "../../../config/constants";
 
 import type { UploadProps } from 'antd';
 import { useNavigate } from "react-router-dom";
@@ -115,7 +115,10 @@ const NewEmployee = () => {
   const redirectTo = (role: string, user: string) => {
     role === constants?.roles?.Employee ?
       (!skipClient ?
-        navigate(routes.attachClient.path(authData?.company?.code ?? "", user ?? ""))
+        navigate(routes.redirectToClientInfoTab.path(
+          authData?.company?.code ?? "1",
+          user ?? "1",'client'
+        ))
         :
         navigate(routes.user.path(authData?.company?.code ?? '')))
       :
@@ -536,16 +539,16 @@ const NewEmployee = () => {
                       lg={12}>
                       <Form.Item
                         name="manager_id"
-                        label="Task Manager"
+                        label="Approver"
                       >
-                        <Select placeholder="Select manager" onChange={handleManagerChange}>
+                        <Select placeholder="Select approver" onChange={handleManagerChange}>
                           {managerData?.User?.data?.map((manager, index) => (
                             <Option key={index} value={manager?.id}> {`${manager?.fullName} / ${manager?.email}`}</Option>
                           ))}
                         </Select>
                         {form.getFieldValue('manager_id')}
                         {!manager &&
-                          <p>Please add task manager first to assign manager for this user.</p>
+                          <p>Please add approver first to assign manager for this user.</p>
                         }
                       </Form.Item>
                     </Col>

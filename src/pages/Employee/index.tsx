@@ -298,9 +298,9 @@ const Employee = () => {
   };
 
   const changeClient = () => {
-    navigate(routes.attachClient.path(
+    navigate(routes.redirectToClientInfoTab.path(
       loggedInUser?.company?.code ?? "1",
-      employee?.id ?? "1"
+      employee?.id ?? "1",'client'
     ))
   };
 
@@ -612,7 +612,7 @@ const Employee = () => {
       title: "Role",
       key: "role",
       render: (user: any) => {
-        return <span>{user?.roles[0]?.name}</span>;
+        return <span>{user?.roles[0]?.name === 'TaskManager' ? 'Approver' : user?.roles[0]?.name}</span>;
       },
     },
     {
@@ -738,7 +738,7 @@ const Employee = () => {
                               setEmployee(record);
                               setShowChangeClient(true)
                             }}
-                            title='Change Client'
+                            title='Change Client Info'
                             className={`${styles["table-icon"]} ${styles["table-client-icon"]}`}
                           >
 
