@@ -189,12 +189,12 @@ export const notifySubscriptionExpiration = (args: NotifySubscriptionExpiration)
     const diff = periodEnd.diff(now, 'days');
 
     if (diff >= 0 && diff <= 7) {
-      title = 'Subscription about to expire';
-      description = `Your subscription will expire in ${diff} days.`;
+      title = 'Your payment is due';
+      description = `Your subscription will expire on ${periodEnd.format('MMM DD,YYYY')}.`;
       type = 'warning'
     } else if (diff < 0) {
-      title = 'Subscription expired';
-      description = `Your subscription has expired.`;
+      title = 'Your payment is due';
+      description = `Your subscription has already been expired on  ${periodEnd.format('MMM DD,YYYY')}.`;
       type = 'error'
     }
   }
