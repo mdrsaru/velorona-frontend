@@ -29,6 +29,7 @@ import styles from './style.module.scss';
 
 import subscriptionImg from '../../assets/images/subscription.png';
 import { UserOutlined } from '@ant-design/icons';
+import SubMenu from "antd/lib/menu/SubMenu";
 
 const { Sider } = Layout;
 
@@ -155,20 +156,38 @@ const Sidebar = (props: any) => {
     },
     {
       key: routes.invoice.key,
-      name: routes.invoice.name,
+      name: 'Invoice',
       icon: <ProfileOutlined />,
       route: routes.invoice.path(loggedInUser?.company?.code ?? ''),
-      accessRoles: [constants.roles.CompanyAdmin,constants.roles.BookKeeper],
+      accessRoles: [constants.roles.CompanyAdmin, constants.roles.BookKeeper],
       viewAsAdmin: true,
+      children: [
+        {
+          key: routes.invoice.key,
+          name: routes.invoice.name,
+          icon: <ProfileOutlined />,
+          route: routes.invoice.path(loggedInUser?.company?.code ?? ''),
+          accessRoles: [constants.roles.CompanyAdmin, constants.roles.BookKeeper],
+          viewAsAdmin: true,
+        },
+        {
+          key: routes.employeeTimesheet.key,
+          name: routes.employeeTimesheet.name,
+          icon: <FieldTimeOutlined />,
+          route: routes.employeeTimesheet.path(loggedInUser?.company?.code ?? ''),
+          accessRoles: [constants.roles.CompanyAdmin, constants.roles.TaskManager, constants.roles.BookKeeper],
+          viewAsAdmin: true,
+        },
+      ],
     },
-    {
-      key: routes.employeeTimesheet.key,
-      name: routes.employeeTimesheet.name,
-      icon: <FieldTimeOutlined />,
-      route: routes.employeeTimesheet.path(loggedInUser?.company?.code ?? ''),
-      accessRoles: [constants.roles.CompanyAdmin, constants.roles.TaskManager,constants.roles.BookKeeper],
-      viewAsAdmin: true,
-    },
+    // {
+    //   key: routes.employeeTimesheet.key,
+    //   name: routes.employeeTimesheet.name,
+    //   icon: <FieldTimeOutlined />,
+    //   route: routes.employeeTimesheet.path(loggedInUser?.company?.code ?? ''),
+    //   accessRoles: [constants.roles.CompanyAdmin, constants.roles.TaskManager, constants.roles.BookKeeper],
+    //   viewAsAdmin: true,
+    // },
     {
       key: routes.schedule.key,
       name: routes.schedule.name,
@@ -238,7 +257,7 @@ const Sidebar = (props: any) => {
   return (
     <Sider
       className={styles['site-sidebar']}
-      width={263}
+      width={275}
       collapsible
       collapsedWidth={80}
       collapsed={collapsed}
@@ -254,9 +273,26 @@ const Sidebar = (props: any) => {
         selectedKeys={[selectedMenuKey]}
       >
         {menuArray && menuArray.map((menu) => (
-          <Menu.Item key={menu?.key} icon={menu?.icon} onClick={(e: any) => { setMenuKey(e.key) }}>
-            <Link to={menu.route}>{menu.name}</Link>
-          </Menu.Item>
+          <>
+
+            {
+              menu?.children?.length ?
+                (<SubMenu icon={menu?.icon} title={menu.name}>
+                  {menu?.children?.map((submenu) => (
+                    <Menu.Item key={submenu?.key} icon={submenu?.icon}>
+                      <Link to={submenu.route}>{submenu.name}</Link>
+                    </Menu.Item>
+                  ))}
+
+                </SubMenu>
+                )
+                :
+                (<Menu.Item key={menu?.key} icon={menu?.icon} onClick={(e: any) => { setMenuKey(e.key) }}>
+                  <Link to={menu.route}>{menu.name}</Link>
+                </Menu.Item>
+                )
+            }
+          </>
         ))}
       </Menu>
     </Sider>
