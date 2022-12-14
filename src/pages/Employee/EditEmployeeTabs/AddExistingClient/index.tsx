@@ -351,7 +351,7 @@ const AddExistingClient = () => {
 		})
 	}
 	const tableData = dataSource?.map((data: any, index: number) => (
-		<tr>
+		<tr key={index}>
 			<td>{data.clientName}</td>
 			<td>{data.projectName}</td>
 			<td><Input defaultValue={data.userRate} onKeyPress={onInputChange("amount", data)} /></td>

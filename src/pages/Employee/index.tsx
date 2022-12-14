@@ -749,9 +749,9 @@ const Employee = () => {
                         (
                           <div>
                             <Link
-                              to={routes.attachClient.path(
+                              to={routes.redirectToClientInfoTab.path(
                                 loggedInUser?.company?.code ?? "1",
-                                record?.id ?? "1"
+                                record?.id ?? "1",'client'
                               )}
                               title='Add Client'
                               className={`${styles["table-icon"]} ${styles["table-client-icon"]}`}

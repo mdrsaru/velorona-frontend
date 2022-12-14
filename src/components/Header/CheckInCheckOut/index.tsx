@@ -281,7 +281,7 @@ const CheckInCheckOut = (props: IProps) => {
           <Col xs={24} sm={24} md={12} lg={12}>
             <div className={styles['container']}>
               <Row>
-                <Col xs={24} sm={24} md={12} lg={18}>
+                <Col xs={24} sm={24} md={12} lg={17}>
                   <p className={styles['title']}>Check-in</p>
                 </Col>
                 <Col>
@@ -289,7 +289,7 @@ const CheckInCheckOut = (props: IProps) => {
                 </Col>
               </Row>
               <Row>
-                <Col className={`gutter-row ${styles['timer']}`} xs={24} sm={24} md={12} lg={18}>
+                <Col className={`gutter-row ${styles['timer']}`} xs={24} sm={24} md={12} lg={17}>
                   <Digit value={hours} />:<Digit value={minutes} />:<Digit value={seconds} />
                 </Col>
                 <Col className={styles['timer']}>
@@ -310,7 +310,7 @@ const CheckInCheckOut = (props: IProps) => {
             <Col xs={24} sm={24} md={12} lg={11}>
               <div className={styles['container']}>
                 <Row >
-                  <Col xs={24} sm={24} md={12} lg={18}>
+                  <Col xs={24} sm={24} md={12} lg={17}>
                     <p className={styles['title']}>Take Break</p>
                   </Col>
                   <Col>
@@ -318,7 +318,7 @@ const CheckInCheckOut = (props: IProps) => {
                   </Col>
                 </Row>
                 <Row>
-                  <Col className={`${styles['timer']}`} xs={24} sm={24} md={12} lg={18}>
+                  <Col className={`${styles['timer']}`} xs={24} sm={24} md={12} lg={17}>
                     <Digit value={breakHours} />:<Digit value={breakMinutes} />:<Digit value={breakSeconds} />
                   </Col>
                   <Col>

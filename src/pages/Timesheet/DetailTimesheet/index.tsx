@@ -453,6 +453,7 @@ const DetailTimesheet = (props: any) => {
                           deleteAction={deletePendingGroups}
                           needAction
                           timesheet_id={timesheet_id}
+                          timesheet={timesheet}
                           isTimesheetSubmitted={isSubmitted}
                         />
 
@@ -509,6 +510,7 @@ const DetailTimesheet = (props: any) => {
                           status='Invoiced'
                           timesheet_id={timesheet_id}
                           refetchCanGenerateInvoiceData={props?.refetchCanGenerateInvoiceData}
+                          timesheet={timesheet}
                         />
                       </div>
                     ))
@@ -565,6 +567,7 @@ const DetailTimesheet = (props: any) => {
                         needAction
                         timesheet_id={timesheet_id}
                         refetchCanGenerateInvoiceData={props?.refetchCanGenerateInvoiceData}
+                        timesheet={timesheet}
                       />
 
                     </div>
@@ -608,6 +611,7 @@ const DetailTimesheet = (props: any) => {
                         needAction
                         timesheet_id={timesheet_id}
                         refetchCanGenerateInvoiceData={props?.refetchCanGenerateInvoiceData}
+                        timesheet={timesheet}
                       />
                     </div>
                   }

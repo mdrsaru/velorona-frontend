@@ -12,7 +12,7 @@ import { notifyGraphqlError } from '../../../../utils/error';
 import { getWeekDays, getTimeFormat, checkRoles, checkSubscriptions } from '../../../../utils/common';
 import { authVar } from '../../../../App/link';
 import { IGroupedTimeEntries } from '../../../../interfaces/common.interface';
-import { MutationTimeEntriesApproveRejectArgs, TimeEntryApproveRejectInput} from '../../../../interfaces/generated';
+import { MutationTimeEntriesApproveRejectArgs, TimeEntryApproveRejectInput, Timesheet} from '../../../../interfaces/generated';
 import { GraphQLResponse } from '../../../../interfaces/graphql.interface';
 
 import ModalConfirm from '../../../../components/Modal';
@@ -48,6 +48,7 @@ interface IProps {
   timesheet_id: string;
   isTimesheetSubmitted?: boolean;
   refetchCanGenerateInvoiceData?: any;
+  timesheet:Timesheet;
 }
 
 const TimeEntryDetails = (props: IProps) => {
@@ -82,6 +83,11 @@ const TimeEntryDetails = (props: IProps) => {
   const canApproveReject = checkRoles({
     userRoles,
     expectedRoles: [constants.roles.CompanyAdmin, constants.roles.SuperAdmin, constants.roles.TaskManager]
+  });
+
+  const canEdit = checkRoles({
+    userRoles,
+    expectedRoles: [constants.roles.Employee, constants.roles.CompanyAdmin]
   });
 
   const canDelete = checkRoles({
@@ -241,7 +247,7 @@ const TimeEntryDetails = (props: IProps) => {
                           key={timeIndex}
                         >
                           {
-                            (['Approved', 'Rejected'].includes(props.status) || canApproveReject || props.isTimesheetSubmitted || authData?.user?.roles.includes(constants.roles.BookKeeper)) ? (
+                            (['Approved', 'Rejected'].includes(props.status) || !canEdit || props.isTimesheetSubmitted || authData?.user?.roles.includes(constants.roles.BookKeeper)) ? (
                               <div className={styles['entry-duration']}>
                                 { entries ? getTimeFormat(duration) : '-' }
                               </div>
@@ -254,6 +260,7 @@ const TimeEntryDetails = (props: IProps) => {
                                 duration={entries ? duration : undefined}
                                 timesheet_id={props.timesheet_id}
                                 refetch={props.refetch}
+                                timesheet = {props.timesheet}
                               />
                             )
                           }

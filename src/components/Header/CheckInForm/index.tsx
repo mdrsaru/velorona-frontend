@@ -79,6 +79,8 @@ const CheckInForm = (props: IProps) => {
           company_id,
           startTime: moment().format('YYYY-MM-DD HH:mm:ss'),
           project_id: values.project,
+          created_by:loggedInUser.user.id as string,
+          entry_type:loggedInUser.user.entryType as string
         }
       }
     })

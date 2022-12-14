@@ -204,8 +204,8 @@ const AttachClient = () => {
       } else if (response?.data?.UserClientAssociate) {
         message.success(`Client is associated with employee successfully!`).then(r => { });
          const clientId = response?.data?.UserClientAssociate?.client?.id;
-        navigate(routes.attachProject.path(authData?.company?.code as string, params?.eid as string, clientId))
-    // navigate(routes.user.path(authData?.company?.code ?? ''));
+        navigate(routes.redirectToClientInfoTab.path(authData?.company?.code ?? "1", params?.eid ?? "1",'client'
+    ))
       }
     }).catch(notifyGraphqlError)
   }
@@ -273,7 +273,7 @@ const AttachClient = () => {
                   prefix={<SearchOutlined
                     className="site-form-item-icon" />}
                   placeholder="Search for the Existing Client"
-                  autoComplete="off"
+                  autoComplete="off" role="presentation"
                   onChange={inputChangeSearch} />
               </Form.Item>
             </div>

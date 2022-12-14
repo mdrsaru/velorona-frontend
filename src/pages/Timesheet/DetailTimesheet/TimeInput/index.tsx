@@ -5,7 +5,7 @@ import { useMutation, gql } from '@apollo/client';
 import { Input, message, Modal, InputRef } from 'antd';
 
 import { getTimeFormat, getDurationFromTimeFormat } from '../../../../utils/common';
-import { TimeEntry, MutationTimeEntriesBulkUpdateArgs } from '../../../../interfaces/generated';
+import { TimeEntry, MutationTimeEntriesBulkUpdateArgs, Timesheet } from '../../../../interfaces/generated';
 import { GraphQLResponse } from '../../../../interfaces/graphql.interface';
 
 import NewTimeEntry from './NewTimeEntry'
@@ -24,6 +24,7 @@ interface IProps {
   duration: number | undefined; // no time entry(ies) if duration is undefined
   timesheet_id: string;
   refetch: any;
+  timesheet:Timesheet;
 }
 
 const TimeInput = (props: IProps) => {
@@ -123,6 +124,7 @@ const TimeInput = (props: IProps) => {
           project_id={props.project_id}
           timesheet_id={props.timesheet_id}
           refetch={props.refetch}
+          timesheet = {props.timesheet}
         />
       </Modal>
     </>

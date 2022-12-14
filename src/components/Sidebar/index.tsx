@@ -180,14 +180,14 @@ const Sidebar = (props: any) => {
         },
       ],
     },
-    // {
-    //   key: routes.employeeTimesheet.key,
-    //   name: routes.employeeTimesheet.name,
-    //   icon: <FieldTimeOutlined />,
-    //   route: routes.employeeTimesheet.path(loggedInUser?.company?.code ?? ''),
-    //   accessRoles: [constants.roles.CompanyAdmin, constants.roles.TaskManager, constants.roles.BookKeeper],
-    //   viewAsAdmin: true,
-    // },
+    {
+      key: routes.employeeTimesheet.key,
+      name: 'Employee Timesheet',
+      icon: <FieldTimeOutlined />,
+      route: routes.employeeTimesheet.path(loggedInUser?.company?.code ?? ''),
+      accessRoles: [constants.roles.TaskManager],
+      viewAsAdmin: true,
+    },
     {
       key: routes.schedule.key,
       name: routes.schedule.name,

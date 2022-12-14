@@ -60,6 +60,7 @@ export const TIME_SHEET = gql`
           email
           fullName
           timesheet_attachment
+          entryType
         }
         client {
           id

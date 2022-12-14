@@ -5,7 +5,7 @@ import { Form, Button, Input, message } from 'antd';
 import { AUTH } from '../../../../../gql/auth.gql';
 import { getDurationFromTimeFormat } from '../../../../../utils/common';
 import { notifyGraphqlError } from '../../../../../utils/error';
-import { TimeEntry, MutationTimeEntryCreateArgs } from '../../../../../interfaces/generated';
+import { TimeEntry, MutationTimeEntryCreateArgs, Timesheet } from '../../../../../interfaces/generated';
 import { GraphQLResponse } from '../../../../../interfaces/graphql.interface';
 
 const TIME_ENTRY_CREATE = gql`
@@ -22,6 +22,7 @@ interface IProps {
   project_id: string;
   timesheet_id: string;
   onHideModal: () => void;
+  timesheet:Timesheet;
 }
 
 const NewTimeEntry = (props: IProps) => {
@@ -57,6 +58,8 @@ const NewTimeEntry = (props: IProps) => {
           description: values.description,
           startTime,
           endTime: endTime.format('YYYY-MM-DDTHH:mm:ss'),
+          created_by:props.timesheet.user.id,
+          entry_type:props.timesheet.user.entryType as string,
         },
       },
     })
