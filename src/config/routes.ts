@@ -214,8 +214,8 @@ const routes = {
     childPath: '/:id/setting/:eid',
     path: (id:string,eid: string) => `/${id}/setting/${eid}`,
     component: lazy(() => import('../pages/CompanySetting')),
-    name: 'Profile',
-    key: 'profile',
+    name: 'Setting',
+    key: 'setting',
     allowedRoles: [CompanyAdmin, SuperAdmin],
   },
   editCompanySetting: {

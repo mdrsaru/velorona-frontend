@@ -9,6 +9,7 @@ import {
   message,
   UploadProps,
   Upload,
+  Select,
 } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 
@@ -19,7 +20,7 @@ import { notifyGraphqlError } from "../../../utils/error";
 
 import styles from "./style.module.scss";
 import { useState } from "react";
-import constants from "../../../config/constants";
+import constants, { collection_method } from "../../../config/constants";
 import { authVar } from "../../../App/link";
 import { GraphQLResponse } from "../../../interfaces/graphql.interface";
 import { Company, CompanyPagingResult, CompanyUpdateInput, MutationCompanyUpdateArgs, QueryCompanyArgs } from "../../../interfaces/generated";
@@ -42,6 +43,7 @@ export const COMPANY = gql`
         name
         status
         adminEmail
+        collectionMethod
         logo {
           id
           url
@@ -76,7 +78,7 @@ const EditCompanySetting = () => {
   const props: UploadProps = {
     name: "file",
     action: `${constants.apiUrl}/v1/media/upload`,
-		accept:'image/*',
+    accept: 'image/*',
     maxCount: 1,
     headers: {
       authorization: authData?.token ? `Bearer ${authData?.token}` : "",
@@ -144,13 +146,16 @@ const EditCompanySetting = () => {
   });
 
   const onSubmitForm = (values: any) => {
+    console.log(values)
     const input: CompanyUpdateInput = {
       id: params?.eid as string,
       name: values.name,
+      collectionMethod:values.collectionMethod,
     }
     if (fileData?.id) {
       input.logo_id = fileData.id;
     }
+    console.log(input)
     updateCompany({
       variables: {
         input: input
@@ -169,7 +174,7 @@ const EditCompanySetting = () => {
       <Row>
         <Col span={24} className={styles["form-col"]}>
           <h1>
-            <ArrowLeftOutlined onClick={() => navigate(routes.companySetting.path(authData?.company?.code ?? '',params?.eid ?? ''))} />
+            <ArrowLeftOutlined onClick={() => navigate(routes.companySetting.path(authData?.company?.code ?? '', params?.eid ?? ''))} />
             &nbsp; General Setting
           </h1>
         </Col>
@@ -182,6 +187,7 @@ const EditCompanySetting = () => {
           initialValues={{
             name: companyData?.Company?.data[0]?.name ?? "",
             file: companyData?.Company?.data[0]?.logo?.url,
+            collectionMethod: companyData?.Company?.data[0]?.collectionMethod ?? "",
           }}
         >
           <Row gutter={[24, 0]}>
@@ -190,7 +196,7 @@ const EditCompanySetting = () => {
                 label="Company Name"
                 name="name"
                 rules={[
-                  
+
                   {
                     max: 50,
                     message: "Name should be less than 50 character",
@@ -204,6 +210,26 @@ const EditCompanySetting = () => {
               </Form.Item>
             </Col>
 
+            <Col xs={24} sm={24} md={24} lg={24}>
+              <Form.Item
+                name="collectionMethod"
+                label="Collection Method"
+                style={{ position: "relative" }}>
+                <Select
+                  allowClear
+                  placeholder="Please select collection method">
+                   { collection_method?.map((collectionMethod: any, index: number) => (
+                      <Select.Option
+                        value={collectionMethod?.value}
+                        key={index + 1}>
+                        {collectionMethod?.name}
+                      </Select.Option>
+                    ))
+
+                  }
+                </Select>
+              </Form.Item>
+            </Col>
             <Col xs={24} sm={24} md={24} lg={24}>
               <Form.Item
                 name="upload"

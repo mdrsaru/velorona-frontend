@@ -57,6 +57,14 @@ const CompanySetting = () => {
         </Row>
         <Row>
           <Col span={8} className={styles['title']}>
+            Collection Method
+          </Col>
+          <Col span={12} className={styles['value']}>
+            <p className={styles['collection-method']}> {company?.collectionMethod ?? 'N/A'} </p>
+          </Col>
+        </Row>
+        <Row>
+          <Col span={8} className={styles['title']}>
             Company logo
           </Col>
           <Col span={12} >

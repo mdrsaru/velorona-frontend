@@ -140,6 +140,16 @@ export const plans = {
   Professional: 'Professional',
 };
 
+export const collection_method = [
+  {
+    value: 'charge_automatically',
+    name: 'Charge Automatically'
+  },
+  {
+    value: 'send_invoice',
+    name: 'Send Invoice'
+  }];
+
 export const subscription = {
   price: {
     Starter: 'FREE',

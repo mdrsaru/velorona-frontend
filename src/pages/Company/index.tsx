@@ -41,6 +41,7 @@ export const COMPANY = gql`
         createdAt 
         companyCode
         unapprovedNotification
+        collectionMethod
         logo {
           id
           name
@@ -71,13 +72,14 @@ export const COMPANY = gql`
 `
 
 export const COMPANY_UPDATE = gql`
-  mutation ClientUpdate($input: CompanyUpdateInput!) {
+  mutation CompanyUpdate($input: CompanyUpdateInput!) {
     CompanyUpdate(input: $input) {
       id
       name
       status
       companyCode
       createdAt 
+      collectionMethod
       subscriptionPeriodEnd
       logo{
         id
