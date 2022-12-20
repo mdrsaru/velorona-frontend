@@ -10,6 +10,7 @@ import {
   UploadProps,
   Upload,
   Select,
+  Spin,
 } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 
@@ -75,6 +76,7 @@ const EditCompanySetting = () => {
     url: "",
   });
 
+  const [loading,setLoading] = useState(false)
   const props: UploadProps = {
     name: "file",
     action: `${constants.apiUrl}/v1/media/upload`,
@@ -84,7 +86,9 @@ const EditCompanySetting = () => {
       authorization: authData?.token ? `Bearer ${authData?.token}` : "",
     },
     onChange(info) {
+      setLoading(true)
       if (info.file.status === "done") {
+        setLoading(false)
         setFile({
           name: info?.file?.name,
           id: info?.file?.response?.data?.id,
@@ -132,7 +136,7 @@ const EditCompanySetting = () => {
           code: response.CompanyUpdate?.companyCode as string,
           name: response.CompanyUpdate?.name as string ?? userAuth?.company?.name,
           plan: response.CompanyUpdate?.plan as string ,
-          subscriptionStatus: response.CompanyUpdate?.subscriptionStatus as string ,
+          subscriptionStatus: response.CompanyUpdate?.subscriptionStatus as string,
           subscriptionPeriodEnd: response.CompanyUpdate?.subscriptionPeriodEnd,
           logo: {
             id: response.CompanyUpdate?.logo?.id ?? userAuth?.company?.logo?.id as string,
@@ -146,7 +150,6 @@ const EditCompanySetting = () => {
   });
 
   const onSubmitForm = (values: any) => {
-    console.log(values)
     const input: CompanyUpdateInput = {
       id: params?.eid as string,
       name: values.name,
@@ -155,7 +158,6 @@ const EditCompanySetting = () => {
     if (fileData?.id) {
       input.logo_id = fileData.id;
     }
-    console.log(input)
     updateCompany({
       variables: {
         input: input
@@ -240,7 +242,9 @@ const EditCompanySetting = () => {
               >
                 <div className={styles["upload-file"]}>
                   <div>
-                    {fileData?.url ?
+                    {loading ? <Spin />
+                    :
+                    fileData?.url ?
                       <img src={fileData?.url} width='180px' height='150px' alt='Company Logo'
                       />
                       :

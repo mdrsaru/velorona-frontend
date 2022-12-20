@@ -12,7 +12,6 @@ import { GraphQLResponse } from '../../../interfaces/graphql.interface';
 import {
   SubscriptionCreateResult,
   MutationSubscriptionCreateArgs,
-  QuerySetupIntentSecretArgs,
   SetupIntentResult,
   MutationSubscriptionDowngradeArgs,
 } from '../../../interfaces/generated';
@@ -97,14 +96,13 @@ const Plan = (props: IProps) => {
     getSetupIntentSecret,
     {
       data: setupIntentSecretData,
-      loading: setupIntentLoading,
     }
   ] = useLazyQuery<
     GraphQLResponse<'SetupIntentSecret', SetupIntentResult>,
     MutationSubscriptionCreateArgs
   >(SETUP_INTENT_SECRET, {
     onCompleted(response) {
-      if(response?.SetupIntentSecret) {
+      if (response?.SetupIntentSecret) {
         setShowUpdatePaymentModal(true);
       }
     },
@@ -198,8 +196,18 @@ const Plan = (props: IProps) => {
           <h4>Free Trial for 3 months/No credit card needed</h4>
         }
       </div>
+      {plan.subscriptionStatus === 'active' ?
+        // {/* Need downgrade functionality */}
 
-      {/* Need downgrade functionality */}
+        <Button
+          type="primary"
+          disabled={plan.subscriptionStatus === 'active'}
+          loading={creatingSubscription || downgrading}
+        >
+          {getBtnText()}
+        </Button>
+
+        :
       <Popconfirm
         placement="top"
         title="Are you sure?"
@@ -215,7 +223,7 @@ const Plan = (props: IProps) => {
           { getBtnText() }
         </Button>
       </Popconfirm>
-
+      }
       <ul>
         {
           plan.features.map(feature => (
