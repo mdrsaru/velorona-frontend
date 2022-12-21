@@ -232,11 +232,15 @@ const DetailEmployee = () => {
                 }
                 {profile ? (
                   <div className={styles["camera-div"]}>
-                    <div className={styles["browse-file"]}>
-                      <Upload {...props}>
-                        <img src={camera} alt="camera-src" />
-                      </Upload>
-                    </div>
+                    {isImageLoading && loading ?
+                      <Loader />
+                      : (
+                        <div className={styles["browse-file"]}>
+                          <Upload {...props}>
+                            <img src={camera} alt="camera-src" />
+                          </Upload>
+                        </div>
+                      )}
                   </div>
                 ) : (
                   <div className={styles["name-tag"]}>

@@ -1,6 +1,6 @@
-import { Input, message, Select, Button, Form, Spin } from "antd"
+import { Input, message, Select, Button, Form, Spin, Popconfirm, InputNumber } from "antd"
 import { gql, useMutation, useQuery } from "@apollo/client";
-import { ClientPagingResult, QueryClientArgs, UserClientDetail, QueryUserClientDetailArgs, MutationUserPayRateUpdateArgs, UserPayRate, MutationAttachProjectToUserArgs, User, MutationUserPayRateCreateArgs, MutationUserClientAssociateArgs, UserClient, UserClientStatus, MutationUserClientChangeStatusArgs, MutationRemoveUserProjectAssignArgs, Project, MutationUserPayRateDeleteArgs } from "../../../../interfaces/generated";
+import { ClientPagingResult, QueryClientArgs, UserClientDetail, QueryUserClientDetailArgs, MutationUserPayRateUpdateArgs, UserPayRate, MutationAttachProjectToUserArgs, User, MutationUserPayRateCreateArgs, MutationUserClientAssociateArgs, UserClient, UserClientStatus, MutationUserClientChangeStatusArgs, MutationRemoveUserProjectAssignArgs, Project, MutationUserPayRateDeleteArgs, CurrencyPagingResult, QueryCurrencyArgs } from "../../../../interfaces/generated";
 import { GraphQLResponse } from "../../../../interfaces/graphql.interface";
 import { useParams } from 'react-router-dom';
 import { CLIENT } from "../../../Client";
@@ -17,6 +17,7 @@ import routes from "../../../../config/routes";
 import { useNavigate } from 'react-router-dom';
 
 import styles from '../../style.module.scss'
+import { CURRENCY } from "../../../Currency";
 
 
 export const USER_CLIENT_DETAIL = gql`
@@ -31,6 +32,8 @@ export const USER_CLIENT_DETAIL = gql`
 		 status
 		 projectId 
 		 userPayRateId
+		 invoiceRateCurrency
+		 userRateCurrency
     }
   }
 `;
@@ -172,6 +175,16 @@ const AddExistingClient = () => {
 		}
 	});
 
+
+	const { data: currencyData } = useQuery<
+		GraphQLResponse<'Currency', CurrencyPagingResult>,
+		QueryCurrencyArgs
+	>(CURRENCY, {
+		fetchPolicy: 'network-only',
+		nextFetchPolicy: 'cache-only'
+	});
+
+
 	const [userPayRateUpdate] = useMutation<
 		GraphQLResponse<'UserPayRateUpdate', UserPayRate>, MutationUserPayRateUpdateArgs
 	>(USER_PAYRATE_UPDATE, {
@@ -277,6 +290,33 @@ const AddExistingClient = () => {
   
 	};
 
+	const onSelectCurrency = (key: any, id: any,index:any) => {
+		console.log('change')
+		console.log(key, id,index)
+		if (index?.userPayRateId !== null) {
+			userPayRateUpdate({
+				variables: {
+					input: {
+						id: index?.userPayRateId,
+						[key]: id
+					}
+				}
+			})
+		}
+		else {
+			userPayRateCreate({
+				variables: {
+					input: {
+						user_id: params?.eid as string,
+						project_id: index?.projectId,
+						[key]: id,
+						company_id: authData?.company?.id as string,
+					}
+				}
+			})
+		}
+
+	}
 	const handleChangeProject = (id: string) => {
 
 		attachProject({
@@ -351,12 +391,63 @@ const AddExistingClient = () => {
 		})
 	}
 	const tableData = dataSource?.map((data: any, index: number) => (
-		<tr key={index}>
+		<tr key={index} style={{ marginBottom: '2rem' }}>
 			<td>{data.clientName}</td>
 			<td>{data.projectName}</td>
-			<td><Input defaultValue={data.userRate} onKeyPress={onInputChange("amount", data)} /></td>
-			<td><Input defaultValue={data.invoiceRate} onKeyPress={onInputChange("invoiceRate", data)} /></td>
 			{/* <td>{data.status}</td> */}
+		
+			<td>
+				<InputNumber
+					addonBefore={
+						<Select
+							style={{ width: '5rem' }}
+							placeholder='Symbol'
+							defaultValue={data?.invoiceRateCurrency}
+							onSelect={(e: any) => onSelectCurrency('invoice_rate_currency_id', e,data)}
+
+						>
+							{currencyData?.Currency?.data?.map((currency, index) => (
+								<Select.Option
+									value={currency.id}
+									key={index}
+								>
+									{currency.symbol}
+								</Select.Option>
+							))}
+						</Select>}
+					addonAfter="Hr"
+					placeholder="Enter invoice rate"
+					autoComplete="off"
+					defaultValue={data.invoiceRate}
+					onChangeCapture={onInputChange("invoiceRate", data)}
+					style={{ width: '100%' }} />
+			</td>
+			<td>
+				<InputNumber
+					addonBefore={
+						<Select
+							style={{ width: '5rem' }}
+							placeholder='Symbol'
+							defaultValue={data?.userRateCurrency}
+							onSelect={(e: any) => onSelectCurrency('user_rate_currency_id', e,data)}
+						>
+							{currencyData?.Currency?.data?.map((currency, index) => (
+								<Select.Option
+									value={currency.id}
+									key={index}
+								>
+									{currency.symbol}
+								</Select.Option>
+							))}
+						</Select>
+					}
+					addonAfter="Hr"
+					placeholder="Enter payrate"
+					autoComplete="off"
+					defaultValue={data.userRate}
+					onChangeCapture={onInputChange("amount", data)}
+					style={{ width: '100%' }} />
+			</td>
 			<td>
 				<Select onSelect={(e: any) => handleChangeStatus(data.clientId, e)} placeholder='Select status' defaultValue={data.status}>
 					<Select.Option value={UserClientStatus.Active}>{UserClientStatus.Active}</Select.Option>
@@ -365,7 +456,15 @@ const AddExistingClient = () => {
 				</Select>
 			</td>
 			<td>
-				<CloseCircleOutlined onClick={() => handleRemoveData(data.projectId, data.userPayRateId)} />
+				<Popconfirm
+					placement="topLeft"
+					title='Are you sure?'
+					onConfirm={() => handleRemoveData(data.projectId, data.userPayRateId)}
+					okText="Yes"
+					cancelText="No"
+				>
+					<CloseCircleOutlined />
+				</Popconfirm>
 			</td>
 		</tr>
 	))
@@ -381,7 +480,7 @@ const AddExistingClient = () => {
 							authData?.company?.code
 								? authData?.company?.code
 								: "",
-								params.eid as string
+							params.eid as string
 						))}>
 						Add New Client</span>
 				</div>
@@ -395,8 +494,8 @@ const AddExistingClient = () => {
 							<tr className={styles['table-header']}>
 								<th>Client Name</th>
 								<th>Project Name</th>
-								<th>User Rate</th>
 								<th>Invoice Rate</th>
+								<th>User Rate</th>
 								<th>Status</th>
 								<th>Action</th>
 							</tr>
