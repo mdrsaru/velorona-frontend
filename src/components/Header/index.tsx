@@ -60,7 +60,7 @@ const TopHeader = (props: any) => {
           code: '',
           name: '',
           plan: '',
-          subscriptionStatus:'',
+          subscriptionStatus: '',
           subscriptionPeriodEnd: null,
           logo: {
             id: null,
@@ -84,7 +84,7 @@ const TopHeader = (props: any) => {
   }
 
   const setting = () => {
-    navigate(routes.companySetting.path(loggedInUser?.company?.code,loggedInUser?.company?.id as string))
+    navigate(routes.companySetting.path(loggedInUser?.company?.code, loggedInUser?.company?.id as string))
   }
 
   const isSuperAdmin = useMemo(() => {
@@ -130,20 +130,25 @@ const TopHeader = (props: any) => {
           }} />
         <div>
           {isSuperAdmin && !params.id ?
-                <img
-                  src={logoContent}
-                  alt="logo"
-                />
+            <img
+              src={logoContent}
+              alt="logo"
+            />
             :
             <>
               {authData?.AuthUser?.company?.logo?.url ?
                 <img
                   src={authData?.AuthUser?.company?.logo?.url}
                   alt="logo"
+                  onClick={() => navigate(routes.company.path(authData?.AuthUser?.company?.code))}
                   className={styles['text-logo']}
                 />
                 :
-                <p className={styles['company-name']}>{authData?.AuthUser?.company?.name}</p>
+                <p
+                  className={styles['company-name']}
+                  onClick={() => navigate(routes.company.path(authData?.AuthUser?.company?.code))}>
+                  {authData?.AuthUser?.company?.name}
+                </p>
               }
             </>
           }

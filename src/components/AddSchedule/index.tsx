@@ -1,5 +1,5 @@
 import { gql, useMutation } from "@apollo/client";
-import { Button, Col, DatePicker, Form, message, Modal, Row, Select, Space } from "antd"
+import { Button, Col, DatePicker, Form, message, Modal, Row, Space } from "antd"
 import { MutationWorkscheduleCreateArgs, Workschedule } from "../../interfaces/generated";
 import { GraphQLResponse } from "../../interfaces/graphql.interface";
 import { notifyGraphqlError } from "../../utils/error";
@@ -93,7 +93,7 @@ const AddSchedule = (props: IProps) => {
 
   function disabledStartDate(value: any) {
     return (
-      value.isBefore(moment().subtract(1, "day")) ||
+      value.isBefore(moment().subtract(5, "day")) ||
       value.format("YYYY-MM-DD") !==
       moment(value).startOf("isoWeek").format("YYYY-MM-DD")
     );

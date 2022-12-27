@@ -70,6 +70,7 @@ const Sidebar = (props: any) => {
     else{
       setName('Timesheet')
     }
+    // eslint-disable-next-line
   }, [location, params?.id, params?.company])
 
   const menuItems = [
@@ -272,12 +273,12 @@ const Sidebar = (props: any) => {
         style={{ height: '100%', borderRight: 0 }}
         selectedKeys={[selectedMenuKey]}
       >
-        {menuArray && menuArray.map((menu) => (
+        {menuArray && menuArray.map((menu,index) => (
           <>
 
             {
               menu?.children?.length ?
-                (<SubMenu icon={menu?.icon} title={menu.name}>
+                (<SubMenu icon={menu?.icon} title={menu.name} key = {index}>
                   {menu?.children?.map((submenu) => (
                     <Menu.Item key={submenu?.key} icon={submenu?.icon}>
                       <Link to={submenu.route}>{submenu.name}</Link>
