@@ -38,7 +38,7 @@ export const roles_user = [{
 },
 {
   value: 'BookKeeper',
-  name: 'Book Keeper'
+  name: 'Payroll Admin'
 }
 ]
 

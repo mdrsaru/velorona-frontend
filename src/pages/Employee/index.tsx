@@ -612,7 +612,18 @@ const Employee = () => {
       title: "Role",
       key: "role",
       render: (user: any) => {
-        return <span>{user?.roles[0]?.name === 'TaskManager' ? 'Approver' : user?.roles[0]?.name}</span>;
+        return (
+          <span>
+            {user?.roles[0]?.name === 'TaskManager'
+              ? 'Approver'
+              :
+              user?.roles[0]?.name === 'BookKeeper'
+                ? 'Payroll Admin'
+                :
+                user?.roles[0]?.name
+            }
+          </span>
+        )
       },
     },
     {

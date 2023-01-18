@@ -21,6 +21,8 @@ const SUBSCRIPTION_PAYMENT = gql`
         amount
         paymentDate
         status
+        invoiceLink
+        receiptLink
       }
     }
   }
@@ -83,6 +85,28 @@ const InvoiceAndPayment = () => {
       title: 'Status',
       dataIndex: 'status',
     },
+    {
+      title:'Invoice Link',
+      render: (data: any, __: any, index: number) => {
+        return (
+          data?.invoiceLink ? 
+            <a href={data?.invoiceLink} target='_blank'>{`Invoice${index+1}`}</a>
+            :
+            'N/A'
+          )
+      }
+    },
+    {
+      title:'Receipt Link',
+      render: (data: any, __: any, index: number) => {
+        return (
+          data?.receiptLink ? 
+            <a href={data?.receiptLink} target='_blank'>{`Receipt${index+1}`}</a>
+            :
+            'N/A'
+          )
+      }
+    }
   ];
 
   const changePage = (page: number) => {
