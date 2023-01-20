@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { Button, Card, Checkbox, Col, DatePicker, Form, Input, message, Row, Select, Space, Upload } from "antd";
+import { Button, Card,  Col, DatePicker, Form, Input, message, Row, Select, Space, Upload } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
 import constants, {roles_user, subscriptionStatus } from "../../../config/constants";
 
@@ -92,7 +92,7 @@ const NewEmployee = () => {
     id: '',
     name: ''
   })
-  const [skipClient, setSkipClient] = useState(false)
+  // const [skipClient, setSkipClient] = useState(false)
 
   const _subscriptionStatus = authData?.company?.subscriptionStatus ?? ''
   
@@ -114,13 +114,21 @@ const NewEmployee = () => {
 
   const redirectTo = (role: string, user: string) => {
     role === constants?.roles?.Employee ?
-      (!skipClient ?
-        navigate(routes.redirectToClientInfoTab.path(
-          authData?.company?.code ?? "1",
-          user ?? "1",'client'
-        ))
-        :
-        navigate(routes.user.path(authData?.company?.code ?? '')))
+      // (!skipClient ?
+      //   navigate(routes.redirectToClientInfoTab.path(
+      //     authData?.company?.code ?? "1",
+      //     user ?? "1",'client'
+
+      //     // routes.redirectToClientInfoTab.path(
+      //     //   loggedInUser?.company?.code ?? "1",
+      //     //   record?.id ?? "1",'client'
+      //   ))
+      //   :
+      //   navigate(routes.user.path(authData?.company?.code ?? '')))
+
+      navigate(routes.redirectToClientInfoTab.path(
+            authData?.company?.code ?? "1",
+            user ?? "1",'client'))
       :
       navigate(routes.user.path(authData?.company?.code ?? ''))
     message.success({
@@ -260,9 +268,9 @@ const NewEmployee = () => {
   const handleManagerChange = (value: any) => {
     setManager(value)
   }
-  const handleSkipClient = (e: any) => {
-    setSkipClient(e.target.checked)
-  }
+  // const handleSkipClient = (e: any) => {
+  //   setSkipClient(e.target.checked)
+  // }
   return (
     <div className={styles['main-div']}>
       <Card bordered={false}>
@@ -641,9 +649,9 @@ const NewEmployee = () => {
               </Form.Item>
             </Col>
 
-            <Col xs={24} sm={24} md={24} lg={24}>
+            {/* <Col xs={24} sm={24} md={24} lg={24}>
               <Checkbox onChange={handleSkipClient}><p className={styles['skip-client']}>Skip Client</p></Checkbox>
-            </Col>
+            </Col> */}
 
           </Row>
           <Row justify="end">

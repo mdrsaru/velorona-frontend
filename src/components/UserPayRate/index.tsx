@@ -151,8 +151,8 @@ const UserPayRateModal = (props: IProps) => {
       amount: values.payRate,
       invoiceRate: values.invoiceRate,
       company_id: loggedInUser.company?.id as string,
-      user_rate_currency_id : values.user_rate_currency_id,
-      invoice_rate_currency_id : values.invoice_rate_currency_id,
+      user_rate_currency_id: values.user_rate_currency_id,
+      invoice_rate_currency_id: values.invoice_rate_currency_id,
 
 
     }
@@ -171,9 +171,17 @@ const UserPayRateModal = (props: IProps) => {
 
   let defaultValues: any;
   if (currencyData) {
+    let id;
+    currencyData?.Currency?.data?.map((currency) => {
+      if (currency?.symbol === '$') {
+        return (
+          id = currency?.id
+        )
+      }
+    })
     defaultValues = {
-      user_rate_currency_id: currencyData?.Currency?.data?.[0]?.id,
-      invoice_rate_currency_id: currencyData?.Currency?.data?.[0]?.id,
+      user_rate_currency_id: id,
+      invoice_rate_currency_id: id,
     }
   }
   return (

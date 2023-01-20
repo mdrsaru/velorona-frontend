@@ -293,7 +293,7 @@ const EmployeeTimesheet = () => {
           name="filter-form"
         >
           <Row gutter={[32, 0]}>
-            <Col xs={24} sm={24} md={16} lg={17} xl={20}>
+            <Col xs={24} sm={24} md={16} lg={16} xl={20}>
               <Form.Item name="search" label="">
                 <Input
                   prefix={<SearchOutlined className="site-form-item-icon" />}
@@ -322,7 +322,7 @@ const EmployeeTimesheet = () => {
           {filterProperty?.filter &&
             <Row gutter={[32, 0]} className={styles["role-status-col"]}>
 
-              <Col xs={24} sm={12} md={10} lg={8} xl={5}>
+              <Col xs={24} sm={24} md={24} lg={10} xl={10}>
                 <Form.Item name="status" label="">
                   <Select
                     placeholder="Select status"
@@ -335,7 +335,7 @@ const EmployeeTimesheet = () => {
                   </Select>
                 </Form.Item>
               </Col>
-              <Col xs={24} sm={12} md={10} lg={10} xl={8}>
+              <Col xs={24} sm={24} md={24} lg={10} xl={10}>
                 <Form.Item name="date" label="">
                   <RangePicker bordered={false} onChange={onChangeFilter} />
                 </Form.Item>

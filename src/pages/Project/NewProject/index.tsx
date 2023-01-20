@@ -30,7 +30,7 @@ for (let i = 10; i < 36; i++) {
 }
 
 
-const PROJECT_CREATE = gql`
+export const PROJECT_CREATE = gql`
   mutation ProjectCreate($input: ProjectCreateInput!) {
       ProjectCreate(input: $input) {
           id

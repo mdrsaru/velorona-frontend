@@ -145,7 +145,7 @@ const Plan = (props: IProps) => {
       return;
     }
 
-    if(plan.subscriptionStatus === 'trialing' || plan.subscriptionStatus === 'past_due') {
+    if(plan.subscriptionStatus === 'trialing' || plan.subscriptionStatus === 'past_due' || plan.subscriptionStatus === 'active') {
       getSetupIntentSecret({
         variables: {
           input: {
@@ -196,6 +196,7 @@ const Plan = (props: IProps) => {
           <h4>Free Trial for 3 months/No credit card needed</h4>
         }
       </div>
+      <div className={styles.buttonDiv}>
       {plan.subscriptionStatus === 'active' ?
         // {/* Need downgrade functionality */}
 
@@ -224,6 +225,24 @@ const Plan = (props: IProps) => {
         </Button>
       </Popconfirm>
       }
+      {plan.name === 'Professional' && plan.subscriptionStatus === 'active' &&
+         <Popconfirm
+         placement="top"
+         title="Are you sure?"
+         onConfirm={handlePlanActionClick}
+         okText="Yes"
+         cancelText="No"
+       >
+       <Button
+          type="primary"
+          loading={creatingSubscription || downgrading}
+          className={styles.payNowBtn}
+        >
+          Pay Now
+        </Button>
+        </Popconfirm>
+      }
+      </div>
       <ul>
         {
           plan.features.map(feature => (
@@ -264,6 +283,7 @@ const Plan = (props: IProps) => {
               <UpdatePaymentDetails
                 hidePaymentUpdateModal={hidePaymentUpdateModal}
                 clientSecret={setupIntentSecretData?.SetupIntentSecret?.clientSecret}
+              companyId = {company_id}
               />
             </Elements>
           )

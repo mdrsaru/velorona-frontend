@@ -206,10 +206,7 @@ const EditProject = () => {
                 <Form.Item
                   name="client"
                   label="Client Name"
-                  rules={[{
-                    required: true,
-                    message: 'Please enter client name!'
-                  }]}>
+                 >
                   <Select placeholder="Select Name of the Client">
                     {clientData && clientData?.Client?.data.map((user: any, index: number) => (
                       <Option value={user?.id} key={index}>{user?.name}</Option>

@@ -26,6 +26,7 @@ const COMPANY = gql`
       plan
       subscriptionStatus
       trialEndDate
+      collectionMethod
     }
   }
 `;
@@ -42,7 +43,7 @@ const Subscription = () => {
   const { data: authData } = useQuery(AUTH)
   const company_id = authData.AuthUser?.company?.id as string;
 
-  const { loading: companyLoading } = useQuery<
+  const { loading: companyLoading ,data:companyData} = useQuery<
     GraphQLResponse<'CompanyById', Company>,
     QueryCompanyByIdArgs
   >(COMPANY, {
@@ -80,7 +81,10 @@ const Subscription = () => {
       <div className={styles['container']}>
         <Card bordered={false}>
 
-          <PageHeader title="My Subscription" />
+          <PageHeader 
+          title="My Subscription" 
+          />
+                <h2>({companyData?.CompanyById?.collectionMethod === 'charge_automatically' ? 'Autopay' :'Invoice'})</h2>
 
           <Tabs defaultActiveKey="currentPlan">
             <Tabs.TabPane 

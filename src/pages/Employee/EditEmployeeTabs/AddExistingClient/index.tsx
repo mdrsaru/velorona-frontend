@@ -18,6 +18,7 @@ import { useNavigate } from 'react-router-dom';
 
 import styles from '../../style.module.scss'
 import { CURRENCY } from "../../../Currency";
+import AddNewProject from '../../../../components/AddNewProject/index';
 
 
 export const USER_CLIENT_DETAIL = gql`
@@ -73,6 +74,9 @@ const AddExistingClient = () => {
 	const [client, setClient] = useState('')
 	const [projects, setProject] = useState([])
 	const [showRow, setShowRow] = useState(false)
+	const [currencyId, setCurrencyId] = useState<any>()
+	const [clientId, setClientId] = useState('')
+	const [addProjectShow, setAddProjectShow] = useState(false)
 
 
 	const { data: userClientDetailData, refetch: refetchUserClientDetail, loading } = useQuery<
@@ -142,6 +146,7 @@ const AddExistingClient = () => {
 				}
 
 			})
+			setClientId(response?.UserClientAssociate?.client?.id)
 			refetchProject({
 				input: {
 					query: {
@@ -181,9 +186,12 @@ const AddExistingClient = () => {
 		QueryCurrencyArgs
 	>(CURRENCY, {
 		fetchPolicy: 'network-only',
-		nextFetchPolicy: 'cache-only'
+		nextFetchPolicy: 'cache-only',
+		onCompleted(response) {
+			const result = response?.Currency?.data?.filter(currency => currency.symbol === '$')
+			setCurrencyId(result?.[0]?.id)
+		}
 	});
-
 
 	const [userPayRateUpdate] = useMutation<
 		GraphQLResponse<'UserPayRateUpdate', UserPayRate>, MutationUserPayRateUpdateArgs
@@ -290,9 +298,7 @@ const AddExistingClient = () => {
   
 	};
 
-	const onSelectCurrency = (key: any, id: any,index:any) => {
-		console.log('change')
-		console.log(key, id,index)
+	const onSelectCurrency = (key: any, id: any,index: any) => {
 		if (index?.userPayRateId !== null) {
 			userPayRateUpdate({
 				variables: {
@@ -390,20 +396,24 @@ const AddExistingClient = () => {
 			}
 		})
 	}
-	const tableData = dataSource?.map((data: any, index: number) => (
+	
+	const handleProjectAdd = () => {
+		setAddProjectShow(!addProjectShow)
+	}
+	const tableData = dataSource?.map((data: any, index: number) => {
+	return (
 		<tr key={index} style={{ marginBottom: '2rem' }}>
 			<td>{data.clientName}</td>
 			<td>{data.projectName}</td>
 			{/* <td>{data.status}</td> */}
-		
+
 			<td>
 				<InputNumber
 					addonBefore={
 						<Select
 							style={{ width: '5rem' }}
-							placeholder='Symbol'
-							defaultValue={data?.invoiceRateCurrency}
-							onSelect={(e: any) => onSelectCurrency('invoice_rate_currency_id', e,data)}
+								defaultValue={data?.invoiceRateCurrency !== null ? data?.invoiceRateCurrency : currencyId ?? '$'}
+							onSelect={(e: any) => onSelectCurrency('invoice_rate_currency_id', e, data)}
 
 						>
 							{currencyData?.Currency?.data?.map((currency, index) => (
@@ -427,9 +437,8 @@ const AddExistingClient = () => {
 					addonBefore={
 						<Select
 							style={{ width: '5rem' }}
-							placeholder='Symbol'
-							defaultValue={data?.userRateCurrency}
-							onSelect={(e: any) => onSelectCurrency('user_rate_currency_id', e,data)}
+								defaultValue={data?.userRateCurrency !== null ? data?.userRateCurrency : currencyId ?? '$'}
+							onSelect={(e: any) => onSelectCurrency('user_rate_currency_id', e, data)}
 						>
 							{currencyData?.Currency?.data?.map((currency, index) => (
 								<Select.Option
@@ -467,7 +476,8 @@ const AddExistingClient = () => {
 				</Popconfirm>
 			</td>
 		</tr>
-	))
+	)
+})
 	return (
 		<div className={styles['modal-body']}>
 			<div className={styles['header']}>
@@ -524,26 +534,42 @@ const AddExistingClient = () => {
 											</Select>
 										</Form.Item>
 									</td>
+								{clientId ?
 									<td>
 										<Form.Item
 											name="project1"
 											rules={[{
 												required: true,
-												message: 'Choose the client'
+												message: 'Choose the Project'
 											}]}>
-
-											<Select onChange={handleChangeProject} placeholder='Select project' >
 												{
-													projects &&
-													projects?.map((project: any, index: number) => (
+													projects?.length ?
+
+														(<Select onChange={handleChangeProject} placeholder='Select project' >
+
+													{projects?.map((project: any, index: number) => (
 														<Select.Option value={project.id} key={index}>{project?.name}</Select.Option>
 
 													))
 												}
-											</Select>
+											</Select>)
+
+														:
+														(
+															<Button onClick={() => handleProjectAdd()} disabled={!clientId}>Add New Project</Button>
+														)
+
+												}
+
 										</Form.Item>
 
-									</td>
+										</td>
+										:
+										<td>
+											<Select onChange={handleChangeProject} placeholder='Select project' disabled >
+											</Select>
+										</td>
+									}
 									<td>
 										<Input onKeyPress={onInputChange("amount", 0)} disabled={true} title={'You need to add project'} />
 									</td>
@@ -568,6 +594,13 @@ const AddExistingClient = () => {
 			>
 				Add a row
 			</Button>
+
+			<AddNewProject
+				visibility={addProjectShow}
+				setVisibility={setAddProjectShow}
+				clientId={clientId}
+				handleChangeProject={handleChangeProject}
+			/>
 		</div>
 	)
 }

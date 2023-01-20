@@ -6,9 +6,19 @@ import {
 } from '@stripe/react-stripe-js';
 import { Form, Button, message } from 'antd';
 
+import styles from '../style.module.scss'
+import { GraphQLResponse } from '../../../interfaces/graphql.interface';
+import { useMutation } from '@apollo/client';
+import { MutationCompanyUpdateArgs } from '../../../interfaces/generated';
+import { ICompany } from '../../../interfaces/ICompany';
+import { notifyGraphqlError } from '../../../utils/error';
+import { COMPANY_UPDATE } from '../../Company';
+import { collection_method } from '../../../config/constants';
+
 interface IProps {
   clientSecret: string;
   hidePaymentUpdateModal: () => void;
+  companyId:string;
 }
 
 const UpdatePaymentDetails = (props: IProps) => {
@@ -16,6 +26,19 @@ const UpdatePaymentDetails = (props: IProps) => {
   const elements = useElements();
   const [loading, setLoading] = useState(false);
 
+  const [updateCompany] = useMutation<
+  GraphQLResponse<'CompanyUpdate', ICompany>,
+    MutationCompanyUpdateArgs
+  >(COMPANY_UPDATE, {
+    onCompleted: (response) => {
+      if(response?.CompanyUpdate) {
+        message.success("The subscription has been successfully charged through automatic payments.")
+      }
+    },
+    onError: notifyGraphqlError,
+  })
+
+  
   const onFinish = async () => {
     if (!stripe || !elements) {
       return;
@@ -34,7 +57,15 @@ const UpdatePaymentDetails = (props: IProps) => {
         props.hidePaymentUpdateModal();
         message.success('Payment details updated.')
       }
-    } catch(err) {
+      updateCompany({
+        variables: {
+          input: {
+           collectionMethod:collection_method?.[0]?.value,
+            id: props.companyId
+          }
+        }
+      })
+    } catch (err) {
       console.log(err);
     } finally {
       setLoading(false);
@@ -45,7 +76,12 @@ const UpdatePaymentDetails = (props: IProps) => {
   return (
     <Form onFinish={onFinish}>
       <PaymentElement />
-
+      <div className={styles['autopay-checkbox']}>
+      <input type='checkbox' />  <span className={styles['autopay-title']}>You authorize regularly scheduled charges to your card.</span>
+      <p className={styles['autopay-description']}>You will be charged the amount indicated in your invoice for each billing period until it is cancel.
+        A receipt for each payment will be provided to you and the charge will appear on your card statement.
+      </p>
+      </div>
       <Button
         loading={loading}
         type="primary"
