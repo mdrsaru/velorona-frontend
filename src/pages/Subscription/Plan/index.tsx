@@ -269,7 +269,8 @@ const Plan = (props: IProps) => {
         footer={null}
         destroyOnClose
         title="Update Payment"
-        closable={false}
+        closable
+        onCancel={()=>setShowUpdatePaymentModal(false)}
         visible={showUpdatePaymentModal}
       >
         {

@@ -19,7 +19,7 @@ import styles from './style.module.scss';
 
 const stripePromise = loadStripe(stripeSetting.publishableKey);
 
-const COMPANY = gql`
+export const COMPANY = gql`
   query CompanyById($input: CompanyByIdInput!) {
     CompanyById(input: $input) {
       id
@@ -43,7 +43,7 @@ const Subscription = () => {
   const { data: authData } = useQuery(AUTH)
   const company_id = authData.AuthUser?.company?.id as string;
 
-  const { loading: companyLoading ,data:companyData} = useQuery<
+  const { loading: companyLoading, data:companyData } = useQuery<
     GraphQLResponse<'CompanyById', Company>,
     QueryCompanyByIdArgs
   >(COMPANY, {
@@ -72,7 +72,7 @@ const Subscription = () => {
     }
   });
 
-  if(companyLoading) {
+  if (companyLoading) {
     return null;
   }
 
@@ -81,29 +81,30 @@ const Subscription = () => {
       <div className={styles['container']}>
         <Card bordered={false}>
 
-          <PageHeader 
-          title="My Subscription" 
+          <PageHeader
+            title="My Subscription"
+            
           />
-                <h2>({companyData?.CompanyById?.collectionMethod === 'charge_automatically' ? 'Autopay' :'Invoice'})</h2>
+              <p className={styles['payment-method-title']}>Payment Method: {companyData?.CompanyById?.collectionMethod === 'charge_automatically' ? 'Autopay' : 'Invoice'}</p>
 
           <Tabs defaultActiveKey="currentPlan">
-            <Tabs.TabPane 
+            <Tabs.TabPane
               key="currentPlan"
-              tab={<TabText name="Current Plan" />} 
+              tab={<TabText name="Current Plan" />}
             >
               <CurrentPlan />
             </Tabs.TabPane>
 
-            <Tabs.TabPane 
+            <Tabs.TabPane
               key="availablePlans"
-              tab={<TabText name="Available Plans" />} 
+              tab={<TabText name="Available Plans" />}
             >
               <AvailablePlans />
             </Tabs.TabPane>
 
-            <Tabs.TabPane 
+            <Tabs.TabPane
               key="invoiceAndPayment"
-              tab={<TabText name="Invoice and Payments" />} 
+              tab={<TabText name="Invoice and Payments" />}
             >
               <InvoiceAndPayment />
             </Tabs.TabPane>
