@@ -11,7 +11,7 @@ import { PROJECT } from "../index";
 
 import styles from "../style.module.scss";
 import { GraphQLResponse } from "../../../interfaces/graphql.interface";
-import { MutationProjectUpdateArgs, Project, QueryUserArgs, QueryUserClientArgs, RoleName, UserClientPagingResult, UserPagingResult } from "../../../interfaces/generated";
+import { MutationProjectUpdateArgs, Project, ProjectStatus, QueryUserArgs, QueryUserClientArgs, RoleName, UserClientPagingResult, UserPagingResult } from "../../../interfaces/generated";
 import routes from "../../../config/routes";
 import { CLIENT } from "../../Client";
 import { USER } from "../../Employee";
@@ -71,7 +71,8 @@ const EditProject = () => {
     variables: {
       input: {
         query: {
-          company_id: loggedInUser?.company?.id as string
+          company_id: loggedInUser?.company?.id as string,
+          status:ProjectStatus.Active,
         },
         paging: {
           order: ['updatedAt:DESC']
@@ -142,21 +143,26 @@ const EditProject = () => {
   
   const onSubmitForm = (values: any) => {
     let key = 'project'
+    const input:any = {
+      id: params?.pid as string,
+      name: values.name,
+      company_id: loggedInUser?.company?.id as string,
+      user_ids: values?.assignee,
+    }
+
+    if(values.client ){
+       input.client_id= values.client
+
+    }
     projectUpdate({
       variables: {
-        input: {
-          id: params?.pid as string,
-          name: values.name,
-          company_id: loggedInUser?.company?.id as string,
-          client_id: values.client,
-          user_ids: values?.assignee,
-        }
+        input: input
       }
     }).then((response) => {
       if (response.errors) {
         return notifyGraphqlError((response.errors))
       } else if (response?.data?.ProjectUpdate) {
-        navigate(-1)
+        navigate( routes.projects.path(loggedInUser?.company?.code as string) ) 
         message.success({
           content: `Project is updated successfully!`,
           key,
@@ -166,6 +172,10 @@ const EditProject = () => {
     }).catch(notifyGraphqlError)
   }
 
+  const onCancel = ()=>{
+    navigate( routes.projects.path(loggedInUser?.company?.code as string) ) 
+
+  }
   return (
     <div className={styles['main-div']}>
       <Card bordered={false}>
@@ -250,7 +260,7 @@ const EditProject = () => {
               <Col>
                 <Form.Item>
                   <Space>
-                    <Button type="default" htmlType="button" onClick={() => navigate(routes.projects.path(loggedInUser?.company?.id as string))}>Cancel</Button>
+                    <Button type="default" htmlType="button" onClick={onCancel}>Cancel</Button>
                     <Button type="primary" htmlType="submit">Update Project</Button>
                   </Space>
                 </Form.Item>

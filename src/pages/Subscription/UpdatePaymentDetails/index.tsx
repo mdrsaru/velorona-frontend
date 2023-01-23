@@ -9,7 +9,7 @@ import { Form, Button, message } from 'antd';
 import styles from '../style.module.scss'
 import { GraphQLResponse } from '../../../interfaces/graphql.interface';
 import { useMutation, useQuery } from '@apollo/client';
-import { CompanyPagingResult, MutationCompanyUpdateArgs, QueryCompanyArgs, QueryCompanyByIdArgs } from '../../../interfaces/generated';
+import { CompanyPagingResult, MutationCompanyUpdateArgs, QueryCompanyArgs } from '../../../interfaces/generated';
 import { ICompany } from '../../../interfaces/ICompany';
 import { notifyGraphqlError } from '../../../utils/error';
 import { COMPANY, COMPANY_UPDATE } from '../../Company';
@@ -69,7 +69,10 @@ const UpdatePaymentDetails = (props: IProps) => {
         console.log(error)
       } else {
         props.hidePaymentUpdateModal();
-        message.success('Payment details updated.')
+        window.location.reload()
+        message.info({content:'The change will take some time to appear on Stripe.',duration: 15})
+        
+        // message.success('Payment details updated.')
       }
       updateCompany({
         variables: {

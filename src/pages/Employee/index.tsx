@@ -391,11 +391,14 @@ const Employee = () => {
       status?: string,
       archived?: boolean,
       role?: string,
-      search?: string
-    } = {}
+      search?: string,
+      company_id:string,
+    } = {
+      company_id: loggedInUser?.company?.id as string
+    }
 
     if (values.status) {
-      if (values.status === 'Active' || values.status === 'Inactive') {
+      if (values.status === 'Active' || values.status === 'Inactive' || values.status==='Invitation Sent') {
         query['status'] = values.status
       } else {
         query['archived'] = values.status === 'Archived' ? true : false

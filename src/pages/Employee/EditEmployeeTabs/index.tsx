@@ -25,7 +25,7 @@ const EditEmployeeTabs = () => {
 
 	return (
 		<Card>
-			<h1  style={{textTransform:'capitalize', marginBottom:'1.5rem'}}>{userData?.User?.data?.[0]?.fullName}(<span>{userData?.User?.data?.[0]?.designation}</span>)</h1>
+			<h1  style={{textTransform:'capitalize', marginBottom:'1.5rem'}}>{userData?.User?.data?.[0]?.fullName} {userData?.User?.data?.[0]?.designation && <span>({userData?.User?.data?.[0]?.designation})</span>}</h1>
 			<Tabs type='card' defaultActiveKey={params.client ? "client-info" : "user-info"}>
 				<Tabs.TabPane tab="User Info" key="user-info" style={{ fontSize: '2rem' }}>
 					<EditEmployee />

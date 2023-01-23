@@ -376,11 +376,12 @@ const Company = () => {
               placement="bottomRight"
             >
               {
-                record.status === 'Active'   
-                  ? <CheckCircleOutlined style={{ color: 'var(--primary-green)' }} />
+                record.status === 'Active'
+                  ? <CloseCircleOutlined style={{ color: 'var(--primary-red)' }} />
                   : record.status === 'Inactive'
-                  ? <CloseCircleOutlined  style={{ color: 'var(--primary-red)' }} />
-                  : <FileExcelOutlined style={{ color: 'var(--primary-orange)' }} />
+                    ? <CheckCircleOutlined style={{ color: 'var(--primary-green)' }} />
+
+                    : <FileExcelOutlined style={{ color: 'var(--primary-orange)' }} />
               }
             </Dropdown>
           </span>

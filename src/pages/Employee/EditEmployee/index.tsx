@@ -336,6 +336,10 @@ const EditEmployee = () => {
                       max: 11,
                       message: "Phone number should be less than 11 digits",
                     },
+                    {
+                      min: 8,
+                      message: "Phone number should be more than 8 digits"
+                    }
                   ]}
                 >
                   <Input

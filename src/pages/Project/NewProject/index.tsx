@@ -11,7 +11,7 @@ import { notifyGraphqlError } from "../../../utils/error";
 import routes from "../../../config/routes";
 import styles from "../style.module.scss";
 import { GraphQLResponse } from "../../../interfaces/graphql.interface";
-import { ClientPagingResult, MutationProjectCreateArgs, Project, QueryClientArgs, QueryUserClientArgs, UserClientPagingResult } from "../../../interfaces/generated";
+import { ClientPagingResult, MutationProjectCreateArgs, Project, ProjectStatus, QueryClientArgs, QueryUserClientArgs, UserClientPagingResult } from "../../../interfaces/generated";
 import { USERCLIENT } from "../../Employee/DetailEmployee";
 
 interface ItemProps {
@@ -82,7 +82,8 @@ const NewProject = () => {
     variables: {
       input: {
         query: {
-          company_id: loggedInUser?.company?.id as string
+          company_id: loggedInUser?.company?.id as string,
+          status:ProjectStatus.Active,
         },
         paging: {
           order: ['updatedAt:DESC']

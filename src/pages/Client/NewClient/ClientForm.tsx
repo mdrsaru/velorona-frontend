@@ -244,6 +244,12 @@ const ClientForm = (props: any) => {
               rules={[{
                 required: true,
                 message: 'Please enter contact Number!'
+              },{
+                max: 11,
+                message: "Phone number should be less than 11 digits"
+              },{
+                min: 8,
+                message: "Phone number should be more than 8 digits"
               }]}>
               <Input
                 type='number'

@@ -45,6 +45,9 @@ export const PROJECT = gql`
           id
           fullName
           email
+          userPayRate{
+          id
+          }
         }
       }
     }

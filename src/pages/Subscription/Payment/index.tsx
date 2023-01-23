@@ -7,7 +7,6 @@ import {
 import { Form, Input, Button, message } from 'antd';
 
 import { plansVar } from '../../../App/link'
-import { IPlan } from '../../../interfaces/subscription.interface';
 
 import './stripe.scss';
 
@@ -42,16 +41,15 @@ const Payment = (props: IProps) => {
         }
       });
 
-      if(paymentIntent) {
-        message.success('Payment successful')
+      if (paymentIntent) {
 
         const plans = plansVar();
 
         const newPlans = plans.map((plan) => {
           const _plan = { ...plan };
-          if(plan.name === 'Professional') {
+          if (plan.name === 'Professional') {
             _plan.isCurrent = true
-          } else if(plan.name === 'Starter') {
+          } else if (plan.name === 'Starter') {
             _plan.isCurrent = false;
           }
 
@@ -60,11 +58,14 @@ const Payment = (props: IProps) => {
 
         // Update the plansvar with active professional plan
         plansVar(newPlans)
+        window.location.reload()
+        message.info({ content: 'The change will take some time to appear on Stripe.', duration: 15 })
+
         props.hidePaymentModal();
-      } else if(error) {
+      } else if (error) {
         message.error(error.message);
       }
-    } catch(err) {
+    } catch (err) {
       message.error('Something went wrong. Please try again.')
     } finally {
       setLoading(false);
@@ -72,7 +73,7 @@ const Payment = (props: IProps) => {
   }
 
   return (
-    <Form 
+    <Form
       layout="vertical"
       onFinish={onFinish}
     >
@@ -93,7 +94,7 @@ const Payment = (props: IProps) => {
 
       <Form.Item label="Card Details" >
         <div className="stripe">
-          <CardElement 
+          <CardElement
             options={{
               style: {
                 base: {
@@ -104,7 +105,7 @@ const Payment = (props: IProps) => {
                   },
 
                 }
-              } 
+              }
             }}
           />
         </div>

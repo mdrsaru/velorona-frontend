@@ -1,5 +1,5 @@
 
-import {  useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import { Form, Modal, Row, Col, Button, Space, Input } from "antd"
 import { useEffect, useState } from "react";
 import { authVar } from "../../App/link";
@@ -46,7 +46,7 @@ const AddWorkscheduleEmployee = (props: IProps) => {
           },
           query: {
             company_id: loggedInUser?.user?.id,
-			role:RoleName.Employee
+            role:RoleName.Employee
           }
         },
       },
@@ -65,8 +65,13 @@ const AddWorkscheduleEmployee = (props: IProps) => {
       }
     }
     let query: {
-      search?: string
-    } = {}
+      search?: string,
+      company_id: string,
+      role:string,
+    } = {
+      company_id: loggedInUser?.company?.id as string,
+      role: RoleName.Employee
+    }
 
 
     if (values.search) {
@@ -146,7 +151,7 @@ const AddWorkscheduleEmployee = (props: IProps) => {
                     <Row key={index}>
 
                       <Col style={{ marginBottom: '2%' }} lg={23} >
-                        {employee.fullName+ ' / '+employee.email}
+                        {employee.fullName + ' / ' + employee.email}
                       </Col>
                       <Col>
                         <CheckCircleFilled onClick={() => handleChange(employee?.id)} className={user === employee?.id ? `${styles.selected}` : `${styles.check}`} />

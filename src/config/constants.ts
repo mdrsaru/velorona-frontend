@@ -51,6 +51,10 @@ export const status = [
     value: 'Inactive',
     name: 'In Active',
   },
+  {
+    value: 'Invitation Sent',
+    name: 'Invitation Sent',
+  },
 ];
 
 export const payment_status = [

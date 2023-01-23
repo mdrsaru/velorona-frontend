@@ -187,7 +187,7 @@ const Sidebar = (props: any) => {
       icon: <FieldTimeOutlined />,
       route: routes.employeeTimesheet.path(loggedInUser?.company?.code ?? ''),
       accessRoles: [constants.roles.TaskManager],
-      viewAsAdmin: true,
+      // viewAsAdmin: true,
     },
     {
       key: routes.schedule.key,

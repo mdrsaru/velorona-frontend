@@ -255,7 +255,7 @@ const Plan = (props: IProps) => {
         footer={null}
         destroyOnClose
         title="Payment"
-        closable={false}
+        closable={true}
         visible={!!subscriptionData}
       >
         <Payment
