@@ -22,7 +22,10 @@ const PageHeader = (props: IProps) => {
         props?.extra && props.extra.length && (
           <div className={styles['header__extra']}>
             {
-              props.extra.map(ex => ex)
+              props.extra.map((ex,index) => (
+                <span key={index}>
+                {ex}
+                </span>))
             }
           </div>
         )

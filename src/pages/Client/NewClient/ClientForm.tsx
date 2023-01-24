@@ -242,7 +242,9 @@ const ClientForm = (props: any) => {
               name='phone'
 
               rules={[{
-                required: true,
+                required: true, 
+                type: "regexp",
+                pattern: new RegExp("[^[0-9],+]"),
                 message: 'Please enter contact Number!'
               },{
                 max: 11,

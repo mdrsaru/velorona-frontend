@@ -72,7 +72,7 @@ const CompanyForm = (props: IProps) => {
   });
 
   useEffect(() => {
-    if(props.company?.logo) {
+    if (props.company?.logo) {
       setFile({
         id: props.company.logo.id,
         name: props.company.logo.name,
@@ -85,7 +85,7 @@ const CompanyForm = (props: IProps) => {
     MutationCompanyCreateArgs
   >(COMPANY_CREATE, {
     onCompleted(response) {
-      if(response?.CompanyCreate) {
+      if (response?.CompanyCreate) {
         message.success(`Company ${response?.CompanyCreate?.name} created successfully!`)
         navigate(routes.companyAdmin.path);
       }
@@ -98,7 +98,7 @@ const CompanyForm = (props: IProps) => {
     MutationCompanyUpdateArgs
   >(COMPANY_UPDATE, {
     onCompleted(response) {
-      if(response?.CompanyUpdate) {
+      if (response?.CompanyUpdate) {
         message.success(`Company ${response?.CompanyUpdate?.name} updated successfully!`)
         navigate(routes.companyAdmin.path);
       }
@@ -128,10 +128,10 @@ const CompanyForm = (props: IProps) => {
   const onSubmitForm = () => {
 
     const values = form.getFieldsValue(true, (meta) => meta.touched);
-    if(props.company) {
+    if (props.company) {
       const address = {
 
-        country:values.country,
+        country: values.country,
         streetAddress: values.streetAddress,
         state: values.state,
         city: values.city,
@@ -168,7 +168,7 @@ const CompanyForm = (props: IProps) => {
       const input: CompanyCreateInput = {
         name: values.name,
         status: values.status,
-        plan : values.plan,
+        plan: values.plan,
         user: {
           firstName: values.firstName,
           middleName: values.middleName,
@@ -176,7 +176,7 @@ const CompanyForm = (props: IProps) => {
           email: values.email,
           phone: values.phone,
           address: {
-            country:values.country,
+            country: values.country,
             streetAddress: values.streetAddress,
             state: values.state,
             city: values.city,
@@ -200,22 +200,26 @@ const CompanyForm = (props: IProps) => {
   };
 
   let initialValues: any;
-  if(props.company) {
+  if (props.company) {
     const company = props.company;
+    const admin = props.company?.admin;
+    console.log(company?.companyCode)
     initialValues = {
       name: company.name,
       status: company.status,
-      firstName: company.admin.firstName,
-      middleName: company.admin.middleName,
-      lastName: company.admin.lastName,
-      email: company.admin.email,
-      phone: company.admin.phone,
-      country:company.admin.address?.country,
-      streetAddress: company.admin.address?.streetAddress,
-      aptOrSuite: company.admin.address?.aptOrSuite,
-      state: company.admin.address?.state,
-      city: company.admin.address?.city,
-      zipcode: company.admin.address?.zipcode,
+      companyCode: company.companyCode,
+
+      firstName: admin?.firstName,
+      middleName: admin?.middleName,
+      lastName: admin?.lastName,
+      email: admin?.email,
+      phone: admin?.phone,
+      country: admin?.address?.country,
+      streetAddress: admin?.address?.streetAddress,
+      aptOrSuite: admin?.address?.aptOrSuite,
+      state: admin?.address?.state,
+      city: admin?.address?.city,
+      zipcode: admin?.address?.zipcode,
     }
   }
 
@@ -329,6 +333,8 @@ const CompanyForm = (props: IProps) => {
             rules={[
               {
                 required: true,
+                type: "regexp",
+                pattern: new RegExp("[^[0-9],+]"),
                 message: "Please input your phone number!",
               },
               {
@@ -338,6 +344,7 @@ const CompanyForm = (props: IProps) => {
             ]}
           >
             <Input
+            type='number'
               placeholder="Enter your phone number"
               autoComplete="off"
             />
@@ -435,6 +442,21 @@ const CompanyForm = (props: IProps) => {
             </Form.Item>
           </Col>
         }
+        {props.company &&
+          <Col xs={24} sm={24} md={12}>
+            <Form.Item
+              label="Company Code"
+              name="companyCode"
+            >
+              <Input
+                placeholder="Enter Company Code"
+                autoComplete="off"
+                disabled
+
+              />
+            </Form.Item>
+          </Col>
+        }
         <Col xs={24} sm={24} md={12} lg={12}>
           <Form.Item
             name="upload"
@@ -446,7 +468,7 @@ const CompanyForm = (props: IProps) => {
             <div className={styles['upload-file']}>
               <div>
                 <span>
-                  { fileData?.name ? fileData?.name : ' Attach your files here' }
+                  {fileData?.name ? fileData?.name : ' Attach your files here'}
                 </span>
               </div>
               <div className={styles['browse-file']}>
@@ -469,7 +491,7 @@ const CompanyForm = (props: IProps) => {
               </Button>
 
               <Button type="primary" htmlType="submit" loading={creatingCompany || updatingCompany}>
-                { props.company ? 'Save': 'Add Company' }
+                {props.company ? 'Save' : 'Add Company'}
               </Button>
             </Space>
           </Form.Item>

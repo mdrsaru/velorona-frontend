@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { Card, PageHeader, Form, Row, Col, Input, Button, Select, Tabs, Table, Dropdown, Menu, message } from "antd"
+import { Card,  Form, Row, Col, Input, Button, Select, Tabs, Table, Dropdown, Menu, message } from "antd"
 import {FormOutlined, CheckCircleFilled, DeleteOutlined, SearchOutlined,CloseCircleFilled ,FileSyncOutlined} from "@ant-design/icons"
 import { debounce } from "lodash"
 import { Link, useNavigate } from "react-router-dom"
@@ -23,6 +23,7 @@ import ArchiveBody from "../../components/Archive"
 import RouteLoader from "../../components/Skeleton/RouteLoader"
 
 import styles from './styles.module.scss'
+import PageHeader from "../../components/PageHeader"
 
 const {Option} = Select;
 const {TabPane} = Tabs;

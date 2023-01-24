@@ -52,7 +52,6 @@ const _Layout = () => {
           url: '',
         }
       });
-      client.clearStore();
       navigate(routes.login.path);
     },
   });

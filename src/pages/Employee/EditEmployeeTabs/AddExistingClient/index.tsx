@@ -240,17 +240,17 @@ const AddExistingClient = () => {
 	})
 
 	const [updateUserClientStatus] = useMutation<
-	GraphQLResponse<'UpdateUserClientStatus', UserClient>, MutationUserClientChangeStatusArgs>(USER_CLIENT_UPDATE_STATUS, {
-		onCompleted() {
-			refetchUserClientDetail({
-				input: {
-					company_id: authData?.company?.id as string,
-					user_id: params?.eid,
-				}
+		GraphQLResponse<'UpdateUserClientStatus', UserClient>, MutationUserClientChangeStatusArgs>(USER_CLIENT_UPDATE_STATUS, {
+			onCompleted() {
+				refetchUserClientDetail({
+					input: {
+						company_id: authData?.company?.id as string,
+						user_id: params?.eid,
+					}
 
-			})
-		}
-	})
+				})
+			}
+		})
 
 
 	const [removeProjectUserAssign] = useMutation<
@@ -295,10 +295,10 @@ const AddExistingClient = () => {
 				}
 			})
 		}
-  
+
 	};
 
-	const onSelectCurrency = (key: any, id: any,index: any) => {
+	const onSelectCurrency = (key: any, id: any, index: any) => {
 		if (index?.userPayRateId !== null) {
 			userPayRateUpdate({
 				variables: {
@@ -401,83 +401,83 @@ const AddExistingClient = () => {
 		setAddProjectShow(!addProjectShow)
 	}
 	const tableData = dataSource?.map((data: any, index: number) => {
-	return (
-		<tr key={index} style={{ marginBottom: '2rem' }}>
-			<td>{data.clientName}</td>
-			<td>{data.projectName}</td>
-			{/* <td>{data.status}</td> */}
+		return (
+			<tr key={index} style={{ marginBottom: '2rem' }}>
+				<td>{data.clientName}</td>
+				<td>{data.projectName}</td>
+				{/* <td>{data.status}</td> */}
 
-			<td>
-				<InputNumber
-					addonBefore={
-						<Select
-							style={{ width: '5rem' }}
+				<td>
+					<InputNumber
+						addonBefore={
+							<Select
+								style={{ width: '5rem' }}
 								defaultValue={data?.invoiceRateCurrency !== null ? data?.invoiceRateCurrency : currencyId ?? '$'}
-							onSelect={(e: any) => onSelectCurrency('invoice_rate_currency_id', e, data)}
+								onSelect={(e: any) => onSelectCurrency('invoice_rate_currency_id', e, data)}
 
-						>
-							{currencyData?.Currency?.data?.map((currency, index) => (
-								<Select.Option
-									value={currency.id}
-									key={index}
-								>
-									{currency.symbol}
-								</Select.Option>
-							))}
-						</Select>}
-					addonAfter="Hr"
-					placeholder="Enter invoice rate"
-					autoComplete="off"
-					defaultValue={data.invoiceRate}
-					onChangeCapture={onInputChange("invoiceRate", data)}
-					style={{ width: '100%' }} />
-			</td>
-			<td>
-				<InputNumber
-					addonBefore={
-						<Select
-							style={{ width: '5rem' }}
+							>
+								{currencyData?.Currency?.data?.map((currency, index) => (
+									<Select.Option
+										value={currency.id}
+										key={index}
+									>
+										{currency.symbol}
+									</Select.Option>
+								))}
+							</Select>}
+						addonAfter="Hr"
+						placeholder="Enter invoice rate"
+						autoComplete="off"
+						defaultValue={data.invoiceRate}
+						onChangeCapture={onInputChange("invoiceRate", data)}
+						style={{ width: '100%' }} />
+				</td>
+				<td>
+					<InputNumber
+						addonBefore={
+							<Select
+								style={{ width: '5rem' }}
 								defaultValue={data?.userRateCurrency !== null ? data?.userRateCurrency : currencyId ?? '$'}
-							onSelect={(e: any) => onSelectCurrency('user_rate_currency_id', e, data)}
-						>
-							{currencyData?.Currency?.data?.map((currency, index) => (
-								<Select.Option
-									value={currency.id}
-									key={index}
-								>
-									{currency.symbol}
-								</Select.Option>
-							))}
-						</Select>
-					}
-					addonAfter="Hr"
-					placeholder="Enter payrate"
-					autoComplete="off"
-					defaultValue={data.userRate}
-					onChangeCapture={onInputChange("amount", data)}
-					style={{ width: '100%' }} />
-			</td>
-			<td>
-				<Select onSelect={(e: any) => handleChangeStatus(data.clientId, e)} placeholder='Select status' defaultValue={data.status}>
-					<Select.Option value={UserClientStatus.Active}>{UserClientStatus.Active}</Select.Option>
-					<Select.Option value={UserClientStatus.Inactive}>{UserClientStatus.Inactive}</Select.Option>
+								onSelect={(e: any) => onSelectCurrency('user_rate_currency_id', e, data)}
+							>
+								{currencyData?.Currency?.data?.map((currency, index) => (
+									<Select.Option
+										value={currency.id}
+										key={index}
+									>
+										{currency.symbol}
+									</Select.Option>
+								))}
+							</Select>
+						}
+						addonAfter="Hr"
+						placeholder="Enter payrate"
+						autoComplete="off"
+						defaultValue={data.userRate}
+						onChangeCapture={onInputChange("amount", data)}
+						style={{ width: '100%' }} />
+				</td>
+				<td>
+					<Select onSelect={(e: any) => handleChangeStatus(data.clientId, e)} placeholder='Select status' defaultValue={data.status}>
+						<Select.Option value={UserClientStatus.Active}>{UserClientStatus.Active}</Select.Option>
+						<Select.Option value={UserClientStatus.Inactive}>{UserClientStatus.Inactive}</Select.Option>
 
-				</Select>
-			</td>
-			<td>
-				<Popconfirm
-					placement="topLeft"
-					title='Are you sure?'
-					onConfirm={() => handleRemoveData(data.projectId, data.userPayRateId)}
-					okText="Yes"
-					cancelText="No"
-				>
-					<CloseCircleOutlined />
-				</Popconfirm>
-			</td>
-		</tr>
-	)
-})
+					</Select>
+				</td>
+				<td>
+					<Popconfirm
+						placement="topLeft"
+						title='Are you sure?'
+						onConfirm={() => handleRemoveData(data.projectId, data.userPayRateId)}
+						okText="Yes"
+						cancelText="No"
+					>
+						<CloseCircleOutlined />
+					</Popconfirm>
+				</td>
+			</tr>
+		)
+	})
 	return (
 		<div className={styles['modal-body']}>
 			<div className={styles['header']}>
@@ -534,25 +534,25 @@ const AddExistingClient = () => {
 											</Select>
 										</Form.Item>
 									</td>
-								{clientId ?
-									<td>
-										<Form.Item
-											name="project1"
-											rules={[{
-												required: true,
-												message: 'Choose the Project'
-											}]}>
+									{clientId ?
+										<td>
+											<Form.Item
+												name="project1"
+												rules={[{
+													required: true,
+													message: 'Choose the Project'
+												}]}>
 												{
 													projects?.length ?
 
 														(<Select onChange={handleChangeProject} placeholder='Select project' >
 
-													{projects?.map((project: any, index: number) => (
-														<Select.Option value={project.id} key={index}>{project?.name}</Select.Option>
+															{projects?.map((project: any, index: number) => (
+																<Select.Option value={project.id} key={index}>{project?.name}</Select.Option>
 
-													))
-												}
-											</Select>)
+															))
+															}
+														</Select>)
 
 														:
 														(
@@ -561,20 +561,27 @@ const AddExistingClient = () => {
 
 												}
 
-										</Form.Item>
+											</Form.Item>
 
 										</td>
 										:
 										<td>
-											<Select onChange={handleChangeProject} placeholder='Select project' disabled >
-											</Select>
+											<Form.Item>
+												<Select onChange={handleChangeProject} placeholder='Select project' disabled >
+												</Select>
+											</Form.Item>
 										</td>
+
 									}
 									<td>
-										<Input onKeyPress={onInputChange("amount", 0)} disabled={true} title={'You need to add project'} />
+										<Form.Item>
+											<Input onKeyPress={onInputChange("amount", 0)} disabled={true} title={'You need to add project'} />
+										</Form.Item>
 									</td>
 									<td>
-										<Input onKeyPress={onInputChange("invoiceRate", 0)} disabled={true} title='You need to add project' />
+										<Form.Item>
+											<Input onKeyPress={onInputChange("invoiceRate", 0)} disabled={true} title='You need to add project' />
+										</Form.Item>
 									</td>
 									<td>-</td>
 
@@ -589,7 +596,7 @@ const AddExistingClient = () => {
 				type="primary"
 				style={{
 					marginBottom: 16,
-					marginTop:4,
+					marginTop: 4,
 				}}
 			>
 				Add a row

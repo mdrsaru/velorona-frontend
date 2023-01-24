@@ -147,11 +147,11 @@ export const plans = {
 export const collection_method = [
   {
     value: 'charge_automatically',
-    name: 'Charge Automatically'
+    name: 'Autopay'
   },
   {
     value: 'send_invoice',
-    name: 'Send Invoice'
+    name: 'Invoice'
   }];
 
 export const subscription = {

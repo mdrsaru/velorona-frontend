@@ -344,6 +344,18 @@ const Company = () => {
       )
     },
     {
+      title: 'Email',
+      render: (company: any) => {
+        return (
+          <span>{company?.admin?.email}</span>
+        )
+      }
+    },
+    {
+      title: 'Company Code',
+      dataIndex: 'companyCode',
+    },
+    {
       title: 'Created At',
       dataIndex: 'createdAt',
       key: 'createdAt',
@@ -482,7 +494,8 @@ const Company = () => {
                 current: pagingInput.currentPage,
                 onChange: changePage,
                 total: companyData?.Company?.paging?.total,
-                pageSize: constants.paging.perPage
+                pageSize: constants.paging.perPage,
+                showSizeChanger:false
               }} />
           </Col>
         </Row>

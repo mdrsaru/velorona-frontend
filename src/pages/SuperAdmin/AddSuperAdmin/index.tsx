@@ -318,6 +318,8 @@ const AddSuperAdmin = () => {
 								name='phone'
 								rules={[{
 									required:true,
+									type: "regexp",
+									pattern: new RegExp("[^[0-9],+]"),
 									message: 'Please enter phone number!'
 								},
 								{
@@ -329,7 +331,7 @@ const AddSuperAdmin = () => {
 										message: "Phone number should be more than 8 digits"
 									}]}
 							>
-								<Input placeholder="Enter your phone number" autoComplete="off" />
+								<Input placeholder="Enter your phone number" autoComplete="off" type='number' />
 							</Form.Item>
 						</Col>
 						<Col className={styles['form-header']}>

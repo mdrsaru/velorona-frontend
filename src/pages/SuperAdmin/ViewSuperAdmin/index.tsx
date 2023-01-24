@@ -27,7 +27,6 @@ import { notifyGraphqlError } from "../../../utils/error";
 import { GraphQLResponse } from "../../../interfaces/graphql.interface";
 import { MutationChangeProfilePictureArgs, QueryUserArgs, RoleName, User, UserPagingResult } from "../../../interfaces/generated";
 import Loader from "../../../components/Loader";
-import moment from "moment";
 
 export const USERCLIENT = gql`
   query UserClient($input: UserClientQueryInput!) {

@@ -257,6 +257,7 @@ const Plan = (props: IProps) => {
         title="Payment"
         closable={true}
         visible={!!subscriptionData}
+        onCancel={hidePaymentModal}
       >
         <Payment
           clientSecret={createSubscriptionData?.SubscriptionCreate?.clientSecret as string}

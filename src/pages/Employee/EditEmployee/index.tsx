@@ -329,8 +329,8 @@ const EditEmployee = () => {
                   name="phone"
                   rules={[
                     {
-                      required: true,
-                      message: "Please input your phone number!",
+                      required: true, 
+                      message: 'Please enter contact Number!'
                     },
                     {
                       max: 11,
@@ -343,6 +343,7 @@ const EditEmployee = () => {
                   ]}
                 >
                   <Input
+                    type='number'
                     placeholder="Enter your phone number"
                     autoComplete="off"
                   />

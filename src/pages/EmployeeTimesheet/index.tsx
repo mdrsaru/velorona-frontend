@@ -145,7 +145,7 @@ const EmployeeTimesheet = () => {
     }
 
     if (values.search) {
-      query['search'] = values?.search
+      query['search'] = values?.search.trim();
     }
 
     if (values?.date) {

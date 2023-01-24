@@ -363,6 +363,8 @@ const NewEmployee = () => {
                 name='phone'
                 rules={[{
                   required: true,
+                  type: "regexp",
+                  pattern: new RegExp("[^[0-9],+]"),
                   message: 'Please input your phone number!'
                 }, {
                   max: 11,
@@ -372,7 +374,7 @@ const NewEmployee = () => {
                   min: 8,
                   message: "Phone number should be more than 8 digits"
                 }]}>
-                <Input placeholder="Enter your phone number" autoComplete="off" />
+                <Input placeholder="Enter your phone number" autoComplete="off" type='number'/>
               </Form.Item>
             </Col>
             <Col

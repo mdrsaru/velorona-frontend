@@ -60,7 +60,7 @@ const CompanySetting = () => {
             Collection Method
           </Col>
           <Col span={12} className={styles['value']}>
-            <p className={styles['collection-method']}> {company?.collectionMethod ?? 'N/A'} </p>
+            <p className={styles['collection-method']}> {company?.collectionMethod === 'charge_automatically' ? 'Autopay' : ' Invoice' ?? 'N/A'} </p>
           </Col>
         </Row>
         <Row>

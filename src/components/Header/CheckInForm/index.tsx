@@ -93,7 +93,7 @@ const CheckInForm = (props: IProps) => {
       layout="vertical"
       onFinish={checkIn}
     >
-      <p className={styles['date']}>{moment().format('ddd, MMMM M, YYYY ')}</p>
+      <p className={styles['date']}>{moment().format('ddd, MMMM DD, YYYY ')}</p>
 
       <Form.Item
         label="Choose Project"

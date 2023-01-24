@@ -7,7 +7,7 @@ import {
   CheckCircleOutlined,
 } from '@ant-design/icons';
 
-import constants, { plans, subscriptionStatus } from '../../../../config/constants';
+import constants, { subscriptionStatus } from '../../../../config/constants';
 import { notifyGraphqlError } from '../../../../utils/error';
 import { getWeekDays, getTimeFormat, checkRoles, checkSubscriptions } from '../../../../utils/common';
 import { authVar } from '../../../../App/link';

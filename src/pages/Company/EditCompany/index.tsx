@@ -22,6 +22,7 @@ export const COMPANY = gql`
         name
         status
         adminEmail
+        companyCode
         logo {
           id
           url
