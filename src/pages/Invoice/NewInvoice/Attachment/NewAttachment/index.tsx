@@ -140,11 +140,16 @@ const NewAttachment = (props: IProps) => {
                   <Form.Item
                     label="Amount"
                     name="amount"
+                    rules={[{ 
+                      pattern: new RegExp(/\d+/g),
+                      message: "The amount should contain only numbers",
+                  }]}
                   >
                     <InputNumber
                       type='number'
                       placeholder="Enter amount"
                       autoComplete="off"
+                      min="0"
                       style={{ width: '100%' }}
                     />
                   </Form.Item>

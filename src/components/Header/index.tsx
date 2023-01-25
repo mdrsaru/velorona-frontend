@@ -164,7 +164,12 @@ const TopHeader = (props: any) => {
             alt="notification" />
         </div> */}
         <div className={styles['avatar']}>
-          <Avatar size={38} src={loggedInUser?.avatar?.url ?? pp} />
+          {
+            loggedInUser?.avatar?.url === '' ?
+              <Avatar size={38} src={pp} />
+              :
+              <Avatar size={38} src={loggedInUser?.avatar?.url ?? pp} />
+          }
           <Dropdown
             overlay={menu}
             trigger={['click']}>

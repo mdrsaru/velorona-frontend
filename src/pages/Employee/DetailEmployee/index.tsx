@@ -23,11 +23,11 @@ import { USER } from "../index";
 
 import styles from "../style.module.scss";
 import ViewUserPayRate, { USER_PAY_RATE } from "../../../components/ViewUserPayRate";
-import constants from "../../../config/constants";
+import constants, { userPayRateStatus } from "../../../config/constants";
 import { CHANGE_PROFILE_IMAGE } from "../NewEmployee";
 import { notifyGraphqlError } from "../../../utils/error";
 import { GraphQLResponse, UserPayRatePagingData } from "../../../interfaces/graphql.interface";
-import { MutationChangeProfilePictureArgs, QueryUserArgs, QueryUserClientArgs, RoleName, User, UserClient,UserClientPagingResult, UserPagingResult } from "../../../interfaces/generated";
+import { MutationChangeProfilePictureArgs, QueryUserArgs, QueryUserClientArgs, RoleName, User, UserClient, UserClientPagingResult, UserPagingResult } from "../../../interfaces/generated";
 import Loader from "../../../components/Loader";
 import moment from "moment";
 import Status from "../../../components/Status";
@@ -79,6 +79,8 @@ const DetailEmployee = () => {
         input: {
           query: {
             user_id: params?.eid,
+            company_id: loggedInUser?.company?.id,
+            status: userPayRateStatus.active,
           }
         }
       }
@@ -129,7 +131,7 @@ const DetailEmployee = () => {
         query: {
           user_id: params?.eid,
         },
-        paging:{
+        paging: {
           order: ['updatedAt:DESC']
         }
       },
@@ -145,8 +147,9 @@ const DetailEmployee = () => {
       authorization: loggedInUser?.token ? `Bearer ${loggedInUser?.token}` : "",
     },
     onChange(info) {
+      setIsImageLoading(true);
       if (info.file.status === "done") {
-        setIsImageLoading(true);
+        
         changeProfilePictureInput({
           variables: {
             input: {
@@ -196,7 +199,6 @@ const DetailEmployee = () => {
       }
     },
   ]
-
   return (
     <div className={styles["main-div"]}>
       {userData?.User?.data[0] && (
@@ -213,7 +215,7 @@ const DetailEmployee = () => {
           <Row justify="center">
             <Col className={styles["avatar-col"]}>
               <div className={styles["avatar-image"]}>
-                {isImageLoading && loading ?
+                {isImageLoading && loading?.loading ?
                   <Loader />
                   : (
                     <Avatar
@@ -232,15 +234,13 @@ const DetailEmployee = () => {
                 }
                 {profile ? (
                   <div className={styles["camera-div"]}>
-                    {isImageLoading && loading ?
-                      <Loader />
-                      : (
+                    
                         <div className={styles["browse-file"]}>
                           <Upload {...props}>
                             <img src={camera} alt="camera-src" />
                           </Upload>
                         </div>
-                      )}
+                      
                   </div>
                 ) : (
                   <div className={styles["name-tag"]}>

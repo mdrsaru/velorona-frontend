@@ -125,6 +125,11 @@ export const company_status = [{
 }
 ]
 
+export const userPayRateStatus = {
+  active:'Active',
+  inActive:'Inactive'
+}
+
 export const attachment_type = [{
   value: 'Timesheet',
   name: 'Timesheet'

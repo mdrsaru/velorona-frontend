@@ -16,7 +16,7 @@ import deleteImg from "../../assets/images/delete_btn.svg"
 import archiveImg from "../../assets/images/archive_btn.svg"
 import filterImg from "../../assets/images/filter.svg"
 import PayRateImg from "../../assets/images/pay-rate.svg"
-import constants, { roles_user, status } from "../../config/constants"
+import constants, { roles_user, status, subscriptionStatus, userPayRateStatus } from "../../config/constants"
 
 import RouteLoader from "../../components/Skeleton/RouteLoader";
 import UserPayRateModal from "../../components/UserPayRate";
@@ -30,6 +30,7 @@ import {
 import styles from "./style.module.scss";
 import { debounce } from "lodash";
 import PageHeader from "../../components/PageHeader";
+import { checkSubscriptions } from "../../utils/common";
 
 // const { SubMenu } = Menu;
 const { Option } = Select;
@@ -334,6 +335,7 @@ const Employee = () => {
         input: {
           query: {
             user_id: user?.id,
+            status:userPayRateStatus.active,
           },
           paging: {
             order: ["updatedAt:DESC"],
@@ -351,6 +353,7 @@ const Employee = () => {
         input: {
           query: {
             user_id: user?.id,
+            status:userPayRateStatus.active,
           },
           paging: {
             order: ["updatedAt:DESC"],
@@ -478,6 +481,12 @@ const Employee = () => {
       },
     })
   }
+
+  const _subscriptionStatus = loggedInUser?.company?.subscriptionStatus ?? ''
+  const canAccess = checkSubscriptions({
+    userSubscription: _subscriptionStatus,
+    expectedSubscription: [subscriptionStatus.active,subscriptionStatus.trialing]
+  })  
   const menu = (data: any) => {
     return (
       <Menu>
@@ -901,10 +910,18 @@ const Employee = () => {
                       <Select
                         placeholder="Role"
                         onChange={onChangeFilter}>
-                        {roles_user?.map((role: any) =>
-                          <Option value={role?.value} key={role?.name}>
-                            {role?.name}
-                          </Option>
+                        {roles_user?.map((role: any,index:number) =>{
+                           if (role?.value === 'TaskManager' && !canAccess) {
+                            return 0
+                          }
+                          else {
+                            return (
+                              <Option value={role?.value} key={index}>
+                                {role?.name}
+                              </Option>
+                            )
+                          }
+                        }
                         )}
                       </Select>
                     </Form.Item>

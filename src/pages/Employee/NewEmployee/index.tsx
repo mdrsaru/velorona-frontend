@@ -1,8 +1,8 @@
 import { useState } from "react";
 
-import { Button, Card,  Col, DatePicker, Form, Input, message, Row, Select, Space, Upload } from "antd";
+import { Button, Card, Col, DatePicker, Form, Input, message, Row, Select, Space, Upload } from "antd";
 import { ArrowLeftOutlined } from "@ant-design/icons";
-import constants, {roles_user, subscriptionStatus } from "../../../config/constants";
+import constants, { roles_user, subscriptionStatus } from "../../../config/constants";
 
 import type { UploadProps } from 'antd';
 import { useNavigate } from "react-router-dom";
@@ -95,7 +95,7 @@ const NewEmployee = () => {
   // const [skipClient, setSkipClient] = useState(false)
 
   const _subscriptionStatus = authData?.company?.subscriptionStatus ?? ''
-  
+
   const canAccess = checkSubscriptions({
     userSubscription:_subscriptionStatus,
     expectedSubscription: [subscriptionStatus.active,subscriptionStatus.trialing]
@@ -127,8 +127,8 @@ const NewEmployee = () => {
       //   navigate(routes.user.path(authData?.company?.code ?? '')))
 
       navigate(routes.redirectToClientInfoTab.path(
-            authData?.company?.code ?? "1",
-            user ?? "1",'client'))
+        authData?.company?.code ?? "1",
+        user ?? "1",'client'))
       :
       navigate(routes.user.path(authData?.company?.code ?? ''))
     message.success({
@@ -374,7 +374,7 @@ const NewEmployee = () => {
                   min: 8,
                   message: "Phone number should be more than 8 digits"
                 }]}>
-                <Input placeholder="Enter your phone number" autoComplete="off" type='number'/>
+                <Input placeholder="Enter your phone number" autoComplete="off" type='number' />
               </Form.Item>
             </Col>
             <Col
@@ -595,7 +595,9 @@ const NewEmployee = () => {
                       required: true,
                       message: 'Please select the start date'
                     }]}>
-                    <DatePicker placeholder='Select start date' />
+                    <DatePicker
+                      name="startDate"
+                      placeholder='Select start date' />
                   </Form.Item>
                 </Col>
 
@@ -604,7 +606,14 @@ const NewEmployee = () => {
                     label="End Date"
                     name='endDate'
                   >
-                    <DatePicker placeholder='Select end date' />
+                    <DatePicker
+                      name="endDate"
+                      placeholder='Select end date'
+                      disabledDate={(value) => {
+                        // Can not select days before today and today
+                        return value < form.getFieldValue('startDate');
+                      }}
+                    />
                   </Form.Item>
                 </Col>
 

@@ -203,7 +203,6 @@ const CompanyForm = (props: IProps) => {
   if (props.company) {
     const company = props.company;
     const admin = props.company?.admin;
-    console.log(company?.companyCode)
     initialValues = {
       name: company.name,
       status: company.status,

@@ -432,7 +432,7 @@ const AddExistingClient = () => {
 						onChangeCapture={onInputChange("invoiceRate", data)}
 						style={{ width: '100%' }} />
 				</td>
-				<td>
+				<td width='auto'>
 					<InputNumber
 						addonBefore={
 							<Select
@@ -457,7 +457,7 @@ const AddExistingClient = () => {
 						onChangeCapture={onInputChange("amount", data)}
 						style={{ width: '100%' }} />
 				</td>
-				<td>
+				<td width='150px'>
 					<Select onSelect={(e: any) => handleChangeStatus(data.clientId, e)} placeholder='Select status' defaultValue={data.status}>
 						<Select.Option value={UserClientStatus.Active}>{UserClientStatus.Active}</Select.Option>
 						<Select.Option value={UserClientStatus.Inactive}>{UserClientStatus.Inactive}</Select.Option>

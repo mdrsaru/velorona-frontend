@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Button, Col, Empty, Form, Modal, Row, Select, Space } from 'antd'
 import { CloseOutlined } from '@ant-design/icons';
 
@@ -22,6 +23,7 @@ const AssignedUser = (props: IProps) => {
 	const [form] = Form.useForm();
 	const { Option } = Select;
 	const loggedInUser = authVar();
+	const [removedUser, setRemovedUser] = useState<any>([])
 
 	const selectProps = {
 		placeholder: "Select Employees",
@@ -36,7 +38,8 @@ const AssignedUser = (props: IProps) => {
 		variables: {
 			input: {
 				query: {
-					client_id: props?.project?.client?.id as string
+					client_id: props?.project?.client?.id as string,
+					status: 'Active'
 				},
 				paging: {
 					order: ["updatedAt:DESC"],
@@ -61,7 +64,7 @@ const AssignedUser = (props: IProps) => {
 		},
 	});
 
-	let userClientList, userList;
+	let userClientList: any = [], userList;
 	if (userClientData) {
 		userClientList = userClientData?.UserClient?.data?.filter(function (userClient) {
 			return userClient?.status === "Active"
@@ -100,6 +103,23 @@ const AssignedUser = (props: IProps) => {
 		})
 	}
 
+	let initialValues: any;
+	if (userClientList?.length) {
+		initialValues = {
+			assignee: props?.project?.users?.map((user: any) => {
+
+				return user?.id
+			}) ?? ""
+
+		}
+	}
+	const handleDeselect = (value: any) => {
+		setRemovedUser([...removedUser, value]);
+	}
+
+	useEffect(() => {
+		form.setFieldsValue(initialValues)
+	}, [form, initialValues])
 	return (
 		<Modal
 			centered
@@ -123,13 +143,16 @@ const AssignedUser = (props: IProps) => {
 					</span>
 				</div>
 				<p className={styles['sub-title']}>Assigned User</p>
-				{props.project?.users?.length ?
-					<ul>
-						{props.project?.users?.map((user: any, index: number) => (
-							<li key={index}>{user.fullName}/{user.email}</li>
-						))
-						}
-					</ul>
+				{userClientList?.length ?
+					(props.project?.users?.length ?
+						<ul>
+							{props.project?.users?.map((user: any, index: number) => (
+								<li key={index}>{user.fullName}/{user.email}</li>
+							))
+							}
+						</ul>
+						:
+						<Empty description='No Employee assigned yet' />)
 					:
 					<Empty description='No Employee assigned yet' />
 				}
@@ -138,11 +161,7 @@ const AssignedUser = (props: IProps) => {
 					form={form}
 					layout="vertical"
 					onFinish={onSubmitForm}
-					initialValues=
-					{{assignee: props?.project?.users?.map((user: any) => {
-							return user?.id
-						}) ?? "",
-					}}
+					initialValues={initialValues}
 				>
 					<Row className={styles.formCol}>
 						<Col xs={24} sm={24} md={24} lg={24} className={styles.formCol}>
@@ -153,9 +172,10 @@ const AssignedUser = (props: IProps) => {
 								<Select
 									{...selectProps}
 									allowClear
+									onDeselect={handleDeselect}
 									placeholder="Please select">
 									{userClientList &&
-										userClientList?.map((userClient, index: number) => (
+										userClientList?.map((userClient: any, index: number) => (
 											<Option
 												value={userClient?.user?.id}
 												key={index}>

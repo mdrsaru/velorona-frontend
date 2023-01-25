@@ -10,6 +10,7 @@ import EditUserPayRateModal from "../EditUserPayRate";
 import styles from "./styles.module.scss";
 import { authVar } from '../../App/link';
 import { useParams } from 'react-router-dom';
+import { userPayRateStatus } from "../../config/constants";
 
 interface IProps {
   visibility: boolean;
@@ -69,6 +70,7 @@ const ViewUserPayRate = (props: IProps) => {
           query: {
             user_id: userId,
             id: id,
+            status:userPayRateStatus.active,
           },
           paging: {
             order: ["updatedAt:DESC"],
