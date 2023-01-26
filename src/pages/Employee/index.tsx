@@ -365,6 +365,8 @@ const Employee = () => {
   }
 
   const openFilterRow = () => {
+    onChangeTabs('all')
+
     if (filterProperty?.filter) {
       refetchEmployee({
         input: {
@@ -425,6 +427,7 @@ const Employee = () => {
   }
 
   const onChangeFilter = () => {
+    onChangeTabs('all')
     refetchEmployees()
   }
 
@@ -605,12 +608,13 @@ const Employee = () => {
       onCell: (record: any) => {
         return {
           onClick: () => {
+           !record.archived &&
             navigate(
               routes.detailEmployee.path(
                 loggedInUser?.company?.code ?? "",
                 record?.id ?? ""
               )
-            );
+            )
           },
         };
       },
@@ -942,7 +946,7 @@ const Employee = () => {
                 </Row>}
             </Form>
 
-            <Tabs defaultActiveKey="1" onChange={onChangeTabs}>
+            <Tabs defaultActiveKey="all" onChange={onChangeTabs}>
               <TabPane tab="All Users" key="all">
               </TabPane>
               <TabPane tab="Active Users" key="active">

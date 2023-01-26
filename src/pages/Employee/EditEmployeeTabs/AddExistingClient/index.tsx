@@ -396,7 +396,7 @@ const AddExistingClient = () => {
 			}
 		})
 	}
-	
+
 	const handleProjectAdd = () => {
 		setAddProjectShow(!addProjectShow)
 	}
@@ -546,12 +546,19 @@ const AddExistingClient = () => {
 													projects?.length ?
 
 														(<Select onChange={handleChangeProject} placeholder='Select project' >
+															<>
+																{projects?.map((project: any, index: number) => (
 
-															{projects?.map((project: any, index: number) => (
-																<Select.Option value={project.id} key={index}>{project?.name}</Select.Option>
+																	<Select.Option value={project.id} key={index}>{project?.name}</Select.Option>
 
-															))
-															}
+																))
+																}
+
+																<Select.Option>
+																	<p onClick={() => handleProjectAdd()} >Add New Project</p>
+																</Select.Option>
+															</>
+
 														</Select>)
 
 														:

@@ -507,7 +507,7 @@ const Invoice = () => {
       render: (invoice: IInvoice) => {
         return (
           <Row>
-            {
+            {/* {
               loggedInUser?.user?.roles.includes(constants.roles.BookKeeper) ? (
                 <Col>
                   <div
@@ -518,7 +518,7 @@ const Invoice = () => {
                     <FileTextOutlined />
                   </div>
                 </Col>
-              ) : (
+              ) : ( */}
                 <>
                   <Col>
                     {
@@ -589,8 +589,8 @@ const Invoice = () => {
                     )
                   }
                 </>
-              )
-            }
+              {/* )
+            } */}
           </Row>
         )
       }
@@ -600,11 +600,11 @@ const Invoice = () => {
   return (
     <div className={styles['container']}>
       <Card bordered={false}>
-        {loggedInUser?.user?.roles.includes(constants.roles.BookKeeper) ?
+        {/* {loggedInUser?.user?.roles.includes(constants.roles.BookKeeper) ?
           <PageHeader
             title="Invoice History"
           />
-          :
+          : */}
           <PageHeader
             title="Invoice History"
             extra={[
@@ -615,7 +615,7 @@ const Invoice = () => {
               </div>
             ]}
           />
-        }
+        {/* } */}
         <Form
           form={filterForm}
           layout="vertical"
