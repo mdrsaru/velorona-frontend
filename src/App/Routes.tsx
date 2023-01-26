@@ -19,8 +19,7 @@ import { authVar } from './link';
 import { notifyCompanySignUp } from '../utils/common';
 
 const _Routes = () => {
-  const queryString = window.location.href;
-  var query = queryString.split('/');
+
 
   const authData = authVar();
   const roles = authData?.user?.roles;
@@ -31,7 +30,7 @@ const _Routes = () => {
       nextFetchPolicy: "cache-first",
     },
   );
-  if (roles.includes(RoleName.SuperAdmin) && !query.includes('company')) {
+  if (roles.includes(RoleName.SuperAdmin)) {
     notifyCompanySignUp({
       companyList:companyData?.Company?.data
      })
