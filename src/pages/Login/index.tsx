@@ -70,6 +70,7 @@ const Login = () => {
   const [form] = Form.useForm();
   const [forgetForm] = Form.useForm();
   const navigate = useNavigate();
+  const [isSaving, setIsSaving] = useState<boolean>(false);
 
   if (from === 'marketing') {
     notification.destroy();
@@ -202,6 +203,7 @@ const Login = () => {
   };
 
   const onSubmitForgotPasswordForm = (values: any) => {
+    setIsSaving(true);
     let key = 'forgotPassword'
     let formData = role === 'admin' ?
       {
@@ -223,6 +225,9 @@ const Login = () => {
         return notifyGraphqlError((response?.errors), key)
       }
     }).catch(notifyGraphqlError)
+      .finally(() => {
+      setIsSaving(false);
+    })
   }
 
 
@@ -352,7 +357,7 @@ const Login = () => {
             </Form.Item>
 
             <Form.Item>
-              <Button type="primary" htmlType="submit">Proceed</Button><br /><br />
+              <Button type="primary" htmlType="submit" disabled={isSaving}>Proceed</Button><br /><br />
               <Button type="default" onClick={() => setModalVisible(false)}>Go to Login</Button>
             </Form.Item>
 
