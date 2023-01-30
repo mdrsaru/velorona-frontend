@@ -784,7 +784,7 @@ const DetailTimesheet = (props: any) => {
           <TimesheetConfirmation
             title={
               <>
-                There's still working days left ? Are you sure you want to submit it ?
+                There's still working days left. Are you sure you want to submit it ?
               </>
             }
           />

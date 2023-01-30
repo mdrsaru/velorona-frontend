@@ -138,7 +138,7 @@ export const openNotificationWithIcon = (args: NotificationArgs) => {
   const authData = authVar()
 
   const btn = (
-    <Button><a href={routes.subscription.path(authData.company?.code as string)} target='_blank' rel="noreferrer">Renew subscription</a></Button>
+    <Button type='link' onClick={()=>notification.destroy()}><a href={routes.subscription.path(authData.company?.code as string)} rel="noreferrer">Renew subscription</a></Button>
   )
 
 
