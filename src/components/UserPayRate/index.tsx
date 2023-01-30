@@ -252,6 +252,7 @@ const UserPayRateModal = (props: IProps) => {
                   addonAfter="Hr"
                   placeholder="Enter invoice rate"
                   autoComplete="off"
+                  min={0}
                   style={{ width: '100%' }}/>
               </Form.Item>
             </Col>
@@ -268,6 +269,7 @@ const UserPayRateModal = (props: IProps) => {
                   addonAfter="Hr"
                   placeholder="Enter payrate"
                   autoComplete="off"
+                  min={0}
                   style={{ width: '100%' }} />
               </Form.Item>
             </Col>
