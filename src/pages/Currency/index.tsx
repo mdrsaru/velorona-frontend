@@ -23,6 +23,7 @@ export const CURRENCY = gql`
         id
         name
 				symbol
+				createdAt
        }
   }
 }

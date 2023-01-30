@@ -15,7 +15,7 @@ import { notifyGraphqlError } from "../../utils/error"
 import deleteImg from "../../assets/images/delete_btn.svg"
 import archiveImg from "../../assets/images/archive_btn.svg"
 import filterImg from "../../assets/images/filter.svg"
-import PayRateImg from "../../assets/images/pay-rate.svg"
+// import PayRateImg from "../../assets/images/pay-rate.svg"
 import constants, { roles_user, status, subscriptionStatus, userPayRateStatus } from "../../config/constants"
 
 import RouteLoader from "../../components/Skeleton/RouteLoader";
@@ -694,7 +694,7 @@ const Employee = () => {
           <Row style={{ marginTop: '11px' }}>
             {!record.archived ? (
               <>
-                {record.roles[0]?.name === constants.roles.Employee &&
+                {/* {record.roles[0]?.name === constants.roles.Employee &&
                   <Col>
                     <p
                       onClick={() => handleUserPayRate(record)}
@@ -704,7 +704,7 @@ const Employee = () => {
                       <Image src={PayRateImg} width='2rem' preview={false}/>
                     </p>
                   </Col>
-                }
+                } */}
 
                 {!record.loggedIn && <Col>
                   <Popconfirm
@@ -763,7 +763,11 @@ const Employee = () => {
                           <div
                             onClick={() => {
                               setEmployee(record);
-                              setShowChangeClient(true)
+                              // setShowChangeClient(true)
+                              navigate(routes.redirectToClientInfoTab.path(
+                                loggedInUser?.company?.code ?? "1",
+                                record?.id ?? "1",'client'))
+                              
                             }}
                             title='Change Client Info'
                             className={`${styles["table-icon"]} ${styles["table-client-icon"]}`}

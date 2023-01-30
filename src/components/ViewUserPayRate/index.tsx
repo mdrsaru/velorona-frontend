@@ -1,5 +1,5 @@
 import CloseOutlined from "@ant-design/icons/lib/icons/CloseOutlined";
-import EditOutlined from "@ant-design/icons/lib/icons/EditOutlined";
+// import EditOutlined from "@ant-design/icons/lib/icons/EditOutlined";
 import { gql, useLazyQuery } from "@apollo/client";
 import { Modal } from "antd";
 import { Table } from "antd";
@@ -8,9 +8,11 @@ import { UserPayRatePagingData } from "../../interfaces/graphql.interface";
 import EditUserPayRateModal from "../EditUserPayRate";
 
 import styles from "./styles.module.scss";
+import { useNavigate } from "react-router-dom"
+import routes from "../../config/routes"
 import { authVar } from '../../App/link';
 import { useParams } from 'react-router-dom';
-import { userPayRateStatus } from "../../config/constants";
+// import { userPayRateStatus } from "../../config/constants";
 
 interface IProps {
   visibility: boolean;
@@ -61,25 +63,26 @@ const ViewUserPayRate = (props: IProps) => {
 
   const authData = authVar()
   const params = useParams()
-  const handleEdit = (id: any, userId: string) => {
-    setUserPayRateId(id)
-    setVisibility(false);
-    getUserPayRate({
-      variables: {
-        input: {
-          query: {
-            user_id: userId,
-            id: id,
-            status:userPayRateStatus.active,
-          },
-          paging: {
-            order: ["updatedAt:DESC"],
-          },
-        },
-      }
-    })
-    setEditVisibility(!editVisibility)
-  }
+  const navigate = useNavigate();
+  // const handleEdit = (id: any, userId: string) => {
+  //   setUserPayRateId(id)
+  //   setVisibility(false);
+  //   getUserPayRate({
+  //     variables: {
+  //       input: {
+  //         query: {
+  //           user_id: userId,
+  //           id: id,
+  //           status:userPayRateStatus.active,
+  //         },
+  //         paging: {
+  //           order: ["updatedAt:DESC"],
+  //         },
+  //       },
+  //     }
+  //   })
+  //   setEditVisibility(!editVisibility)
+  // }
   let columns;
   if (authData?.user?.id === params?.eid) {
     columns = [
@@ -129,10 +132,10 @@ const ViewUserPayRate = (props: IProps) => {
           return <p><span>{payRate?.userRateCurrency?.symbol && payRate?.userRateCurrency?.symbol} </span>{`${payRate?.amount}`}</p>;
         },
       },
-      {
-        title: "Action",
-        render: (payRate: any) => <EditOutlined onClick={() => handleEdit(payRate?.id, payRate?.user?.id)} />
-      }
+      // {
+      //   title: "Action",
+      //   render: (payRate: any) => <EditOutlined onClick={() => handleEdit(payRate?.id, payRate?.user?.id)} />
+      // }
     ];
   }
   return (
@@ -150,8 +153,10 @@ const ViewUserPayRate = (props: IProps) => {
         ]}
         cancelButtonProps={{ style: { display: 'none' } }}
         width={869}
-        okText="Close"
-        onOk={() => setVisibility(false)}
+        okText="Edit"
+        onOk={() => navigate(routes.redirectToClientInfoTab.path(
+          authData?.company?.code ?? "1",
+          userPayRate?.UserPayRate?.data?.[0]?.user?.id ?? "1",'client'))}
       >
         <div className={styles["modal-body"]}>
           <span className={styles["title"]}>Payment Details</span>
