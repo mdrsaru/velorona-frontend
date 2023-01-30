@@ -153,7 +153,7 @@ const Employee = () => {
 
   const [resendInvitation] = useMutation(RESEND_INVITATION, {
     onCompleted: () => {
-      message.success('Resend invitation successful')
+      message.success('Resend invitation successfull')
     },
     onError(err) {
       notifyGraphqlError(err)
@@ -176,6 +176,7 @@ const Employee = () => {
     });
   };
   const [employee, setEmployee] = useState<any>("");
+  const [activeTab, setActiveTab] = useState<string>("all");
   const [filterProperty, setFilterProperty] = useState<any>({
     filter: false,
   });
@@ -365,8 +366,6 @@ const Employee = () => {
   }
 
   const openFilterRow = () => {
-    onChangeTabs('all')
-
     if (filterProperty?.filter) {
       refetchEmployee({
         input: {
@@ -403,7 +402,7 @@ const Employee = () => {
     }
 
     if (values.status) {
-      if (values.status === 'Active' || values.status === 'Inactive' || values.status==='Invitation Sent') {
+      if (values.status === 'Active' || values.status === 'Inactive' || values.status ==='Invitation Sent') {
         query['status'] = values.status
       } else {
         query['archived'] = values.status === 'Archived' ? true : false
@@ -427,8 +426,8 @@ const Employee = () => {
   }
 
   const onChangeFilter = () => {
-    onChangeTabs('all')
-    refetchEmployees()
+    onChangeTabs('all');
+    refetchEmployees();
   }
 
   const onChangeTabs = (keys: any) => {
@@ -441,6 +440,7 @@ const Employee = () => {
         order: ["updatedAt:DESC"],
       }
     }
+    setActiveTab(keys);
 
     let query: {
       status?: string,
@@ -946,7 +946,7 @@ const Employee = () => {
                 </Row>}
             </Form>
 
-            <Tabs defaultActiveKey="all" onChange={onChangeTabs}>
+            <Tabs defaultActiveKey="all" activeKey={activeTab} onChange={onChangeTabs}>
               <TabPane tab="All Users" key="all">
               </TabPane>
               <TabPane tab="Active Users" key="active">
