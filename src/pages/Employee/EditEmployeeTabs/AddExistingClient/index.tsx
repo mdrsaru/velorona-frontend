@@ -270,15 +270,13 @@ const AddExistingClient = () => {
 
 		}
 	});
-	const onInputChange = (key: any, index: any) => (
-		e: any
-	) => {
+	const onInputChange = (key: any, index: any, value: any) => {
 		if (index?.userPayRateId !== null) {
 			userPayRateUpdate({
 				variables: {
 					input: {
 						id: index?.userPayRateId,
-						[key]: Number(e.target.value)
+						[key]: Number(value)
 					}
 				}
 			})
@@ -289,7 +287,7 @@ const AddExistingClient = () => {
 					input: {
 						user_id: params?.eid as string,
 						project_id: index?.projectId,
-						[key]: Number(e.target.value),
+						[key]: Number(value),
 						company_id: authData?.company?.id as string,
 					}
 				}
@@ -428,8 +426,9 @@ const AddExistingClient = () => {
 						addonAfter="Hr"
 						placeholder="Enter invoice rate"
 						autoComplete="off"
+						min={0}
 						defaultValue={data.invoiceRate}
-						onChangeCapture={onInputChange("invoiceRate", data)}
+						onChange={(value) => onInputChange("invoiceRate", data, value)}
 						style={{ width: '100%' }} />
 				</td>
 				<td width='auto'>
@@ -453,8 +452,9 @@ const AddExistingClient = () => {
 						addonAfter="Hr"
 						placeholder="Enter payrate"
 						autoComplete="off"
+						min={0}
 						defaultValue={data.userRate}
-						onChangeCapture={onInputChange("amount", data)}
+						onChange={(value) => onInputChange("amount", data, value)}
 						style={{ width: '100%' }} />
 				</td>
 				<td width='150px'>
@@ -582,12 +582,12 @@ const AddExistingClient = () => {
 									}
 									<td>
 										<Form.Item>
-											<Input onKeyPress={onInputChange("amount", 0)} disabled={true} title={'You need to add project'} />
+											<Input onKeyPress={(e) => onInputChange("amount", 0, e)} disabled={true} title={'You need to add project'} />
 										</Form.Item>
 									</td>
 									<td>
 										<Form.Item>
-											<Input onKeyPress={onInputChange("invoiceRate", 0)} disabled={true} title='You need to add project' />
+											<Input onKeyPress={(e) => onInputChange("invoiceRate", 0, e)} disabled={true} title='You need to add project' />
 										</Form.Item>
 									</td>
 									<td>-</td>
