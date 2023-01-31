@@ -369,6 +369,9 @@ const Employee = () => {
     if (filterProperty?.filter) {
       refetchEmployee({
         input: {
+          query: {
+            company_id: loggedInUser?.company?.id,
+          },
           paging: {
             order: ["updatedAt:DESC"],
           }
@@ -447,7 +450,10 @@ const Employee = () => {
       archived?: boolean,
       role?: string,
       search?: string
-    } = {}
+      company_id:string,
+    } = {
+      company_id: loggedInUser?.company?.id as string
+    }
 
 
     if (keys === 'archived') {
