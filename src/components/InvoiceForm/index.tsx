@@ -1,9 +1,9 @@
 import moment from 'moment';
 import isNil from 'lodash/isNil';
 import { ChangeEvent, useState, useEffect } from 'react';
-import { gql, useQuery, useMutation } from '@apollo/client';
+import { gql, useQuery, useMutation, useLazyQuery } from '@apollo/client';
 import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
-import { Button, Col, Form, Input, Row, Select, Image, DatePicker, InputNumber, Space, message, Popover, Checkbox, Alert } from 'antd';
+import { Button, Col, Form, Input, Row, Select, Image, DatePicker, InputNumber, Space, message, Popover, Checkbox, Alert, Modal, notification } from 'antd';
 import { CloseCircleOutlined } from '@ant-design/icons';
 import { CheckboxChangeEvent } from 'antd/es/checkbox';
 
@@ -11,7 +11,7 @@ import { round } from '../../utils/common';
 import { notifyGraphqlError } from '../../utils/error';
 import routes from '../../config/routes';
 import { authVar } from '../../App/link';
-import { GraphQLResponse, IInvoiceInput } from '../../interfaces/graphql.interface';
+import { GraphQLResponse, IInvoiceInput, UserPayRatePagingData } from '../../interfaces/graphql.interface';
 import {
   Invoice,
   InvoiceCreateInput,
@@ -25,6 +25,7 @@ import {
 
 import addIcon from '../../assets/images/add_icon.svg';
 import styles from './style.module.scss';
+import { USER_PAY_RATE } from '../ViewUserPayRate';
 
 const PROJECT_LIST = gql`
   query ProjectList($input: ProjectQueryInput!) {
@@ -74,14 +75,15 @@ const InvoiceForm = (props: IProps) => {
   const [form] = Form.useForm();
   const [isSendInvoiceClicked, setIsSendInvoiceClicked] = useState(false);
   const [needProject, setNeedProject] = useState(true);
-  const [searchParams, ] = useSearchParams();
+  const [searchParams,] = useSearchParams();
   const period = searchParams.get('period');
 
+  const [show, setShow] = useState(false)
   const company_id = loggedInUser?.company?.id as string
   const companyCode = loggedInUser?.company?.code as string
 
   useEffect(() => {
-    if(!isNil(props.invoice?.needProject)) {
+    if (!isNil(props.invoice?.needProject)) {
       setNeedProject(props.invoice?.needProject as boolean);
     }
   }, [props.invoice?.needProject])
@@ -124,42 +126,42 @@ const InvoiceForm = (props: IProps) => {
     MutationInvoiceCreateArgs
   >(
     INVOICE_CREATE, {
-      onCompleted(data) {
-        if(data.InvoiceCreate) {
-          message.success('Invoice created successfully');
+    onCompleted(data) {
+      if (data.InvoiceCreate) {
+        message.success('Invoice created successfully');
 
-          if(location?.state?.from === 'timesheet' && props.timesheet_id) {
-            return navigate(routes.detailTimesheet.path(companyCode, props.timesheet_id));
-          }
-
-          navigate(routes.invoice.path(companyCode));
+        if (location?.state?.from === 'timesheet' && props.timesheet_id) {
+          return navigate(routes.detailTimesheet.path(companyCode, props.timesheet_id));
         }
-      },
-      onError: notifyGraphqlError,
-    }
+
+        navigate(routes.invoice.path(companyCode));
+      }
+    },
+    onError: notifyGraphqlError,
+  }
   );
   const [updateInvoice, { loading: updatingInvoice }] = useMutation<
     GraphQLResponse<'InvoiceUpdate', Invoice>,
     MutationInvoiceUpdateArgs
   >(
     INVOICE_UPDATE, {
-      onCompleted(data) {
-        if(data.InvoiceUpdate) {
-          message.success('Invoice updated successfully');
+    onCompleted(data) {
+      if (data.InvoiceUpdate) {
+        message.success('Invoice updated successfully');
 
-          navigate(routes.invoice.path(companyCode));
-        }
-      },
-      onError: notifyGraphqlError,
-    }
+        navigate(routes.invoice.path(companyCode));
+      }
+    },
+    onError: notifyGraphqlError,
+  }
   );
 
-  let query:any={};
-  query={
+  let query: any = {};
+  query = {
     client_id: props.client_id,
     company_id,
   }
-  if(props?.user_id){
+  if (props?.user_id) {
     query.user_id = props?.user_id;
   }
   const { data: projectData, loading: projectLoading } = useQuery<
@@ -185,30 +187,30 @@ const InvoiceForm = (props: IProps) => {
     const quantity = items?.[index]?.quantity;
     const rate = items?.[index]?.rate;
 
-    if(quantity && rate) {
+    if (quantity && rate) {
       items[index].amount = round(quantity * rate, 2);
 
       const subtotal = items.reduce((acc: number, current: any) => {
         return acc + current.amount;
-      }, 0) 
+      }, 0)
 
-      const totalQuantity= items.reduce((acc: number, current: any) => {
+      const totalQuantity = items.reduce((acc: number, current: any) => {
         return acc + current.quantity;
-      }, 0) 
+      }, 0)
 
       totalAmount = subtotal;
 
-      if(discount >= 0) {
+      if (discount >= 0) {
         discountAmount = discount * 0.01 * subtotal;
         totalAmount = subtotal - discountAmount;
       }
 
-      if(taxPercent >= 0) {
+      if (taxPercent >= 0) {
         taxAmount = taxPercent * 0.01 * totalAmount;
         totalAmount += taxAmount;
       }
 
-      if(shipping >= 0) {
+      if (shipping >= 0) {
         totalAmount += shipping;
       }
 
@@ -224,7 +226,7 @@ const InvoiceForm = (props: IProps) => {
   }
 
   const onItemRowRemove = (index: number, remove: (key: number) => void) => {
-    let { items, totalQuantity, totalAmount, subtotal, taxPercent = 0, taxAmount = 0, discount = 0, discountAmount = 0, shipping = 0 }= form.getFieldsValue();
+    let { items, totalQuantity, totalAmount, subtotal, taxPercent = 0, taxAmount = 0, discount = 0, discountAmount = 0, shipping = 0 } = form.getFieldsValue();
 
     const quantity = items?.[index]?.quantity ?? 0;
     const amount = items?.[index]?.amount ?? 0;
@@ -233,17 +235,17 @@ const InvoiceForm = (props: IProps) => {
     totalQuantity -= quantity;
     totalAmount -= amount;
 
-    if(discount >= 0) {
+    if (discount >= 0) {
       discountAmount = discount * 0.01 * subtotal;
       totalAmount = subtotal - discountAmount;
     }
 
-    if(taxPercent >= 0) {
+    if (taxPercent >= 0) {
       taxAmount = taxPercent * 0.01 * totalAmount;
       totalAmount += taxAmount;
     }
 
-    if(shipping >= 0) {
+    if (shipping >= 0) {
       totalAmount += shipping;
     }
 
@@ -259,12 +261,12 @@ const InvoiceForm = (props: IProps) => {
   }
 
   const onTaxPercentChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const subtotal = form.getFieldValue('subtotal') 
-    const discountAmount = parseFloat(form.getFieldValue('discountAmount') || 0) 
+    const subtotal = form.getFieldValue('subtotal')
+    const discountAmount = parseFloat(form.getFieldValue('discountAmount') || 0)
     const value = parseFloat(e.target.value || '0');
     const subtotalWithDiscount = subtotal - discountAmount;
 
-    if(value >= 0) {
+    if (value >= 0) {
       const taxAmount = value * 0.01 * (subtotalWithDiscount);
       const totalAmount = (1 + value * 0.01) * subtotalWithDiscount;
       form.setFieldsValue({
@@ -275,11 +277,11 @@ const InvoiceForm = (props: IProps) => {
   }
 
   const onDiscountPercentChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const subtotal = form.getFieldValue('subtotal') 
+    const subtotal = form.getFieldValue('subtotal')
     const value = parseFloat(e.target.value || '0');
     const taxPercent = parseFloat(form.getFieldValue('taxPercent') || 0);
 
-    if(value >= 0) {
+    if (value >= 0) {
       const discount = value * 0.01 * subtotal;
       let totalAmount = subtotal - discount;
       const taxAmount = taxPercent * 0.01 * totalAmount;
@@ -293,12 +295,12 @@ const InvoiceForm = (props: IProps) => {
   }
 
   const onShippingChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const subtotal = form.getFieldValue('subtotal') 
-    const discountAmount = parseFloat(form.getFieldValue('discountAmount') || 0) 
-    const taxAmount = parseFloat(form.getFieldValue('taxAmount') || 0) 
+    const subtotal = form.getFieldValue('subtotal')
+    const discountAmount = parseFloat(form.getFieldValue('discountAmount') || 0)
+    const taxAmount = parseFloat(form.getFieldValue('taxAmount') || 0)
     const value = parseFloat(e.target.value || '0');
 
-    if(value >= 0) {
+    if (value >= 0) {
       const totalAmount = subtotal - discountAmount + taxAmount;
       form.setFieldsValue({
         totalAmount: round(totalAmount + value, 2),
@@ -323,7 +325,7 @@ const InvoiceForm = (props: IProps) => {
       shipping: parseFloat(values.shipping || 0)
     };
 
-    if(props.invoice?.id) {
+    if (props.invoice?.id) {
       const input: InvoiceUpdateInput = {
         id: props.invoice.id,
         ...commonData,
@@ -337,7 +339,7 @@ const InvoiceForm = (props: IProps) => {
         })),
       };
 
-      if(values.status) {
+      if (values.status) {
         input.status = values.status
       }
 
@@ -356,30 +358,31 @@ const InvoiceForm = (props: IProps) => {
         items: values.items.map((item: any) => ({
           project_id: item.project_id,
           description: item.description,
+          currency: invoiceCurrency,
           quantity: parseFloat(item.quantity),
           rate: parseFloat(item.rate),
           amount: parseFloat(item.amount),
         })),
-      }; 
+      };
 
-      if(props.user_id) {
+      if (props.user_id) {
         input.user_id = props.user_id;
       }
-      if(props.startDate) {
+      if (props.startDate) {
         input.startDate = props.startDate;
       }
-      if(props.endDate) {
+      if (props.endDate) {
         input.endDate = props.endDate;
       }
-      if(props.attachments?.length) {
+      if (props.attachments?.length) {
         input.attachments = props.attachments;
       }
 
-      if(values.status) {
+      if (values.status) {
         input.status = values.status
       }
 
-      if(props.timesheet_id) {
+      if (props.timesheet_id) {
         input['timesheet_id'] = props.timesheet_id;
       }
 
@@ -392,7 +395,7 @@ const InvoiceForm = (props: IProps) => {
       });
 
     }
-  } 
+  }
 
   const saveAndSend = () => {
     setIsSendInvoiceClicked(true);
@@ -403,6 +406,46 @@ const InvoiceForm = (props: IProps) => {
 
   const initialValues = {
     needProject: props?.invoice?.needProject ?? needProject,
+  }
+
+  const [invoiceCurrency, setInvoiceCurrency] = useState('$')
+  const [getUserPayRate] = useLazyQuery<UserPayRatePagingData>(USER_PAY_RATE, {
+    onCompleted(response) {
+      console.log(response?.UserPayRate.data?.[0]?.invoiceRateCurrency, invoiceCurrency)
+      if (response?.UserPayRate.data?.[0]?.invoiceRateCurrency?.symbol === invoiceCurrency) {
+        notification['warning']({
+          message: 'Found a different currency',
+          description:'Kindly generate separate invoices for each distinct currency.',
+          placement:  'top',
+          duration:  4.5,
+        });
+      }
+      else if (invoiceCurrency != '$' && response?.UserPayRate.data?.[0]?.invoiceRateCurrency === null) {
+        notification['warning']({
+          message: 'Found a different currency',
+          description:'Kindly generate separate invoices for each distinct currency.',
+          placement:  'top',
+          duration:  4.5,
+        });
+      }
+      else {
+        setInvoiceCurrency(response?.UserPayRate.data?.[0]?.invoiceRateCurrency?.symbol as string)
+      }
+    }
+  })
+  const handleProjectChange = (id?: any) => {
+    if (props?.user_id) {
+      getUserPayRate({
+        variables: {
+          input: {
+            query: {
+              project_id: id,
+              user_id: props?.user_id
+            }
+          }
+        }
+      })
+    }
   }
 
   return (
@@ -420,9 +463,9 @@ const InvoiceForm = (props: IProps) => {
           >
             <Popover content="Invoice number will be auto generated" >
               <div>
-                <Input 
-                  placeholder="Invoice Number" 
-                  value={props.invoice?.invoiceNumber} 
+                <Input
+                  placeholder="Invoice Number"
+                  value={props.invoice?.invoiceNumber}
                   disabled
                 />
               </div>
@@ -491,7 +534,7 @@ const InvoiceForm = (props: IProps) => {
           <thead>
             <tr>
               <th>Description</th>
-              { needProject && <th></th> }
+              {needProject && <th></th>}
               <th>Quantity</th>
               <th>Rates</th>
               <th>Amount</th>
@@ -519,7 +562,7 @@ const InvoiceForm = (props: IProps) => {
                                   }]}
                                   {...restField}
                                 >
-                                  <Select placeholder="Select Project" loading={projectLoading} disabled={!!period}>
+                                  <Select placeholder="Select Project" loading={projectLoading} disabled={!!period} onChange={handleProjectChange}>
                                     {
                                       projectData?.Project?.data?.map((project) => (
                                         <Select.Option key={project.id} value={project.id}>{project.name}</Select.Option>
@@ -565,7 +608,7 @@ const InvoiceForm = (props: IProps) => {
                                 message: 'Please enter rate'
                               }]}
                             >
-                              <Input type="number" prefix="$" min={0} autoComplete="off" onChange={() => onHourRateChange(name)} />
+                              <Input type="number" prefix={invoiceCurrency} min={0} autoComplete="off" onChange={() => onHourRateChange(name)} />
                             </Form.Item>
                           </td>
 
@@ -575,15 +618,15 @@ const InvoiceForm = (props: IProps) => {
                               name={[name, 'amount']}
                               {...restField}
                             >
-                              <Input type="number" prefix="$" disabled placeholder="Total Amount" autoComplete="off" />
+                              <Input type="number" prefix={invoiceCurrency} disabled placeholder="Total Amount" autoComplete="off" />
                             </Form.Item>
                           </td>
 
                           {
                             !period && (
                               <td>
-                                <CloseCircleOutlined 
-                                  className={styles['remove-icon']} 
+                                <CloseCircleOutlined
+                                  className={styles['remove-icon']}
                                   onClick={() => onItemRowRemove(name, remove)}
                                 />
                               </td>
@@ -599,8 +642,8 @@ const InvoiceForm = (props: IProps) => {
                         <tr>
                           <td>
                             <Form.Item>
-                              <div 
-                                className={styles['add-project']} 
+                              <div
+                                className={styles['add-project']}
                                 onClick={() => add({
                                   project_id: undefined,
                                   quantity: 0,
@@ -609,7 +652,7 @@ const InvoiceForm = (props: IProps) => {
                                 })}
                               >
                                 <Image width={20} src={addIcon} preview={false} />
-                                &nbsp; &nbsp; Add Item 
+                                &nbsp; &nbsp; Add Item
                               </div>
                             </Form.Item>
                           </td>
@@ -634,8 +677,8 @@ const InvoiceForm = (props: IProps) => {
               </td>
 
               <td>
-                <Form.Item 
-                  name="totalQuantity" 
+                <Form.Item
+                  name="totalQuantity"
                   className={styles['td-input']}
                   label="Total Quantity"
                 >
@@ -646,23 +689,23 @@ const InvoiceForm = (props: IProps) => {
               <td></td>
 
               <td>
-                <Form.Item 
-                  name="subtotal" 
+                <Form.Item
+                  name="subtotal"
                   className={styles['td-input']}
                   label="Sub Total"
                 >
-                  <Input type="number" prefix="$" disabled />
+                  <Input type="number" prefix={invoiceCurrency} disabled />
                 </Form.Item>
               </td>
 
             </tr>
 
             <tr>
-              <td colSpan={ needProject ? 3 : 2 }></td>
+              <td colSpan={needProject ? 3 : 2}></td>
 
               <td>
-                <Form.Item 
-                  name="discount" 
+                <Form.Item
+                  name="discount"
                   className={styles['td-input']}
                   label="Discount Percentage"
                 >
@@ -671,22 +714,22 @@ const InvoiceForm = (props: IProps) => {
               </td>
 
               <td>
-                <Form.Item 
+                <Form.Item
                   className={styles['td-input']}
                   label="Discount Amount"
                   name="discountAmount"
                 >
-                  <Input type="number" prefix="$" disabled />
+                  <Input type="number" prefix={invoiceCurrency} disabled />
                 </Form.Item>
               </td>
             </tr>
 
             <tr>
-              <td colSpan={ needProject ? 3 : 2 }></td>
+              <td colSpan={needProject ? 3 : 2}></td>
 
               <td>
-                <Form.Item 
-                  name="taxPercent" 
+                <Form.Item
+                  name="taxPercent"
                   className={styles['td-input']}
                   label="Tax Percentage"
                 >
@@ -695,47 +738,47 @@ const InvoiceForm = (props: IProps) => {
               </td>
 
               <td>
-                <Form.Item 
-                  name="taxAmount" 
+                <Form.Item
+                  name="taxAmount"
                   className={styles['td-input']}
                   label="Tax Amount"
                 >
-                  <Input type="number" prefix="$" disabled />
+                  <Input type="number" prefix={invoiceCurrency} disabled />
                 </Form.Item>
               </td>
             </tr>
 
             <tr>
-              <td colSpan={ needProject ? 4 : 3 }></td>
+              <td colSpan={needProject ? 4 : 3}></td>
 
               <td>
-                <Form.Item 
+                <Form.Item
                   className={styles['td-input']}
                   label="Shipping"
                   name="shipping"
                 >
-                  <Input type="number" prefix="$" onChange={onShippingChange} />
+                  <Input type="number" prefix={invoiceCurrency} onChange={onShippingChange} />
                 </Form.Item>
               </td>
             </tr>
 
 
             <tr>
-              <td className={styles['horizontal']} colSpan={ needProject ? 5 : 4 }></td>
+              <td className={styles['horizontal']} colSpan={needProject ? 5 : 4}></td>
             </tr>
 
             <tr>
-              { needProject && <td></td> }
+              {needProject && <td></td>}
               <td></td>
               <td></td>
               <td> </td>
               <td>
-                <Form.Item 
-                  name="totalAmount" 
+                <Form.Item
+                  name="totalAmount"
                   className={styles['td-input']}
                   label="Total Amount"
                 >
-                  <Input type="number" prefix="$" disabled />
+                  <Input type="number" prefix={invoiceCurrency} disabled />
                 </Form.Item>
               </td>
             </tr>
@@ -770,17 +813,17 @@ const InvoiceForm = (props: IProps) => {
 
       <Row justify="end">
         <Space>
-          <Button 
-            type="primary" 
-            htmlType="submit" 
+          <Button
+            type="primary"
+            htmlType="submit"
             loading={!isSendInvoiceClicked && (creatingInvoice || updatingInvoice)}
           >
             Save and Exit
           </Button>
 
-          <Button 
+          <Button
             disabled={!props.invoicingEmail}
-            type="primary" 
+            type="primary"
             loading={isSendInvoiceClicked && (creatingInvoice || updatingInvoice)}
             onClick={saveAndSend}
           >
@@ -788,6 +831,14 @@ const InvoiceForm = (props: IProps) => {
           </Button>
         </Space>
       </Row>
+      <Modal
+        centered
+        width={900}
+        visible={show}
+        onCancel={() => setShow(false)}
+        footer={null}>
+        <p>Kindly generate separate invoices for each distinct currency.</p>
+      </Modal>
     </Form>
   )
 }
