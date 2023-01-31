@@ -506,7 +506,10 @@ h1 {
     }
 
     .ant-select-single.ant-select-show-arrow .ant-select-selection-placeholder {
-      padding-top: 0.2rem;
+      // padding-top: 0.2rem;
+      padding-top: 0.5rem;
+      padding-right: 1.2rem;
+      font-size: 14px;
     }
 
     .ant-select-single.ant-select-show-arrow .ant-select-selection-item{

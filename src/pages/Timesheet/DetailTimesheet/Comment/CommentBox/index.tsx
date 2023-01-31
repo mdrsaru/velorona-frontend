@@ -153,6 +153,7 @@ const Comment = (props: IProps) => {
                     name={reply.user.fullName as string}
                     date={reply.createdAt}
                     comment={reply.comment}
+                    avatar={reply.user.avatar?.url}
                   />
                 </div>
               ))
