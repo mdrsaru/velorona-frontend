@@ -105,7 +105,8 @@ const Index = (props: IProps) => {
   const months = moment.monthsShort();
 
   const handleChange = (month: number) => {
-    props.setDate(`2022/${month}/01`)
+    const year = moment().year()
+    props.setDate(`${year}/${month}/01`)
   }
 
   let month = new Date().getMonth();
