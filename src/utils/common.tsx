@@ -249,7 +249,7 @@ let unapprovedCompany = false;
   openPendingCompanyNotification({
     type: 'info',
     title: `New company approval pending`,
-    description: `Click the button to see the upapproved company list`,
+    description: `Click the button to see the unapproved company list`,
     duration: 0,
   });
 }

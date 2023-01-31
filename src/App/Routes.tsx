@@ -12,29 +12,30 @@ import RouteLoader from '../components/Skeleton/RouteLoader';
 import PublicRoutes from '../components/PublicRoutes';
 import TimeSheetLoader from '../components/Skeleton/TimeSheetLoader';
 import CompanySet from '../components/CompanySet';
-import { COMPANY } from '../pages/Company';
-import { useQuery } from '@apollo/client';
-import { RoleName } from '../interfaces/generated';
-import { authVar } from './link';
-import { notifyCompanySignUp } from '../utils/common';
+// import { COMPANY } from '../pages/Company';
+// import { useQuery } from '@apollo/client';
+// import { RoleName } from '../interfaces/generated';
+// import { authVar } from './link';
+// import { notifyCompanySignUp } from '../utils/common';
 
 const _Routes = () => {
 
 
-  const authData = authVar();
-  const roles = authData?.user?.roles;
-  const {data:companyData} = useQuery(
-    COMPANY,
-    {
-      fetchPolicy: "network-only",
-      nextFetchPolicy: "cache-first",
-    },
-  );
-  if (roles.includes(RoleName.SuperAdmin)) {
-    notifyCompanySignUp({
-      companyList:companyData?.Company?.data
-     })
-  }
+  // const authData = authVar();
+  // const roles = authData?.user?.roles;
+  // const {data:companyData} = useQuery(
+  //   COMPANY,
+  //   {
+  //     fetchPolicy: "network-only",
+  //     nextFetchPolicy: "cache-first",
+  //   },
+  // );
+  // if (roles.includes(RoleName.SuperAdmin)) {
+  //   notifyCompanySignUp({
+  //     companyList:companyData?.Company?.data
+  //    })
+  // }
+
   return (
     <Router>
       <Routes>

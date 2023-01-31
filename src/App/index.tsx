@@ -8,8 +8,8 @@ import {
   fieldPolicy,
   typeDefs,
 } from '../gql/schema.gql';
-import { notifySubscriptionExpiration } from '../utils/common';
-import { RoleName } from '../interfaces/generated';
+// import { notifySubscriptionExpiration } from '../utils/common';
+// import { RoleName } from '../interfaces/generated';
 
 import Routes from './Routes';
 import AppLoader from "../components/Skeleton/AppLoader";
@@ -61,8 +61,8 @@ function App() {
         if (response?.data) {
           const roles = response?.data?.roles?.map((role: any) => role.name);
           const subscriptionPeriodEnd = response?.data?.company?.subscriptionPeriodEnd ?? null;
-          const trialEndDate = response?.data?.company?.trialEndDate ?? null;
-          const subscriptionStatus = response?.data?.company?.subscriptionStatus ?? null;
+          // const trialEndDate = response?.data?.company?.trialEndDate ?? null;
+          // const subscriptionStatus = response?.data?.company?.subscriptionStatus ?? null;
 
           authVar({
             isLoggedIn: true,
@@ -93,13 +93,13 @@ function App() {
             },
           })
 
-          if(roles.includes(RoleName.CompanyAdmin) && (subscriptionPeriodEnd || trialEndDate)) {
-            notifySubscriptionExpiration({
-              periodEnd: subscriptionPeriodEnd,
-              status: subscriptionStatus,
-              trialEndDate,
-            })
-          }
+          // if(roles.includes(RoleName.CompanyAdmin) && (subscriptionPeriodEnd || trialEndDate)) {
+          //   notifySubscriptionExpiration({
+          //     periodEnd: subscriptionPeriodEnd,
+          //     status: subscriptionStatus,
+          //     trialEndDate,
+          //   })
+          // }
         }
       })
       .finally(() => {
