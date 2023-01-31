@@ -1,30 +1,58 @@
 import { useState } from 'react';
 import {
-  PaymentElement,
   useStripe,
   useElements,
 } from '@stripe/react-stripe-js';
-import { Form, Button, message } from 'antd';
+import { Form, Button, message, Spin } from 'antd';
 
 import styles from '../style.module.scss'
 import { GraphQLResponse } from '../../../interfaces/graphql.interface';
-import { useMutation, useQuery } from '@apollo/client';
+import { gql, useMutation, useQuery } from '@apollo/client';
 import { CompanyPagingResult, MutationCompanyUpdateArgs, QueryCompanyArgs } from '../../../interfaces/generated';
 import { ICompany } from '../../../interfaces/ICompany';
 import { notifyGraphqlError } from '../../../utils/error';
 import { COMPANY, COMPANY_UPDATE } from '../../Company';
 import { collection_method } from '../../../config/constants';
+import CardDetail from '../../../components/CardDetail';
+import { CardElement } from '@stripe/react-stripe-js';
 
 interface IProps {
   clientSecret: string;
   hidePaymentUpdateModal: () => void;
-  companyId:string;
+  companyId: string;
 }
+
+export const RETRIEVE_CUSTOMER = gql`
+  query RetrieveCustomer($input:CompanyByIdInput) {
+    RetrieveCustomer(input:$input) {
+       id
+       customer 
+       type
+       card {
+          last4
+          exp_month
+          exp_year
+          brand
+           }
+        }
+       }
+`
+
+export const SUBSCRIPTION_PAYMENT = gql`
+  mutation SubscriptionPayment($input: SubscriptionPaymentInput!) {
+    SubscriptionPayment(input: $input)
+
+		}
+`;
+
 
 const UpdatePaymentDetails = (props: IProps) => {
   const stripe = useStripe();
   const elements = useElements();
   const [loading, setLoading] = useState(false);
+  const [card, setCard] = useState<any>()
+  const [autoPay, setAutoPay] = useState(false)
+  // const [show, setShow] = useState(false)
 
   const {
     data: companyData,
@@ -40,6 +68,14 @@ const UpdatePaymentDetails = (props: IProps) => {
     },
   });
 
+  const { data: cardDetail, loading: fetchCardLoading } = useQuery(RETRIEVE_CUSTOMER, {
+    variables: {
+      input: {
+        id: props?.companyId,
+      },
+    },
+  }
+  )
   const [updateCompany] = useMutation<
     GraphQLResponse<'CompanyUpdate', ICompany>,
     MutationCompanyUpdateArgs
@@ -52,51 +88,95 @@ const UpdatePaymentDetails = (props: IProps) => {
     onError: notifyGraphqlError,
   })
 
-  
+  const [subscriptionPayment, { loading: paymentLoading }] = useMutation(SUBSCRIPTION_PAYMENT, {
+    onCompleted: (response) => {
+      if (response?.SubscriptionPayment) {
+        message.success("Subscription Payment successful")
+        props?.hidePaymentUpdateModal()
+      }
+    },
+    onError: notifyGraphqlError,
+  })
+
   const onFinish = async () => {
     if (!stripe || !elements) {
       return;
     }
-
-    setLoading(true);
+setLoading(true);
     try {
-      const { error } = await stripe.confirmSetup({
-        elements,
-        redirect: 'if_required',
-      });
+      // const { error } = await stripe.confirmSetup({
+      //   // elements,
+      //   // clientSecret:'pi_3MVs2cLea2Z7YpN43NyCvnjL_secret_GOxhw7a6ZYqM8lMteto4sivRx',
+      //   redirect: 'if_required',
+      // });
 
-      if (error) {
-        console.log(error)
-      } else {
-        props.hidePaymentUpdateModal();
-        window.location.reload()
-        message.info({content:'The change will take some time to appear on Stripe.',duration: 15})
-        
-        // message.success('Payment details updated.')
-      }
-      updateCompany({
+      // if (error) {
+      //   console.log(error)
+      // } else {
+      //   props.hidePaymentUpdateModal();
+      //   window.location.reload()
+      //   message.info({ content: 'The change will take some time to appear on Stripe.', duration: 15 })
+
+      //   // message.success('Payment details updated.')
+      // }
+
+      subscriptionPayment({
         variables: {
           input: {
-            collectionMethod: collection_method?.[0]?.value,
-            id: props.companyId
+            customerId: card?.customer,
+            cardId: card?.id
           }
         }
       })
-    } catch (err) {
+      {
+        autoPay &&
+          updateCompany({
+            variables: {
+              input: {
+                collectionMethod: collection_method?.[0]?.value,
+                id: props.companyId
+              }
+            }
+          })
+      }
+    }
+    catch (err) {
       console.log(err);
     } finally {
       setLoading(false);
     }
   };
 
+  const handleCardSelect = (card: any) => {
+    console.log(card)
+    setCard(card)
+  }
+  const handleAutoPay = (e: any) => {
+    setAutoPay(e.target.checked)
+  }
+
+  // const handlePay = () => {
+  //   setShow(!show)
+  // }
   return (
     <Form onFinish={onFinish} >
-      <PaymentElement />
+      <CardElement />
+      {paymentLoading || fetchCardLoading ?
+        <Spin />
+        :
+        cardDetail?.RetrieveCustomer?.map((cardDetail: any) => (
+          <CardDetail cardDetail={cardDetail}
+            hideModal={props.hidePaymentUpdateModal}
+            handleCardSelect={handleCardSelect} />
+        ))
+
+      }
+      {/* <p onClick={handlePay}>Pay with Different Card</p> */}
       <div className={styles['autopay-checkbox']}>
         {
           companyData?.Company?.data?.[0]?.collectionMethod !== collection_method?.[0]?.value &&
           <>
-            <input type='checkbox' />  <span className={styles['autopay-title']}>You authorize regularly scheduled charges to your card.</span>
+            <input type='checkbox' onClick={handleAutoPay} name='autopay' />  <span className={styles['autopay-title']}>You authorize regularly scheduled charges to your card.</span>
             <p className={styles['autopay-description']}>You will be charged the amount indicated in your invoice for each billing period until it is cancel.
               A receipt for each payment will be provided to you and the charge will appear on your card statement.
             </p>
@@ -111,7 +191,17 @@ const UpdatePaymentDetails = (props: IProps) => {
       >
         Submit
       </Button>
-
+      {/* <Elements
+              stripe={loadStripe(stripeSetting.publishableKey)}
+              // options={{
+              //   clientSecret: setupIntentSecretData?.SetupIntentSecret?.clientSecret
+              // }}
+            >
+      <SubscriptionPay
+        visibility={show}
+        setModalVisibility={setShow}
+      />
+      </Elements> */}
     </Form>
   )
 }
