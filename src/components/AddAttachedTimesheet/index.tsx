@@ -1,6 +1,21 @@
-import { Button, Col, DatePicker, Form, Input, InputNumber, message, Modal, Row, Select, Space, Upload, UploadProps } from "antd";
+import {
+    Button,
+    Col,
+    DatePicker,
+    Form,
+    Input,
+    InputNumber,
+    message,
+    Modal,
+    Row,
+    Select,
+    Space,
+    Spin,
+    Upload,
+    UploadProps
+} from "antd";
 import { authVar } from "../../App/link";
-import { CloseOutlined } from '@ant-design/icons';
+import { CloseOutlined, CloseCircleOutlined } from '@ant-design/icons';
 
 
 import constants, { attachment_type } from "../../config/constants";
@@ -51,7 +66,8 @@ const AttachNewTimesheetModal = (props: IProps) => {
         id: null,
         name: "",
     });
-	const [type,setType] = useState('')
+	const [type, setType] = useState('');
+	const [attachmentLoading, setAttachmentLoading] = useState<boolean>(false);
 
     const [createAttachedTimesheet] = useMutation<GraphQLResponse<'AttachedTimesheetCreate', AttachedTimesheet>, MutationAttachedTimesheetCreateArgs>(ATTACH_TIMESHEET_CREATE, {
 
@@ -95,6 +111,7 @@ const AttachNewTimesheetModal = (props: IProps) => {
             'authorization': authData?.token ? `Bearer ${authData?.token}` : '',
         },
         onChange(info) {
+            setAttachmentLoading(true);
             form.setFieldsValue({ attachment: fileData as any })
             form.setFields([
                 {
@@ -103,11 +120,13 @@ const AttachNewTimesheetModal = (props: IProps) => {
                 }
               ]);
             if (info.file.status === 'done') {
+                setAttachmentLoading(false);
                 setFile({
                     name: info?.file?.name,
                     id: info?.file?.response?.data?.id
                 })
             } else if (info.file.status === 'error') {
+                setAttachmentLoading(false);
                 message.error(`${info.file.name} file upload failed.`);
             }
         }
@@ -273,11 +292,20 @@ const AttachNewTimesheetModal = (props: IProps) => {
                             >
                                 <div className={styles["upload-file"]}>
                                     <div>
-                                        <span>
-                                            {fileData?.name
-                                                ? fileData?.name
-                                                : " Attach your files here"}
-                                        </span>
+                                        {attachmentLoading ? (
+                                          <Spin tip="Uploading"/>
+                                        ): fileData?.name ? (
+                                          <div>
+                                              <span>{fileData?.name}</span>
+                                              <CloseCircleOutlined onClick={() => setFile({
+                                                  id: null,
+                                                  name: "",
+                                              })} title={'Remove Attachment'} className={styles['close-file']}/>
+                                          </div>
+                                        ):
+                                        (<span>
+                                           Attach your files here
+                                        </span>)}
                                     </div>
                                     <div className={styles["browse-file"]}>
                                         <Upload {...uploadProps}>Click to Upload</Upload>
