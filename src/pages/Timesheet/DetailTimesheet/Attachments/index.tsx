@@ -68,7 +68,7 @@ const Attachments = (props: IProps) => {
   });
   
 
-  const { data: attachedTimesheetData ,refetch:refetchAttachedTimesheet} = useQuery(ATTACHED_TIMESHEET, {
+  const { data: attachedTimesheetData , refetch:refetchAttachedTimesheet} = useQuery(ATTACHED_TIMESHEET, {
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
     variables: {
@@ -137,7 +137,7 @@ const Attachments = (props: IProps) => {
           setEditAttachedVisibility(true);
           setAttachedTimesheet(data);
         }}>
-          Edit Expense
+          Edit Attachment
         </div>
       </Menu.Item>
       <Menu.Divider />
@@ -147,7 +147,7 @@ const Attachments = (props: IProps) => {
           setAttachedTimesheet(data);
         }}
         >
-          Delete Expense
+          Delete Attachment
         </div>
       </Menu.Item>
 
@@ -170,7 +170,7 @@ const Attachments = (props: IProps) => {
       }
     },
     {
-      title: 'Expense Type',
+      title: 'Attachment Type',
       dataIndex: 'type',
     },
     {
@@ -244,7 +244,7 @@ const Attachments = (props: IProps) => {
         props.isEmployee && (
           <p className={styles['attach-new-timesheet']} onClick={attachNewTimesheet}>
             <PlusCircleFilled />
-            <span style={{ marginLeft: '1rem' }}> Add New Expense
+            <span style={{ marginLeft: '1rem' }}> Add New Attachment
             </span>
           </p>
         )
