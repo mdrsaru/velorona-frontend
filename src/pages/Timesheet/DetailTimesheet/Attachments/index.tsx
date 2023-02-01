@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { gql, useQuery, useMutation } from '@apollo/client';
 import { message, Dropdown, Menu, Table } from 'antd';
 import {
@@ -51,6 +51,7 @@ interface IProps {
   timesheet_id: string;
   isEmployee: boolean; 
   isSubmitted: boolean;
+  setAttachmentSubmitted: React.Dispatch<React.SetStateAction<boolean>>
 }
 
 const Attachments = (props: IProps) => {
@@ -83,6 +84,9 @@ const Attachments = (props: IProps) => {
       },
     },
     onCompleted(response){
+      if (response?.AttachedTimesheet?.data?.length > 0) {
+        props?.setAttachmentSubmitted(true);
+      }
       setFile({
         id:  response?.AttachedTimesheet?.data[0]?.attachments?.id,
         name: response?.AttachedTimesheet?.data[0]?.attachments?.name as string,
@@ -254,6 +258,7 @@ const Attachments = (props: IProps) => {
         visibility={showAttachTimeEntry}
         setVisibility={setAttachTimeEntry}
         timesheet_id={props.timesheet_id}
+        setAttachmentSubmitted={props.setAttachmentSubmitted}
         refetch={refetchAttachedTimesheet} 
       />
 
@@ -264,6 +269,7 @@ const Attachments = (props: IProps) => {
         setFile={setFile}
         fileData = {fileData}
         refetch= {refetchAttachedTimesheet}
+        setAttachmentSubmitted={props.setAttachmentSubmitted}
       />
 
       <ApprovedTimesheetAttachment

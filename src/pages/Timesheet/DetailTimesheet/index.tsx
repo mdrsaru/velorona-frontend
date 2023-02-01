@@ -16,7 +16,7 @@ import { authVar } from '../../../App/link';
 import { _cs, checkRoles, checkSubscriptions } from '../../../utils/common';
 import routes from '../../../config/routes';
 import { notifyGraphqlError } from "../../../utils/error";
-import constants, { plans, subscriptionStatus } from "../../../config/constants";
+import constants, { subscriptionStatus } from "../../../config/constants";
 import { TimeEntry, MutationTimeEntriesApproveRejectArgs, InvoiceSchedule, EntryType } from '../../../interfaces/generated';
 import { GraphQLResponse } from '../../../interfaces/graphql.interface';
 import { PROJECT } from '../../Project';
@@ -115,6 +115,7 @@ const DetailTimesheet = (props: any) => {
   })
 
   const entriesByStatusRef = useRef<any>({});
+  const [attachmentAdded, setAttachmentAdded] = useState<boolean>(false)
   const [invoicedTimeEntries, setInvoicedTimeEntries] = useState<InvoicedTimeEntries[]>([])
   const [entriesByStatus, setEntriesByStatus] = useState<EntriesByStatus>({
     approved: [],
@@ -263,7 +264,18 @@ const DetailTimesheet = (props: any) => {
     const weekEndDate: any = new Date(timesheetDetail?.weekEndDate as any);
     const today = new Date();
 
-    const result = checkDate(today, weekEndDate)
+    const result = checkDate(today, weekEndDate);
+
+    if (timesheet.user.timesheet_attachment) {
+      if (!attachmentAdded) {
+        message.error({
+          content: `Please add an attachment first.`,
+          className: 'custom-message'
+        });
+        return;
+      }
+
+    }
 
     if (result) {
       setConfirmShow(!confirmShow)
@@ -634,6 +646,7 @@ const DetailTimesheet = (props: any) => {
                     isEmployee={isEmployee}
                     timesheet_id={timesheet_id}
                     isSubmitted={timesheet?.isSubmitted}
+                    setAttachmentSubmitted={setAttachmentAdded}
                   />
                 </Panel>
               </Collapse>

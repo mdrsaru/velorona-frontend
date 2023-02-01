@@ -22,7 +22,7 @@ import constants, { attachment_type } from "../../config/constants";
 
 import styles from './styles.module.scss'
 import { gql, useMutation } from "@apollo/client";
-import { useState } from "react";
+import {Dispatch, SetStateAction, useState} from "react";
 import { GraphQLResponse } from "../../interfaces/graphql.interface";
 import { AttachedTimesheet, AttachmentType, MutationAttachedTimesheetCreateArgs } from "../../interfaces/generated";
 import { notifyGraphqlError } from "../../utils/error";
@@ -34,6 +34,7 @@ interface IProps {
     timesheet_id?: string;
     invoice_id?: string;
     refetch?: any;
+    setAttachmentSubmitted?: Dispatch<SetStateAction<boolean>>;
 }
 
 
@@ -76,6 +77,9 @@ const AttachNewTimesheetModal = (props: IProps) => {
                 content: `New attached timesheet is added successfully!`,
                 className: "custom-message",
             });
+            if (props?.setAttachmentSubmitted) {
+                props?.setAttachmentSubmitted(true);
+            }
 
             if (props?.refetch) {
                 props?.refetch({
@@ -94,8 +98,7 @@ const AttachNewTimesheetModal = (props: IProps) => {
                     }
                 })
             }
-            props?.setVisibility(false)
-
+            props?.setVisibility(false);
         },
         onError(err) {
             notifyGraphqlError(err)

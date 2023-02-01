@@ -1,13 +1,28 @@
-import { Button, Col, DatePicker, Form, Input, InputNumber, message, Modal, Row, Select, Space, Upload, UploadProps } from "antd";
+import {
+    Button,
+    Col,
+    DatePicker,
+    Form,
+    Input,
+    InputNumber,
+    message,
+    Modal,
+    Row,
+    Select,
+    Space,
+    Spin,
+    Upload,
+    UploadProps
+} from "antd";
 import { authVar } from "../../App/link";
-import { CloseOutlined } from '@ant-design/icons';
+import {CloseCircleOutlined, CloseOutlined} from '@ant-design/icons';
 import moment from "moment";
 
 import constants, { attachment_type } from "../../config/constants";
 
 import styles from '../AddAttachedTimesheet/styles.module.scss'
 import { gql, useMutation } from "@apollo/client";
-import { useEffect, useMemo, useState } from "react";
+import {Dispatch, SetStateAction, useEffect, useMemo, useState} from "react";
 import { GraphQLResponse } from "../../interfaces/graphql.interface";
 import { AttachedTimesheet, AttachmentType, MutationAttachedTimesheetUpdateArgs } from "../../interfaces/generated";
 import { notifyGraphqlError } from "../../utils/error";
@@ -18,6 +33,7 @@ interface IProps {
     fileData:any;
     setFile:any;
     refetch:any;
+    setAttachmentSubmitted?: Dispatch<SetStateAction<boolean>>;
 }
 
 
@@ -47,6 +63,7 @@ const EditAttachedTimesheet = (props: IProps) => {
     const [form] = Form.useForm();
     const attachedTimesheet = props?.data;
     const [option,setOption] = useState('')
+    const [attachmentLoading, setAttachmentLoading] = useState<boolean>(false);
 
     const [attachedTimesheetUpdate] = useMutation<GraphQLResponse<'AttachedTimesheetUpdate', AttachedTimesheet>, MutationAttachedTimesheetUpdateArgs>(ATTACH_TIMESHEET_UPDATE, {
 
@@ -55,6 +72,9 @@ const EditAttachedTimesheet = (props: IProps) => {
                 content: `Attachment updated successfully!`,
                 className: "custom-message",
             });
+            if (props?.setAttachmentSubmitted) {
+                props?.setAttachmentSubmitted(true);
+            }
             props?.refetch({
                 variables: {
                     input: {
@@ -85,13 +105,16 @@ const EditAttachedTimesheet = (props: IProps) => {
             'authorization': authData?.token ? `Bearer ${authData?.token}` : '',
         },
         onChange(info) {
+            setAttachmentLoading(true);
             if (info.file.status === 'done') {
                 props.setFile({
                     name: info?.file?.name,
                     id: info?.file?.response?.data?.id
                 })
+                setAttachmentLoading(false);
             } else if (info.file.status === 'error') {
                 message.error(`${info.file.name} file upload failed.`);
+                setAttachmentLoading(false);
             }
         }
     };
@@ -258,11 +281,20 @@ const EditAttachedTimesheet = (props: IProps) => {
                             >
                                 <div className={styles["upload-file"]}>
                                     <div>
-                                        <span>
-                                            {props.fileData?.name
-                                                ? props.fileData?.name
-                                                : " Attach your files here"}
-                                        </span>
+                                        {attachmentLoading ? (
+                                          <Spin tip="Uploading"/>
+                                        ): props?.fileData?.name ? (
+                                            <div>
+                                                <span>{props?.fileData?.name}</span>
+                                                <CloseCircleOutlined onClick={() => props?.setFile({
+                                                    id: null,
+                                                    name: "",
+                                                })} title={'Remove Attachment'} className={styles['close-file']}/>
+                                            </div>
+                                          ):
+                                          (<span>
+                                           Attach your files here
+                                        </span>)}
                                     </div>
                                     <div className={styles["browse-file"]}>
                                         <Upload {...uploadProps}>Click to Upload</Upload>
