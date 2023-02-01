@@ -86,7 +86,7 @@ const InvoiceAndPayment = () => {
       dataIndex: 'status',
     },
     {
-      title:'Invoice Link',
+      title:'Invoice',
       render: (data: any, __: any, index: number) => {
         return (
           data?.invoiceLink ? 
@@ -97,7 +97,7 @@ const InvoiceAndPayment = () => {
       }
     },
     {
-      title:'Receipt Link',
+      title:'Receipt',
       render: (data: any, __: any, index: number) => {
         return (
           data?.receiptLink ? 
