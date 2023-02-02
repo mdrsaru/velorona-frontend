@@ -51,6 +51,15 @@ const SETUP_INTENT_SECRET = gql`
   }
 `;
 
+const RETRIEVE_SUBSCRIPTION = gql`
+  query RetrieveSubscription($input: RetrieveSubscriptionInput!) {
+    RetrieveSubscription(input: $input) {
+      id 
+      current_period_end
+    }
+  }
+`;
+
 const SUBSCRIPTION_DOWNGRADE = gql`
   mutation SubscriptionDowngrade($input: SubscriptionDowngradeInput!) {
     SubscriptionDowngrade(input: $input)
@@ -68,6 +77,20 @@ const Plan = (props: IProps) => {
 
   const { data: authData } = useQuery(AUTH)
   const company_id = authData.AuthUser?.company?.id as string;
+  const { data: subscriptionRetrieveData } = useQuery(
+    RETRIEVE_SUBSCRIPTION,
+    {
+      fetchPolicy: "network-only",
+      nextFetchPolicy: "cache-first",
+      variables: {
+        input: {
+          company_id: company_id
+        }
+      }
+    },
+  );
+
+  const periodEndDate = subscriptionRetrieveData?.RetrieveSubscription?.current_period_end
 
   const [
     createSubscription,
@@ -82,7 +105,7 @@ const Plan = (props: IProps) => {
       },
     },
     onCompleted(response) {
-      if(response?.SubscriptionCreate) {
+      if (response?.SubscriptionCreate) {
         setSubscriptionData({
           clientSecret: response.SubscriptionCreate.clientSecret,
           subscriptionId: response.SubscriptionCreate.subscriptionId,
@@ -122,7 +145,7 @@ const Plan = (props: IProps) => {
       },
     },
     onCompleted(response) {
-      if(response?.SubscriptionDowngrade) {
+      if (response?.SubscriptionDowngrade) {
         message.success(response.SubscriptionDowngrade)
       }
     },
@@ -130,14 +153,14 @@ const Plan = (props: IProps) => {
   });
 
   const createIncompleteSubscription = () => {
-    if(plan.name === 'Professional') {
+    if (plan.name === 'Professional') {
       createSubscription();
     }
   }
 
   const handlePlanActionClick = () => {
-    if(plan.name === 'Starter') {
-      if(plan.isCurrent) {
+    if (plan.name === 'Starter') {
+      if (plan.isCurrent) {
         return;
       }
 
@@ -145,7 +168,7 @@ const Plan = (props: IProps) => {
       return;
     }
 
-    if(plan.subscriptionStatus === 'trialing' || plan.subscriptionStatus === 'past_due' || plan.subscriptionStatus === 'active') {
+    if (plan.subscriptionStatus === 'trialing' || plan.subscriptionStatus === 'past_due' || plan.subscriptionStatus === 'active') {
       getSetupIntentSecret({
         variables: {
           input: {
@@ -167,11 +190,11 @@ const Plan = (props: IProps) => {
   }
 
   const getBtnText = () => {
-    if(plan.name === 'Starter' && !plan.isCurrent) {
+    if (plan.name === 'Starter' && !plan.isCurrent) {
       return 'Downgrade';
     }
 
-    if([
+    if ([
       'active',
       'trialing',
       'past_due',
@@ -197,51 +220,51 @@ const Plan = (props: IProps) => {
         }
       </div>
       <div className={styles.buttonDiv}>
-      {plan.subscriptionStatus === 'active' ?
-        // {/* Need downgrade functionality */}
+        {plan.subscriptionStatus === 'active' || periodEndDate !== null ?
+          // {/* Need downgrade functionality */}
 
-        <Button
-          type="primary"
-          disabled={plan.subscriptionStatus === 'active'}
-          loading={creatingSubscription || downgrading}
-        >
-          {getBtnText()}
-        </Button>
+          <Button
+            type="primary"
+            disabled={plan.subscriptionStatus === 'active' || !!periodEndDate}
+            loading={creatingSubscription || downgrading}
+          >
+            {getBtnText()}
+          </Button>
 
-        :
-      <Popconfirm
-        placement="top"
-        title="Are you sure?"
-        onConfirm={handlePlanActionClick}
-        okText="Yes"
-        cancelText="No"
-      >
-        <Button
-          type="primary"
-          disabled={plan.subscriptionStatus === 'active'}
-          loading={creatingSubscription || downgrading}
-        >
-          { getBtnText() }
-        </Button>
-      </Popconfirm>
-      }
-      {plan.name === 'Professional' && plan.subscriptionStatus === 'active' &&
-         <Popconfirm
-         placement="top"
-         title="Are you sure?"
-         onConfirm={handlePlanActionClick}
-         okText="Yes"
-         cancelText="No"
-       >
-       <Button
-          type="primary"
-          loading={creatingSubscription || downgrading}
-          className={styles.payNowBtn}
-        >
-          Pay Now
-        </Button>
-        </Popconfirm>
-      }
+          :
+          <Popconfirm
+            placement="top"
+            title="Are you sure?"
+            onConfirm={handlePlanActionClick}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button
+              type="primary"
+              disabled={plan.subscriptionStatus === 'active' || !!periodEndDate}
+              loading={creatingSubscription || downgrading}
+            >
+              {getBtnText()}
+            </Button>
+          </Popconfirm>
+        }
+        {plan.name === 'Professional' && plan.subscriptionStatus === 'active' &&
+          <Popconfirm
+            placement="top"
+            title="Are you sure?"
+            onConfirm={handlePlanActionClick}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button
+              type="primary"
+              loading={creatingSubscription || downgrading}
+              className={styles.payNowBtn}
+            >
+              Pay Now
+            </Button>
+          </Popconfirm>
+        }
       </div>
       <ul>
         {
@@ -271,7 +294,7 @@ const Plan = (props: IProps) => {
         destroyOnClose
         title="Update Payment"
         closable
-        onCancel={()=>setShowUpdatePaymentModal(false)}
+        onCancel={() => setShowUpdatePaymentModal(false)}
         visible={showUpdatePaymentModal}
       >
         {
@@ -285,7 +308,7 @@ const Plan = (props: IProps) => {
               <UpdatePaymentDetails
                 hidePaymentUpdateModal={hidePaymentUpdateModal}
                 clientSecret={setupIntentSecretData?.SetupIntentSecret?.clientSecret}
-              companyId = {company_id}
+                companyId={company_id}
               />
             </Elements>
           )

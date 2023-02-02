@@ -16,6 +16,7 @@ import InvoiceAndPayment from './InvoiceAndPayment';
 import AvailablePlans from './AvailablePlans';
 
 import styles from './style.module.scss';
+import moment from 'moment';
 
 const stripePromise = loadStripe(stripeSetting.publishableKey);
 
@@ -27,6 +28,7 @@ export const COMPANY = gql`
       subscriptionStatus
       trialEndDate
       collectionMethod
+      subscriptionPeriodEnd
     }
   }
 `;
@@ -86,6 +88,7 @@ const Subscription = () => {
             
           />
               <p className={styles['payment-method-title']}>Payment Method: {companyData?.CompanyById?.collectionMethod === 'charge_automatically' ? 'Autopay' : 'Invoice'}</p>
+              <p className={styles['payment-method-title']}>Subscription End Date: {moment(companyData?.CompanyById?.subscriptionPeriodEnd).format('MM-DD-YYYY')}</p>
 
           <Tabs defaultActiveKey="currentPlan">
             <Tabs.TabPane
