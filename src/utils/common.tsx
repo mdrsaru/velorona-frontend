@@ -194,7 +194,7 @@ export const notifySubscriptionExpiration = (args: NotifySubscriptionExpiration)
       type = 'warning'
     } else if (diff < 0) {
       title = 'Your payment is due';
-      description = `Your subscription has already been expired on  ${periodEnd.format('MMM DD,YYYY')}.`;
+      description = `Your subscription has already expired on  ${periodEnd.format('MMM DD,YYYY')}.`;
       type = 'error'
     }
   }
@@ -206,7 +206,7 @@ export const notifySubscriptionExpiration = (args: NotifySubscriptionExpiration)
         type: type,
         title,
         description,
-        duration: 0,
+        duration: 10,
       });
     }, 2000)
   }
@@ -235,7 +235,8 @@ export const openPendingCompanyNotification = (args: NotificationArgs) => {
 };
 
 export const notifyCompanySignUp = (args: NotifyCompanySignUp) => {
-let unapprovedCompany = false;
+  let unapprovedCompany = false;
+  notification.destroy();
   args?.companyList?.map((company: Company, index: number) => {
     if (company?.unapprovedNotification) {
       unapprovedCompany = true

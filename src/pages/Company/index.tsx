@@ -151,7 +151,7 @@ const Company = () => {
     currentPage: 1,
   });
 
-  const { data: companyData, loading: dataLoading, refetch:refetchCompany } = useQuery<
+  const { data: companyData, loading: dataLoading, refetch: refetchCompany } = useQuery<
     GraphQLResponse<'Company', CompanyPagingResult>,
     QueryCompanyArgs
   >(COMPANY, {
@@ -218,8 +218,8 @@ const Company = () => {
     }).then((response) => {
       if (response.errors) {
         return notifyGraphqlError((response.errors))
-      };
-    }).catch(notifyGraphqlError)
+      }
+    }).catch(notifyGraphqlError);
   };
 
   const changePage = (page: number) => {
