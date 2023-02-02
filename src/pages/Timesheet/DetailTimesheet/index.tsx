@@ -656,7 +656,7 @@ const DetailTimesheet = (props: any) => {
       }
 
       {
-        (!!timesheetDetail?.entriesGroup?.byStatus?.length || !!timesheetDetail?.entriesGroup?.byInvoice?.length ) &&  (
+        // (!!timesheetDetail?.entriesGroup?.byStatus?.length || !!timesheetDetail?.entriesGroup?.byInvoice?.length ) &&  (
           <Row justify={"end"} className={styles['button-row']}>
             <Col className={styles['form-col']}>
               <Space>
@@ -685,7 +685,7 @@ const DetailTimesheet = (props: any) => {
               </Space>
             </Col>
           </Row>
-        )
+        // )
       }
 
       <div className={styles['site-card-wrapper']}>
