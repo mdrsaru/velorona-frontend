@@ -1,7 +1,7 @@
 import moment from 'moment';
 import { debounce } from 'lodash';
 import { useEffect, useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useQuery, gql, useMutation } from '@apollo/client';
 import { SearchOutlined, SendOutlined, FormOutlined, UserOutlined, FileExcelOutlined, CheckCircleOutlined, CloseCircleOutlined } from '@ant-design/icons';
 import { Card, Row, Col, Table, Menu, Dropdown, Form, Select, Button, Input, Popconfirm, message } from 'antd';
@@ -132,7 +132,6 @@ const ArchiveBody = () => {
 
 const {Option} = Select;
 const Company = () => {
-  const navigate = useNavigate();
   const [filterForm] = Form.useForm();
 
   const debouncedResults = debounce(() => { onChangeFilter() }, 600);

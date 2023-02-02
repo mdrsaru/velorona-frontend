@@ -29,6 +29,7 @@ import RouteLoader from '../../../components/Skeleton/RouteLoader'
 import { EntryType, MutationChangeProfilePictureArgs, MutationUserUpdateArgs, QueryUserArgs, RoleName, User, UserPagingResult, UserStatus } from "../../../interfaces/generated";
 import { GraphQLResponse } from "../../../interfaces/graphql.interface";
 import { checkSubscriptions } from "../../../utils/common";
+import routes from "../../../config/routes";
 
 const dateFormat = "YYYY-MM-DD HH:mm:ss";
 const profileFile = (e: any) => {
@@ -141,12 +142,11 @@ const EditEmployee = () => {
   })
 
   const cancelEditEmployee = () => {
-    navigate(-1);
-  };
+    navigate(routes.user.path(authData?.company?.code ?? ''))  };
 
   const successMessage = () => {
     message.success(`Employee is updated successfully!`).then((r) => { });
-    navigate(-1);
+    navigate(routes.user.path(authData?.company?.code ?? ''))
   };
 
   const props: UploadProps = {
@@ -203,7 +203,7 @@ const EditEmployee = () => {
       //   };
       // }).catch(notifyGraphqlError)
     } else {
-      navigate(-1);
+      navigate(routes.user.path(authData?.company?.code ?? ''))
     }
   };
 
@@ -254,7 +254,7 @@ const EditEmployee = () => {
             <Col span={12} className={styles["employee-col"]}>
               <h1>
                 <ArrowLeftOutlined
-                  onClick={() => navigate(-1)} />
+                  onClick={() => navigate(routes.user.path(authData?.company?.code ?? ''))} />
                 &nbsp;
                 Edit {authData?.user?.id === params.eid ? "Profile" : " User"}
               </h1>
@@ -458,10 +458,12 @@ const EditEmployee = () => {
                         },
                       ]}
                     >
-                      <Select placeholder="Employee" disabled={authData?.user?.id === params.eid ? true : false} onChange={handleChange}>
+                      <Select placeholder="Employee"
+                              disabled={authData?.user?.id === params.eid}
+                              onChange={handleChange}>
                         {roles_user?.map((role: any, index: number) => {
                           if (role?.value === 'TaskManager' && !canAccess) {
-                            return
+                            return (<></>);
                           }
                           else {
                             return (

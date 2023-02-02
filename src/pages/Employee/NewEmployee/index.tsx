@@ -1,7 +1,7 @@
 import { useState } from "react";
 
-import { Button, Card, Col, DatePicker, Form, Input, message, Row, Select, Space, Upload } from "antd";
-import { ArrowLeftOutlined } from "@ant-design/icons";
+import {Button, Card, Col, DatePicker, Form, Input, message, Row, Select, Space, Spin, Upload} from "antd";
+import {ArrowLeftOutlined, CloseCircleOutlined} from "@ant-design/icons";
 import constants, { roles_user, subscriptionStatus } from "../../../config/constants";
 
 import type { UploadProps } from 'antd';
@@ -89,9 +89,11 @@ const NewEmployee = () => {
   const navigate = useNavigate();
   const authData = authVar();
   const [fileData, setFile] = useState({
-    id: '',
+    id: null,
     name: ''
   })
+  const [attachmentLoading, setAttachmentLoading] = useState<boolean>(false);
+
   // const [skipClient, setSkipClient] = useState(false)
 
   const _subscriptionStatus = authData?.company?.subscriptionStatus ?? ''
@@ -132,7 +134,7 @@ const NewEmployee = () => {
       :
       navigate(routes.user.path(authData?.company?.code ?? ''))
     message.success({
-      content: `New User is created successfully!`,
+      content: `New User is created successfully! Please add the client information as well.`,
       className: 'custom-message'
     });
   }
@@ -145,13 +147,16 @@ const NewEmployee = () => {
       'authorization': authData?.token ? `Bearer ${authData?.token}` : '',
     },
     onChange(info) {
+      setAttachmentLoading(true)
       if (info.file.status === 'done') {
         setFile({
           name: info?.file?.name,
           id: info?.file?.response?.data?.id
         })
+        setAttachmentLoading(false)
       } else if (info.file.status === 'error') {
         message.error(`${info.file.name} file upload failed.`);
+        setAttachmentLoading(false);
       }
     }
   };
@@ -183,6 +188,7 @@ const NewEmployee = () => {
   >(USER_CREATE, {
     onCompleted: (response) => {
       const user = response?.UserCreate;
+      console.log('i am here')
       if (fileData?.id) {
         changeProfilePictureInput({
           variables: {
@@ -192,7 +198,7 @@ const NewEmployee = () => {
             }
           }
         }).catch(notifyGraphqlError)
-        navigate(-1);
+        redirectTo(user?.roles[0]?.name, user?.id);
       } else {
         redirectTo(user?.roles[0]?.name, user?.id);
       }
@@ -651,8 +657,21 @@ const NewEmployee = () => {
                 style={{ position: "relative" }}>
                 <div className={styles["upload-file"]}>
                   <div>
+                    {attachmentLoading ? (
+                      <Spin tip="Uploading"/>
+                    ): fileData?.name ? (
+                        <div>
+                          <span>{fileData?.name}</span>
+                          <CloseCircleOutlined onClick={() => setFile({
+                            id: null,
+                            name: "",
+                          })} title={'Remove Attachment'} className={styles['close-file']}/>
+                        </div>
+                      ):
+                      (<span>
+                        Attach your file here
+                      </span>)}
                     <span>
-                      {fileData?.name ? fileData?.name : " Attach your files here"}
                     </span>
                   </div>
                   <div className={styles["browse-file"]}>

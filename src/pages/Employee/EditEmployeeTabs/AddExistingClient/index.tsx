@@ -71,16 +71,15 @@ const AddExistingClient = () => {
 	const authData = authVar();
 	const navigate = useNavigate();
 	const [form] = Form.useForm()
-	const [client, setClient] = useState('')
 	const [projects, setProject] = useState([])
-	const [showRow, setShowRow] = useState(false)
+	const [showRow, setShowRow] = useState(true)
 	const [currencyId, setCurrencyId] = useState<any>()
 	const [clientId, setClientId] = useState('')
 	const [addProjectShow, setAddProjectShow] = useState(false)
 
 
 	const { data: userClientDetailData, refetch: refetchUserClientDetail, loading } = useQuery<
-		GraphQLResponse<'UserClientDetail', UserClientDetail>,
+		GraphQLResponse<'UserClientDetail', UserClientDetail[]>,
 		QueryUserClientDetailArgs
 	>(USER_CLIENT_DETAIL, {
 		fetchPolicy: "network-only",
@@ -95,7 +94,10 @@ const AddExistingClient = () => {
 	const [dataSource, setDataSource] = useState<any>([]);
 
 	useEffect(() => {
-		setDataSource(userClientDetailData?.UserClientDetail)
+		setDataSource(userClientDetailData?.UserClientDetail);
+		if (userClientDetailData?.UserClientDetail?.length) {
+			setShowRow(false);
+		}
 	}, [userClientDetailData?.UserClientDetail])
 
 	const { data: clientData } = useQuery<
@@ -119,12 +121,12 @@ const AddExistingClient = () => {
 	const { refetch: refetchProject } = useQuery(PROJECT, {
 		fetchPolicy: "network-only",
 		nextFetchPolicy: "cache-first",
-		skip: !client,
+		skip: !clientId,
 		variables: {
 			input: {
 				query: {
 					company_id: authData?.company?.id as string,
-					client_id: client as string
+					client_id: clientId as string
 				},
 				paging: {
 					order: ["updatedAt:DESC"],
