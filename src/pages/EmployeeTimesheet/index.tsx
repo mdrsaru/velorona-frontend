@@ -10,7 +10,7 @@ import constants, { employee_timesheet_status } from '../../config/constants';
 import routes from '../../config/routes';
 import { notifyGraphqlError } from '../../utils/error';
 import { TimesheetPagingData } from '../../interfaces/graphql.interface';
-import { TimesheetQueryInput, Timesheet, InvoiceSchedule} from '../../interfaces/generated';
+import { TimesheetQueryInput, Timesheet, InvoiceSchedule, TimesheetQuery } from '../../interfaces/generated';
 import PageHeader from '../../components/PageHeader';
 import Status from '../../components/Status';
 
@@ -124,21 +124,16 @@ const EmployeeTimesheet = () => {
       },
 
       query: {
-        company_id: authData?.company?.id
+        company_id: authData?.company?.id,
+        needGroupedTimesheet: true,
       }
 
     }
 
-    let query: {
-      status?: string,
-      archived?: boolean,
-      search?: boolean,
-      company_id: string;
-      weekStartDate?: Date;
-      weekEndDate?: Date;
-    } = {
-      company_id: authData?.company?.id as string
-    }
+    let query: TimesheetQuery = {
+      company_id: authData?.company?.id as string,
+      needGroupedTimesheet: true,
+    };
 
     if (values.status) {
       query['status'] = values.status;
