@@ -329,25 +329,20 @@ const ScheduleDetail = () => {
       const designation = groups && (groups[property][0]?.user?.designation ?? '-');
       const total = getTotalSchedule(groups[property]);
       const timeSheetBodyPart =
-        groups &&
-        Object.keys(groups).map((key) => {
-          return weekDays.map(
+        weekDays.map(
             (day) =>
               groups[property] &&
-              groups[property]?.map((data: any) => {
-                return (
-                  day === moment(data?.schedule_date).utc().format('YYYY-MM-DD') &&
-                  data?.workscheduleTimeDetail?.length > 0 &&
-                  data?.workscheduleTimeDetail?.map(
-                    (timeData: any) => `${moment(timeData?.startTime).utc().format('HH:mm') || ''}-${
-                      moment(timeData?.endTime).utc().format('HH:mm') || ''
-                      }`
+              groups[property]?.find((data: any) =>
+                (moment(data?.schedule_date).utc().format('YYYY-MM-DD') === day))?.workscheduleTimeDetail?.map(
+                    (timeData: any) => {
+                      return `${moment(timeData?.startTime).utc().format('HH:mm') || ''}-${
+                          moment(timeData?.endTime).utc().format('HH:mm') || ''
+                        }`
+                    }
                   )[0]
-                );
-              })[0]
           );
-        });
-      const timeSheetBody = timeSheetBodyPart[0]?.map((item:string)=>item || '-');
+
+      const timeSheetBody = timeSheetBodyPart?.map((item:string)=>item || '-');
       tableRows.push({ username, designation, total, timeSheetBody: Object.assign({}, timeSheetBody) });
     }
     return tableRows;
