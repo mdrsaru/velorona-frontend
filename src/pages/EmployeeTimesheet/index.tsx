@@ -171,7 +171,19 @@ const EmployeeTimesheet = () => {
       width: '20%',
 
       render: (timesheet: any) => {
-        return <>{moment(timesheet?.weekStartDate).format('YYYY/MM/DD')}-{moment(timesheet?.weekEndDate).format('YYYY/MM/DD')}</>
+        let link = routes.detailTimesheet.path(authData?.company?.code as string, timesheet?.id)
+        if(timesheet.period === InvoiceSchedule.Biweekly || timesheet.period === InvoiceSchedule.Monthly || timesheet.period === InvoiceSchedule.Custom) {
+          link += `?start=${timesheet.weekStartDate}&end=${timesheet.weekEndDate}&period=${timesheet.period}`;
+        }
+        return <>
+        <Link
+            className={styles['invoice-link']}
+            title='View Detail'
+            to={link}>
+        {moment(timesheet?.weekStartDate).format('YYYY/MM/DD')}-{moment(timesheet?.weekEndDate).format('YYYY/MM/DD')}
+          </Link>
+        </>
+        
       }
     },
 
@@ -179,10 +191,10 @@ const EmployeeTimesheet = () => {
       title: 'Employee Name',
       dataIndex: ['user', 'fullName'],
     },
-    {
-      title: 'Employee Email',
-      dataIndex: ['user', 'email'],
-    },
+    // {
+    //   title: 'Employee Email',
+    //   dataIndex: ['user', 'email'],
+    // },
     {
       title: 'Client',
       dataIndex: ['client', 'name'],
@@ -193,27 +205,27 @@ const EmployeeTimesheet = () => {
       render: (record: any) =>
         <TimeDuration duration={record.duration} />
     },
+    // {
+    //   title: 'Last Approved',
+    //   dataIndex: 'lastApprovedAt',
+    //   render: (lastApprovedAt: any) => {
+    //     return <span>{lastApprovedAt ? moment(lastApprovedAt).format('LL') : 'N/A'}</span>
+    //   }
+    // },
     {
-      title: 'Last Approved',
-      dataIndex: 'lastApprovedAt',
-      render: (lastApprovedAt: any) => {
-        return <span>{lastApprovedAt ? moment(lastApprovedAt).format('LL') : 'N/A'}</span>
-      }
-    },
-    {
-      title: 'Expense',
+      title: 'Invoice Amount',
       dataIndex: 'totalExpense',
       render: (totalExpense: number) => {
         return `$${totalExpense}`
       }
     },
-    {
-      title: 'Status',
-      dataIndex: 'status',
-      render: (status: string) => {
-        return <Status status={status} />
-      }
-    },
+    // {
+    //   title: 'Status',
+    //   dataIndex: 'status',
+    //   render: (status: string) => {
+    //     return <Status status={status} />
+    //   }
+    // },
     {
       title: 'Invoice Status',
       dataIndex: 'invoiceStatus',
@@ -233,24 +245,24 @@ const EmployeeTimesheet = () => {
         )
       }
     },
-    {
-      title: 'Action',
-      render: (timesheet: Timesheet) => {
-        let link = routes.detailTimesheet.path(authData?.company?.code as string, timesheet?.id)
-        if(timesheet.period === InvoiceSchedule.Biweekly || timesheet.period === InvoiceSchedule.Monthly || timesheet.period === InvoiceSchedule.Custom) {
-          link += `?start=${timesheet.weekStartDate}&end=${timesheet.weekEndDate}&period=${timesheet.period}`;
-        }
+    // {
+    //   title: 'Action',
+    //   render: (timesheet: Timesheet) => {
+    //     let link = routes.detailTimesheet.path(authData?.company?.code as string, timesheet?.id)
+    //     if(timesheet.period === InvoiceSchedule.Biweekly || timesheet.period === InvoiceSchedule.Monthly || timesheet.period === InvoiceSchedule.Custom) {
+    //       link += `?start=${timesheet.weekStartDate}&end=${timesheet.weekEndDate}&period=${timesheet.period}`;
+    //     }
 
-        return (
-          <Link
-            className={styles['invoice-link']}
-            title='View Detail'
-            to={link}>
-            <EyeFilled  className={`${styles["table-icon"]} ${styles["table-view-icon"]}`}/>
-          </Link>
-        )
-      }
-    },
+    //     return (
+    //       <Link
+    //         className={styles['invoice-link']}
+    //         title='View Detail'
+    //         to={link}>
+    //         <EyeFilled  className={`${styles["table-icon"]} ${styles["table-view-icon"]}`}/>
+    //       </Link>
+    //     )
+    //   }
+    // },
   ];
 
   return (
