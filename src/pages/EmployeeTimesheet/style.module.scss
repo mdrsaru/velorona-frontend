@@ -2,7 +2,9 @@
   padding: 2rem 0 2rem 0;
 
   .invoice-link {
-    font-weight: 600;
+    // font-weight: 600;
+    text-decoration: none;
+    color: var(--black-1);
   }
 
   .download-report {
