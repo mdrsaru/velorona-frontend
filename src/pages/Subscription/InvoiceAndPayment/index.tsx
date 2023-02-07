@@ -23,6 +23,9 @@ const SUBSCRIPTION_PAYMENT = gql`
         status
         invoiceLink
         receiptLink
+        periodStartDate
+        periodEndDate
+        invoiceId  
       }
     }
   }
@@ -71,7 +74,9 @@ const InvoiceAndPayment = () => {
       title: 'Date of Payment',
       dataIndex: 'paymentDate',
       render: (date: string) => {
-        return moment(date).format('MM/DD/YYYY');
+        return (
+          <>{date ? moment(date).format('MM/DD/YYYY'): 'N/A'}</>
+        )
       }
     },
     {
@@ -82,29 +87,47 @@ const InvoiceAndPayment = () => {
       }
     },
     {
+      title: 'Period Start Date',
+      dataIndex: 'periodStartDate',
+      render: (date: string) => {
+        return (
+          <>{date ? moment(date).format('MM/DD/YYYY'): 'N/A'}</>
+        )
+      }
+    },
+    {
+      title: 'Period End Date',
+      dataIndex: 'periodEndDate',
+      render: (date: string) => {
+        return (
+          <>{date ? moment(date).format('MM/DD/YYYY'): 'N/A'}</>
+        )
+      }
+    },
+    {
       title: 'Status',
       dataIndex: 'status',
     },
     {
-      title:'Invoice',
+      title: 'Invoice',
       render: (data: any, __: any, index: number) => {
         return (
-          data?.invoiceLink ? 
-            <a href={data?.invoiceLink} target='_blank'>{`Invoice${index+1}`}</a>
+          data?.invoiceLink ?
+            <a href={data?.invoiceLink} target='_blank'>{`Invoice${index + 1}`}</a>
             :
             'N/A'
-          )
+        )
       }
     },
     {
       title:'Receipt',
       render: (data: any, __: any, index: number) => {
         return (
-          data?.receiptLink ? 
+          data?.receiptLink ?
             <a href={data?.receiptLink} target='_blank'>{`Receipt${index+1}`}</a>
             :
             'N/A'
-          )
+        )
       }
     }
   ];
@@ -123,12 +146,12 @@ const InvoiceAndPayment = () => {
       loading={loading}
       dataSource={data?.SubscriptionPayment?.data}
       columns={columns}
-      rowKey={((record: any) => record.id)} 
+      rowKey={((record: any) => record.id)}
       pagination={{
         current: pagingInput.currentPage,
-          onChange: changePage,
-          total: data?.SubscriptionPayment?.paging?.total,
-          pageSize: constants.paging.perPage,
+        onChange: changePage,
+        total: data?.SubscriptionPayment?.paging?.total,
+        pageSize: constants.paging.perPage,
       }}
     />
   )

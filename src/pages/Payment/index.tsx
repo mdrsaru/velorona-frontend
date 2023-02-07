@@ -21,6 +21,11 @@ export const SUBSCRIPTION_PAYMENT = gql`
         id
         amount
         paymentDate
+        invoiceLink
+        receiptLink
+        periodStartDate
+        periodEndDate
+        invoiceId
         status
         company {
           name

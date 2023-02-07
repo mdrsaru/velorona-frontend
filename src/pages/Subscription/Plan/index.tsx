@@ -14,12 +14,15 @@ import {
   MutationSubscriptionCreateArgs,
   SetupIntentResult,
   MutationSubscriptionDowngradeArgs,
+  QuerySubscriptionPaymentArgs,
+  SubscriptionPaymentPagingResult,
 } from '../../../interfaces/generated';
 
 import Payment from '../Payment';
 import UpdatePaymentDetails from '../UpdatePaymentDetails';
 
 import styles from './style.module.scss';
+import { SUBSCRIPTION_PAYMENT } from '../../Payment';
 
 const stripePromise = loadStripe(stripeSetting.publishableKey);
 
@@ -77,20 +80,20 @@ const Plan = (props: IProps) => {
 
   const { data: authData } = useQuery(AUTH)
   const company_id = authData.AuthUser?.company?.id as string;
-  const { data: subscriptionRetrieveData } = useQuery(
-    RETRIEVE_SUBSCRIPTION,
-    {
-      fetchPolicy: "network-only",
-      nextFetchPolicy: "cache-first",
-      variables: {
-        input: {
-          company_id: company_id
-        }
-      }
-    },
-  );
+  // const { data: subscriptionRetrieveData } = useQuery(
+  //   RETRIEVE_SUBSCRIPTION,
+  //   {
+  //     fetchPolicy: "network-only",
+  //     nextFetchPolicy: "cache-first",
+  //     variables: {
+  //       input: {
+  //         company_id: company_id
+  //       }
+  //     }
+  //   },
+  // );
 
-  const periodEndDate = subscriptionRetrieveData?.RetrieveSubscription?.current_period_end
+  // const periodEndDate = subscriptionRetrieveData?.RetrieveSubscription?.current_period_end
 
   const [
     createSubscription,
@@ -207,6 +210,27 @@ const Plan = (props: IProps) => {
     return 'Upgrade'
   }
 
+  const { data: subscriptionPaymentDetail, loading: SubscriptionPaymentLoading } = useQuery<
+    GraphQLResponse<'SubscriptionPayment', SubscriptionPaymentPagingResult>,
+    QuerySubscriptionPaymentArgs
+  >(SUBSCRIPTION_PAYMENT, {
+    fetchPolicy: 'network-only',
+    nextFetchPolicy: 'cache-first',
+    variables: {
+      input: {
+        query: {
+          company_id,
+          status: 'draft',
+          paymentDate: null,
+        },
+
+      }
+    }
+  });
+  const subscriptionPaymentData = subscriptionPaymentDetail?.SubscriptionPayment?.data?.[0];
+  console.log(subscriptionPaymentData?.invoiceId)
+  console.log(!!subscriptionPaymentData?.invoiceId)
+
   return (
     <div className={styles['container']}>
       <div className={styles['header']}>
@@ -220,12 +244,12 @@ const Plan = (props: IProps) => {
         }
       </div>
       <div className={styles.buttonDiv}>
-        {plan.subscriptionStatus === 'active' || periodEndDate !== null ?
+        { subscriptionPaymentData?.invoiceId === undefined ?
           // {/* Need downgrade functionality */}
 
           <Button
             type="primary"
-            disabled={plan.subscriptionStatus === 'active' || !!periodEndDate}
+            disabled={ subscriptionPaymentData?.invoiceId === undefined}
             loading={creatingSubscription || downgrading}
           >
             {getBtnText()}
@@ -241,14 +265,14 @@ const Plan = (props: IProps) => {
           >
             <Button
               type="primary"
-              disabled={plan.subscriptionStatus === 'active' || !!periodEndDate}
+              disabled={ subscriptionPaymentData?.invoiceId === undefined}
               loading={creatingSubscription || downgrading}
             >
               {getBtnText()}
             </Button>
           </Popconfirm>
         }
-        {plan.name === 'Professional' && plan.subscriptionStatus === 'active' &&
+        {/* {plan.name === 'Professional' && plan.subscriptionStatus === 'active' &&
           <Popconfirm
             placement="top"
             title="Are you sure?"
@@ -264,7 +288,7 @@ const Plan = (props: IProps) => {
               Pay Now
             </Button>
           </Popconfirm>
-        }
+        } */}
       </div>
       <ul>
         {
@@ -292,7 +316,7 @@ const Plan = (props: IProps) => {
       <Modal
         footer={null}
         destroyOnClose
-        title="Update Payment"
+        title="Proceed Payment"
         closable
         onCancel={() => setShowUpdatePaymentModal(false)}
         visible={showUpdatePaymentModal}

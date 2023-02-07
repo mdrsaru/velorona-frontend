@@ -2,19 +2,21 @@ import { useState } from 'react';
 import {
   useStripe,
   useElements,
+  CardExpiryElement,
 } from '@stripe/react-stripe-js';
 import { Form, Button, message, Spin } from 'antd';
 
 import styles from '../style.module.scss'
 import { GraphQLResponse } from '../../../interfaces/graphql.interface';
 import { gql, useMutation, useQuery } from '@apollo/client';
-import { CompanyPagingResult, MutationCompanyUpdateArgs, QueryCompanyArgs } from '../../../interfaces/generated';
+import { CompanyPagingResult, MutationCompanyUpdateArgs, QueryCompanyArgs, QuerySubscriptionPaymentArgs, SubscriptionPaymentPagingResult, SubscriptionPaymentStatus } from '../../../interfaces/generated';
 import { ICompany } from '../../../interfaces/ICompany';
 import { notifyGraphqlError } from '../../../utils/error';
 import { COMPANY, COMPANY_UPDATE } from '../../Company';
-import { collection_method } from '../../../config/constants';
+import  { collection_method } from '../../../config/constants';
 import CardDetail from '../../../components/CardDetail';
 import { CardElement } from '@stripe/react-stripe-js';
+import { SUBSCRIPTION_PAYMENT } from '../../Payment';
 
 interface IProps {
   clientSecret: string;
@@ -38,7 +40,7 @@ export const RETRIEVE_CUSTOMER = gql`
        }
 `
 
-export const SUBSCRIPTION_PAYMENT = gql`
+export const SUBSCRIPTION_PAYMENTS = gql`
   mutation SubscriptionPayment($input: SubscriptionPaymentInput!) {
     SubscriptionPayment(input: $input)
 
@@ -68,6 +70,25 @@ const UpdatePaymentDetails = (props: IProps) => {
     },
   });
 
+  const { data: subscriptionPaymentDetail, loading: SubscriptionPaymentLoading } = useQuery<
+    GraphQLResponse<'SubscriptionPayment', SubscriptionPaymentPagingResult>,
+    QuerySubscriptionPaymentArgs
+  >(SUBSCRIPTION_PAYMENT, {
+    fetchPolicy: 'network-only',
+    nextFetchPolicy: 'cache-first',
+    variables: {
+      input: {
+        query: {
+          company_id: props?.companyId,
+          status: 'draft',
+          paymentDate: null,
+        },
+
+      }
+    }
+  });
+
+  const subscriptionPaymentData = subscriptionPaymentDetail?.SubscriptionPayment?.data?.[0];
   const { data: cardDetail, loading: fetchCardLoading } = useQuery(RETRIEVE_CUSTOMER, {
     variables: {
       input: {
@@ -88,7 +109,7 @@ const UpdatePaymentDetails = (props: IProps) => {
     onError: notifyGraphqlError,
   })
 
-  const [subscriptionPayment, { loading: paymentLoading }] = useMutation(SUBSCRIPTION_PAYMENT, {
+  const [subscriptionPayment, { loading: paymentLoading }] = useMutation(SUBSCRIPTION_PAYMENTS, {
     onCompleted: (response) => {
       if (response?.SubscriptionPayment) {
         message.success("Subscription Payment successful")
@@ -102,7 +123,12 @@ const UpdatePaymentDetails = (props: IProps) => {
     if (!stripe || !elements) {
       return;
     }
-setLoading(true);
+    setLoading(true);
+
+    const cardElement = elements.getElement(CardElement);
+    console.log(cardElement)
+    const cardNumber = elements.getElement(CardExpiryElement)
+    console.log(cardNumber)
     try {
       // const { error } = await stripe.confirmSetup({
       //   // elements,
@@ -124,7 +150,9 @@ setLoading(true);
         variables: {
           input: {
             customerId: card?.customer,
-            cardId: card?.id
+            cardId: card?.id,
+            company_id: props?.companyId,
+            subscriptionPaymentId : subscriptionPaymentData?.id,
           }
         }
       })
@@ -148,7 +176,6 @@ setLoading(true);
   };
 
   const handleCardSelect = (card: any) => {
-    console.log(card)
     setCard(card)
   }
   const handleAutoPay = (e: any) => {
@@ -160,7 +187,12 @@ setLoading(true);
   // }
   return (
     <Form onFinish={onFinish} >
-      <CardElement />
+      {/* <CardElement /> */}
+      <p><b>Invoice Id :</b> {subscriptionPaymentData?.invoiceId}</p>
+      <p><b>Subscription Date :</b> {subscriptionPaymentData?.periodStartDate} - {subscriptionPaymentData?.periodEndDate}</p>
+      {subscriptionPaymentData?.invoiceLink &&
+        <p>Invoice Link : {subscriptionPaymentData?.invoiceLink ?? ''}</p>
+      }
       {paymentLoading || fetchCardLoading ?
         <Spin />
         :
