@@ -68,11 +68,14 @@ const EmployeeTimesheet = () => {
     currentPage: 1,
   });
 
+  const [queryInput, setQueryInput] = useState<TimesheetQuery>({
+    company_id,
+    needGroupedTimesheet: true,
+  });
+
   const [filterForm] = Form.useForm();
 
-  const [filterProperty, setFilterProperty] = useState<any>({
-    filter: false,
-  });
+  const [filter, setFilter] = useState<boolean>(false);
 
   const input: TimesheetQueryInput = {
     paging: {
@@ -80,16 +83,12 @@ const EmployeeTimesheet = () => {
       take: constants.paging.perPage,
       order: ['weekStartDate:DESC'],
     },
-    query: {
-      company_id: company_id,
-      needGroupedTimesheet: true,
-    },
+    query: queryInput,
   };
 
   const {
     data: timesheetData,
     loading: timesheetLoading,
-    refetch: refetchTimesheet,
   } = useQuery<TimesheetPagingData, { input: TimesheetQueryInput }>(
     EMPLOYEE_TIMESHEET,
     {
@@ -111,27 +110,11 @@ const EmployeeTimesheet = () => {
     })
   };
 
-  const refetchTimesheets = () => {
-
-    let values = filterForm.getFieldsValue(['search', 'role', 'status', 'date'])
-
-    let input: {
-      paging?: any,
-      query: any
-    } = {
-      paging: {
-        order: ["updatedAt:DESC"],
-      },
-
-      query: {
-        company_id: authData?.company?.id,
-        needGroupedTimesheet: true,
-      }
-
-    }
+  const onFilterChange = () => {
+    const values = filterForm.getFieldsValue(['search', 'role', 'status', 'date'])
 
     let query: TimesheetQuery = {
-      company_id: authData?.company?.id as string,
+      company_id,
       needGroupedTimesheet: true,
     };
 
@@ -147,38 +130,33 @@ const EmployeeTimesheet = () => {
       query['weekStartDate'] = values?.date[0]
       query['weekEndDate'] = values?.date[1]
     }
-    input['query'] = query
 
-    refetchTimesheet({
-      input: input
+    setQueryInput(query)
+    setPagingInput({
+      skip: 0,
+      currentPage: 1,
     })
   }
 
-  const onChangeFilter = () => {
-    refetchTimesheets()
-  }
+  const toggleFilter = () => {
+    if(filter) {
+      setQueryInput({
+        company_id,
+        needGroupedTimesheet: true,
+      });
 
-  const openFilterRow = () => {
-    if (filterProperty?.filter) {
-      refetchTimesheet({
-        input: {
-          paging: {
-            order: ["updatedAt:DESC"],
-          },
-          query: {
-            company_id: authData?.company?.id as string,
-          }
-        }
-      })
+      setPagingInput({
+        skip: 0,
+        currentPage: 1,
+      });
     }
-    filterForm.resetFields()
-    setFilterProperty({
-      filter: !filterProperty?.filter
+
+    setFilter((prev: boolean) => {
+      return !prev;
     })
   }
 
-
-  const debouncedResults = debounce(() => { onChangeFilter() }, 600);
+  const debouncedResults = debounce(() => { onFilterChange() }, 600);
 
   useEffect(() => {
     return () => {
@@ -193,7 +171,19 @@ const EmployeeTimesheet = () => {
       width: '20%',
 
       render: (timesheet: any) => {
-        return <>{moment(timesheet?.weekStartDate).format('YYYY/MM/DD')}-{moment(timesheet?.weekEndDate).format('YYYY/MM/DD')}</>
+        let link = routes.detailTimesheet.path(authData?.company?.code as string, timesheet?.id)
+        if(timesheet.period === InvoiceSchedule.Biweekly || timesheet.period === InvoiceSchedule.Monthly || timesheet.period === InvoiceSchedule.Custom) {
+          link += `?start=${timesheet.weekStartDate}&end=${timesheet.weekEndDate}&period=${timesheet.period}`;
+        }
+        return <>
+        <Link
+            className={styles['invoice-link']}
+            title='View Detail'
+            to={link}>
+        {moment(timesheet?.weekStartDate).format('YYYY/MM/DD')}-{moment(timesheet?.weekEndDate).format('YYYY/MM/DD')}
+          </Link>
+        </>
+        
       }
     },
 
@@ -201,10 +191,10 @@ const EmployeeTimesheet = () => {
       title: 'Employee Name',
       dataIndex: ['user', 'fullName'],
     },
-    {
-      title: 'Employee Email',
-      dataIndex: ['user', 'email'],
-    },
+    // {
+    //   title: 'Employee Email',
+    //   dataIndex: ['user', 'email'],
+    // },
     {
       title: 'Client',
       dataIndex: ['client', 'name'],
@@ -215,27 +205,27 @@ const EmployeeTimesheet = () => {
       render: (record: any) =>
         <TimeDuration duration={record.duration} />
     },
+    // {
+    //   title: 'Last Approved',
+    //   dataIndex: 'lastApprovedAt',
+    //   render: (lastApprovedAt: any) => {
+    //     return <span>{lastApprovedAt ? moment(lastApprovedAt).format('LL') : 'N/A'}</span>
+    //   }
+    // },
     {
-      title: 'Last Approved',
-      dataIndex: 'lastApprovedAt',
-      render: (lastApprovedAt: any) => {
-        return <span>{lastApprovedAt ? moment(lastApprovedAt).format('LL') : 'N/A'}</span>
-      }
-    },
-    {
-      title: 'Expense',
+      title: 'Invoice Amount',
       dataIndex: 'totalExpense',
       render: (totalExpense: number) => {
         return `$${totalExpense}`
       }
     },
-    {
-      title: 'Status',
-      dataIndex: 'status',
-      render: (status: string) => {
-        return <Status status={status} />
-      }
-    },
+    // {
+    //   title: 'Status',
+    //   dataIndex: 'status',
+    //   render: (status: string) => {
+    //     return <Status status={status} />
+    //   }
+    // },
     {
       title: 'Invoice Status',
       dataIndex: 'invoiceStatus',
@@ -255,24 +245,24 @@ const EmployeeTimesheet = () => {
         )
       }
     },
-    {
-      title: 'Action',
-      render: (timesheet: Timesheet) => {
-        let link = routes.detailTimesheet.path(authData?.company?.code as string, timesheet?.id)
-        if(timesheet.period === InvoiceSchedule.Biweekly || timesheet.period === InvoiceSchedule.Monthly || timesheet.period === InvoiceSchedule.Custom) {
-          link += `?start=${timesheet.weekStartDate}&end=${timesheet.weekEndDate}&period=${timesheet.period}`;
-        }
+    // {
+    //   title: 'Action',
+    //   render: (timesheet: Timesheet) => {
+    //     let link = routes.detailTimesheet.path(authData?.company?.code as string, timesheet?.id)
+    //     if(timesheet.period === InvoiceSchedule.Biweekly || timesheet.period === InvoiceSchedule.Monthly || timesheet.period === InvoiceSchedule.Custom) {
+    //       link += `?start=${timesheet.weekStartDate}&end=${timesheet.weekEndDate}&period=${timesheet.period}`;
+    //     }
 
-        return (
-          <Link
-            className={styles['invoice-link']}
-            title='View Detail'
-            to={link}>
-            <EyeFilled  className={`${styles["table-icon"]} ${styles["table-view-icon"]}`}/>
-          </Link>
-        )
-      }
-    },
+    //     return (
+    //       <Link
+    //         className={styles['invoice-link']}
+    //         title='View Detail'
+    //         to={link}>
+    //         <EyeFilled  className={`${styles["table-icon"]} ${styles["table-view-icon"]}`}/>
+    //       </Link>
+    //     )
+    //   }
+    // },
   ];
 
   return (
@@ -302,26 +292,29 @@ const EmployeeTimesheet = () => {
               <div className={styles['filter-col']}>
                 <Button
                   type="text"
-                  onClick={openFilterRow}
-                  icon={<img
+                  onClick={toggleFilter}
+                  icon={
+                    <img
                     src={filterImg}
                     alt="filter"
-                    className={styles['filter-image']} />}>
-                  &nbsp; &nbsp;
-                  {filterProperty?.filter ? 'Reset' : 'Filter'}
+                    className={styles['filter-image']} 
+                  />
+                  }
+                >
+                  &nbsp; &nbsp; { filter ? 'Reset' : 'Filter'}
                 </Button>
               </div>
             </Col>
           </Row>
           <br />
-          {filterProperty?.filter &&
+          {filter &&
             <Row gutter={[32, 0]} className={styles["role-status-col"]}>
 
               <Col xs={24} sm={24} md={24} lg={10} xl={10}>
                 <Form.Item name="status" label="">
                   <Select
                     placeholder="Select status"
-                    onChange={onChangeFilter}
+                    onChange={onFilterChange}
                   >
                     {employee_timesheet_status?.map((status: any) =>
                       <Option value={status?.value} key={status?.name}>
@@ -332,7 +325,7 @@ const EmployeeTimesheet = () => {
               </Col>
               <Col xs={24} sm={24} md={24} lg={10} xl={10}>
                 <Form.Item name="date" label="">
-                  <RangePicker bordered={false} onChange={onChangeFilter} />
+                  <RangePicker bordered={false} onChange={onFilterChange} />
                 </Form.Item>
               </Col>
             </Row>}

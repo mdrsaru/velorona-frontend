@@ -73,7 +73,7 @@ const NewClient = () => {
         return notifyGraphqlError((response.errors))
       } else if (response?.data) {
         navigate(-1)
-        message.success({ content: `New Client is created successfully!`, key, className: 'custom-message' });
+        message.success({ content: `Successfully created a client; now add a new project and assign an user .`, key, className: 'custom-message' });
       }
     }).catch(notifyGraphqlError)
   }
