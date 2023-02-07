@@ -54,14 +54,14 @@ const SETUP_INTENT_SECRET = gql`
   }
 `;
 
-const RETRIEVE_SUBSCRIPTION = gql`
-  query RetrieveSubscription($input: RetrieveSubscriptionInput!) {
-    RetrieveSubscription(input: $input) {
-      id 
-      current_period_end
-    }
-  }
-`;
+// const RETRIEVE_SUBSCRIPTION = gql`
+//   query RetrieveSubscription($input: RetrieveSubscriptionInput!) {
+//     RetrieveSubscription(input: $input) {
+//       id 
+//       current_period_end
+//     }
+//   }
+// `;
 
 const SUBSCRIPTION_DOWNGRADE = gql`
   mutation SubscriptionDowngrade($input: SubscriptionDowngradeInput!) {
@@ -228,8 +228,6 @@ const Plan = (props: IProps) => {
     }
   });
   const subscriptionPaymentData = subscriptionPaymentDetail?.SubscriptionPayment?.data?.[0];
-  console.log(subscriptionPaymentData?.invoiceId)
-  console.log(!!subscriptionPaymentData?.invoiceId)
 
   return (
     <div className={styles['container']}>
@@ -244,12 +242,12 @@ const Plan = (props: IProps) => {
         }
       </div>
       <div className={styles.buttonDiv}>
-        { subscriptionPaymentData?.invoiceId === undefined ?
+        { plan.subscriptionStatus === 'active'  ?
           // {/* Need downgrade functionality */}
 
           <Button
             type="primary"
-            disabled={ subscriptionPaymentData?.invoiceId === undefined}
+            disabled={plan.subscriptionStatus === 'active' && subscriptionPaymentData?.invoiceId === undefined}
             loading={creatingSubscription || downgrading}
           >
             {getBtnText()}
@@ -265,7 +263,8 @@ const Plan = (props: IProps) => {
           >
             <Button
               type="primary"
-              disabled={ subscriptionPaymentData?.invoiceId === undefined}
+              // disabled={ subscriptionPaymentData?.invoiceId === undefined}
+              disabled={plan.subscriptionStatus === 'active' && subscriptionPaymentData?.invoiceId === undefined}
               loading={creatingSubscription || downgrading}
             >
               {getBtnText()}

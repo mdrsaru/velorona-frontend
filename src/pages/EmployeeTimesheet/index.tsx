@@ -3,14 +3,14 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { gql, useQuery } from '@apollo/client';
 import { Card, Table, Button, Form, Row, Select, Col, Input, DatePicker } from 'antd';
-import { SearchOutlined,EyeFilled } from '@ant-design/icons';
+import { SearchOutlined } from '@ant-design/icons';
 
 import { authVar } from '../../App/link';
 import constants, { employee_timesheet_status } from '../../config/constants';
 import routes from '../../config/routes';
 import { notifyGraphqlError } from '../../utils/error';
 import { TimesheetPagingData } from '../../interfaces/graphql.interface';
-import { TimesheetQueryInput, Timesheet, InvoiceSchedule, TimesheetQuery } from '../../interfaces/generated';
+import { TimesheetQueryInput, InvoiceSchedule, TimesheetQuery } from '../../interfaces/generated';
 import PageHeader from '../../components/PageHeader';
 import Status from '../../components/Status';
 
@@ -42,6 +42,8 @@ export const EMPLOYEE_TIMESHEET = gql`
         userPayment
         status
         invoiceStatus
+        projectName
+        expense
         user {
           fullName
           email
@@ -227,6 +229,10 @@ const EmployeeTimesheet = () => {
     //   }
     // },
     {
+      title: 'Project Name',
+      dataIndex: 'projectName',  
+    },
+    {
       title: 'Invoice Status',
       dataIndex: 'invoiceStatus',
       render: (status: string) => {
@@ -245,6 +251,13 @@ const EmployeeTimesheet = () => {
         )
       }
     },
+    // {
+    //   title: 'Expense',
+    //   dataIndex: 'expense',
+    //   render: (expense: number) => {
+    //     return `$${expense}`
+    //   }
+    // },
     // {
     //   title: 'Action',
     //   render: (timesheet: Timesheet) => {

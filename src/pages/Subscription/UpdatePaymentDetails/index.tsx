@@ -2,7 +2,6 @@ import { useState } from 'react';
 import {
   useStripe,
   useElements,
-  CardExpiryElement,
 } from '@stripe/react-stripe-js';
 import { Form, Button, message, Spin } from 'antd';
 
@@ -15,7 +14,6 @@ import { notifyGraphqlError } from '../../../utils/error';
 import { COMPANY, COMPANY_UPDATE } from '../../Company';
 import  { collection_method } from '../../../config/constants';
 import CardDetail from '../../../components/CardDetail';
-import { CardElement } from '@stripe/react-stripe-js';
 import { SUBSCRIPTION_PAYMENT } from '../../Payment';
 
 interface IProps {
@@ -124,11 +122,6 @@ const UpdatePaymentDetails = (props: IProps) => {
       return;
     }
     setLoading(true);
-
-    const cardElement = elements.getElement(CardElement);
-    console.log(cardElement)
-    const cardNumber = elements.getElement(CardExpiryElement)
-    console.log(cardNumber)
     try {
       // const { error } = await stripe.confirmSetup({
       //   // elements,
