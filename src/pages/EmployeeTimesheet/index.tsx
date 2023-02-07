@@ -1,16 +1,16 @@
 import moment from 'moment';
 import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import {useNavigate} from 'react-router-dom';
 import { gql, useQuery } from '@apollo/client';
 import { Card, Table, Button, Form, Row, Select, Col, Input, DatePicker } from 'antd';
-import { SearchOutlined,EyeFilled } from '@ant-design/icons';
+import { SearchOutlined } from '@ant-design/icons';
 
 import { authVar } from '../../App/link';
 import constants, { employee_timesheet_status } from '../../config/constants';
 import routes from '../../config/routes';
 import { notifyGraphqlError } from '../../utils/error';
 import { TimesheetPagingData } from '../../interfaces/graphql.interface';
-import { TimesheetQueryInput, Timesheet, InvoiceSchedule, TimesheetQuery } from '../../interfaces/generated';
+import { TimesheetQueryInput, InvoiceSchedule, TimesheetQuery } from '../../interfaces/generated';
 import PageHeader from '../../components/PageHeader';
 import Status from '../../components/Status';
 
@@ -58,6 +58,7 @@ const { RangePicker } = DatePicker;
 
 const EmployeeTimesheet = () => {
   const authData = authVar();
+  const navigate = useNavigate();
   const company_id = authData.company?.id as string
 
   const [pagingInput, setPagingInput] = useState<{
@@ -171,18 +172,23 @@ const EmployeeTimesheet = () => {
       width: '20%',
 
       render: (timesheet: any) => {
-        let link = routes.detailTimesheet.path(authData?.company?.code as string, timesheet?.id)
-        if(timesheet.period === InvoiceSchedule.Biweekly || timesheet.period === InvoiceSchedule.Monthly || timesheet.period === InvoiceSchedule.Custom) {
-          link += `?start=${timesheet.weekStartDate}&end=${timesheet.weekEndDate}&period=${timesheet.period}`;
+
+        const getNavigationPath = () => {
+          let link = routes.detailTimesheet.path(authData?.company?.code as string, timesheet?.id)
+          if(timesheet.period === InvoiceSchedule.Biweekly || timesheet.period === InvoiceSchedule.Monthly || timesheet.period === InvoiceSchedule.Custom) {
+            return `${link}?start=${timesheet.weekStartDate}&end=${timesheet.weekEndDate}&period=${timesheet.period}`;
+          } else {
+            return link
+          }
         }
-        return <>
-        <Link
+        return (<>
+        <div
             className={styles['invoice-link']}
             title='View Detail'
-            to={link}>
+            onClick={() => navigate(getNavigationPath())}>
         {moment(timesheet?.weekStartDate).format('YYYY/MM/DD')}-{moment(timesheet?.weekEndDate).format('YYYY/MM/DD')}
-          </Link>
-        </>
+          </div>
+        </>)
         
       }
     },
