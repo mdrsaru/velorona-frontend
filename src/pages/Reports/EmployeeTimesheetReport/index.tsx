@@ -42,6 +42,7 @@ const EmployeeTimesheetReport = () => {
     },
     query: {
       company_id: company_id,
+      needGroupedTimesheet: true,
     },
   };
 
@@ -62,10 +63,9 @@ const EmployeeTimesheetReport = () => {
     { label: 'Employee Name', key: 'employee' },
     { label: 'Client Name', key: 'client' },
     { label: 'Total Time', key: 'durationFormat' },
-    { label: 'Last Approved', key: 'lastApprovedAt' },
     { label: 'Invoiced amount', key: 'totalExpense' },
-    { label: 'User Payrate amount', key: 'userPayRate' },
-    { label: 'Status', key: 'status' },
+    { label: 'Project Name', key: 'projectName' },
+    { label: 'InvoiceStatus', key: 'invoiceStatus' },
 
   ];
 
@@ -78,12 +78,11 @@ const EmployeeTimesheetReport = () => {
       const employee = timesheet?.user?.fullName ?? '-';
       const client = timesheet?.client?.name ?? '-';
       const durationFormat = secondsToHms(timesheet?.duration) ?? '-';
-      const status = (timesheet?.status ?? '-');
+      const invoiceStatus = (timesheet?.invoiceStatus ?? '-');
       const totalExpense = (timesheet?.totalExpense ?? '-');
-      const userPayRate = (timesheet?.userPayment ?? '-');
-      const lastApprovedAt = (timesheet?.lastApprovedAt ?? '-');
+      const projectName = (timesheet?.projectName ?? '-');
       tableRows.push({
-        date,employee, client, durationFormat, status, totalExpense, lastApprovedAt,userPayRate
+        date,employee, client, durationFormat, totalExpense, invoiceStatus,projectName
       });
     }
     return tableRows;
@@ -110,6 +109,7 @@ const EmployeeTimesheetReport = () => {
 
       query: {
         company_id: authData?.company?.id,
+        needGroupedTimesheet: true,
       },
     };
 
@@ -120,8 +120,10 @@ const EmployeeTimesheetReport = () => {
       company_id: string;
       weekStartDate?: Date;
       weekEndDate?: Date;
+      needGroupedTimesheet?:Boolean;
     } = {
       company_id: authData?.company?.id as string,
+      needGroupedTimesheet: true,
     };
 
     if (values.status) {

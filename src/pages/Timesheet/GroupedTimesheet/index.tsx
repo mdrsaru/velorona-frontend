@@ -258,7 +258,7 @@ const GroupedTimesheet = () => {
                 />
               ) : timesheet?.map((_timesheet, index) => (
                 <div className={styles['collapse']} key={_timesheet.id} style={{ marginBottom: 16 }}>
-                  <Collapse collapsible="header">
+                  <Collapse accordion>
                     <Panel header={`${_timesheet.weekStartDate} - ${_timesheet.weekEndDate}`} key={index}>
                     <DetailTimesheet 
                       period={period}
