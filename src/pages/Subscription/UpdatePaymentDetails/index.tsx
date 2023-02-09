@@ -2,6 +2,8 @@ import { useState } from 'react';
 import {
   useStripe,
   useElements,
+  CardElement,
+  CardNumberElement,
 } from '@stripe/react-stripe-js';
 import { Form, Button, message, Spin } from 'antd';
 
@@ -52,7 +54,7 @@ const UpdatePaymentDetails = (props: IProps) => {
   const [loading, setLoading] = useState(false);
   const [card, setCard] = useState<any>()
   const [autoPay, setAutoPay] = useState(false)
-  // const [show, setShow] = useState(false)
+  const [show, setShow] = useState(false)
 
   const {
     data: companyData,
@@ -123,7 +125,7 @@ const UpdatePaymentDetails = (props: IProps) => {
     }
     setLoading(true);
     try {
-      // const { error } = await stripe.confirmSetup({
+         // const { error } = await stripe.confirmSetup({
       //   // elements,
       //   // clientSecret:'pi_3MVs2cLea2Z7YpN43NyCvnjL_secret_GOxhw7a6ZYqM8lMteto4sivRx',
       //   redirect: 'if_required',
@@ -138,27 +140,48 @@ const UpdatePaymentDetails = (props: IProps) => {
 
       //   // message.success('Payment details updated.')
       // }
+      if (show && !card) {
+    const cardElement = elements.getElement(CardElement);
 
-      subscriptionPayment({
-        variables: {
-          input: {
-            customerId: card?.customer,
-            cardId: card?.id,
-            company_id: props?.companyId,
-            subscriptionPaymentId : subscriptionPaymentData?.id,
-          }
-        }
-      })
-      {
-        autoPay &&
-          updateCompany({
-            variables: {
-              input: {
-                collectionMethod: collection_method?.[0]?.value,
-                id: props.companyId
-              }
+        let { error, paymentIntent } = await stripe.confirmCardPayment(props.clientSecret, {
+          payment_method: {
+            card: cardElement,
+            billing_details: {
+              name: companyData?.Company?.data?.[0]?.name,
             }
-          })
+          }
+        });
+        if (paymentIntent) {
+          message.info({ content: 'The change will take some time to appear on Stripe.', duration: 15 })
+          window.location.reload()
+          props?.hidePaymentUpdateModal()
+        }
+        else if (error) {
+          message.error(error.message);
+        }
+      }
+      else {
+        subscriptionPayment({
+          variables: {
+            input: {
+              customerId: card?.customer,
+              cardId: card?.id,
+              company_id: props?.companyId,
+              subscriptionPaymentId : subscriptionPaymentData?.id,
+            }
+          }
+        })
+      }
+        {
+          autoPay &&
+            updateCompany({
+              variables: {
+                input: {
+                  collectionMethod: collection_method?.[0]?.value,
+                  id: props.companyId
+                }
+              }
+            })     
       }
     }
     catch (err) {
@@ -180,7 +203,6 @@ const UpdatePaymentDetails = (props: IProps) => {
   // }
   return (
     <Form onFinish={onFinish} >
-      {/* <CardElement /> */}
       <p><b>Invoice Id :</b> {subscriptionPaymentData?.invoiceId}</p>
       <p><b>Subscription Date :</b> {subscriptionPaymentData?.periodStartDate} - {subscriptionPaymentData?.periodEndDate}</p>
       {subscriptionPaymentData?.invoiceLink &&
@@ -189,14 +211,23 @@ const UpdatePaymentDetails = (props: IProps) => {
       {paymentLoading || fetchCardLoading ?
         <Spin />
         :
-        cardDetail?.RetrieveCustomer?.map((cardDetail: any) => (
-          <CardDetail cardDetail={cardDetail}
-            hideModal={props.hidePaymentUpdateModal}
-            handleCardSelect={handleCardSelect} />
-        ))
-
+        <>
+          {
+            cardDetail?.RetrieveCustomer?.length &&
+            <p className={styles['pay-text']}>Pay with existing card </p>
+          }
+          {cardDetail?.RetrieveCustomer?.map((cardDetail: any) => (
+            <CardDetail cardDetail={cardDetail}
+              hideModal={props.hidePaymentUpdateModal}
+              handleCardSelect={handleCardSelect} />
+          ))}
+        </>
       }
-      {/* <p onClick={handlePay}>Pay with Different Card</p> */}
+      <p onClick={() => setShow(!show)} className={styles['pay-text']}>Pay with another card </p>
+      {
+        show &&
+        <CardElement />
+      }
       <div className={styles['autopay-checkbox']}>
         {
           companyData?.Company?.data?.[0]?.collectionMethod !== collection_method?.[0]?.value &&
