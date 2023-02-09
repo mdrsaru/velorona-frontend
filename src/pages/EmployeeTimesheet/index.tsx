@@ -208,6 +208,10 @@ const EmployeeTimesheet = () => {
       dataIndex: ['client', 'name'],
     },
     {
+      title: 'Project Name',
+      dataIndex: 'projectName',  
+    },
+    {
       title: 'Total Hours',
       key: 'duration',
       render: (record: any) =>
@@ -235,8 +239,12 @@ const EmployeeTimesheet = () => {
     //   }
     // },
     {
-      title: 'Project Name',
-      dataIndex: 'projectName',  
+      title: 'Expense',
+      dataIndex: 'expense',
+      render: (expense: number) => {
+        console.log(expense)
+        return `$${expense}`
+      }
     },
     {
       title: 'Invoice Status',
@@ -256,14 +264,7 @@ const EmployeeTimesheet = () => {
           </>
         )
       }
-    },
-    // {
-    //   title: 'Expense',
-    //   dataIndex: 'expense',
-    //   render: (expense: number) => {
-    //     return `$${expense}`
-    //   }
-    // },
+    }, 
     // {
     //   title: 'Action',
     //   render: (timesheet: Timesheet) => {
