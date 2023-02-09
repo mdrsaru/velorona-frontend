@@ -85,11 +85,12 @@ const Subscription = () => {
 
           <PageHeader
             title="My Subscription"
-            
-          />
-              <p className={styles['payment-method-title']}>Payment Method: {companyData?.CompanyById?.collectionMethod === 'charge_automatically' ? 'Autopay' : 'Invoice'}</p>
-              <p className={styles['payment-method-title']}>Subscription End Date: {moment(companyData?.CompanyById?.subscriptionPeriodEnd).format('MM-DD-YYYY')}</p>
 
+          />
+          <p className={styles['payment-method-title']}>Payment Method: {companyData?.CompanyById?.collectionMethod === 'charge_automatically' ? 'Autopay' : 'Invoice'}</p>
+          {companyData?.CompanyById?.subscriptionPeriodEnd && 
+          <p className={styles['payment-method-title']}>Subscription End Date: {moment(companyData?.CompanyById?.subscriptionPeriodEnd).format('MM-DD-YYYY')}</p>
+          }
           <Tabs defaultActiveKey="currentPlan">
             <Tabs.TabPane
               key="currentPlan"
