@@ -131,7 +131,7 @@ const InvoiceForm = (props: IProps) => {
         message.success('Invoice created successfully');
 
         if (location?.state?.from === 'timesheet' && props.timesheet_id) {
-          return navigate(routes.detailTimesheet.path(companyCode, props.timesheet_id));
+          return navigate(routes.detailEmployeeTimesheet.path(companyCode, props.timesheet_id));
         }
 
         navigate(routes.invoice.path(companyCode));
@@ -420,7 +420,7 @@ const InvoiceForm = (props: IProps) => {
           duration:  4.5,
         });
       }
-      else if (invoiceCurrency != '$' && response?.UserPayRate.data?.[0]?.invoiceRateCurrency === null) {
+      else if (invoiceCurrency !== '$' && response?.UserPayRate.data?.[0]?.invoiceRateCurrency === null) {
         notification['warning']({
           message: 'Found a different currency',
           description:'Kindly generate separate invoices for each distinct currency.',

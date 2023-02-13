@@ -243,6 +243,17 @@ const _Routes = () => {
             />
 
             <Route
+              path={routes.detailEmployeeTimesheet.childPath}
+              element={
+                <CheckRoles allowedRoles={routes.detailEmployeeTimesheet.allowedRoles}>
+                  <Suspense fallback={<RouteLoader />}>
+                    <routes.detailEmployeeTimesheet.component />
+                  </Suspense>
+                </CheckRoles>
+              }
+            />
+
+            <Route
               path={routes.timesheetInvoice.childPath}
               element={
                 <CheckRoles allowedRoles={routes.timesheetInvoice.allowedRoles}>
@@ -274,16 +285,16 @@ const _Routes = () => {
                 }
               />
 
-              <Route
+              {/* <Route
                 path={routes.detailTimesheet.childPath}
                 element={
-                  <CheckRoles allowedRoles={routes.detailTimesheet.allowedRoles}>
-                    <Suspense fallback={<TimeSheetLoader />}>
-                      <routes.detailTimesheet.component />
-                    </Suspense>
-                  </CheckRoles>
+                  // <CheckRoles allowedRoles={routes.detailTimesheet.allowedRoles}>
+                  <Suspense fallback={<TimeSheetLoader />}>
+                    <routes.detailTimesheet.component />
+                  </Suspense>
+                  // </CheckRoles>
                 }
-              />
+              /> */}
             </Route>
 
             <Route
@@ -473,7 +484,7 @@ const _Routes = () => {
                   </Suspense>
                 }
               />
-               <Route
+              <Route
                 path={routes.addUserPayRate.childPath}
                 element={
                   <Suspense fallback={<RouteLoader />}>

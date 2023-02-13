@@ -322,7 +322,7 @@ const Timesheet = () => {
         <div
           className={styles['dropdown-menu']}
           onClick={(e) => {
-            navigate(routes.detailTimesheet.path(authData?.company?.code ?? '', record?.id))
+            navigate(routes.detailEmployeeTimesheet.path(authData?.company?.code ?? '', record?.id))
           }}>
           <span>View Details</span>
         </div>

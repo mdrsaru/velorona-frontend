@@ -278,6 +278,14 @@ const routes = {
     key: 'timesheet',
     allowedRoles: [CompanyAdmin, SuperAdmin, TaskManager, BookKeeper],
   },
+  detailEmployeeTimesheet: {
+    childPath: 'timesheet/employee/:tid',
+    path: (id: string,tid:string) => `/${id}/timesheet/employee/${tid}`,
+    component: lazy(() => import('../pages/Timesheet/GroupedTimesheet')),
+    name: 'Timesheet Based Invoice',
+    key: 'timesheet',
+    allowedRoles: [CompanyAdmin, SuperAdmin,Employee, TaskManager, BookKeeper],
+  },
   timesheetInvoice: {
     //childPath: 'timesheet/employee/:timesheetId/add-invoice',
     //path: (code: string, id: string) => `/${code}/timesheet/employee/${id}/add-invoice`,
@@ -414,15 +422,15 @@ const routes = {
     name: 'New Timesheet',
     key: 'timesheet'
   },
-  detailTimesheet: {
-    childPath: ':id/detail',
-    path: (id: string, tid: string) => `/${id}/timesheet/${tid}/detail`,
-    //component: lazy(() => import('../pages/Timesheet/DetailTimesheet')),
-    component: lazy(() => import('../pages/Timesheet/GroupedTimesheet')),
-    name: 'Detail Timesheet',
-    key: 'timesheet',
-    allowedRoles: [CompanyAdmin, SuperAdmin, Employee, TaskManager,BookKeeper],
-  },
+  // detailTimesheet: {
+  //   childPath: ':id/detail',
+  //   path: (id: string, tid: string) => `/${id}/timesheet/${tid}/detail`,
+  //   //component: lazy(() => import('../pages/Timesheet/DetailTimesheet')),
+  //   component: lazy(() => import('../pages/Timesheet/GroupedTimesheet')),
+  //   name: 'Detail Timesheet',
+  //   key: 'timesheet',
+  //   // allowedRoles: [CompanyAdmin, SuperAdmin, Employee, TaskManager,BookKeeper],
+  // },
   subscription: {
     childPath: 'subscriptions',
     path: (code: string) => `/${code}/subscriptions`,

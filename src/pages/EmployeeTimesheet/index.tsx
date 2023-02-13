@@ -176,8 +176,8 @@ const EmployeeTimesheet = () => {
       render: (timesheet: any) => {
 
         const getNavigationPath = () => {
-          let link = routes.detailTimesheet.path(authData?.company?.code as string, timesheet?.id)
-          if(timesheet.period === InvoiceSchedule.Biweekly || timesheet.period === InvoiceSchedule.Monthly || timesheet.period === InvoiceSchedule.Custom) {
+          let link = routes.detailEmployeeTimesheet.path(authData?.company?.code as string, timesheet?.id)
+        if(timesheet.period === InvoiceSchedule.Biweekly || timesheet.period === InvoiceSchedule.Monthly || timesheet.period === InvoiceSchedule.Custom) {
             return `${link}?start=${timesheet.weekStartDate}&end=${timesheet.weekEndDate}&period=${timesheet.period}`;
           } else {
             return link
@@ -242,7 +242,6 @@ const EmployeeTimesheet = () => {
       title: 'Expense',
       dataIndex: 'expense',
       render: (expense: number) => {
-        console.log(expense)
         return `$${expense}`
       }
     },

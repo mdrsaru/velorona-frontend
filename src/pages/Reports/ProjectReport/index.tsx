@@ -17,10 +17,10 @@ import { notifyGraphqlError } from '../../../utils/error';
 
 const csvHeader: Array<{ label: string; key: string; subKey?: string }> = [
   { label: 'Project Name', key: 'name' },
-  { label: 'Client', key: 'client', subKey: 'name' },
-  { label: 'Client Email', key: 'client', subKey: 'email' },
+  { label: 'Client', key: 'clientName'},
+  { label: 'Client Email', key: 'clientEmail'},
   { label: 'Status', key: 'status' },
-  { label: 'Company', key: 'company', subKey: 'name' },
+  { label: 'Company', key: 'companyName'},
 ];
 
 const { Option } = Select;
@@ -69,6 +69,25 @@ const ProjectReport = () => {
    onError:notifyGraphqlError
   });
 
+  const tableBody = (projectData:any) => {
+    const tableRows = [];
+    let projects: any = projectData?.Project?.data;
+
+       for (const project of projects) {
+        const name = project?.name ?? '-';
+        const clientName = project?.client?.name;
+        const clientEmail = project?.client?.email;
+        const status = (project?.status ?? '-');
+        const companyName = (project?.company?.name ?? '-');
+       
+        tableRows.push({
+         name,clientName,clientEmail,status,companyName
+        });
+      }
+      return tableRows;
+    };
+
+
   const downloadReport = () => {
     let values = filterForm.getFieldsValue(['role', 'status', 'archived']);
 
@@ -106,7 +125,8 @@ const ProjectReport = () => {
       },
     })
     .then((response) => {
-      downloadCSV(response?.data?.Project?.data, csvHeader, 'Projects.csv');
+      const csvBody = tableBody(response.data);
+      downloadCSV(csvBody, csvHeader, 'Projects.csv');
     })
   };
 

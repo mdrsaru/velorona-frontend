@@ -144,7 +144,7 @@ const GroupedTimesheet = () => {
       input: {
         query: {
           company_id,
-          ids: params?.id?.split(',') ?? [],
+          ids: params?.tid?.split(',') ?? [],
         },
         paging: {
           order: ['weekStartDate:DESC']
