@@ -286,6 +286,14 @@ const routes = {
     key: 'timesheet',
     allowedRoles: [CompanyAdmin, SuperAdmin,Employee, TaskManager, BookKeeper],
   },
+  approverEmployeeTimesheet: {
+    childPath: 'timesheet/employeeList',
+    path: (id: string) => `/${id}/timesheet/employeeList`,
+    component: lazy(() => import('../pages/ApproverEmployeeTimesheet')),
+    name: 'Employee Timesheet',
+    key: 'timesheet',
+    allowedRoles: [ TaskManager ],
+  },
   timesheetInvoice: {
     //childPath: 'timesheet/employee/:timesheetId/add-invoice',
     //path: (code: string, id: string) => `/${code}/timesheet/employee/${id}/add-invoice`,

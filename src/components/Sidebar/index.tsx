@@ -182,10 +182,10 @@ const Sidebar = (props: any) => {
       ],
     },
     {
-      key: routes.employeeTimesheet.key,
-      name: 'Employee Timesheet',
+      key: routes.approverEmployeeTimesheet.key,
+      name: routes.approverEmployeeTimesheet.name,
       icon: <FieldTimeOutlined />,
-      route: routes.employeeTimesheet.path(loggedInUser?.company?.code ?? ''),
+      route: routes.approverEmployeeTimesheet.path(loggedInUser?.company?.code ?? ''),
       accessRoles: [constants.roles.TaskManager],
       // viewAsAdmin: true,
     },

@@ -10,7 +10,7 @@ import { Form, Button, message, Spin } from 'antd';
 import styles from '../style.module.scss'
 import { GraphQLResponse } from '../../../interfaces/graphql.interface';
 import { gql, useMutation, useQuery } from '@apollo/client';
-import { CompanyPagingResult, MutationCompanyUpdateArgs, QueryCompanyArgs, QuerySubscriptionPaymentArgs, SubscriptionPaymentPagingResult, SubscriptionPaymentStatus } from '../../../interfaces/generated';
+import { CompanyPagingResult, MutationCompanyUpdateArgs, QueryCompanyArgs, QuerySubscriptionPaymentArgs, SubscriptionPaymentPagingResult } from '../../../interfaces/generated';
 import { ICompany } from '../../../interfaces/ICompany';
 import { notifyGraphqlError } from '../../../utils/error';
 import { COMPANY, COMPANY_UPDATE } from '../../Company';

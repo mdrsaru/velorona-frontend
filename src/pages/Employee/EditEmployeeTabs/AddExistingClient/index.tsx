@@ -210,7 +210,7 @@ const AddExistingClient = () => {
 					user_id: params?.eid,
 				}
 
-		})
+			})
 		},
 		onError(err) {
 			return message.error('You can not add pay rate to already existing project')
@@ -244,13 +244,15 @@ const AddExistingClient = () => {
 	const [updateUserClientStatus] = useMutation<
 		GraphQLResponse<'UpdateUserClientStatus', UserClient>, MutationUserClientChangeStatusArgs>(USER_CLIENT_UPDATE_STATUS, {
 			onCompleted() {
-				refetchUserClientDetail({
-					input: {
-						company_id: authData?.company?.id as string,
-						user_id: params?.eid,
-					}
+				window.location.reload()
 
-				})
+				// refetchUserClientDetail({
+				// 	input: {
+				// 		company_id: authData?.company?.id as string,
+				// 		user_id: params?.eid,
+				// 	}
+
+				// })
 			}
 		})
 
@@ -469,7 +471,7 @@ const AddExistingClient = () => {
 				<td>
 					<Popconfirm
 						placement="topLeft"
-						title='Are you sure?'
+						title='Are you sure you want to delete? Once deleted, it cannot be retrieved'
 						onConfirm={() => handleRemoveData(data.projectId, data.userPayRateId)}
 						okText="Yes"
 						cancelText="No"
@@ -485,6 +487,9 @@ const AddExistingClient = () => {
 			<div className={styles['header']}>
 				<div>
 					<span className={styles['add-title']}>Client Information</span>
+					{!dataSource?.length &&
+						<h3>To generate the invoice for this user, it is necessary to include the rates for the client and project.</h3>
+					}
 				</div>
 				<div className={styles['add-new-client']}>
 					<span style={{ cursor: 'pointer' }}

@@ -254,6 +254,17 @@ const _Routes = () => {
             />
 
             <Route
+              path={routes.approverEmployeeTimesheet.childPath}
+              element={
+                <CheckRoles allowedRoles={routes.approverEmployeeTimesheet.allowedRoles}>
+                  <Suspense fallback={<RouteLoader />}>
+                    <routes.approverEmployeeTimesheet.component />
+                  </Suspense>
+                </CheckRoles>
+              }
+            />
+
+            <Route
               path={routes.timesheetInvoice.childPath}
               element={
                 <CheckRoles allowedRoles={routes.timesheetInvoice.allowedRoles}>

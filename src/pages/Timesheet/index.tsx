@@ -90,6 +90,10 @@ query Timesheet($input: TimesheetQueryInput!) {
         id
         name
       }
+      projectItems{
+         project_id,
+         projectName
+      }
     }
   }
 }`;
@@ -162,7 +166,7 @@ const Timesheet = () => {
   const [pagingInput, setPagingInput] = useState<{
     skip: number,
     currentPage: number,
-  }> ({
+  }>({
     skip: 0,
     currentPage: 1,
   });
@@ -205,7 +209,7 @@ const Timesheet = () => {
     reset(new Date(time))
   }
 
-  const { data: timeEntryData ,refetch:refetchTimeEntry } = useQuery<GraphQLResponse<'TimeEntry', TimeEntryPagingResult>>(TIME_ENTRY, {
+  const { data: timeEntryData ,refetch: refetchTimeEntry } = useQuery<GraphQLResponse<'TimeEntry', TimeEntryPagingResult>>(TIME_ENTRY, {
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
     variables: {
@@ -283,7 +287,11 @@ const Timesheet = () => {
       title: 'Week',
       key: 'week',
       render: (record: any) =>
-        <div>
+        <div style={{ cursor: 'pointer' }}
+          onClick={(e) => {
+            navigate(routes.detailEmployeeTimesheet.path(authData?.company?.code ?? '', record?.id))
+          }}
+        >
           {moment(record?.weekStartDate).format('LL')} - {moment(record?.weekEndDate).format('LL')}
         </div>
     },
@@ -294,6 +302,20 @@ const Timesheet = () => {
         <div>
           {record?.client?.name}
         </div>
+    },
+    {
+      title: 'Project Name',
+      dataIndex: 'projectItems',
+      render: (project: any) => {
+        return (
+          <div>
+            {project.map((item: any) => {
+              return item.projectName
+            }).join(',')
+            }
+          </div>
+        )
+      }
     },
     {
       title: 'Total Hours',
@@ -309,24 +331,12 @@ const Timesheet = () => {
         </div>
     },
     {
-      title: 'Total Expense',
+      title: 'Total Pay',
       dataIndex: 'totalExpense',
       render: (totalExpense: number) => {
         return `$${totalExpense}`
       }
     },
-    {
-      title: 'Actions',
-      key: 'actions',
-      render: (record: any) =>
-        <div
-          className={styles['dropdown-menu']}
-          onClick={(e) => {
-            navigate(routes.detailEmployeeTimesheet.path(authData?.company?.code ?? '', record?.id))
-          }}>
-          <span>View Details</span>
-        </div>
-    }
   ]
 
   const changePage = (page: number) => {
@@ -356,15 +366,15 @@ const Timesheet = () => {
     }
   });
 
-  
+
   return (
     <>
       <div className={styles['site-card-wrapper']}>
         {/* TimeEntry Form */}
-        { authData?.user?.entryType === 'CICO' &&
+        {authData?.user?.entryType === 'CICO' &&
           <>
             <div className={styles['checkIn-checkOut-div']}>
-              <CheckInCheckOut refetch={refetchTimeEntry} refetchTimesheet = {refetchTimeWeekly}/>
+              <CheckInCheckOut refetch={refetchTimeEntry} refetchTimesheet={refetchTimeWeekly}/>
             </div>
 
 

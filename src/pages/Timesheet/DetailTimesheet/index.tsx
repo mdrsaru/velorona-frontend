@@ -145,6 +145,14 @@ const DetailTimesheet = (props: any) => {
     });
   }, [roles])
 
+  const taskManagerLvlRole = useMemo(() => {
+    let _roles = roles ?? [];
+    return checkRoles({
+      expectedRoles: [constants.roles.TaskManager],
+      userRoles: _roles,
+    });
+  }, [roles])
+  
   const isEmployee = useMemo(() => {
     let _roles = roles ?? [];
     return checkRoles({
@@ -352,7 +360,11 @@ const DetailTimesheet = (props: any) => {
   }
 
   const exit = () => {
-    if (managerLvlRole) {
+    if(taskManagerLvlRole){
+      navigate(routes.approverEmployeeTimesheet.path(authData?.company?.code as string))
+
+    }
+    else if (managerLvlRole) {
       navigate(routes.employeeTimesheet.path(authData?.company?.code as string))
     } else {
       navigate(routes.timesheet.path(authData?.company?.code as string))
@@ -474,11 +486,11 @@ const DetailTimesheet = (props: any) => {
                             <Row justify="end" style={{ margin: '36px 0' }}>
                               <Space>
                                 <Button onClick={() => { approveRejectAll('Approved') }} >
-                                  Approve All
+                                  Approve
                                 </Button>
 
                                 <Button onClick={() => { approveRejectAll('Rejected') }} >
-                                  Reject All
+                                  Reject
                                 </Button>
                               </Space>
                             </Row>

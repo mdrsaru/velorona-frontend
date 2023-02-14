@@ -1,7 +1,7 @@
 import moment from 'moment';
 import { useEffect, useState } from 'react';
 import {useNavigate} from 'react-router-dom';
-import { gql, useQuery } from '@apollo/client';
+import { useQuery } from '@apollo/client';
 import { Card, Table, Button, Form, Row, Select, Col, Input, DatePicker } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 
@@ -16,56 +16,17 @@ import Status from '../../components/Status';
 
 import filterImg from "../../assets/images/filter.svg"
 
-import styles from './style.module.scss';
+import styles from '../EmployeeTimesheet/style.module.scss';
 import { debounce } from 'lodash';
 import TimeDuration from '../../components/TimeDuration';
+import { EMPLOYEE_TIMESHEET } from '../EmployeeTimesheet';
 
 const { Option } = Select;
 
-export const EMPLOYEE_TIMESHEET = gql`
-  query EmployeeTimesheet($input: TimesheetQueryInput!) {
-    Timesheet(input: $input) {
-      paging {
-        total
-      }
-      data {
-        id
-        period
-        durationFormat
-        duration
-        invoicedDuration
-        invoicedDurationFormat
-        totalExpense
-        lastApprovedAt
-        weekStartDate
-        weekEndDate
-        userPayment
-        status
-        invoiceStatus
-        projectName
-        expense
-        user {
-          fullName
-          email
-        }
-        client {
-          name
-        }
-        timeEntries{
-        id 
-        }
-        projectItems{
-         project_id,
-         projectName
-      }
-      }
-    }
-  }
-`;
 
 const { RangePicker } = DatePicker;
 
-const EmployeeTimesheet = () => {
+const ApproverEmployeeTimesheet = () => {
   const authData = authVar();
   const navigate = useNavigate();
   const company_id = authData.company?.id as string
@@ -80,7 +41,6 @@ const EmployeeTimesheet = () => {
 
   const [queryInput, setQueryInput] = useState<TimesheetQuery>({
     company_id,
-    needGroupedTimesheet: true,
   });
 
   const [filterForm] = Form.useForm();
@@ -125,7 +85,6 @@ const EmployeeTimesheet = () => {
 
     let query: TimesheetQuery = {
       company_id,
-      needGroupedTimesheet: true,
     };
 
     if (values.status) {
@@ -152,7 +111,6 @@ const EmployeeTimesheet = () => {
     if(filter) {
       setQueryInput({
         company_id,
-        needGroupedTimesheet: true,
       });
 
       setPagingInput({
@@ -214,10 +172,25 @@ const EmployeeTimesheet = () => {
       title: 'Client',
       dataIndex: ['client', 'name'],
     },
-    {
-      title: 'Project Name',
-      dataIndex: 'projectName',  
-    },
+		// {
+    //   title: 'Project Name',
+    //   dataIndex: 'projectItems',
+    //   render: (project: any) => {
+		// 		console.log(project)
+    //     return (
+    //       <div>
+    //         {project?.map((item: any) => {
+    //           return item?.projectName
+    //         }).join(',')
+    //         }
+    //       </div>
+    //     )
+    //   }
+    // },
+    // {
+    //   title: 'Project Name',
+    //   dataIndex: 'projectName',  
+    // },
     {
       title: 'Total Hours',
       key: 'duration',
@@ -232,63 +205,12 @@ const EmployeeTimesheet = () => {
     //   }
     // },
     {
-      title: 'Invoice Amount',
-      dataIndex: 'totalExpense',
-      render: (totalExpense: number) => {
-        return `$${totalExpense}`
-      }
-    },
-    // {
-    //   title: 'Status',
-    //   dataIndex: 'status',
-    //   render: (status: string) => {
-    //     return <Status status={status} />
-    //   }
-    // },
-    {
-      title: 'Expense',
-      dataIndex: 'expense',
-      render: (expense: number) => {
-        return `$${expense}`
-      }
-    },
-    {
-      title: 'Invoice Status',
-      dataIndex: 'invoiceStatus',
+      title: 'Status',
+      dataIndex: 'status',
       render: (status: string) => {
-        if(!status) {
-          return '-';
-        }
-
-        return (
-          <>
-            {
-              status?.split(',')?.map((st, index) => (
-                <>{ index ? ', ': '' }<Status status={st} /></>
-              ))
-            }
-          </>
-        )
+        return <Status status={status} />
       }
     }, 
-    // {
-    //   title: 'Action',
-    //   render: (timesheet: Timesheet) => {
-    //     let link = routes.detailTimesheet.path(authData?.company?.code as string, timesheet?.id)
-    //     if(timesheet.period === InvoiceSchedule.Biweekly || timesheet.period === InvoiceSchedule.Monthly || timesheet.period === InvoiceSchedule.Custom) {
-    //       link += `?start=${timesheet.weekStartDate}&end=${timesheet.weekEndDate}&period=${timesheet.period}`;
-    //     }
-
-    //     return (
-    //       <Link
-    //         className={styles['invoice-link']}
-    //         title='View Detail'
-    //         to={link}>
-    //         <EyeFilled  className={`${styles["table-icon"]} ${styles["table-view-icon"]}`}/>
-    //       </Link>
-    //     )
-    //   }
-    // },
   ];
 
   return (
@@ -376,5 +298,5 @@ const EmployeeTimesheet = () => {
   )
 }
 
-export default EmployeeTimesheet;
+export default ApproverEmployeeTimesheet;
 

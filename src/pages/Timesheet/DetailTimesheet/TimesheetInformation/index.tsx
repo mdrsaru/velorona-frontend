@@ -42,6 +42,10 @@ const TimesheetInformation = (props: IProps) => {
               <Link to={routes.timesheet.path(companyCode)}>
                 <ArrowLeftOutlined />
               </Link> :
+              authData?.user?.roles[0] === constants.roles.TaskManager ?
+              <Link to={routes.approverEmployeeTimesheet.path(companyCode)}>
+                <ArrowLeftOutlined />
+              </Link> :
               <Link to={routes.employeeTimesheet.path(companyCode)}>
                 <ArrowLeftOutlined />
               </Link>
@@ -73,7 +77,7 @@ const TimesheetInformation = (props: IProps) => {
 
           <div className={styles['detail-row']}>
             <div className={styles['header']}>
-              Total Expense
+              Total Pay
             </div>
 
             <div>

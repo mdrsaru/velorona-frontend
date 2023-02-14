@@ -130,7 +130,7 @@ const NewTimesheet = () => {
               lg={12}
               className={styles['form-col']}>
               <div className={styles['total-time-div']}>
-                <span>Total Expense</span>
+                <span>Total Pay</span>
                 <span className={styles.hours}>
                   $20/hr
                 </span>
