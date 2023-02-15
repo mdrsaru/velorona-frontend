@@ -219,7 +219,7 @@ const GroupedTimesheet = () => {
     const user_id = timesheet?.[0]?.user?.id;
     let link = routes.timesheetInvoice.path(code, '');
 
-    link += `?client_id=${client?.id}&period=${period}&start=${start}&end=${end}&user_id=${user_id}`;
+    link += `?client_id=${client?.id}&period=${period}&start=${start}&end=${end}&user_id=${user_id}&timesheet_id=${timesheet?.[0]?.id}`;
 
     navigate(link);
   }
