@@ -1,7 +1,7 @@
 import moment from 'moment';
 import { useEffect, useState } from 'react';
 import {useNavigate} from 'react-router-dom';
-import { useQuery } from '@apollo/client';
+import { gql, useQuery } from '@apollo/client';
 import { Card, Table, Button, Form, Row, Select, Col, Input, DatePicker } from 'antd';
 import { SearchOutlined } from '@ant-design/icons';
 
@@ -19,12 +19,52 @@ import filterImg from "../../assets/images/filter.svg"
 import styles from '../EmployeeTimesheet/style.module.scss';
 import { debounce } from 'lodash';
 import TimeDuration from '../../components/TimeDuration';
-import { EMPLOYEE_TIMESHEET } from '../EmployeeTimesheet';
 
 const { Option } = Select;
 
 
 const { RangePicker } = DatePicker;
+
+export const EMPLOYEE_TIMESHEET = gql`
+  query EmployeeTimesheet($input: TimesheetQueryInput!) {
+    Timesheet(input: $input) {
+      paging {
+        total
+      }
+      data {
+        id
+        period
+        durationFormat
+        duration
+        invoicedDuration
+        invoicedDurationFormat
+        totalExpense
+        lastApprovedAt
+        weekStartDate
+        weekEndDate
+        userPayment
+        status
+        invoiceStatus
+        projectName
+        expense
+        user {
+          fullName
+          email
+        }
+        client {
+          name
+        }
+        timeEntries{
+        id 
+        }
+        projectItems{
+         project_id,
+         projectName
+      }
+      }
+    }
+  }
+`;
 
 const ApproverEmployeeTimesheet = () => {
   const authData = authVar();
@@ -41,6 +81,7 @@ const ApproverEmployeeTimesheet = () => {
 
   const [queryInput, setQueryInput] = useState<TimesheetQuery>({
     company_id,
+    approver_id : authData?.user?.id
   });
 
   const [filterForm] = Form.useForm();

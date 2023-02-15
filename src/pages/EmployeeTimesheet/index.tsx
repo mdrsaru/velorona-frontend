@@ -51,13 +51,6 @@ export const EMPLOYEE_TIMESHEET = gql`
         client {
           name
         }
-        timeEntries{
-        id 
-        }
-        projectItems{
-         project_id,
-         projectName
-      }
       }
     }
   }
