@@ -355,6 +355,7 @@ const InvoiceForm = (props: IProps) => {
       const input: InvoiceCreateInput = {
         ...commonData,
         client_id: props.client_id,
+        timesheet_id:props.invoice?.items?.[0]?.timesheet_id,
         items: values.items.map((item: any) => ({
           project_id: item.project_id,
           description: item.description,

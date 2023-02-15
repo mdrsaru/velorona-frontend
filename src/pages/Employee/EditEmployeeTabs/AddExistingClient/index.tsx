@@ -76,7 +76,9 @@ const AddExistingClient = () => {
 	const [currencyId, setCurrencyId] = useState<any>()
 	const [clientId, setClientId] = useState('')
 	const [addProjectShow, setAddProjectShow] = useState(false)
+	const [removeLoading, setRemoveLoading] = useState(false)
 
+	const [clientList, setClientList] = useState<any>([])
 
 	const { data: userClientDetailData, refetch: refetchUserClientDetail, loading } = useQuery<
 		GraphQLResponse<'UserClientDetail', UserClientDetail[]>,
@@ -116,8 +118,23 @@ const AddExistingClient = () => {
 				},
 			},
 		},
+		onCompleted(data){
+      let internalClient: any = data?.Client?.data.filter(client => client['name'] === 'In House')
+  
+			let otherClient: any = data?.Client?.data.filter(client => client['name'] !== 'In House')
+
+			const clients = [...internalClient,...otherClient]
+      if (internalClient?.length) {
+			 setClientList(clients)
+      }
+      else {
+			  setClientList(data?.Client?.data)
+      }
+		}
+		
 	});
 
+	console.log(clientList)
 	const { refetch: refetchProject } = useQuery(PROJECT, {
 		fetchPolicy: "network-only",
 		nextFetchPolicy: "cache-first",
@@ -369,6 +386,7 @@ const AddExistingClient = () => {
 	}
 
 	const handleRemoveData = (projectId: string, userPayRateId: string) => {
+		setRemoveLoading(true)
 		if (userPayRateId) {
 			removeUserPayRate({
 				variables: {
@@ -390,7 +408,7 @@ const AddExistingClient = () => {
 		})
 
 		form.resetFields()
-
+		setRemoveLoading(false)
 		refetchUserClientDetail({
 			input: {
 				company_id: authData?.company?.id as string,
@@ -517,8 +535,10 @@ const AddExistingClient = () => {
 								<th>Action</th>
 							</tr>
 						</thead>
-
-						<tbody>
+						{removeLoading ?
+							<Spin/>:
+							(	
+							<tbody>
 							{tableData}
 
 							{showRow &&
@@ -533,7 +553,7 @@ const AddExistingClient = () => {
 											}]}>
 											<Select onChange={handleAddClient} placeholder='Select client'>
 												{
-													clientData?.Client?.data?.map((client: any, index: number) => (
+													clientList?.map((client: any, index: number) => (
 														<Select.Option value={client.id} key={index}>{client?.name}</Select.Option>
 
 													))
@@ -602,6 +622,7 @@ const AddExistingClient = () => {
 								</tr>
 							}
 						</tbody>
+					)}
 					</table>
 				</Form>
 			</div>

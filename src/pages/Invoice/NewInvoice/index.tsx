@@ -84,6 +84,7 @@ const PROJECT_ITEMS = gql`
       totalDuration
       totalHours
       hourlyRate
+      timesheet_id
     }
   }
 `;
@@ -165,11 +166,12 @@ const NewInvoice = (props: any) => {
           totalQuantity += quantity;
 
           return {
-            project_id: item.project_id,
+            project_id: item?.project_id,
             description: '',
             quantity: round(quantity, 6),
-            rate: item.hourlyRate,
-            amount: item.totalExpense,
+            rate: item?.hourlyRate,
+            amount: item?.totalExpense,
+            timesheet_id : item?.timesheet_id as string,
           }
         })
 

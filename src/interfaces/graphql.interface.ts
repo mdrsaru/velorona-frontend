@@ -52,6 +52,7 @@ export interface IInvoiceItemInput {
   quantity: number;
   rate: number;
   amount: number;
+  timesheet_id?:string;
 };
 
 export interface IInvoiceInput {
