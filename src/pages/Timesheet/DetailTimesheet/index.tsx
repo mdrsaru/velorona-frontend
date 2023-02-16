@@ -502,7 +502,8 @@ const DetailTimesheet = (props: any) => {
                   }
 
                   {
-                    adminLvlRole && invoicedTimeEntries.map((invoiced) => (
+                    // adminLvlRole && 
+                    invoicedTimeEntries.map((invoiced) => (
                       <div key={invoiced.invoice_id} className={styles['timesheet-section']}>
                         <div
                           className={
