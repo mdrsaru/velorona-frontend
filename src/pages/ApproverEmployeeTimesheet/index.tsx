@@ -126,6 +126,7 @@ const ApproverEmployeeTimesheet = () => {
 
     let query: TimesheetQuery = {
       company_id,
+      approver_id : authData?.user?.id,
     };
 
     if (values.status) {
@@ -152,6 +153,7 @@ const ApproverEmployeeTimesheet = () => {
     if(filter) {
       setQueryInput({
         company_id,
+        approver_id : authData?.user?.id
       });
 
       setPagingInput({
@@ -213,21 +215,21 @@ const ApproverEmployeeTimesheet = () => {
       title: 'Client',
       dataIndex: ['client', 'name'],
     },
-		// {
-    //   title: 'Project Name',
-    //   dataIndex: 'projectItems',
-    //   render: (project: any) => {
-		// 		console.log(project)
-    //     return (
-    //       <div>
-    //         {project?.map((item: any) => {
-    //           return item?.projectName
-    //         }).join(',')
-    //         }
-    //       </div>
-    //     )
-    //   }
-    // },
+		{
+      title: 'Project Name',
+      dataIndex: 'projectItems',
+      render: (project: any) => {
+        return (
+          <div>
+            {project?.map((item: any) => {
+              return item?.projectName
+            }).join(',')
+            }
+          </div>
+        )
+      }
+    },
+
     // {
     //   title: 'Project Name',
     //   dataIndex: 'projectName',  
