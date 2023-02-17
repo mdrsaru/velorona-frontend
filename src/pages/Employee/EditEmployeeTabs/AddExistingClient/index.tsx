@@ -1,6 +1,6 @@
 import { Input, message, Select, Button, Form, Spin, Popconfirm, InputNumber } from "antd"
 import { gql, useMutation, useQuery } from "@apollo/client";
-import { ClientPagingResult, QueryClientArgs, UserClientDetail, QueryUserClientDetailArgs, MutationUserPayRateUpdateArgs, UserPayRate, MutationAttachProjectToUserArgs, User, MutationUserPayRateCreateArgs, MutationUserClientAssociateArgs, UserClient, UserClientStatus, MutationUserClientChangeStatusArgs, MutationRemoveUserProjectAssignArgs, Project, MutationUserPayRateDeleteArgs, CurrencyPagingResult, QueryCurrencyArgs } from "../../../../interfaces/generated";
+import { ClientPagingResult, QueryClientArgs, UserClientDetail, QueryUserClientDetailArgs, MutationUserPayRateUpdateArgs, UserPayRate, MutationAttachProjectToUserArgs, User, MutationUserPayRateCreateArgs, MutationUserClientAssociateArgs, UserClient, UserClientStatus, MutationUserClientChangeStatusArgs, MutationRemoveUserProjectAssignArgs, Project, MutationUserPayRateDeleteArgs, CurrencyPagingResult, QueryCurrencyArgs, MutationUserProjectChangeStatusArgs, UserProject, UserProjectStatus } from "../../../../interfaces/generated";
 import { GraphQLResponse } from "../../../../interfaces/graphql.interface";
 import { useParams } from 'react-router-dom';
 import { CLIENT } from "../../../Client";
@@ -35,16 +35,17 @@ export const USER_CLIENT_DETAIL = gql`
 		 userPayRateId
 		 invoiceRateCurrency
 		 userRateCurrency
+		 userProjectStatus
     }
   }
 `;
 
-export const USER_CLIENT_UPDATE_STATUS = gql`
-    mutation UserClientChangeStatus($input: UserClientChangeStatusInput!) {
-      UserClientChangeStatus(input: $input) {
+export const USER_PROJECT_UPDATE_STATUS = gql`
+    mutation UserProjectChangeStatus($input: UserProjectChangeStatusInput!) {
+      UserProjectChangeStatus(input: $input) {
        status
 			 user_id 
-			 client_id 
+			 project_id 
       }
     }
   `;
@@ -134,7 +135,6 @@ const AddExistingClient = () => {
 		
 	});
 
-	console.log(clientList)
 	const { refetch: refetchProject } = useQuery(PROJECT, {
 		fetchPolicy: "network-only",
 		nextFetchPolicy: "cache-first",
@@ -258,8 +258,8 @@ const AddExistingClient = () => {
 		}
 	})
 
-	const [updateUserClientStatus] = useMutation<
-		GraphQLResponse<'UpdateUserClientStatus', UserClient>, MutationUserClientChangeStatusArgs>(USER_CLIENT_UPDATE_STATUS, {
+	const [updateUserProjectStatus] = useMutation<
+		GraphQLResponse<'UpdateUserProjectStatus', UserProject>, MutationUserProjectChangeStatusArgs>(USER_PROJECT_UPDATE_STATUS, {
 			onCompleted() {
 				window.location.reload()
 
@@ -372,12 +372,12 @@ const AddExistingClient = () => {
 	};
 
 
-	const handleChangeStatus = (clientId: any, status: any) => {
-		updateUserClientStatus({
+	const handleChangeStatus = (projectId: any, status: any) => {
+		updateUserProjectStatus({
 			variables: {
 				input: {
 					user_id: params?.eid as string,
-					client_id: clientId as string,
+					project_id: projectId as string,
 					company_id: authData?.company?.id as string,
 					status: status
 				}
@@ -480,9 +480,9 @@ const AddExistingClient = () => {
 						style={{ width: '100%' }} />
 				</td>
 				<td width='150px'>
-					<Select onSelect={(e: any) => handleChangeStatus(data.clientId, e)} placeholder='Select status' defaultValue={data.status}>
-						<Select.Option value={UserClientStatus.Active}>{UserClientStatus.Active}</Select.Option>
-						<Select.Option value={UserClientStatus.Inactive}>{UserClientStatus.Inactive}</Select.Option>
+					<Select onSelect={(e: any) => handleChangeStatus(data.projectId, e)} placeholder='Select User Project Status' defaultValue={data.userProjectStatus}>
+						<Select.Option value={UserProjectStatus.Active}>{UserProjectStatus.Active}</Select.Option>
+						<Select.Option value={UserProjectStatus.Inactive}>{UserProjectStatus.Inactive}</Select.Option>
 
 					</Select>
 				</td>
@@ -506,7 +506,7 @@ const AddExistingClient = () => {
 				<div>
 					<span className={styles['add-title']}>Client Information</span>
 					{!dataSource?.length &&
-						<h3>To generate the invoice for this user, it is necessary to include the rates for the client and project.</h3>
+						<h3>To generate the invoice for this user, it is required to include client name, project name, invoice rate, and the status should be active..</h3>
 					}
 				</div>
 				<div className={styles['add-new-client']}>
