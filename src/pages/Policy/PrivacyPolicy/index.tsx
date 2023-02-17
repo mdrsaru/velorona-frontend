@@ -6,7 +6,7 @@ import styles from './styles.module.scss'
 const PrivacyPolicy = () => {
 	const header = {
 		title: "Privacy Policy",
-		lastUpdated: "July 18, 2022",
+		lastUpdated: "February 16, 2023 ",
 	};
 
 	return (
@@ -15,10 +15,11 @@ const PrivacyPolicy = () => {
 				<PolicyCard {...header} />
 				<p>This Privacy Policy describes Our policies and procedures on the collection, use and disclosure of Your information when You use the Service and tells You about Your privacy rights and how the law protects You.</p>
 				<p>We use Your Personal data to provide and improve the Service. By using the Service, You agree to the collection and use of information in accordance with this Privacy Policy.</p>
-				<h1>Interpretation and Definitions</h1>
-				<h2>Interpretation</h2>
+				<h1 className={styles["topic"]}>Interpretation and Definitions</h1>
+				<hr className={styles["topic_line"]}/>
+				<h2 className={styles["subtopic"]}>Interpretation</h2>
 				<p>The words of which the initial letter is capitalized have meanings defined under the following conditions. The following definitions shall have the same meaning regardless of whether they appear in singular or in plural.</p>
-				<h2>Definitions</h2>
+				<h2 className={styles["subtopic"]}>Definitions</h2>
 				<p>For the purposes of this Privacy Policy:</p>
 				<ul>
 					<li>
@@ -28,17 +29,20 @@ const PrivacyPolicy = () => {
 						<p><strong>Affiliate</strong> means an entity that controls, is controlled by or is under common control with a party, where &quot;control&quot; means ownership of 50% or more of the shares, equity interest or other securities entitled to vote for election of directors or other managing authority.</p>
 					</li>
 					<li>
-						<p><strong>Application</strong> means the software program provided by the Company downloaded by You on any electronic device, named Velorona</p>
+						<p><strong>Application</strong> refers to Velorona, the software program provided by the Company. </p>
 					</li>
 					<li>
-						<p><strong>Business</strong>, for the purpose of the CCPA (California Consumer Privacy Act), refers to the Company as the legal entity that collects Consumers' personal information and determines the purposes and means of the processing of Consumers' personal information, or on behalf of which such information is collected and that alone, or jointly with others, determines the purposes and means of the processing of consumers' personal information, that does business in the State of California.</p>
+						<p><strong>Business</strong>, for the purpose of CCPA/CPRA, refers to the Company as the legal entity that collects Consumers' personal information and determines the purposes and means of the processing of Consumers' personal information, or on behalf of which such information is collected and that alone, or jointly with others, determines the purposes and means of the processing of consumers' personal information, that does business in the State of California.</p>
 					</li>
 					<li>
+						<li>
+							<p><strong>CCPA</strong> and/or <strong>CPRA</strong> refers to California Consumer Privacy Act (the "CCPA") as amended by the California Privacy Rights Act of 2020 (the &quot;CCPA&quot;)</p>
+						</li>
 						<p><strong>Company</strong> (referred to as either &quot;the Company&quot;, &quot;We&quot;, &quot;Us&quot; or &quot;Our&quot; in this Agreement) refers to Velorona LLC, 1001 W Euless Boulevard Ste 408, Euless, TX-76040.</p>
 						<p>For the purpose of the GDPR, the Company is the Data Controller.</p>
 					</li>
 					<li>
-						<p><strong>Consumer</strong>, for the purpose of the CCPA (California Consumer Privacy Act), means a natural person who is a California resident. A resident, as defined in the law, includes (1) every individual who is in the USA for other than a temporary or transitory purpose, and (2) every individual who is domiciled in the USA who is outside the USA for a temporary or transitory purpose.</p>
+						<p><strong>Consumer</strong>,for the purpose of the CCPA/CPRA, means a natural person who is a California resident. A resident, as defined in the law, includes (1) every individual who is in the USA for other than a temporary or transitory purpose, and (2) every individual who is domiciled in the USA who is outside the USA for a temporary or transitory purpose.</p>
 					</li>
 					<li>
 						<p><strong>Cookies</strong> are small files that are placed on Your computer, mobile device or any other device by a website, containing the details of Your browsing history on that website among its many uses.</p>
@@ -54,6 +58,9 @@ const PrivacyPolicy = () => {
 					</li>
 					<li>
 						<p><strong>Do Not Track</strong> (DNT) is a concept that has been promoted by US regulatory authorities, in particular the U.S. Federal Trade Commission (FTC), for the Internet industry to develop and implement a mechanism for allowing internet users to control the tracking of their online activities across websites.</p>
+					</li>
+					<li>
+						<p><strong>GDPR</strong> refers to EU General Data Protection Regulation.</p>
 					</li>
 					<li>
 						<p><strong>Personal Data</strong> is any information that relates to an identified or identifiable individual.</p>
@@ -81,9 +88,10 @@ const PrivacyPolicy = () => {
 						<p>Under GDPR (General Data Protection Regulation), You can be referred to as the Data Subject or as the User as you are the individual using the Service.</p>
 					</li>
 				</ul>
-				<h1>Collecting and Using Your Personal Data</h1>
-				<h2>Types of Data Collected</h2>
-				<h3>Personal Data</h3>
+				<h1 className={styles["topic"]}>Collecting and Using Your Personal Data</h1>
+				<hr className={styles["topic_line"]}/>
+				<h2 className={styles["subtopic"]}>Types of Data Collected</h2>
+				<h3 className={styles["subtopic"]}>Personal Data</h3>
 				<p>While using Our Service, We may ask You to provide Us with certain personally identifiable information that can be used to contact or identify You. Personally identifiable information may include, but is not limited to:</p>
 				<ul>
 					<li>
@@ -102,12 +110,12 @@ const PrivacyPolicy = () => {
 						<p>Usage Data</p>
 					</li>
 				</ul>
-				<h3>Usage Data</h3>
+				<h3 className={styles["subtopic"]}>Usage Data</h3>
 				<p>Usage Data is collected automatically when using the Service.</p>
 				<p>Usage Data may include information such as Your Device's Internet Protocol address (e.g. IP address), browser type, browser version, the pages of our Service that You visit, the time and date of Your visit, the time spent on those pages, unique device identifiers and other diagnostic data.</p>
 				<p>When You access the Service by or through a mobile device, We may collect certain information automatically, including, but not limited to, the type of mobile device You use, Your mobile device unique ID, the IP address of Your mobile device, Your mobile operating system, the type of mobile Internet browser You use, unique device identifiers and other diagnostic data.</p>
 				<p>We may also collect information that Your browser sends whenever You visit our Service or when You access the Service by or through a mobile device.</p>
-				<h3>Information Collected while Using the Application</h3>
+				<h3 className={styles["subtopic"]}>Information Collected while Using the Application</h3>
 				<p>While using Our Application, in order to provide features of Our Application, We may collect, with Your prior permission:</p>
 				<ul>
 					<li>Information regarding your location</li>
@@ -116,7 +124,7 @@ const PrivacyPolicy = () => {
 				</ul>
 				<p>We use this information to provide features of Our Service, to improve and customize Our Service. The information may be uploaded to the Company's servers and/or a Service Provider's server or it may be simply stored on Your device.</p>
 				<p>You can enable or disable access to this information at any time, through Your Device settings.</p>
-				<h3>Tracking Technologies and Cookies</h3>
+				<h3 className={styles["subtopic"]}>Tracking Technologies and Cookies</h3>
 				<p>We use Cookies and similar tracking technologies to track the activity on Our Service and store certain information. Tracking technologies used are beacons, tags, and scripts to collect and track information and to improve and analyze Our Service. The technologies We use may include:</p>
 				<ul>
 					<li><strong>Cookies or Browser Cookies.</strong> A cookie is a small file placed on Your Device. You can instruct Your browser to refuse all Cookies or to indicate when a Cookie is being sent. However, if You do not accept Cookies, You may not be able to use some parts of our Service. Unless you have adjusted Your browser setting so that it will refuse Cookies, our Service may use Cookies.</li>
@@ -158,7 +166,7 @@ const PrivacyPolicy = () => {
 					</li>
 				</ul>
 				<p>For more information about the cookies we use and your choices regarding cookies, please visit our Cookies Policy or the Cookies section of our Privacy Policy.</p>
-				<h2>Use of Your Personal Data</h2>
+				<h2 className={styles["subtopic"]}>Use of Your Personal Data</h2>
 				<p>The Company may use Personal Data for the following purposes:</p>
 				<ul>
 					<li>
@@ -195,19 +203,24 @@ const PrivacyPolicy = () => {
 					<li><strong>With other users:</strong> when You share personal information or otherwise interact in the public areas with other users, such information may be viewed by all users and may be publicly distributed outside.</li>
 					<li><strong>With Your consent</strong>: We may disclose Your personal information for any other purpose with Your consent.</li>
 				</ul>
-				<h2>Retention of Your Personal Data</h2>
+				<h2 className={styles["subtopic"]}>Retention of Your Personal Data</h2>
 				<p>The Company will retain Your Personal Data only for as long as is necessary for the purposes set out in this Privacy Policy. We will retain and use Your Personal Data to the extent necessary to comply with our legal obligations (for example, if we are required to retain your data to comply with applicable laws), resolve disputes, and enforce our legal agreements and policies.</p>
 				<p>The Company will also retain Usage Data for internal analysis purposes. Usage Data is generally retained for a shorter period of time, except when this data is used to strengthen the security or to improve the functionality of Our Service, or We are legally obligated to retain this data for longer time periods.</p>
-				<h2>Transfer of Your Personal Data</h2>
+				<h2 className={styles["subtopic"]}>Transfer of Your Personal Data</h2>
 				<p>Your information, including Personal Data, is processed at the Company's operating offices and in any other places where the parties involved in the processing are located. It means that this information may be transferred to — and maintained on — computers located outside of Your state, province, country or other governmental jurisdiction where the data protection laws may differ than those from Your jurisdiction.</p>
 				<p>Your consent to this Privacy Policy followed by Your submission of such information represents Your agreement to that transfer.</p>
 				<p>The Company will take all steps reasonably necessary to ensure that Your data is treated securely and in accordance with this Privacy Policy and no transfer of Your Personal Data will take place to an organization or a country unless there are adequate controls in place including the security of Your data and other personal information.</p>
-				<h2>Disclosure of Your Personal Data</h2>
-				<h3>Business Transactions</h3>
+				<h2 className={styles["subtopic"]}>Delete Your Personal Data </h2>
+				<p>You have the right to delete or request that We assist in deleting the Personal Data that We have collected about You. </p>
+				<p>Our Service may give You the ability to delete certain information about You from within the Service. 
+You may update, amend, or delete Your information at any time by signing in to Your Account, if you have one, and visiting the account settings section that allows you to manage Your personal information. You may also contact Us to request access to, correct, or delete any personal information that You have provided to Us.</p>
+				<p>Please note, however, that We may need to retain certain information when we have a legal obligation or lawful basis to do so. </p>
+				<h2 className={styles["subtopic"]}>Disclosure of Your Personal Data</h2>
+				<h3 className={styles["subtopic"]}>Business Transactions</h3>
 				<p>If the Company is involved in a merger, acquisition or asset sale, Your Personal Data may be transferred. We will provide notice before Your Personal Data is transferred and becomes subject to a different Privacy Policy.</p>
-				<h3>Law enforcement</h3>
+				<h3 className={styles["subtopic"]}>Law enforcement</h3>
 				<p>Under certain circumstances, the Company may be required to disclose Your Personal Data if required to do so by law or in response to valid requests by public authorities (e.g. a court or a government agency).</p>
-				<h3>Other legal requirements</h3>
+				<h3 className={styles["subtopic"]}>Other legal requirements</h3>
 				<p>The Company may disclose Your Personal Data in the good faith belief that such action is necessary to:</p>
 				<ul>
 					<li>Comply with a legal obligation</li>
@@ -216,11 +229,12 @@ const PrivacyPolicy = () => {
 					<li>Protect the personal safety of Users of the Service or the public</li>
 					<li>Protect against legal liability</li>
 				</ul>
-				<h2>Security of Your Personal Data</h2>
+				<h2 className={styles["subtopic"]}>Security of Your Personal Data</h2>
 				<p>The security of Your Personal Data is important to Us, but remember that no method of transmission over the Internet, or method of electronic storage is 100% secure. While We strive to use commercially acceptable means to protect Your Personal Data, We cannot guarantee its absolute security.</p>
-				<h1>Detailed Information on the Processing of Your Personal Data</h1>
+				<h1 className={styles["topic"]}>Detailed Information on the Processing of Your Personal Data</h1>
+				<hr className={styles["topic_line"]}/>
 				<p>The Service Providers We use may have access to Your Personal Data. These third-party vendors collect, store, use, process and transfer information about Your activity on Our Service in accordance with their Privacy Policies.</p>
-				<h2>Analytics</h2>
+				<h2 className={styles["subtopic"]}>Analytics</h2>
 				<p>We may use third-party Service providers to monitor and analyze the use of our Service.</p>
 				<ul>
 					<li>
@@ -231,7 +245,7 @@ const PrivacyPolicy = () => {
 						<p>For more information on the privacy practices of Google, please visit the Google Privacy &amp; Terms web page: <a href="https://policies.google.com/privacy" target="_blank" rel="noreferrer">https://policies.google.com/privacy</a></p>
 					</li>
 				</ul>
-				<h2>Advertising</h2>
+				<h2 className={styles["subtopic"]}>Advertising</h2>
 				<p>We may use Service Providers to show advertisements to You to help support and maintain Our Service.</p>
 				<ul>
 					<li>
@@ -264,7 +278,7 @@ const PrivacyPolicy = () => {
 						<p>Their Privacy Policy can be viewed at <a href="https://twitter.com/en/privacy" target="_blank" rel="noreferrer">https://twitter.com/en/privacy</a></p>
 					</li>
 				</ul>
-				<h2>Email Marketing</h2>
+				<h2 className={styles["subtopic"]}>Email Marketing</h2>
 				<p>We may use Your Personal Data to contact You with newsletters, marketing or promotional materials and other information that may be of interest to You. You may opt-out of receiving any, or all, of these communications from Us by following the unsubscribe link or instructions provided in any email We send or by contacting Us.</p>
 				<p>We may use Email Marketing Service Providers to manage and send emails to You.</p>
 				<ul>
@@ -274,7 +288,7 @@ const PrivacyPolicy = () => {
 						<p>For more information on the privacy practices of Mailchimp, please visit their Privacy policy: <a href="https://mailchimp.com/legal/privacy/" target="_blank" rel="noreferrer">https://mailchimp.com/legal/privacy/</a></p>
 					</li>
 				</ul>
-				<h2>Payments</h2>
+				<h2 className={styles["subtopic"]}>Payments</h2>
 				<p>We may provide paid products and/or services within the Service. In that case, we may use third-party services for payment processing (e.g. payment processors).</p>
 				<p>We will not store or collect Your payment card details. That information is provided directly to Our third-party payment processors whose use of Your personal information is governed by their Privacy Policy. These payment processors adhere to the standards set by PCI-DSS as managed by the PCI Security Standards Council, which is a joint effort of brands like Visa, Mastercard, American Express and Discover. PCI-DSS requirements help ensure the secure handling of payment information.</p>
 				<ul>
@@ -283,7 +297,7 @@ const PrivacyPolicy = () => {
 						<p>Their Privacy Policy can be viewed at <a href="https://stripe.com/us/privacy" target="_blank" rel="noreferrer">https://stripe.com/us/privacy</a></p>
 					</li>
 				</ul>
-				<h2>Usage, Performance and Miscellaneous</h2>
+				<h2 className={styles["subtopic"]}>Usage, Performance and Miscellaneous</h2>
 				<p>We may use third-party Service Providers to provide better improvement of our Service.</p>
 				<ul>
 					<li>
@@ -293,8 +307,9 @@ const PrivacyPolicy = () => {
 						<p>The information gathered by reCAPTCHA is held in accordance with the Privacy Policy of Google: <a href="https://www.google.com/intl/en/policies/privacy/" target="_blank" rel="noreferrer">https://www.google.com/intl/en/policies/privacy/</a></p>
 					</li>
 				</ul>
-				<h1>GDPR Privacy</h1>
-				<h2>Legal Basis for Processing Personal Data under GDPR</h2>
+				<h1 className={styles["topic"]}>GDPR Privacy</h1>
+				<hr className={styles["topic_line"]}/>
+				<h2 className={styles["subtopic"]}>Legal Basis for Processing Personal Data under GDPR</h2>
 				<p>We may process Personal Data under the following conditions:</p>
 				<ul>
 					<li><strong>Consent:</strong> You have given Your consent for processing Personal Data for one or more specific purposes.</li>
@@ -305,7 +320,7 @@ const PrivacyPolicy = () => {
 					<li><strong>Legitimate interests:</strong> Processing Personal Data is necessary for the purposes of the legitimate interests pursued by the Company.</li>
 				</ul>
 				<p>In any case, the Company will gladly help to clarify the specific legal basis that applies to the processing, and in particular whether the provision of Personal Data is a statutory or contractual requirement, or a requirement necessary to enter into a contract.</p>
-				<h2>Your Rights under the GDPR</h2>
+				<h2 className={styles["subtopic"]}>Your Rights under the GDPR</h2>
 				<p>The Company undertakes to respect the confidentiality of Your Personal Data and to guarantee You can exercise Your rights.</p>
 				<p>You have the right under this Privacy Policy, and by law if You are within the EU, to:</p>
 				<ul>
@@ -316,14 +331,15 @@ const PrivacyPolicy = () => {
 					<li><strong>Request the transfer of Your Personal Data.</strong> We will provide to You, or to a third-party You have chosen, Your Personal Data in a structured, commonly used, machine-readable format. Please note that this right only applies to automated information which You initially provided consent for Us to use or where We used the information to perform a contract with You.</li>
 					<li><strong>Withdraw Your consent.</strong> You have the right to withdraw Your consent on using your Personal Data. If You withdraw Your consent, We may not be able to provide You with access to certain specific functionalities of the Service.</li>
 				</ul>
-				<h2>Exercising of Your GDPR Data Protection Rights</h2>
+				<h2 className={styles["subtopic"]}>Exercising of Your GDPR Data Protection Rights</h2>
 				<p>You may exercise Your rights of access, rectification, cancellation and opposition by contacting Us. Please note that we may ask You to verify Your identity before responding to such requests. If You make a request, We will try our best to respond to You as soon as possible.</p>
 				<p>You have the right to complain to a Data Protection Authority about Our collection and use of Your Personal Data. For more information, if You are in the European Economic Area (EEA), please contact Your local data protection authority in the EEA.</p>
-				<h1>CCPA Privacy</h1>
+				<h1 className={styles["topic"]}>CCPA Privacy</h1>
+				<hr className={styles["topic_line"]}/>
 				<p>This privacy notice section for California residents supplements the information contained in Our Privacy Policy and it applies solely to all visitors, users, and others who reside in the State of California.</p>
-				<h2>Categories of Personal Information Collected</h2>
+				<h2 className={styles["subtopic"]}>Categories of Personal Information Collected</h2>
 				<p>We collect information that identifies, relates to, describes, references, is capable of being associated with, or could reasonably be linked, directly or indirectly, with a particular Consumer or Device. The following is a list of categories of personal information which we may collect or may have been collected from California residents within the last twelve (12) months.</p>
-				<p>Please note that the categories and examples provided in the list below are those defined in the CCPA. This does not mean that all examples of that category of personal information were in fact collected by Us, but reflects our good faith belief to the best of our knowledge that some of that information from the applicable category may be and may have been collected. For example, certain categories of personal information would only be collected if You provided such personal information directly to Us.</p>
+				<p>Please note that the categories and examples provided in the list below are those defined in the CCPA/CPRA. This does not mean that all examples of that category of personal information were in fact collected by Us, but reflects our good faith belief to the best of our knowledge that some of that information from the applicable category may be and may have been collected. For example, certain categories of personal information would only be collected if You provided such personal information directly to Us.</p>
 				<ul>
 					<li>
 						<p><strong>Category A: Identifiers.</strong></p>
@@ -380,19 +396,22 @@ const PrivacyPolicy = () => {
 						<p>Examples: Profile reflecting a person's preferences, characteristics, psychological trends, predispositions, behavior, attitudes, intelligence, abilities, and aptitudes.</p>
 						<p>Collected: No.</p>
 					</li>
+					<li> <strong>Category L:Sensitive personal information.</strong></li>
+					<p>Examples: Account login and password information, geolocation data. </p>
+					<p>Collected: Yes. </p>
 				</ul>
-				<p>Under CCPA, personal information does not include:</p>
+				<p>Under CCPA/CPRA, personal information does not include:</p>
 				<ul>
 					<li>Publicly available information from government records</li>
 					<li>Deidentified or aggregated consumer information</li>
-					<li>Information excluded from the CCPA's scope, such as:
+					<li>Information excluded from the CCPA/CPRA's scope, such as:
 						<ul>
 							<li>Health or medical information covered by the Health Insurance Portability and Accountability Act of 1996 (HIPAA) and the California Confidentiality of Medical Information Act (CMIA) or clinical trial data</li>
 							<li>Personal Information covered by certain sector-specific privacy laws, including the Fair Credit Reporting Act (FRCA), the Gramm-Leach-Bliley Act (GLBA) or California Financial Information Privacy Act (FIPA), and the Driver's Privacy Protection Act of 1994</li>
 						</ul>
 					</li>
 				</ul>
-				<h2>Sources of Personal Information</h2>
+				<h2 className={styles["subtopic"]}>Sources of Personal Information</h2>
 				<p>We obtain the categories of personal information listed above from the following categories of sources:</p>
 				<ul>
 					<li><strong>Directly from You</strong>. For example, from the forms You complete on our Service, preferences You express or provide through our Service, or from Your purchases on our Service.</li>
@@ -400,20 +419,21 @@ const PrivacyPolicy = () => {
 					<li><strong>Automatically from You</strong>. For example, through cookies We or our Service Providers set on Your Device as You navigate through our Service.</li>
 					<li><strong>From Service Providers</strong>. For example, third-party vendors to monitor and analyze the use of our Service, third-party vendors to provide advertising on our Service, third-party vendors for payment processing, or other third-party vendors that We use to provide the Service to You.</li>
 				</ul>
-				<h2>Use of Personal Information for Business Purposes or Commercial Purposes</h2>
-				<p>We may use or disclose personal information We collect for &quot;business purposes&quot; or &quot;commercial purposes&quot; (as defined under the CCPA), which may include the following examples:</p>
+				<h2 className={styles["subtopic"]}>Use of Personal Information for Business Purposes or Commercial Purposes</h2>
+				<p>We may use or disclose personal information We collect for &quot;business purposes&quot; or &quot;commercial purposes&quot; (as defined under the CCPA/CPRA), which may include the following examples:</p>
 				<ul>
 					<li>To operate our Service and provide You with our Service.</li>
 					<li>To provide You with support and to respond to Your inquiries, including to investigate and address Your concerns and monitor and improve our Service.</li>
 					<li>To fulfill or meet the reason You provided the information. For example, if You share Your contact information to ask a question about our Service, We will use that personal information to respond to Your inquiry. If You provide Your personal information to purchase a product or service, We will use that information to process Your payment and facilitate delivery.</li>
 					<li>To respond to law enforcement requests and as required by applicable law, court order, or governmental regulations.</li>
-					<li>As described to You when collecting Your personal information or as otherwise set forth in the CCPA.</li>
+					<li>As described to You when collecting Your personal information or as otherwise set forth in the CCPA/CPRA.</li>
 					<li>For internal administrative and auditing purposes.</li>
 					<li>To detect security incidents and protect against malicious, deceptive, fraudulent or illegal activity, including, when necessary, to prosecute those responsible for such activities.</li>
+					<li>Other one-time uses</li>
 				</ul>
 				<p>Please note that the examples provided above are illustrative and not intended to be exhaustive. For more details on how we use this information, please refer to the &quot;Use of Your Personal Data&quot; section.</p>
 				<p>If We decide to collect additional categories of personal information or use the personal information We collected for materially different, unrelated, or incompatible purposes We will update this Privacy Policy.</p>
-				<h2>Disclosure of Personal Information for Business Purposes or Commercial Purposes</h2>
+				<h2 className={styles["subtopic"]}>Disclosure of Personal Information</h2>
 				<p>We may use or disclose and may have used or disclosed in the last twelve (12) months the following categories of personal information for business or commercial purposes:</p>
 				<ul>
 					<li>Category A: Identifiers</li>
@@ -421,12 +441,20 @@ const PrivacyPolicy = () => {
 					<li>Category D: Commercial information</li>
 					<li>Category F: Internet or other similar network activity</li>
 					<li>Category G: Geolocation data</li>
+					<li>Category L: Sensitive personal information </li>
 				</ul>
-				<p>Please note that the categories listed above are those defined in the CCPA. This does not mean that all examples of that category of personal information were in fact disclosed, but reflects our good faith belief to the best of our knowledge that some of that information from the applicable category may be and may have been disclosed.</p>
+				<p>Please note that the categories listed above are those defined in the CCPA/CPRA. This does not mean that all examples of that category of personal information were in fact disclosed, but reflects our good faith belief to the best of our knowledge that some of that information from the applicable category may be and may have been disclosed.</p>
 				<p>When We disclose personal information for a business purpose or a commercial purpose, We enter a contract that describes the purpose and requires the recipient to both keep that personal information confidential and not use it for any purpose except performing the contract.</p>
-				<h2>Sale of Personal Information</h2>
-				<p>As defined in the CCPA, &quot;sell&quot; and &quot;sale&quot; mean selling, renting, releasing, disclosing, disseminating, making available, transferring, or otherwise communicating orally, in writing, or by electronic or other means, a consumer's personal information by the business to a third party for valuable consideration. This means that We may have received some kind of benefit in return for sharing personal information, but not necessarily a monetary benefit.</p>
-				<p>Please note that the categories listed below are those defined in the CCPA. This does not mean that all examples of that category of personal information were in fact sold, but reflects our good faith belief to the best of our knowledge that some of that information from the applicable category may be and may have been shared for value in return.</p>
+				<h2 className={styles["subtopic"]}>Share of Personal Information </h2>
+				<p>We may share, and have shared in the last twelve (12) months, Your personal information identified in the above categories with the following categories of third parties:</p>
+				<li>Service Providers </li>
+				<li>Payment processors</li>
+				<li>Our affiliates</li>
+				<li>Our business partners</li>
+				<li>Third party vendors to whom You or Your agents authorize Us to disclose Your personal information in connection with products or services We provide to You </li>
+				<h2 className={styles["subtopic"]}>Sale of Personal Information</h2>
+				<p>As defined in the CCPA/CPRA, &quot;sell&quot; and &quot;sale&quot; mean selling, renting, releasing, disclosing, disseminating, making available, transferring, or otherwise communicating orally, in writing, or by electronic or other means, a consumer's personal information by the business to a third party for valuable consideration. This means that We may have received some kind of benefit in return for sharing personal information, but not necessarily a monetary benefit.</p>
+				<p>We do not sell personal information as the term sell is commonly understood. We do allow Service Providers to use Your personal information for the business purposes described in Our Privacy Policy, for activities such as advertising, marketing, and analytics, and these may be deemed a aale under .</p>
 				<p>We may sell and may have sold in the last twelve (12) months the following categories of personal information:</p>
 				<ul>
 					<li>Category A: Identifiers</li>
@@ -435,29 +463,20 @@ const PrivacyPolicy = () => {
 					<li>Category F: Internet or other similar network activity</li>
 					<li>Category G: Geolocation data</li>
 				</ul>
-				<h2>Share of Personal Information</h2>
-				<p>We may share Your personal information identified in the above categories with the following categories of third parties:</p>
-				<ul>
-					<li>Service Providers</li>
-					<li>Payment processors</li>
-					<li>Our affiliates</li>
-					<li>Our business partners</li>
-					<li>Third party vendors to whom You or Your agents authorize Us to disclose Your personal information in connection with products or services We provide to You</li>
-				</ul>
-				<h2>Sale of Personal Information of Minors Under 16 Years of Age</h2>
+				<h2 className={styles["subtopic"]}>Sale of Personal Information of Minors Under 16 Years of Age</h2>
 				<p>We do not knowingly collect personal information from minors under the age of 16 through our Service, although certain third party websites that we link to may do so. These third-party websites have their own terms of use and privacy policies and we encourage parents and legal guardians to monitor their children's Internet usage and instruct their children to never provide information on other websites without their permission.</p>
 				<p>We do not sell the personal information of Consumers We actually know are less than 16 years of age, unless We receive affirmative authorization (the &quot;right to opt-in&quot;) from either the Consumer who is between 13 and 16 years of age, or the parent or guardian of a Consumer less than 13 years of age. Consumers who opt-in to the sale of personal information may opt-out of future sales at any time. To exercise the right to opt-out, You (or Your authorized representative) may submit a request to Us by contacting Us.</p>
 				<p>If You have reason to believe that a child under the age of 13 (or 16) has provided Us with personal information, please contact Us with sufficient detail to enable Us to delete that information.</p>
-				<h2>Your Rights under the CCPA</h2>
-				<p>The CCPA provides California residents with specific rights regarding their personal information. If You are a resident of California, You have the following rights:</p>
+				<h2 className={styles["subtopic"]}>Your Rights under the CCPA/CPRA</h2>
+				<p>The CCPA/CPRA provides California residents with specific rights regarding their personal information. If You are a resident of California, You have the following rights:</p>
 				<ul>
 					<li><strong>The right to notice.</strong> You have the right to be notified which categories of Personal Data are being collected and the purposes for which the Personal Data is being used.</li>
-					<li><strong>The right to request.</strong> Under CCPA, You have the right to request that We disclose information to You about Our collection, use, sale, disclosure for business purposes and share of personal information. Once We receive and confirm Your request, We will disclose to You:
+					<li><strong>The right to request.</strong> Under CCPA/CPRA, You have the right to request that We disclose information to You about Our collection, use, sale, disclosure for business purposes and share of personal information. Once We receive and confirm Your request, We will disclose to You:
 						<ul>
 							<li>The categories of personal information We collected about You</li>
 							<li>The categories of sources for the personal information We collected about You</li>
-							<li>Our business or commercial purpose for collecting or selling that personal information</li>
-							<li>The categories of third parties with whom We share that personal information</li>
+							<li>Our business or commercial purposes for collecting or selling that personal information </li>
+							<li>The categories of third parties with whom We share that personal information </li>
 							<li>The specific pieces of personal information We collected about You</li>
 							<li>If we sold Your personal information or disclosed Your personal information for a business purpose, We will disclose to You:
 								<ul>
@@ -467,8 +486,11 @@ const PrivacyPolicy = () => {
 							</li>
 						</ul>
 					</li>
-					<li><strong>The right to say no to the sale of Personal Data (opt-out).</strong> You have the right to direct Us to not sell Your personal information. To submit an opt-out request please contact Us.</li>
-					<li><strong>The right to delete Personal Data.</strong> You have the right to request the deletion of Your Personal Data, subject to certain exceptions. Once We receive and confirm Your request, We will delete (and direct Our Service Providers to delete) Your personal information from our records, unless an exception applies. We may deny Your deletion request if retaining the information is necessary for Us or Our Service Providers to:
+					<li><strong>The right to say no to the sale of Personal Data (opt-out).</strong> You have the right to direct Us to not sell Your personal information. To submit an opt-out request, please see the "Do Not Sell My Personal Information" section or contact Us. </li>
+					<li><strong>The right to correct Personal Data.</strong> You have the right to correct or rectify any any inaccurate personal information about You that We collected. Once We receive and confirm Your request, We will use commercially reasonable efforts to correct (and direct our Service Providers to correct) Your personal information, unless an exception applies. </li>
+					<li><strong>The right to limit use and disclosure of sensitive Personal Data.</strong>You have the right to request to limit the use or disclosure of certain sensitive personal information We collected about You, unless an exception applies. To submit, please see the "Limit the Use or Disclosure of My Sensitive Personal Information" section or contact Us. 
+</li>
+					<li><strong>The right to delete Personal Data.</strong> You have the right to request the deletion of Your Personal Data under certain circumstances, subject to certain exceptions. Once We receive and confirm Your request, We will delete (and direct Our Service Providers to delete) Your personal information from our records, unless an exception applies. We may deny Your deletion request if retaining the information is necessary for Us or Our Service Providers to:
 						<ul>
 							<li>Complete the transaction for which We collected the personal information, provide a good or service that You requested, take actions reasonably anticipated within the context of our ongoing business relationship with You, or otherwise perform our contract with You.</li>
 							<li>Detect security incidents, protect against malicious, deceptive, fraudulent, or illegal activity, or prosecute those responsible for such activities.</li>
@@ -490,10 +512,11 @@ const PrivacyPolicy = () => {
 						</ul>
 					</li>
 				</ul>
-				<h2>Exercising Your CCPA Data Protection Rights</h2>
-				<p>In order to exercise any of Your rights under the CCPA, and if You are a California resident, You can contact Us:</p>
+				<h2 className={styles["subtopic"]}>Exercising Your CCPA/CPRA Data Protection Rights</h2>
+				<p>Please see the "Do Not Sell My Personal Information" section and "Limit the Use or Disclosure of My Sensitive Personal Information" section for more information on how to opt out and limit the use of sensitive information collected.</p>
+				<p> Additionally, in order to exercise any of Your rights under the CCPA/CPRA, and if You are a California resident, You can contact Us: </p>
 				<ul>
-					<li>By email: <a href="/cdn-cgi/l/email-protection" className="__cf_email__" data-cfemail="452c2b232a053320292a372a2b246b262a28">[email&#160;protected]</a></li>
+					<li>By email: <a href="/cdn-cgi/l/email-protection" className="__cf_email__" data-cfemail="452c2b232a053320292a372a2b246b262a28">info@velorona.com </a></li>
 				</ul>
 				<p>Only You, or a person registered with the California Secretary of State that You authorize to act on Your behalf, may make a verifiable request related to Your personal information.</p>
 				<p>Your request to Us must:</p>
@@ -509,49 +532,61 @@ const PrivacyPolicy = () => {
 				<p>We will disclose and deliver the required information free of charge within 45 days of receiving Your verifiable request. The time period to provide the required information may be extended once by an additional 45 days when reasonably necessary and with prior notice.</p>
 				<p>Any disclosures We provide will only cover the 12-month period preceding the verifiable request's receipt.</p>
 				<p>For data portability requests, We will select a format to provide Your personal information that is readily usable and should allow You to transmit the information from one entity to another entity without hindrance.</p>
-				<h2>Do Not Sell My Personal Information</h2>
+				<h2 className={styles["subtopic"]}>Do Not Sell My Personal Information</h2>
+				<p>As defined in the CCPA/CPRA, "sell" and "sale" mean selling, renting, releasing, disclosing, disseminating, making available, transferring, or otherwise communicating orally, in writing, or by electronic or other means, a Consumer's personal information by the Business to a third party for valuable consideration. This means that We may have received some kind of benefit in return for sharing personal information, but not necessarily a monetary benefit. </p>
+				<p>TWe do not sell personal information as the term sell is commonly understood. We do allow Service Providers to use Your personal information for the business purposes described in Our Privacy Policy, for activities such as advertising, marketing, and analytics, and these may be deemed a sale under CCPA/CPRA.</p>
 				<p>You have the right to opt-out of the sale of Your personal information. Once We receive and confirm a verifiable consumer request from You, we will stop selling Your personal information. To exercise Your right to opt-out, please contact Us.</p>
-				<p>The Service Providers we partner with (for example, our analytics or advertising partners) may use technology on the Service that sells personal information as defined by the CCPA law. If you wish to opt out of the use of Your personal information for interest-based advertising purposes and these potential sales as defined under CCPA law, you may do so by following the instructions below.</p>
-				<p>Please note that any opt out is specific to the browser You use. You may need to opt out on every browser that You use.</p>
-				<h3>Website</h3>
-				<p>You can opt out of receiving ads that are personalized as served by our Service Providers by following our instructions presented on the Service:</p>
+				<p>The Service Providers we partner with (for example, our analytics or advertising partners) may use technology on the Service that sells personal information as defined by the CCPA/CPRA law. If you wish to opt out of the use of Your personal information for interest-based advertising purposes and these potential sales as defined under CCPA/CPRA law, you may do so by following the instructions below. 
+Please note that any opt out is specific to the browser You use. You may need to opt out on every browser that You use.</p>
+				<h3 className={styles["subtopic"]}>Website</h3>
+				<p>If applicable, click "Privacy Preferences", "Update Privacy Preferences" or "Do Not Sell My Personal Information" buttons listed on the Service to review your privacy preferences and opt out of cookies and other technologies that We may use. Please note that You will need to opt out from each browser that You use to access the Service.</p>
+				<p>Additionally, You can opt out of receiving ads that are personalized as served by our Service Providers by following our instructions presented on the Service: </p>
 				<ul>
 					<li>The NAI's opt-out platform: <a href="http://www.networkadvertising.org/choices/" target="_blank" rel="noreferrer">http://www.networkadvertising.org/choices/</a></li>
 					<li>The EDAA's opt-out platform <a href="http://www.youronlinechoices.com/" target="_blank" rel="noreferrer">http://www.youronlinechoices.com/</a></li>
 					<li>The DAA's opt-out platform: <a href="http://optout.aboutads.info/?c=2&amp;lang=EN" target="_blank" rel="noreferrer">http://optout.aboutads.info/?c=2&amp;lang=EN</a></li>
 				</ul>
 				<p>The opt out will place a cookie on Your computer that is unique to the browser You use to opt out. If you change browsers or delete the cookies saved by your browser, You will need to opt out again.</p>
-				<h3>Mobile Devices</h3>
+				<h3 className={styles["subtopic"]}>Mobile Devices</h3>
 				<p>Your mobile device may give You the ability to opt out of the use of information about the apps You use in order to serve You ads that are targeted to Your interests:</p>
 				<ul>
 					<li>&quot;Opt out of Interest-Based Ads&quot; or &quot;Opt out of Ads Personalization&quot; on Android devices</li>
 					<li>&quot;Limit Ad Tracking&quot; on iOS devices</li>
 				</ul>
 				<p>You can also stop the collection of location information from Your mobile device by changing the preferences on Your mobile device.</p>
-				<h1>&quot;Do Not Track&quot; Policy as Required by California Online Privacy Protection Act (CalOPPA)</h1>
+
+				<h2 className={styles["subtopic"]}> Limit the Use or Disclosure of My Sensitive Personal Information </h2>
+				<p>If You are a California resident, You have the right to limit the use and disclosure of Your sensitive personal information to that use which is necessary to perform the services or provide the goods reasonably expected by an average Consumer who requests such services or goods.</p>
+				<p>We collect, use and disclose sensitive personal information in ways that are necessary to provide the Service. For more information on how We use Your personal information, please see the "Use of Your Personal Data" section or contact us. </p>
+				<h1 className={styles["topic"]}>&quot;Do Not Track&quot; Policy as Required by California Online Privacy Protection Act (CalOPPA)</h1>
+				<hr className={styles["topic_line"]}/>
 				<p>Our Service does not respond to Do Not Track signals.</p>
 				<p>However, some third party websites do keep track of Your browsing activities. If You are visiting such websites, You can set Your preferences in Your web browser to inform websites that You do not want to be tracked. You can enable or disable DNT by visiting the preferences or settings page of Your web browser.</p>
-				<h1>Children's Privacy</h1>
+				<h1 className={styles["topic"]}>Children's Privacy</h1>
+				<hr className={styles["topic_line"]}/>
 				<p>Our Service does not address anyone under the age of 13. We do not knowingly collect personally identifiable information from anyone under the age of 13. If You are a parent or guardian and You are aware that Your child has provided Us with Personal Data, please contact Us. If We become aware that We have collected Personal Data from anyone under the age of 13 without verification of parental consent, We take steps to remove that information from Our servers.</p>
 				<p>If We need to rely on consent as a legal basis for processing Your information and Your country requires consent from a parent, We may require Your parent's consent before We collect and use that information.</p>
-				<h1>Your California Privacy Rights (California's Shine the Light law)</h1>
+				<h1 className={styles["topic"]}>Your California Privacy Rights (California's Shine the Light law)</h1>
 				<p>Under California Civil Code Section 1798 (California's Shine the Light law), California residents with an established business relationship with us can request information once a year about sharing their Personal Data with third parties for the third parties' direct marketing purposes.</p>
 				<p>If you'd like to request more information under the California Shine the Light law, and if You are a California resident, You can contact Us using the contact information provided below.</p>
-				<h1>California Privacy Rights for Minor Users (California Business and Professions Code Section 22581)</h1>
+				<h1 className={styles["topic"]}>California Privacy Rights for Minor Users (California Business and Professions Code Section 22581)</h1>
 				<p>California Business and Professions Code Section 22581 allows California residents under the age of 18 who are registered users of online sites, services or applications to request and obtain removal of content or information they have publicly posted.</p>
 				<p>To request removal of such data, and if You are a California resident, You can contact Us using the contact information provided below, and include the email address associated with Your account.</p>
 				<p>Be aware that Your request does not guarantee complete or comprehensive removal of content or information posted online and that the law may not permit or require removal in certain circumstances.</p>
-				<h1>Links to Other Websites</h1>
+				<h1 className={styles["topic"]}>Links to Other Websites</h1>
+				<hr className={styles["topic_line"]}/>
 				<p>Our Service may contain links to other websites that are not operated by Us. If You click on a third party link, You will be directed to that third party's site. We strongly advise You to review the Privacy Policy of every site You visit.</p>
 				<p>We have no control over and assume no responsibility for the content, privacy policies or practices of any third party sites or services.</p>
-				<h1>Changes to this Privacy Policy</h1>
+				<h1 className={styles["topic"]}>Changes to this Privacy Policy</h1>
+				<hr className={styles["topic_line"]}/>
 				<p>We may update Our Privacy Policy from time to time. We will notify You of any changes by posting the new Privacy Policy on this page.</p>
 				<p>We will let You know via email and/or a prominent notice on Our Service, prior to the change becoming effective and update the &quot;Last updated&quot; date at the top of this Privacy Policy.</p>
 				<p>You are advised to review this Privacy Policy periodically for any changes. Changes to this Privacy Policy are effective when they are posted on this page.</p>
-				<h1>Contact Us</h1>
+				<h1 className={styles["topic"]}>Contact Us</h1>
+				<hr className={styles["topic_line"]}/>
 				<p>If you have any questions about this Privacy Policy, You can contact us:</p>
 				<ul>
-					<li>By email: <span className="__cf_email__" data-cfemail="365f5850597640535a59445958571855595b" >[email&#160;protected]</span></li>
+					<li>By email: <span className="__cf_email__" data-cfemail="365f5850597640535a59445958571855595b" >info@velorona.com </span></li>
 				</ul>
 			</Space>
 		</Card>
