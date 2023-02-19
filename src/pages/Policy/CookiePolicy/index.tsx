@@ -6,7 +6,7 @@ import styles from '../PrivacyPolicy/styles.module.scss'
 const CookiePolicy = () => {
 	const header = {
 		title: "Cookies Policy",
-		lastUpdated: "July 18, 2022",
+		lastUpdated: "February 16, 2023",
 	};
 	return (
 		<>
@@ -27,10 +27,10 @@ const CookiePolicy = () => {
 					<p>Cookies do not typically contain any information that personally identifies a user, but personal information that we store about You may be linked to the information stored in and obtained from Cookies. For further information on how We use, store and keep your personal data secure, see our Privacy Policy.</p>
 					<p>We do not store sensitive personal information, such as mailing addresses, account passwords, etc. in the Cookies We use.</p>
 
-					<h1>Interpretation and Definitions</h1>
-					<h2>Interpretation</h2>
+					<h1 className={styles["topic"]}>Interpretation and Definitions</h1>
+					<h2 className={styles["subtopic"]}>Interpretation</h2>
 					<p>The words of which the initial letter is capitalized have meanings defined under the following conditions. The following definitions shall have the same meaning regardless of whether they appear in singular or in plural.</p>
-					<h2>Definitions</h2>
+					<h2 className={styles["subtopic"]}>Definitions</h2>
 					<p>For the purposes of this Cookies Policy:</p>
 					<ul>
 						<li><strong>Company</strong> (referred to as either &quot;the Company&quot;, &quot;We&quot;, &quot;Us&quot; or &quot;Our&quot; in this Cookies Policy) refers to Velorona LLC, 1001 W Euless Boulevard Ste 408, Euless, TX-76040.</li>
@@ -38,8 +38,8 @@ const CookiePolicy = () => {
 						<li><strong>Website</strong> refers to Velorona, accessible from <a href="www.velorona.com" rel="noreferrer" target="_blank">www.velorona.com</a></li>
 						<li><strong>You</strong> means the individual accessing or using the Website, or a company, or any legal entity on behalf of which such individual is accessing or using the Website, as applicable.</li>
 					</ul>
-					<h1>The use of the Cookies</h1>
-					<h2>Type of Cookies We Use</h2>
+					<h1 className={styles["topic"]}>The use of the Cookies</h1>
+					<h2> className={styles["subtopic"]}Type of Cookies We Use</h2>
 					<p>Cookies can be &quot;Persistent&quot; or &quot;Session&quot; Cookies. Persistent Cookies remain on your personal computer or mobile device when You go offline, while Session Cookies are deleted as soon as You close your web browser.</p>
 					<p>We use both session and persistent Cookies for the purposes set out below:</p>
 					<ul>
@@ -80,7 +80,7 @@ const CookiePolicy = () => {
 							<p>Purpose: In addition to Our own Cookies, We may also use various third parties Cookies to report usage statistics of the Website, deliver advertisements on and through the Website, and so on. These Cookies may be used when You share information using a social media networking website such as Facebook, Instagram, Twitter or Google+.</p>
 						</li>
 					</ul>
-					<h2>Your Choices Regarding Cookies</h2>
+					<h2 className={styles["topic"]}>Your Choices Regarding Cookies</h2>
 					<p>If You prefer to avoid the use of Cookies on the Website, first You must disable the use of Cookies in your browser and then delete the Cookies saved in your browser associated with this website. You may use this option for preventing the use of Cookies at any time.</p>
 					<p>If You do not accept Our Cookies, You may experience some inconvenience in your use of the Website and some features may not function properly.</p>
 					<p>If You'd like to delete Cookies or instruct your web browser to delete or refuse Cookies, please visit the help pages of your web browser.</p>
@@ -104,7 +104,7 @@ const CookiePolicy = () => {
 					<h2>Contact Us</h2>
 					<p>If you have any questions about this Cookies Policy, You can contact us:</p>
 					<ul>
-						<li>By email: <span className="__cf_email__" data-cfemail="4e272028210e382b22213c21202f602d2123">[email&#160;protected]</span></li>
+					<li>By email: <span className="__cf_email__" data-cfemail="3950575f56794f5c55564b565758175a5654">info@velorona.com </span></li>
 					</ul>
 					{/* </Row> */}
 				</Space>

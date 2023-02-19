@@ -20,7 +20,7 @@ import { authVar } from '../../App/link'
 import constants from '../../config/constants'
 import routes from "../../config/routes"
 import { TIME_ENTRY_FIELDS } from '../../gql/time-entries.gql';
-import { Timesheet as ITimesheet, TimeEntry as ITimeEntry, EntryType, TimeEntryPagingResult, } from '../../interfaces/generated';
+import { Timesheet as ITimesheet, TimeEntry as ITimeEntry, EntryType, TimeEntryPagingResult, UserClientStatus, } from '../../interfaces/generated';
 
 import TimeDuration from '../../components/TimeDuration'
 
@@ -31,6 +31,7 @@ import NoContent from '../../components/NoContent'
 import TimeEntry from './TimeEntry'
 import { GraphQLResponse } from '../../interfaces/graphql.interface'
 import CheckInCheckOut from '../../components/Header/CheckInCheckOut'
+import { USERCLIENT } from '../Employee/DetailEmployee/index';
 
 
 export const CREATE_TIME_ENTRY = gql`
@@ -93,6 +94,9 @@ query Timesheet($input: TimesheetQueryInput!) {
       projectItems{
          project_id,
          projectName
+      }
+      timeEntries{
+      id
       }
     }
   }
@@ -367,6 +371,25 @@ const Timesheet = () => {
   });
 
 
+  const {
+    data: userClientData,
+  } = useQuery(USERCLIENT, {
+    fetchPolicy: "network-only",
+    nextFetchPolicy: "cache-first",
+    variables: {
+      input: {
+        query: {
+          user_id: authData?.user?.id,
+          status:UserClientStatus.Active
+        }
+      }
+    }
+  });
+
+let timesheetList: any = timeWeeklyEntryData?.Timesheet?.data.filter((timesheet: { [x: string]: any }) => {
+  return timesheet.client.id === userClientData?.UserClient?.data?.[0]?.client_id || timesheet.timeEntries.length
+})
+
   return (
     <>
       <div className={styles['site-card-wrapper']}>
@@ -587,7 +610,7 @@ const Timesheet = () => {
               className={styles['card-col-timesheet']}>
               <Table
                 loading={loadTimesheetWeekly}
-                dataSource={timeWeeklyEntryData?.Timesheet?.data}
+                dataSource={timesheetList}
                 columns={columns}
                 rowKey={record => record?.id}
                 pagination={{

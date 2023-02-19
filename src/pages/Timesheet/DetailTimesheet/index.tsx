@@ -66,6 +66,17 @@ export const TIMESHEET_SUBMIT = gql`
     }
   }
 `
+export const USER_PROJECT = gql`
+  query UserProjectDetail($input: UserProjectQueryInput!) {
+    UserProjectDetail(input: $input) {
+      projectId
+      user_id
+      projectName
+      userClientStatus
+      userProjectStatus
+  }
+  }
+`;
 
 export const getTotalTimeForADay = (entries: any) => {
   let sum = 0;
@@ -206,7 +217,7 @@ const DetailTimesheet = (props: any) => {
 
   }, [timesheet])
 
-  const { data: projectData } = useQuery(PROJECT, {
+  const { data: userProjectData } = useQuery(USER_PROJECT, {
     skip: !timesheet?.client?.id,
     fetchPolicy: "network-only",
     nextFetchPolicy: "cache-first",
@@ -234,7 +245,7 @@ const DetailTimesheet = (props: any) => {
   }
 
   const onSubmitNewTimeEntry = (values: any) => {
-    const project = projectData?.Project?.data?.filter((data: any) =>
+    const project = userProjectData?.UserProject?.data?.filter((data: any) =>
       data?.id === values?.project
     );
     const timeEntry = {
@@ -741,9 +752,9 @@ const DetailTimesheet = (props: any) => {
                 placeholder="Select Project"
                 onChange={onChangeProjectSelect}
               >
-                {projectData && projectData?.Project?.data.map((project: any, index: number) => (
-                  <Option value={project?.id} key={index}>
-                    {project?.name}
+                {userProjectData && userProjectData?.UserProjectDetail?.map((project: any, index: number) => (
+                  <Option value={project?.projectId} key={index}>
+                    {project?.projectName}
                   </Option>))}
               </Select>
             </Form.Item>

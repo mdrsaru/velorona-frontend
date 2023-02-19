@@ -17,7 +17,7 @@ const AddNewClient = () => {
 	const navigate = useNavigate();
 
 	const [clientCreate, { loading: creatingClient }] = useMutation<
-		GraphQLResponse<'CleintCreate', Client>,
+		GraphQLResponse<'ClientCreate', Client>,
 		MutationClientCreateArgs
 	>(CLIENT_CREATE);
 	const [form] = Form.useForm();
@@ -59,10 +59,10 @@ const AddNewClient = () => {
 			if (response.errors) {
 				return notifyGraphqlError((response.errors))
 			} else if (response?.data) {
-				navigate(routes.redirectToClientInfoTab.path(
+				const link = routes.redirectToClientInfoTab.path(
 					authData?.company?.code ?? "1",
-					params?.eid ?? "1", 'client'
-				))
+					params?.eid ?? "1", 'client');
+				navigate(`${link}?client_id=${response?.data?.ClientCreate?.id}`)
 				message.success({ content: `New Client is created successfully!`, key, className: 'custom-message' });
 			}
 		}).catch(notifyGraphqlError)

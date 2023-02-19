@@ -2,7 +2,7 @@ import { Input, message, Select, Button, Form, Spin, Popconfirm, InputNumber } f
 import { gql, useMutation, useQuery } from "@apollo/client";
 import { ClientPagingResult, QueryClientArgs, UserClientDetail, QueryUserClientDetailArgs, MutationUserPayRateUpdateArgs, UserPayRate, MutationAttachProjectToUserArgs, User, MutationUserPayRateCreateArgs, MutationUserClientAssociateArgs, UserClient, UserClientStatus, MutationUserClientChangeStatusArgs, MutationRemoveUserProjectAssignArgs, Project, MutationUserPayRateDeleteArgs, CurrencyPagingResult, QueryCurrencyArgs, MutationUserProjectChangeStatusArgs, UserProject, UserProjectStatus } from "../../../../interfaces/generated";
 import { GraphQLResponse } from "../../../../interfaces/graphql.interface";
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import { CLIENT } from "../../../Client";
 import { CloseCircleOutlined } from "@ant-design/icons"
 import { authVar } from "../../../../App/link";
@@ -78,9 +78,11 @@ const AddExistingClient = () => {
 	const [clientId, setClientId] = useState('')
 	const [addProjectShow, setAddProjectShow] = useState(false)
 	const [removeLoading, setRemoveLoading] = useState(false)
+  const [searchParams,] = useSearchParams();
 
 	const [clientList, setClientList] = useState<any>([])
 
+	const client_id = searchParams.get('client_id')
 	const { data: userClientDetailData, refetch: refetchUserClientDetail, loading } = useQuery<
 		GraphQLResponse<'UserClientDetail', UserClientDetail[]>,
 		QueryUserClientDetailArgs
@@ -541,12 +543,13 @@ const AddExistingClient = () => {
 							<tbody>
 							{tableData}
 
-							{showRow &&
+							{(showRow || client_id)&&
 								<tr>
 
 									<td>
 										<Form.Item
 											name="client"
+											initialValue={client_id}
 											rules={[{
 												required: true,
 												message: 'Choose the client'
