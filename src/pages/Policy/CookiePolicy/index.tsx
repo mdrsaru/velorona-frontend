@@ -41,7 +41,7 @@ const CookiePolicy = () => {
 					</ul>
 					<h1 className={styles["topic"]}>The use of the Cookies</h1>
 					<hr className={styles["topic_line"]}/>
-					<h2> className={styles["subtopic"]}Type of Cookies We Use</h2>
+					<h2 className={styles["subtopic"]}>Type of Cookies We Use</h2>
 					<p>Cookies can be &quot;Persistent&quot; or &quot;Session&quot; Cookies. Persistent Cookies remain on your personal computer or mobile device when You go offline, while Session Cookies are deleted as soon as You close your web browser.</p>
 					<p>We use both session and persistent Cookies for the purposes set out below:</p>
 					<ul>
