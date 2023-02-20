@@ -156,7 +156,7 @@ const PrivacyPolicy = () => {
 						<p><strong>Tracking and Performance Cookies</strong></p>
 						<p>Type: Persistent Cookies</p>
 						<p>Administered by: Third-Parties</p>
-						<p>Purpose: These Cookies are used to track information about traffic to the Website and how users use the Website. The information gathered via these Cookies may directly or indirectly identify you as an individual visitor. This is because the information collected is typically linked to a pseudonymous identifier associated with the device you use to access the Website. We may also use these Cookies to test new pages, features or new functionality of the Website to see how our users react to them.</p>
+						<p>Purpose: These Cookies are used to track information about traffic to the Website and how users use the Website. The information gathered via these Cookies may directly or indirectly identify you as an individual visitor. This is because the information collected is typically linked to a pseudonymous identifier associated with the device you use to access the Website. We may also use these Cookies to test new advertisements, pages, features or new functionality of the Website to see how our users react to them.</p>
 					</li>
 					<li>
 						<p><strong>Targeting and Advertising Cookies</strong></p>
