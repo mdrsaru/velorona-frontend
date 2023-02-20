@@ -156,7 +156,7 @@ const PrivacyPolicy = () => {
 						<p><strong>Tracking and Performance Cookies</strong></p>
 						<p>Type: Persistent Cookies</p>
 						<p>Administered by: Third-Parties</p>
-						<p>Purpose: These Cookies are used to track information about traffic to the Website and how users use the Website. The information gathered via these Cookies may directly or indirectly identify you as an individual visitor. This is because the information collected is typically linked to a pseudonymous identifier associated with the device you use to access the Website. We may also use these Cookies to test new pages, features or new functionality of the Website to see how our users react to them.</p>
+						<p>Purpose: These Cookies are used to track information about traffic to the Website and how users use the Website. The information gathered via these Cookies may directly or indirectly identify you as an individual visitor. This is because the information collected is typically linked to a pseudonymous identifier associated with the device you use to access the Website. We may also use these Cookies to test new advertisements, pages, features or new functionality of the Website to see how our users react to them.</p>
 					</li>
 					<li>
 						<p><strong>Targeting and Advertising Cookies</strong></p>
@@ -454,7 +454,7 @@ You may update, amend, or delete Your information at any time by signing in to Y
 				<li>Third party vendors to whom You or Your agents authorize Us to disclose Your personal information in connection with products or services We provide to You </li>
 				<h2 className={styles["subtopic"]}>Sale of Personal Information</h2>
 				<p>As defined in the CCPA/CPRA, &quot;sell&quot; and &quot;sale&quot; mean selling, renting, releasing, disclosing, disseminating, making available, transferring, or otherwise communicating orally, in writing, or by electronic or other means, a consumer's personal information by the business to a third party for valuable consideration. This means that We may have received some kind of benefit in return for sharing personal information, but not necessarily a monetary benefit.</p>
-				<p>We do not sell personal information as the term sell is commonly understood. We do allow Service Providers to use Your personal information for the business purposes described in Our Privacy Policy, for activities such as advertising, marketing, and analytics, and these may be deemed a aale under .</p>
+				<p>We do not sell personal information as the term sell is commonly understood. We do allow Service Providers to use Your personal information for the business purposes described in Our Privacy Policy, for activities such as advertising, marketing, and analytics, and these may be deemed a sale under .</p>
 				<p>We may sell and may have sold in the last twelve (12) months the following categories of personal information:</p>
 				<ul>
 					<li>Category A: Identifiers</li>
@@ -567,9 +567,11 @@ Please note that any opt out is specific to the browser You use. You may need to
 				<p>Our Service does not address anyone under the age of 13. We do not knowingly collect personally identifiable information from anyone under the age of 13. If You are a parent or guardian and You are aware that Your child has provided Us with Personal Data, please contact Us. If We become aware that We have collected Personal Data from anyone under the age of 13 without verification of parental consent, We take steps to remove that information from Our servers.</p>
 				<p>If We need to rely on consent as a legal basis for processing Your information and Your country requires consent from a parent, We may require Your parent's consent before We collect and use that information.</p>
 				<h1 className={styles["topic"]}>Your California Privacy Rights (California's Shine the Light law)</h1>
+				<hr className={styles["topic_line"]}/>
 				<p>Under California Civil Code Section 1798 (California's Shine the Light law), California residents with an established business relationship with us can request information once a year about sharing their Personal Data with third parties for the third parties' direct marketing purposes.</p>
 				<p>If you'd like to request more information under the California Shine the Light law, and if You are a California resident, You can contact Us using the contact information provided below.</p>
 				<h1 className={styles["topic"]}>California Privacy Rights for Minor Users (California Business and Professions Code Section 22581)</h1>
+				<hr className={styles["topic_line"]}/>
 				<p>California Business and Professions Code Section 22581 allows California residents under the age of 18 who are registered users of online sites, services or applications to request and obtain removal of content or information they have publicly posted.</p>
 				<p>To request removal of such data, and if You are a California resident, You can contact Us using the contact information provided below, and include the email address associated with Your account.</p>
 				<p>Be aware that Your request does not guarantee complete or comprehensive removal of content or information posted online and that the law may not permit or require removal in certain circumstances.</p>

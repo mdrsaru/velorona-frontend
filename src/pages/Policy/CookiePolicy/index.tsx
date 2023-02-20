@@ -28,6 +28,7 @@ const CookiePolicy = () => {
 					<p>We do not store sensitive personal information, such as mailing addresses, account passwords, etc. in the Cookies We use.</p>
 
 					<h1 className={styles["topic"]}>Interpretation and Definitions</h1>
+					<hr className={styles["topic_line"]}/>
 					<h2 className={styles["subtopic"]}>Interpretation</h2>
 					<p>The words of which the initial letter is capitalized have meanings defined under the following conditions. The following definitions shall have the same meaning regardless of whether they appear in singular or in plural.</p>
 					<h2 className={styles["subtopic"]}>Definitions</h2>
@@ -35,11 +36,12 @@ const CookiePolicy = () => {
 					<ul>
 						<li><strong>Company</strong> (referred to as either &quot;the Company&quot;, &quot;We&quot;, &quot;Us&quot; or &quot;Our&quot; in this Cookies Policy) refers to Velorona LLC, 1001 W Euless Boulevard Ste 408, Euless, TX-76040.</li>
 						<li><strong>Cookies</strong> means small files that are placed on Your computer, mobile device or any other device by a website, containing details of your browsing history on that website among its many uses.</li>
-						<li><strong>Website</strong> refers to Velorona, accessible from <a href="www.velorona.com" rel="noreferrer" target="_blank">www.velorona.com</a></li>
+						<li><strong>Website</strong> refers to Velorona, accessible from <a href="www.velorona.com" rel="noreferrer" target="_blank">https://www.velorona.com </a></li>
 						<li><strong>You</strong> means the individual accessing or using the Website, or a company, or any legal entity on behalf of which such individual is accessing or using the Website, as applicable.</li>
 					</ul>
 					<h1 className={styles["topic"]}>The use of the Cookies</h1>
-					<h2> className={styles["subtopic"]}Type of Cookies We Use</h2>
+					<hr className={styles["topic_line"]}/>
+					<h2 className={styles["subtopic"]}>Type of Cookies We Use</h2>
 					<p>Cookies can be &quot;Persistent&quot; or &quot;Session&quot; Cookies. Persistent Cookies remain on your personal computer or mobile device when You go offline, while Session Cookies are deleted as soon as You close your web browser.</p>
 					<p>We use both session and persistent Cookies for the purposes set out below:</p>
 					<ul>
@@ -80,7 +82,8 @@ const CookiePolicy = () => {
 							<p>Purpose: In addition to Our own Cookies, We may also use various third parties Cookies to report usage statistics of the Website, deliver advertisements on and through the Website, and so on. These Cookies may be used when You share information using a social media networking website such as Facebook, Instagram, Twitter or Google+.</p>
 						</li>
 					</ul>
-					<h2 className={styles["topic"]}>Your Choices Regarding Cookies</h2>
+					<h1 className={styles["topic"]}>Your Choices Regarding Cookies</h1>
+					<hr className={styles["topic_line"]}/>
 					<p>If You prefer to avoid the use of Cookies on the Website, first You must disable the use of Cookies in your browser and then delete the Cookies saved in your browser associated with this website. You may use this option for preventing the use of Cookies at any time.</p>
 					<p>If You do not accept Our Cookies, You may experience some inconvenience in your use of the Website and some features may not function properly.</p>
 					<p>If You'd like to delete Cookies or instruct your web browser to delete or refuse Cookies, please visit the help pages of your web browser.</p>
@@ -99,9 +102,9 @@ const CookiePolicy = () => {
 						</li>
 					</ul>
 					<p>For any other web browser, please visit your web browser's official web pages.</p>
-					<h2>More Information about Cookies</h2>
+					<h2 className={styles["subtopic"]}>More Information about Cookies</h2>
 					<p>You can learn more about cookies: <a href="https://www.privacypolicies.com/blog/cookies/" target="_blank" rel="noreferrer">What Are Cookies?</a>.</p>
-					<h2>Contact Us</h2>
+					<h2 className={styles["subtopic"]}>Contact Us</h2>
 					<p>If you have any questions about this Cookies Policy, You can contact us:</p>
 					<ul>
 					<li>By email: <span className="__cf_email__" data-cfemail="3950575f56794f5c55564b565758175a5654">info@velorona.com </span></li>
