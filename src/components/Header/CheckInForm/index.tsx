@@ -3,11 +3,13 @@ import { gql, useQuery, useMutation } from '@apollo/client';
 import { Select, Form, Button, Row } from 'antd';
 
 import { GraphQLResponse } from '../../../interfaces/graphql.interface';
-import { ProjectPagingResult, QueryProjectArgs, MutationTimeEntryCreateArgs, TimeEntry, ProjectStatus } from '../../../interfaces/generated';
+import { ProjectPagingResult, QueryProjectArgs, MutationTimeEntryCreateArgs, TimeEntry, ProjectStatus, QueryUserClientArgs, UserClientPagingResult, UserClientStatus } from '../../../interfaces/generated';
 import { authVar } from "../../../App/link"
 
 import styles from './style.module.scss';
 import { notifyGraphqlError } from '../../../utils/error';
+import { USER_PROJECT } from '../../../pages/Timesheet/DetailTimesheet';
+import { USERCLIENT } from '../../../pages/Employee/DetailEmployee';
 
 const PROJECT = gql`
   query Projects($input: ProjectQueryInput!) {
@@ -58,6 +60,45 @@ const CheckInForm = (props: IProps) => {
     },
   });
 
+  const { data: userClientData } = useQuery<
+  GraphQLResponse<'UserClient', UserClientPagingResult>,
+  QueryUserClientArgs
+>(USERCLIENT, {
+  fetchPolicy: "network-only",
+  variables: {
+    input: {
+      query: {
+        user_id: loggedInUser?.user?.id,
+        status:UserClientStatus.Active
+      },
+      paging: {
+        order: ['updatedAt:DESC']
+      }
+    },
+  },
+});
+
+
+const client_id = userClientData?.UserClient?.data?.[0]?.client_id ?? ''
+  const { data: userProjectData } = useQuery(USER_PROJECT, {
+    skip: !client_id,
+    fetchPolicy: "network-only",
+    nextFetchPolicy: "cache-first",
+    variables: {
+      input: {
+        query: {
+          company_id: loggedInUser?.company?.id,
+          client_id:client_id,
+          user_id : loggedInUser?.user?.id,
+        },
+        paging: {
+          order: ['updatedAt:DESC']
+        }
+      }
+    }
+  })
+
+
   const [createTimeEntry, { loading: createTimeEntryLoading }] = useMutation<
     GraphQLResponse<'TimeEntryCreate', TimeEntry>,
     MutationTimeEntryCreateArgs 
@@ -86,7 +127,7 @@ const CheckInForm = (props: IProps) => {
     })
   }
 
-  const projects = projectData?.Project?.data ?? [];
+  // const projects = projectData?.Project?.data ?? [];
 
   return (
     <Form 
@@ -108,8 +149,8 @@ const CheckInForm = (props: IProps) => {
           placeholder="Select Project"
         >
           {
-            projects.map((project) => (
-              <Select.Option key={project.id} value={project.id}>{project.name}</Select.Option>
+            userProjectData?.UserProjectDetail?.map((project:any) => (
+              <Select.Option key={project.projectId} value={project.projectId}>{project.projectName}</Select.Option>
             ))
           }
         </Select>
