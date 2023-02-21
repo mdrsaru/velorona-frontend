@@ -138,8 +138,13 @@ const ClientDetail = () => {
         <Row justify="end" className={styles["footer-btn"]}>
           <Col>
             <Button type="primary" style={{ marginRight: '1rem' }}>
-              <Link to={routes.client.path(params?.eid ?? "1")}>
-                Exit
+              <Link to={
+              routes.editClient.path(
+                params?.eid ?? "1",
+                clientData?.id ?? "1" 
+              )}
+              >
+                Edit Client
               </Link>
             </Button>
           </Col>

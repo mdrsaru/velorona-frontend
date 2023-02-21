@@ -73,9 +73,9 @@ const AddExistingClient = () => {
 	const navigate = useNavigate();
 	const [form] = Form.useForm()
 	const [projects, setProject] = useState([])
-	const [showRow, setShowRow] = useState(true)
+	const [showRow, setShowRow] = useState(false)
 	const [currencyId, setCurrencyId] = useState<any>()
-	const [clientId, setClientId] = useState('')
+	const [clientId, setClientId] = useState<any>()
 	const [addProjectShow, setAddProjectShow] = useState(false)
 	const [removeLoading, setRemoveLoading] = useState(false)
   const [searchParams,] = useSearchParams();
@@ -98,12 +98,57 @@ const AddExistingClient = () => {
 	})
 	const [dataSource, setDataSource] = useState<any>([]);
 
-	useEffect(() => {
-		setDataSource(userClientDetailData?.UserClientDetail);
-		if (userClientDetailData?.UserClientDetail?.length) {
-			setShowRow(false);
-		}
-	}, [userClientDetailData?.UserClientDetail])
+	const [associateClient] = useMutation<
+	GraphQLResponse<'UserClientAssociate', UserClient>,
+	MutationUserClientAssociateArgs
+>(ASSOCIATE_USER_WITH_CLIENT, {
+	onCompleted(response) {
+		form.resetFields(['project'])
+		refetchUserClientDetail({
+			input: {
+				company_id: authData?.company?.id as string,
+				user_id: params?.eid,
+			}
+
+		})
+		setClientId(response?.UserClientAssociate?.client?.id)
+		refetchProject({
+			input: {
+				query: {
+					company_id: authData?.company?.id as string,
+					client_id: response?.UserClientAssociate?.client?.id
+				},
+				paging: {
+					order: ["updatedAt:DESC"],
+				},
+			}
+		})
+			.then((response) => {
+				setProject(response.data.Project.data)
+			})
+	}
+});
+
+
+useEffect(() => {
+	if(client_id){
+		setClientId(client_id)
+		setShowRow(true)
+		associateClient({
+			variables: {
+				input: {
+					user_id: params?.eid as string,
+					client_id: client_id as string,
+					company_id: authData?.company?.id as string
+				}
+			}
+		})
+	}
+	setDataSource(userClientDetailData?.UserClientDetail);
+	if (userClientDetailData?.UserClientDetail?.length) {
+		setShowRow(false);
+	}
+}, [userClientDetailData?.UserClientDetail])
 
 	const { data: clientData } = useQuery<
 		GraphQLResponse<'Client', ClientPagingResult>,
@@ -154,36 +199,6 @@ const AddExistingClient = () => {
 		}
 	})
 
-	const [associateClient] = useMutation<
-		GraphQLResponse<'UserClientAssociate', UserClient>,
-		MutationUserClientAssociateArgs
-	>(ASSOCIATE_USER_WITH_CLIENT, {
-		onCompleted(response) {
-			form.resetFields(['project'])
-			refetchUserClientDetail({
-				input: {
-					company_id: authData?.company?.id as string,
-					user_id: params?.eid,
-				}
-
-			})
-			setClientId(response?.UserClientAssociate?.client?.id)
-			refetchProject({
-				input: {
-					query: {
-						company_id: authData?.company?.id as string,
-						client_id: response?.UserClientAssociate?.client?.id
-					},
-					paging: {
-						order: ["updatedAt:DESC"],
-					},
-				}
-			})
-				.then((response) => {
-					setProject(response.data.Project.data)
-				})
-		}
-	});
 
 	const [attachProject] = useMutation<
 		GraphQLResponse<'ClientCreate', User>,
@@ -198,6 +213,7 @@ const AddExistingClient = () => {
 				}
 
 			})
+			setClientId(null)
 		}
 	});
 
@@ -263,15 +279,15 @@ const AddExistingClient = () => {
 	const [updateUserProjectStatus] = useMutation<
 		GraphQLResponse<'UpdateUserProjectStatus', UserProject>, MutationUserProjectChangeStatusArgs>(USER_PROJECT_UPDATE_STATUS, {
 			onCompleted() {
-				window.location.reload()
+				// window.location.reload()
 
-				// refetchUserClientDetail({
-				// 	input: {
-				// 		company_id: authData?.company?.id as string,
-				// 		user_id: params?.eid,
-				// 	}
+				refetchUserClientDetail({
+					input: {
+						company_id: authData?.company?.id as string,
+						user_id: params?.eid,
+					}
 
-				// })
+				})
 			}
 		})
 
@@ -543,13 +559,13 @@ const AddExistingClient = () => {
 							<tbody>
 							{tableData}
 
-							{(showRow || client_id)&&
+							{(showRow) &&
 								<tr>
 
 									<td>
 										<Form.Item
 											name="client"
-											initialValue={client_id}
+											initialValue={clientId}
 											rules={[{
 												required: true,
 												message: 'Choose the client'
