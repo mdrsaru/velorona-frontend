@@ -3,7 +3,6 @@ import { useRef, useState, useMemo, useEffect } from 'react';
 import { gql, useQuery, useMutation } from '@apollo/client';
 import {
   Link,
-  useNavigate
 } from 'react-router-dom';
 import groupBy from 'lodash/groupBy';
 import find from 'lodash/find';
@@ -19,7 +18,6 @@ import { notifyGraphqlError } from "../../../utils/error";
 import constants, { subscriptionStatus } from "../../../config/constants";
 import { TimeEntry, MutationTimeEntriesApproveRejectArgs, InvoiceSchedule, EntryType } from '../../../interfaces/generated';
 import { GraphQLResponse } from '../../../interfaces/graphql.interface';
-import { PROJECT } from '../../Project';
 import { IGroupedTimeEntries } from '../../../interfaces/common.interface';
 
 import PageHeader from '../../../components/PageHeader';
@@ -93,7 +91,7 @@ const { Option } = Select;
 const { Panel } = Collapse;
 
 const DetailTimesheet = (props: any) => {
-  let navigate = useNavigate();
+  // let navigate = useNavigate();
   const timesheet = props.timesheet;
   const timesheet_id = timesheet.id;
 
@@ -156,13 +154,13 @@ const DetailTimesheet = (props: any) => {
     });
   }, [roles])
 
-  const taskManagerLvlRole = useMemo(() => {
-    let _roles = roles ?? [];
-    return checkRoles({
-      expectedRoles: [constants.roles.TaskManager],
-      userRoles: _roles,
-    });
-  }, [roles])
+  // const taskManagerLvlRole = useMemo(() => {
+  //   let _roles = roles ?? [];
+  //   return checkRoles({
+  //     expectedRoles: [constants.roles.TaskManager],
+  //     userRoles: _roles,
+  //   });
+  // }, [roles])
   
   const isEmployee = useMemo(() => {
     let _roles = roles ?? [];
@@ -245,15 +243,16 @@ const DetailTimesheet = (props: any) => {
   }
 
   const onSubmitNewTimeEntry = (values: any) => {
-    const project = userProjectData?.UserProject?.data?.filter((data: any) =>
-      data?.id === values?.project
-    );
+    const project = userProjectData?.UserProjectDetail?.filter((data: any) =>{
+     return data?.projectId === values?.project
+  });
+
     const timeEntry = {
       entries: {},
-      id: project[0]?.id,
-      name: project[0]?.name,
-      project: project[0]?.name,
-      project_id: project[0]?.id,
+      id: project[0]?.projectId,
+      name: project[0]?.projectName,
+      project: project[0]?.projectName,
+      project_id: project[0]?.projectId,
     }
 
     const ids = entriesByStatus.pending?.map((timesheet: any) => {
@@ -370,17 +369,17 @@ const DetailTimesheet = (props: any) => {
     });
   }
 
-  const exit = () => {
-    if(taskManagerLvlRole){
-      navigate(routes.approverEmployeeTimesheet.path(authData?.company?.code as string))
+  // const exit = () => {
+  //   if(taskManagerLvlRole){
+  //     navigate(routes.approverEmployeeTimesheet.path(authData?.company?.code as string))
 
-    }
-    else if (managerLvlRole) {
-      navigate(routes.employeeTimesheet.path(authData?.company?.code as string))
-    } else {
-      navigate(routes.timesheet.path(authData?.company?.code as string))
-    }
-  }
+  //   }
+  //   else if (managerLvlRole) {
+  //     navigate(routes.employeeTimesheet.path(authData?.company?.code as string))
+  //   } else {
+  //     navigate(routes.timesheet.path(authData?.company?.code as string))
+  //   }
+  // }
 
   const deletePendingGroups = (id: string) => {
     const filteredPendingArray = entriesByStatus?.pending?.filter(entry => entry?.id !== id)
@@ -684,13 +683,13 @@ const DetailTimesheet = (props: any) => {
           <Row justify={"end"} className={styles['button-row']}>
             <Col className={styles['form-col']}>
               <Space>
-                <Button
+                {/* <Button
                   type="primary"
                   htmlType="button"
                   onClick={exit}
                 >
                   Exit
-                </Button>
+                </Button> */}
 
                 {
                   isEmployee && (
