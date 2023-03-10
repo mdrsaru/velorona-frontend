@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
-import { Card,  Form, Row, Col, Input, Button, Select, Tabs, Table, Dropdown, Menu, message } from "antd"
-import {FormOutlined, CheckCircleFilled, DeleteOutlined, SearchOutlined,CloseCircleFilled ,FileSyncOutlined} from "@ant-design/icons"
+import { Card,  Form, Row, Col, Input, Button, Select, Tabs, Table, Dropdown, Menu, message, Popconfirm } from "antd"
+import {FormOutlined, CheckCircleFilled, DeleteOutlined, SearchOutlined,CloseCircleFilled ,FileSyncOutlined , MailOutlined} from "@ant-design/icons"
 import { debounce } from "lodash"
 import { Link, useNavigate } from "react-router-dom"
 import { useMutation, useQuery } from "@apollo/client"
@@ -10,7 +10,7 @@ import routes from "../../config/routes"
 import { authVar } from '../../App/link';
 import { UserPagingResult, QueryUserArgs, RoleName } from "../../interfaces/generated"
 import { GraphQLResponse } from "../../interfaces/graphql.interface"
-import { USER, USER_UPDATE } from "../Employee"
+import { RESEND_INVITATION, USER, USER_UPDATE } from "../Employee"
 import { USER_ARCHIVE } from "../Employee"
 
 import archiveImg from "../../assets/images/archive_btn.svg"
@@ -94,6 +94,15 @@ const SuperAdmin =() =>{
     },
   });
 
+  const [resendInvitation] = useMutation(RESEND_INVITATION, {
+    onCompleted: () => {
+      message.success('Resend invitation successfull')
+    },
+    onError(err) {
+      notifyGraphqlError(err)
+    },
+  });
+  
   const changeStatus = (value: string, id: string) => {
     let key = "status";
     employeeUpdate({
@@ -248,6 +257,15 @@ const SuperAdmin =() =>{
     };
   });
 
+  const handleResendInvitation = (record: any) => {
+    resendInvitation({
+      variables: {
+        input: {
+          user_id: record?.id,
+        },
+      },
+    })
+  }
   
   const menu = (data: any) => {
     return (
@@ -397,6 +415,22 @@ const SuperAdmin =() =>{
                     )
                   }
                 </Col>
+                {!record.loggedIn && <Col>
+                  <Popconfirm
+                    placement="left"
+                    title={`Are you sure you want to resend invitation to ${record.fullName}?`}
+                    onConfirm={() => handleResendInvitation(record)}
+                    okText="Yes" cancelText="No"
+                  >
+                    <div
+                      className={`${styles["table-icon"]} ${styles["table-unarchive-icon"]}`}
+                      title='Resend Invitation'
+                    >
+                      <MailOutlined />
+                    </div>
+                  </Popconfirm>
+                </Col>
+                }
               </>
             ) :
               (

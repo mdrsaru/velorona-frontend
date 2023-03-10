@@ -45,6 +45,22 @@ const routes = {
     key: 'payment-config',
     allowedRoles: [SuperAdmin],
   },
+  addInvoicePaymentConfig: {
+    childPath: ':add',
+    path: '/payment-config/add',
+    component: lazy(() => import('../pages/PaymentConfig/AddPaymentConfig')),
+    name: 'New Payment Config',
+    key: 'payment-config',
+    allowedRoles: [SuperAdmin],
+  },
+  editInvoicePaymentConfig: {
+    childPath: ':id/edit',
+    path: (id: string | undefined) => `/payment-config/${id}/edit`,
+    component: lazy(() => import('../pages/PaymentConfig/EditPaymentConfig')),
+    name: 'Edit Payment Config',
+    key: 'payment-config',
+    allowedRoles: [SuperAdmin],
+  },
   login: {
     childPath: null,
     path: '/login',

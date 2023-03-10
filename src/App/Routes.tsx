@@ -158,6 +158,28 @@ const _Routes = () => {
                 </Suspense>
               }
             />
+
+            <Route
+              path={routes.addInvoicePaymentConfig.childPath}
+              element={
+                <CheckRoles allowedRoles={routes.addInvoicePaymentConfig.allowedRoles}>
+                  <Suspense fallback={<RouteLoader />}>
+                    <routes.addInvoicePaymentConfig.component />
+                  </Suspense>
+                </CheckRoles>
+              }
+            />
+
+            <Route
+              path={routes.editInvoicePaymentConfig.childPath}
+              element={
+                <CheckRoles allowedRoles={routes.editInvoicePaymentConfig.allowedRoles}>
+                  <Suspense fallback={<RouteLoader />}>
+                    <routes.editInvoicePaymentConfig.component />
+                  </Suspense>
+                </CheckRoles>
+              }
+            />
           </Route>
 
           <Route
@@ -654,7 +676,6 @@ const _Routes = () => {
               }
             />
             <Route
-
               path={routes.addCurrency.childPath}
               element={
                 <CheckRoles allowedRoles={routes.addCurrency.allowedRoles}>

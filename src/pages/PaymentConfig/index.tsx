@@ -1,19 +1,20 @@
-import React, { useState } from 'react';
-import { gql, useMutation, useQuery } from '@apollo/client';
-import { Card, Col, Form, Input, message, Row, Table } from 'antd';
 
-import constants from '../../config/constants';
-import { notifyGraphqlError } from '../../utils/error';
+import { gql,  useQuery } from '@apollo/client';
+import { Card, Col, Row, Table } from 'antd';
+import {FormOutlined } from "@ant-design/icons"
+
 import { GraphQLResponse } from '../../interfaces/graphql.interface';
 import {
   QueryInvoicePaymentConfigArgs,
   InvoicePaymentConfigPagingResult,
-  MutationInvoicePaymentConfigCreateArgs,
 } from '../../interfaces/generated';
 
 import PageHeader from '../../components/PageHeader';
 
 import styles from './style.module.scss';
+import routes from '../../config/routes';
+import { useNavigate } from 'react-router';
+import { Link } from 'react-router-dom';
 
 export const INVOICE_PAYMENT_CONFIG = gql`
   query InvoicePaymentConfig($input: InvoicePaymentConfigQueryInput!) {
@@ -34,6 +35,8 @@ export const INVOICE_PAYMENT_CONFIG = gql`
 `;
 
 const InvoicePaymentConfig = () => {
+  const navigate = useNavigate()
+  
   const { data: paymentConfigData, loading: paymnentConfigLoading } = useQuery<
     GraphQLResponse<'InvoicePaymentConfig', InvoicePaymentConfigPagingResult>,
     QueryInvoicePaymentConfigArgs
@@ -66,6 +69,20 @@ const InvoicePaymentConfig = () => {
       dataIndex: 'days',
       key: 'days',
     },
+    {
+			title: 'Actions',
+			key: 'actions',
+			render: (data: any) =>
+				<Row style={{ marginTop: '11px' }}>
+					<Col>
+					<div
+					onClick={() => navigate(routes.editInvoicePaymentConfig.path(data?.id ?? '1'))}>
+					<FormOutlined/>
+				</div>
+
+					</Col>
+					</Row>
+		}
   ];
 
   return (
@@ -74,8 +91,11 @@ const InvoicePaymentConfig = () => {
         <PageHeader
           title="Invoice Payment"
           extra={[
-            <div>
-            </div>
+            <div className={styles['add-new-currency']} key="new-currency">
+            <Link to={routes.addInvoicePaymentConfig.path}>
+              Add Invoice Payment
+            </Link>
+          </div>
           ]}
         />
 
