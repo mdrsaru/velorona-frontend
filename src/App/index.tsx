@@ -54,7 +54,7 @@ const client = new ApolloClient({
 function App() {
   const [appLoading, setAppLoading] = useState(true);
 
-  useEffect(() => {
+  useEffect(() => { 
     TokenService.renewAccessToken()
       .then((response) => response.json())
       .then((response) => {
